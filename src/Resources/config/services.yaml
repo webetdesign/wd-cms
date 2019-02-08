@@ -1,0 +1,73 @@
+services:
+    cms.routing_loader:
+        class: WebEtDesign\CmsBundle\Routing\Extraloader
+        arguments: ['@doctrine.orm.entity_manager']
+        tags:
+            - { name: routing.loader }
+
+    cms.helper:
+        class: WebEtDesign\CmsBundle\Services\CmsHelper
+        arguments: ['@doctrine.orm.entity_manager']
+        public: true
+
+    # TODO: Won't work if not in autowire directories
+    App\Services\PageProvider:
+        arguments:
+            $config: %wd_cms.templates%
+
+    cms.page_provider:
+        alias: WebEtDesign\CmsBundle\Services\PageProvider
+
+    cms.admin.cms_page_listener:
+        class: WebEtDesign\CmsBundle\EventListener\PageAdminListener
+        arguments: ['@cms.page_provider', '@doctrine.orm.entity_manager', '@router', '@filesystem', '@kernel']
+        tags:
+            - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildPage }
+            - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
+            - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
+
+    cms.menu_builder:
+        class: WebEtDesign\CmsBundle\Services\CmsMenuBuilder
+        arguments:
+          - "@knp_menu.factory"
+          - "@doctrine.orm.entity_manager"
+          - "@router"
+        tags:
+            - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
+
+    # ===============================================
+    # ADMIN
+    # ===============================================
+
+    cms.admin.cms_route:
+        class: WebEtDesign\CmsBundle\Admin\CmsRouteAdmin
+        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsRoute, WebEtDesign\CmsBundle\Controller\CmsRouteAdminController]
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: CMS, label: Route }
+        public: true
+
+    cms.admin.cms_page:
+        class: WebEtDesign\CmsBundle\Admin\CmsPageAdmin
+        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsPage, WebEtDesign\CmsBundle\Controller\CmsPageAdminController]
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
+        public: true
+
+    cms.admin.cms_content:
+        class: WebEtDesign\CmsBundle\Admin\CmsContentAdmin
+        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsContent, WebEtDesign\CmsBundle\Controller\CmsContentAdminController]
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: CMS, label: Content }
+        public: true
+
+    cms.admin.cms_menu:
+        class: WebEtDesign\CmsBundle\Admin\CmsMenuAdmin
+        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsMenu, WebEtDesign\CmsBundle\Controller\CmsMenuAdminController]
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: CMS, label: Menu }
+        calls:
+            - [setTranslationDomain, ['cms']]
+            - [setTemplate, ['list', 'admin/cms/menu/list.html.twig']]
+            - [setTemplate, ['edit', 'admin/cms/menu/edit.html.twig']]
+        public: true
+
