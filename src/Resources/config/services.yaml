@@ -41,28 +41,28 @@ services:
 
     cms.admin.cms_route:
         class: WebEtDesign\CmsBundle\Admin\CmsRouteAdmin
-        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsRoute, WebEtDesign\CmsBundle\Controller\CmsRouteAdminController]
+        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsRoute, WebEtDesign\CmsBundle\Controller\Admin\CmsRouteAdminController]
         tags:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Route }
         public: true
 
     cms.admin.cms_page:
         class: WebEtDesign\CmsBundle\Admin\CmsPageAdmin
-        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsPage, WebEtDesign\CmsBundle\Controller\CmsPageAdminController]
+        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsPage, WebEtDesign\CmsBundle\Controller\Admin\CmsPageAdminController]
         tags:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
         public: true
 
     cms.admin.cms_content:
         class: WebEtDesign\CmsBundle\Admin\CmsContentAdmin
-        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsContent, WebEtDesign\CmsBundle\Controller\CmsContentAdminController]
+        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsContent, WebEtDesign\CmsBundle\Controller\Admin\CmsContentAdminController]
         tags:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Content }
         public: true
 
     cms.admin.cms_menu:
         class: WebEtDesign\CmsBundle\Admin\CmsMenuAdmin
-        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsMenu, WebEtDesign\CmsBundle\Controller\CmsMenuAdminController]
+        arguments: [~, WebEtDesign\CmsBundle\Entity\CmsMenu, WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController]
         tags:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Menu }
         calls:
