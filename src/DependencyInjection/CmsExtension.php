@@ -12,6 +12,8 @@ namespace WebEtDesign\CmsBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class CmsExtension extends Extension
 {
@@ -22,6 +24,9 @@ class CmsExtension extends Extension
         $config        = $processor->processConfiguration($configuration, $configs);
 
         $this->configureClass($config, $container);
+
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__));
+        $loader->load('services.yaml');
 
         // TODO : work for autowired configuration
         $container->setParameter('wd_cms.templates', $config['pages']);

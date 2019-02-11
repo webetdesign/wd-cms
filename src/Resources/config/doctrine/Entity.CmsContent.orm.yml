@@ -54,7 +54,7 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
                     referencedColumnName: id
             orphanRemoval: false
         media:
-            targetEntity: "%cms.classes.media%"
+            targetEntity: "%wd_cms.admin.content.media%"
             cascade: {  }
             fetch: LAZY
             mappedBy: null
