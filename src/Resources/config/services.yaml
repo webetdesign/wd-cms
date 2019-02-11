@@ -36,6 +36,15 @@ services:
             - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
 
     # ===============================================
+    # REPOSITORY
+    # ===============================================
+
+    cms.repositories:
+        resource: '../src/Repository'
+        autowire: true
+        tags: ['doctrine.repository_service']
+
+    # ===============================================
     # ADMIN
     # ===============================================
 
