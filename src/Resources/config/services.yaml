@@ -1,6 +1,6 @@
 services:
     cms.routing_loader:
-        class: WebEtDesign\CmsBundle\Routing\Extraloader
+        class: WebEtDesign\CmsBundle\Routing\ExtraLoader
         arguments: ['@doctrine.orm.entity_manager']
         tags:
             - { name: routing.loader }
@@ -11,7 +11,7 @@ services:
         public: true
 
     # TODO: Won't work if not in autowire directories
-    App\Services\PageProvider:
+    WebEtDesign\CmsBundle\Services\PageProvider:
         arguments:
             $config: %wd_cms.templates%
 

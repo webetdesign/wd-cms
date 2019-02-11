@@ -1,6 +1,6 @@
 <?php
 
-namespace App\EventListener;
+namespace WebEtDesign\CmsBundle\EventListener;
 
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;

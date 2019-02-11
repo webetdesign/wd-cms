@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace WebEtDesign\CmsBundle\Services;
 
 
 use WebEtDesign\CmsBundle\Entity\CmsPage;
