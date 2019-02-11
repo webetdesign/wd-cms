@@ -1,0 +1,90 @@
+{% extends '@SonataAdmin/CRUD/base_list.html.twig' %}
+
+{% block list_table %}
+    <div class="col-xs-6 col-md-6">
+        {% if admin.datagrid.results|length > 0 %}
+            {% set items = admin.datagrid.results %}
+            <div>
+                <ul class="list-group">
+                    {% for item in items %}
+                    {% if not loop.first and item.lvl == 0 %}
+                </ul>
+                <ul class="list-group">
+                    {% endif %}
+                    <li class="cms-menu-item list-group-item" data-id="{{ item.id }}" data-edit-url="{{ admin.generateUrl('edit', {id: item.id}) }}">
+                        <span class="offset-{{ item.lvl }}">{{ item.name }}{% if item.page is not null %} => {{ item.page.title }}{% endif %} {{ item.linkValue is not empty ? '=> ' ~ item.linkValue : '' }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            {% block no_result_content %}
+                <div class="box box-primary" {% if admin.datagrid.pager.lastPage == 1 %}style="margin-bottom: 100px;"{% endif %}>
+                    <div class="box-body {% if admin.datagrid.results|length > 0 %}table-responsive no-padding{% endif %}">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-aqua"><i class="fa fa-arrow-circle-right" aria-hidden="true"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">{{ 'no_result'|trans({}, 'SonataAdminBundle') }}</span>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-description">
+                                    {% if not app.request.xmlHttpRequest %}
+                                        <ul class="list-unstyled">
+                                        {% include get_admin_template('button_create', admin.code) %}
+                                    </ul>
+                                    {% endif %}
+                                </span>
+                            </div><!-- /.info-box-content -->
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}
+        {% endif %}
+    </div>
+    <div class="col-xs-6 col-md-6">
+        <div class="spinbox" style="display: none">
+            <div class="spinner"></div>
+        </div>
+        <div class="edit-container" style="display: none">
+
+        </div>
+    </div>
+    <script>
+      var time = 100;
+      $(document).ready(function () {
+        $('.cms-menu-item').on('click', function () {
+          $('.cms-menu-item').removeClass('active');
+          $(this).addClass('active');
+          $('.edit-container').fadeOut(time);
+          var data = $(this).data();
+          setTimeout(function () {
+            $('.spinbox').show();
+
+            $.get(data.editUrl, function (response) {
+              $('.spinbox').hide();
+              $('.edit-container').empty().append(response);
+              $('.edit-container').fadeIn();
+            })
+          }, time)
+        })
+
+        $('.sonata-action-element').on('click', function (e) {
+          e.preventDefault();
+          $('.cms-menu-item').removeClass('active');
+          $('.edit-container').fadeOut(time);
+          var url = $(this).prop('href');
+          setTimeout(function () {
+            $('.spinbox').show();
+
+            $.get(url, function (response) {
+              $('.spinbox').hide();
+              $('.edit-container').empty().append(response);
+              $('.edit-container').fadeIn();
+            })
+          }, time)
+        })
+
+      })
+    </script>
+{% endblock %}
