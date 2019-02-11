@@ -40,7 +40,7 @@ services:
     # ===============================================
 
     WebEtDesign\CmsBundle\Repository\:
-        resource: '../../src/Repository'
+        resource: '../../Repository'
         autowire: true
         tags: ['doctrine.repository_service']
 
