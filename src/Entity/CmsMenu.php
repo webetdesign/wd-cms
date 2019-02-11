@@ -4,92 +4,56 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Table(name="cms__menu")
- * @ORM\Entity(repositoryClass="App\Repository\CmsMenuRepository")
- * @Gedmo\Tree(type="nested")
  */
 class CmsMenu
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
     private $id;
 
     /**
      * @var null|string
      *
-     * @ORM\Column(name="name", type="string")
      */
     private $name;
 
     /**
      * @var null|string
-     * @ORM\Column(name="link_type", type="string", nullable=true)
      */
     private $linkType;
 
     /**
      *
-     * @ORM\ManyToOne(targetEntity="CmsPage")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $page;
 
     /**
      * @var null|string
      *
-     * @ORM\Column(name="link_value", type="string", nullable=true)
      */
     private $linkValue;
 
     /**
-     * @Gedmo\TreeLeft
-     * @ORM\Column(name="lft", type="integer")
      */
     private $lft;
 
     /**
-     * @Gedmo\TreeLevel
-     * @ORM\Column(name="lvl", type="integer")
-     * @Assert\Range(
-     *      min = 0,
-     *      max = 5,
-     *      minMessage = "Level of your can't be lower than {{ limit }}",
-     *      maxMessage = "Depth limit reached, max level are {{ limit }}"
-     * )
      */
     private $lvl;
 
     /**
-     * @Gedmo\TreeRight
-     * @ORM\Column(name="rgt", type="integer")
      */
     private $rgt;
 
     /**
-     * @Gedmo\TreeRoot
-     * @ORM\ManyToOne(targetEntity="CmsMenu")
-     * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
      */
     private $root;
 
     /**
-     * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="CmsMenu", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $parent;
 
     /**
-     * @ORM\OneToMany(targetEntity="CmsMenu", mappedBy="parent")
-     * @ORM\OrderBy({"lft" = "ASC"})
      */
     private $children;
 

@@ -1,0 +1,97 @@
+WebEtDesign\CmsBundle\Entity\CmsPage:
+    type: entity
+    table: cms__page
+    repositoryClass: WebEtDesign\CmsBundle\Repository\CmsPageRepository
+    id:
+        id:
+            type: integer
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        title:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: false
+            precision: 0
+        template:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: true
+            precision: 0
+        slug:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+            gedmo:
+                slug:
+                    separator: -
+                    fields:
+                        - title
+        active:
+            type: boolean
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+            options:
+                default: 0
+        seo_title:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
+        seo_description:
+            type: text
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
+        seo_keywords:
+            type: text
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
+    oneToMany:
+        contents:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsContent
+            cascade:
+                - remove
+                - persist
+            fetch: LAZY
+            mappedBy: page
+            inversedBy: null
+            orphanRemoval: false
+            orderBy: null
+    oneToOne:
+        route:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsRoute
+            cascade:
+                - remove
+                - persist
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: page
+            joinColumns:
+                route_id:
+                    referencedColumnName: id
+            orphanRemoval: false
+    lifecycleCallbacks: {  }

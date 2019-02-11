@@ -1,0 +1,115 @@
+WebEtDesign\CmsBundle\Entity\CmsMenu:
+    type: entity
+    table: cms__menu
+    repositoryClass: WebEtDesign\CmsBundle\Repository\CmsMenuRepository
+    id:
+        id:
+            type: integer
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+            id: true
+            generator:
+                strategy: IDENTITY
+    fields:
+        name:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+        linkType:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
+            column: link_type
+        linkValue:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
+            column: link_value
+        lft:
+            type: integer
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+            gedmo:
+                - treeLeft
+        lvl:
+            type: integer
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+            gedmo:
+                - treeRight
+        rgt:
+            type: integer
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
+            gedmo:
+                - treeLevel
+    manyToOne:
+        page:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsPage
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                page_id:
+                    referencedColumnName: id
+                    onDelete: 'SET NULL'
+            orphanRemoval: false
+        root:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsMenu
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: null
+            joinColumns:
+                tree_root:
+                    referencedColumnName: id
+                    onDelete: CASCADE
+            orphanRemoval: false
+            gedmo:
+                - treeRoot
+        parent:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsMenu
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: children
+            joinColumns:
+                parent_id:
+                    referencedColumnName: id
+                    onDelete: CASCADE
+            orphanRemoval: false
+            gedmo:
+                - treeParent
+    oneToMany:
+        children:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsMenu
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: parent
+            inversedBy: null
+            orphanRemoval: false
+            orderBy:
+                lft: ASC
+    lifecycleCallbacks: {  }

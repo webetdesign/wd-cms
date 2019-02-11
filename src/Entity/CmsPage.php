@@ -3,15 +3,9 @@
 namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
-use Gedmo\Mapping\Annotation as Gedmo;
-use WebEtDesign\CmsBundle\Model\SeoAwareTrait;
 
 /**
- * @ORM\Table(name="cms__page")
- * @ORM\Entity(repositoryClass="App\Repository\CmsPageRepository")
- * @ORM\HasLifecycleCallbacks
  */
 class CmsPage
 {
@@ -20,23 +14,18 @@ class CmsPage
     /**
      * @var int
      *
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255)
      */
     private $title;
 
     /**
      * @var null|string
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $template;
 
@@ -44,15 +33,12 @@ class CmsPage
      *
      * @var ArrayCollection|PersistentCollection
      *
-     * @ORM\OneToMany(targetEntity="CmsContent", mappedBy="page", cascade={"persist", "remove"})
      */
     private $contents;
 
     /**
      * @var null | CmsRoute
      *
-     * @ORM\OneToOne(targetEntity="CmsRoute", inversedBy="page", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="route_id", referencedColumnName="id")
      */
     private $route;
 
@@ -61,15 +47,12 @@ class CmsPage
      *
      * Slug is only used to create CmsRoute path
      *
-     * @Gedmo\Slug(fields={"title"}, updatable=true, separator="-")
-     * @ORM\Column(type="string")
      */
     private $slug;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(name="active", type="boolean", nullable=false, options={"default": 0})
      */
     private $active;
 

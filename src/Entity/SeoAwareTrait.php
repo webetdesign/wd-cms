@@ -1,27 +1,24 @@
 <?php
 
-namespace WebEtDesign\CmsBundle\Model;
+namespace WebEtDesign\CmsBundle\Entity;
 
 trait SeoAwareTrait
 {
     /**
      * @var string
      *
-     * @ORM\Column(name="seo_title", type="string", nullable=true)
      */
     private $seo_title;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="seo_description", type="text", nullable=true)
      */
     private $seo_description;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="seo_keywords", type="text", nullable=true)
      */
     private $seo_keywords;
 

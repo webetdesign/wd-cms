@@ -2,49 +2,38 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ORM\Table(name="cms__route")
- * @ORM\Entity(repositoryClass="App\Repository\CmsRouteRepository")
  * @UniqueEntity("path")
  */
 class CmsRoute
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
-     * @ORM\Column(type="array")
      */
     private $methods = [];
 
     /**
-     * @ORM\Column(type="string", length=255)
      */
     private $path;
 
     /**
      * @var null|string
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $controller;
 
     /**
      * @var CmsPage
      *
-     * @ORM\OneToOne(targetEntity="CmsPage", mappedBy="route")
      */
     private $page;
 
