@@ -53,14 +53,4 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
                 page_id:
                     referencedColumnName: id
             orphanRemoval: false
-        media:
-            targetEntity: "%wd_cms.admin.content.media%"
-            cascade: {  }
-            fetch: LAZY
-            mappedBy: null
-            inversedBy: null
-            joinColumns:
-                media_id:
-                    referencedColumnName: id
-            orphanRemoval: false
     lifecycleCallbacks: {  }

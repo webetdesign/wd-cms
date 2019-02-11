@@ -9,11 +9,13 @@
 namespace WebEtDesign\CmsBundle\DependencyInjection;
 
 
+use Sonata\EasyExtendsBundle\Mapper\DoctrineCollector;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use WebEtDesign\CmsBundle\Entity\CmsContent;
 
 class WebEtDesignCmsExtension extends Extension
 {
@@ -27,6 +29,8 @@ class WebEtDesignCmsExtension extends Extension
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');
+
+        $this->registerDoctrineMapping($config);
 
         // TODO : work for autowired configuration
         $container->setParameter('wd_cms.templates', $config['pages']);
@@ -46,5 +50,26 @@ class WebEtDesignCmsExtension extends Extension
     public function getAlias()
     {
         return 'web_et_design_cms';
+    }
+
+    private function registerDoctrineMapping($config) {
+        $collector = DoctrineCollector::getInstance();
+
+        $collector->addAssociation(CmsContent::class, 'mapManyToOne', [
+            'fieldName' => 'media',
+            'targetEntity' => $config['class']['media'],
+            'cascade' => [
+            ],
+            'mappedBy' => null,
+            'inversedBy' => null,
+            'joinColumns' => [
+                [
+                    'name' => 'media_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
     }
 }
