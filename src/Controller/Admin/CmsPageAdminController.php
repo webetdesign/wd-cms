@@ -1,6 +1,6 @@
 <?php
 
-namespace WebEtDesign\CmsBundle\Admin\Controller;
+namespace WebEtDesign\CmsBundle\Controller\Admin;
 
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
