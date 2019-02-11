@@ -28,7 +28,7 @@ final class CmsRouteAdmin extends AbstractAdmin
             ->add('id')
             ->addIdentifier('page')
             ->add('name')
-            ->add('methods', null, ['template' => 'admin/cms/arrayListField.html.twig'])
+            ->add('methods', null, ['template' => '@WebEtDesignCms/arrayListField.html.twig'])
             ->add('path')
             ->add('_action', null, [
                 'actions' => [
@@ -71,7 +71,7 @@ final class CmsRouteAdmin extends AbstractAdmin
         $showMapper
             ->add('id')
             ->add('name')
-            ->add('methods', null, ['template' => 'admin/cms/arrayShowField.html.twig'])
+            ->add('methods', null, ['template' => '@WebEtDesignCms/arrayShowField.html.twig'])
             ->add('path');
     }
 }

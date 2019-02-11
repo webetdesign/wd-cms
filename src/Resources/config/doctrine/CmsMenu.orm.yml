@@ -2,6 +2,9 @@ WebEtDesign\CmsBundle\Entity\CmsMenu:
     type: entity
     table: cms__menu
     repositoryClass: WebEtDesign\CmsBundle\Repository\CmsMenuRepository
+    gedmo:
+        tree:
+          type: nested
     id:
         id:
             type: integer

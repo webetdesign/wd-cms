@@ -2,6 +2,8 @@
 
 namespace WebEtDesign\CmsBundle\Services;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\RouterInterface;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use Doctrine\ORM\EntityManager;
@@ -26,10 +28,10 @@ class CmsMenuBuilder
      * @param EntityManager $entityManager
      * @param Router $router
      */
-    public function __construct(FactoryInterface $factory, EntityManager $entityManager, Router $router)
+    public function __construct(FactoryInterface $factory, EntityManagerInterface $entityManager, RouterInterface $router)
     {
         $this->em = $entityManager;
-        $this->repo = $this->em->getRepository('App:CmsMenu');
+        $this->repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
         $this->router = $router;
         $this->factory = $factory;
     }
@@ -40,7 +42,7 @@ class CmsMenuBuilder
         $menuRootName = $options['menuRootName'];
         $parentActive = $options['parentActive'] ?? false;
 
-        $repo = $this->em->getRepository('App:CmsMenu');
+        $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
 
 
         $menu = $this->factory->createItem('root');

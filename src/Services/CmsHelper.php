@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Services;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Doctrine\ORM\EntityManager;
@@ -20,7 +21,7 @@ class CmsHelper
     /**
      * @inheritDoc
      */
-    public function __construct(EntityManager $em, PageProvider $provider, Twig_Environment $twig)
+    public function __construct(EntityManagerInterface $em, PageProvider $provider, Twig_Environment $twig)
     {
         $this->em       = $em;
         $this->provider = $provider;

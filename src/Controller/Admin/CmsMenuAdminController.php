@@ -18,7 +18,7 @@ class CmsMenuAdminController extends CRUDController
 
         $id = $request->get($this->admin->getIdParameter());
         $existingObject = $this->admin->getObject($id);
-        $cmsReop = $this->getDoctrine()->getRepository('App:CmsMenu');
+        $cmsReop = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu');
 
         if (!$existingObject) {
             throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
@@ -291,7 +291,7 @@ class CmsMenuAdminController extends CRUDController
     }
 
     protected function moveItems($submittedObject) {
-        $cmsReop = $this->getDoctrine()->getRepository('App:CmsMenu');
+        $cmsReop = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu');
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':

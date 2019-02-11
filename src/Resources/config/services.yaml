@@ -1,4 +1,10 @@
 services:
+    WebEtDesign\CmsBundle\Form\TemplateType:
+        arguments:
+            - '@cms.page_provider'
+        tags:
+            - { name: form.type }
+
     cms.routing_loader:
         class: WebEtDesign\CmsBundle\Routing\ExtraLoader
         arguments: ['@doctrine.orm.entity_manager']
@@ -76,7 +82,7 @@ services:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Menu }
         calls:
             - [setTranslationDomain, ['cms']]
-            - [setTemplate, ['list', 'admin/cms/menu/list.html.twig']]
-            - [setTemplate, ['edit', 'admin/cms/menu/edit.html.twig']]
+            - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
+            - [setTemplate, ['edit', '@@WebEtDesignCms/menu/edit.html.twig']]
         public: true
 
