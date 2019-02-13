@@ -83,7 +83,7 @@ WebEtDesign\CmsBundle\Entity\CmsPage:
             orderBy: null
     oneToOne:
         route:
-            targetEntity: WebEtDesign\CmsBundle\Entity\CmsRoute
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsRouteInterface
             cascade:
                 - remove
                 - persist

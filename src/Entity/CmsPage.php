@@ -37,7 +37,7 @@ class CmsPage
     private $contents;
 
     /**
-     * @var null | CmsRoute
+     * @var null | CmsRouteInterface
      *
      */
     private $route;
@@ -91,17 +91,17 @@ class CmsPage
     }
 
     /**
-     * @return CmsRoute|null
+     * @return CmsRouteInterface|null
      */
-    public function getRoute(): ?CmsRoute
+    public function getRoute(): ?CmsRouteInterface
     {
         return $this->route;
     }
 
     /**
-     * @param CmsRoute|null $route
+     * @param null|CmsRouteInterface $route
      */
-    public function setRoute(?CmsRoute $route): void
+    public function setRoute(?CmsRouteInterface $route): void
     {
         $this->route = $route;
     }
