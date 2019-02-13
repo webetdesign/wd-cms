@@ -8,6 +8,7 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
 
 class CmsRoute extends AbstractCmsRoute
 {
