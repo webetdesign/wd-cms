@@ -13,7 +13,7 @@ services:
 
     cms.helper:
         class: WebEtDesign\CmsBundle\Services\CmsHelper
-        arguments: ['@doctrine.orm.entity_manager']
+        arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig']
         public: true
 
     # TODO: Won't work if not in autowire directories

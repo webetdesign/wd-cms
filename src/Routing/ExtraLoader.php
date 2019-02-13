@@ -39,8 +39,8 @@ class ExtraLoader implements LoaderInterface
             // prepare a new route
             $pattern = $cmsRoute->getPath();
             $defaults = [
-                '_controller' => !$cmsRoute->getPage()->isActive() ? 'App\Controller\CmsController::pageDisabled' :
-                    $cmsRoute->getController() ?? 'App\Controller\CmsController::index',
+                '_controller' => !$cmsRoute->getPage()->isActive() ? 'WebEtDesign\CmsBundle\Controller\CmsController::pageDisabled' :
+                    $cmsRoute->getController() ?? 'WebEtDesign\CmsBundle\Controller\CmsController::index',
             ];
             $requirements = [
 //                'parameter' => '\d+',
