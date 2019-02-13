@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('configuration')->addDefaultsIfNotSet()
                             ->children()
-                                ->arrayNode('class')
+                                ->arrayNode('class')->addDefaultsIfNotSet()
                                     ->children()
                                         ->scalarNode('content')->defaultValue('WebEtDesign\\CmsBundle\\Admin\\CmsContentAdmin')->end()
                                         ->scalarNode('menu')->defaultValue('WebEtDesign\\CmsBundle\\Admin\\CmsMenuAdmin')->end()
