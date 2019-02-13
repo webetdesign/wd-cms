@@ -11,9 +11,9 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ExtraLoader implements LoaderInterface
 {
-    private $loaded = false;
+    protected $loaded = false;
 
-    private $em = null;
+    protected $em = null;
 
     /**
      * ExtraLoader constructor.
@@ -56,7 +56,7 @@ class ExtraLoader implements LoaderInterface
 
     public function supports($resource, $type = null)
     {
-        return 'extra' === $type;
+        return 'cms' === $type;
     }
 
     public function getResolver()
