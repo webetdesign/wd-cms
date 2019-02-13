@@ -46,7 +46,7 @@ WebEtDesign\CmsBundle\Entity\AbstractCmsRoute:
     oneToOne:
         page:
             targetEntity: WebEtDesign\CmsBundle\Entity\CmsPage
-            cascade: {  }
+            cascade: ["remove"]
             fetch: LAZY
             mappedBy: route
             inversedBy: null
