@@ -21,7 +21,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('admin')
+                ->arrayNode('admin')->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('configuration')->addDefaultsIfNotSet()
                             ->children()
