@@ -1,0 +1,4 @@
+doctrine:
+    orm:
+        resolve_target_entities:
+            WebEtDesign\CmsBundle\Entity\CmsRouteInterface: WebEtDesign\CmsBundle\Entity\CmsRoute
