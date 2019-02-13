@@ -78,14 +78,14 @@ class WebEtDesignCmsExtension extends Extension
     {
         $collector = DoctrineCollector::getInstance();
 
-        if ($config['admin']['configuration']['entity']['route'] !== CmsRoute::class) {
             $collector->addInheritanceType(AbstractCmsRoute::class, ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE);
-            $collector->addDiscriminator(AbstractCmsRoute::class, 'routeOverride', $config['admin']['configuration']['entity']['route']);
             $collector->addDiscriminator(AbstractCmsRoute::class, 'origin', CmsRoute::class);
             $collector->addDiscriminatorColumn(AbstractCmsRoute::class, [
                 'name' => 'discr',
                 'type' => 'string'
             ]);
+        if ($config['admin']['configuration']['entity']['route'] !== CmsRoute::class) {
+            $collector->addDiscriminator(AbstractCmsRoute::class, 'routeOverride', $config['admin']['configuration']['entity']['route']);
         }
 
         $collector->addAssociation(CmsContent::class, 'mapManyToOne', [
