@@ -4,7 +4,6 @@ namespace WebEtDesign\CmsBundle\EventListener;
 
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Services\PageProvider;
 use Doctrine\ORM\EntityManager;
 use Sonata\AdminBundle\Event\PersistenceEvent;
@@ -15,19 +14,21 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class PageAdminListener
 {
-    private $provider;
-    private $em;
-    private $router;
-    private $fs;
-    private $kernel;
+    protected $provider;
+    protected $em;
+    protected $router;
+    protected $fs;
+    protected $kernel;
+    protected $routeClass;
 
-    public function __construct(PageProvider $provider, EntityManager $em, Router $router, Filesystem $fs, KernelInterface $kernel)
+    public function __construct(PageProvider $provider, EntityManager $em, Router $router, Filesystem $fs, KernelInterface $kernel, $routeClass)
     {
-        $this->provider = $provider;
-        $this->em       = $em;
-        $this->router   = $router;
-        $this->fs       = $fs;
-        $this->kernel   = $kernel;
+        $this->provider   = $provider;
+        $this->em         = $em;
+        $this->router     = $router;
+        $this->fs         = $fs;
+        $this->kernel     = $kernel;
+        $this->routeClass = $routeClass;
     }
 
     // create page form template configuration
@@ -63,7 +64,7 @@ class PageAdminListener
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
         // hydrate route
-        $CmsRoute = new CmsRoute();
+        $CmsRoute = new $this->routeClass();
         $CmsRoute->setName(sprintf('cms_route_%s', $page->getId()));
 
         if ($config['controller'] && $config['action']) {
@@ -71,7 +72,7 @@ class PageAdminListener
         }
 
         $CmsRoute->setMethods([Request::METHOD_GET]);
-        $CmsRoute->setPath('/'.$page->getSlug());
+        $CmsRoute->setPath('/' . $page->getSlug());
         $CmsRoute->setPage($page);
 
         // link route to current page
@@ -101,9 +102,9 @@ class PageAdminListener
     {
         $cacheDir = $this->kernel->getCacheDir();
 
-        foreach (array('matcher_cache_class', 'generator_cache_class') as $option) {
+        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
             $className = $this->router->getOption($option);
-            $cacheFile = $cacheDir.DIRECTORY_SEPARATOR.$className.'.php';
+            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
             $this->fs->remove($cacheFile);
         }
 
