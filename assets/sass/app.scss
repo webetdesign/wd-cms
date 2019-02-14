@@ -1,0 +1,47 @@
+@for $i from 0 through 6 {
+    .offset-#{$i} {
+        padding-left : $i * 25px
+    }
+}
+
+.cms-menu-item {
+    cursor: pointer;
+}
+
+.spinbox {
+    height: 120px;
+    .spinner {
+        width         : 80px;
+        height        : 80px;
+
+        border        : 2px solid #c7c7c7;
+        border-top    : 3px solid #337ab7;
+        border-radius : 100%;
+
+        position      : absolute;
+        top           : 0;
+        bottom        : 0;
+        left          : 0;
+        right         : 0;
+        margin        : auto;
+
+        animation     : spin 1s infinite linear;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform : rotate(0deg);
+    }
+    to {
+        transform : rotate(360deg);
+    }
+}
+
+.skin-black .main-header > .logo {
+    text-align : left;
+}
+
+.logo img {
+    max-width : 100%;
+}
