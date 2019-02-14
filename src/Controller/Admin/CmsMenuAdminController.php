@@ -4,6 +4,13 @@ namespace WebEtDesign\CmsBundle\Controller\Admin;
 
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormRenderer;
+use Symfony\Bridge\Twig\AppVariable;
+use Symfony\Bridge\Twig\Command\DebugCommand;
+use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Form\TwigRenderer;
+
 
 class CmsMenuAdminController extends CRUDController
 {
@@ -112,6 +119,9 @@ class CmsMenuAdminController extends CRUDController
         }
 
         $formView = $form->createView();
+
+        // set the theme for the current Admin Form
+        $this->setFormTheme($formView, $this->admin->getFormTheme());
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplate($templateKey);
@@ -232,6 +242,9 @@ class CmsMenuAdminController extends CRUDController
 
         $formView = $form->createView();
 
+        // set the theme for the current Admin Form
+        $this->setFormTheme($formView, $this->admin->getFormTheme());
+
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplate($templateKey);
         // $template = $this->templateRegistry->getTemplate($templateKey);
@@ -325,6 +338,27 @@ class CmsMenuAdminController extends CRUDController
         }
 
         $this->getDoctrine()->getManager()->flush();
+    }
+
+    protected function setFormTheme(FormView $formView, array $theme = null): void
+    {
+        $twig = $this->get('twig');
+
+        // BC for Symfony < 3.2 where this runtime does not exists
+        if (!method_exists(AppVariable::class, 'getToken')) {
+            $twig->getExtension(FormExtension::class)->renderer->setTheme($formView, $theme);
+
+            return;
+        }
+
+        // BC for Symfony < 3.4 where runtime should be TwigRenderer
+        if (!method_exists(DebugCommand::class, 'getLoaderPaths')) {
+            $twig->getRuntime(TwigRenderer::class)->setTheme($formView, $theme);
+
+            return;
+        }
+
+        $twig->getRuntime(FormRenderer::class)->setTheme($formView, $theme);
     }
 
 

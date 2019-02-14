@@ -29,6 +29,14 @@ class CmsMenuRepository extends NestedTreeRepository
         parent::__construct($manager, $manager->getClassMetadata(CmsMenu::class));
     }
 
+    public function getByName($name)
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->where('m.name = :name')
+            ->setParameter('name', $name);
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
     public function getRootByName($rootName)
     {
         $qb = $this->createQueryBuilder('m')
