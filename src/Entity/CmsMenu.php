@@ -19,6 +19,12 @@ class CmsMenu
 
     /**
      * @var null|string
+     *
+     */
+    private $code;
+
+    /**
+     * @var null|string
      */
     private $linkType;
 
@@ -191,6 +197,22 @@ class CmsMenu
     public function setName(?string $name): void
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param null|string $code
+     */
+    public function setCode($code): void
+    {
+        $this->code = $code;
     }
 
     /**

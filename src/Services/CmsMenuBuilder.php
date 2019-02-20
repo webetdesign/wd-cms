@@ -36,8 +36,7 @@ class CmsMenuBuilder
         $this->factory = $factory;
     }
 
-
-    public function cmsMenu(array $options)
+    public function __cmsMenu(array $options)
     {
         $menuRootName = $options['menuRootName'];
         $parentActive = $options['parentActive'] ?? false;
@@ -47,6 +46,21 @@ class CmsMenuBuilder
 
         $menu = $this->factory->createItem('root');
         $rootItem = $repo->getRootByName($menuRootName);
+        $this->buildNodes($menu, $repo->children($rootItem, true), $parentActive);
+
+        return $menu;
+    }
+
+    public function cmsMenu(array $options)
+    {
+        $menuRootCode = $options['menuRootCode'];
+        $parentActive = $options['parentActive'] ?? false;
+
+        $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
+
+
+        $menu = $this->factory->createItem('root');
+        $rootItem = $repo->getRootByCode($menuRootCode);
         $this->buildNodes($menu, $repo->children($rootItem, true), $parentActive);
 
         return $menu;

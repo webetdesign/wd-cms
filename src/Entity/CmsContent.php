@@ -47,6 +47,8 @@ class CmsContent
      */
     private $media;
 
+    private $slider;
+
     public function getId(): ?int
     {
         return $this->id;

@@ -45,4 +45,21 @@ class CmsMenuRepository extends NestedTreeRepository
             ->setParameter('name', $rootName);
         return $qb->getQuery()->getOneOrNullResult();
     }
+
+    public function getByCode($code)
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->where('m.code = :code')
+            ->setParameter('code', $code);
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function getRootByCode($rootCode)
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->where('m.code = :code')
+            ->andWhere('m.lvl = 0')
+            ->setParameter('code', $rootCode);
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

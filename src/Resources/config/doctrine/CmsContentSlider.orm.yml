@@ -1,7 +1,7 @@
-WebEtDesign\CmsBundle\Entity\CmsContent:
+WebEtDesign\CmsBundle\Entity\CmsContentSlider:
     type: entity
-    table: cms__content
-    repositoryClass: WebEtDesign\CmsBundle\Repository\CmsContentRepository
+    table: cms__content_slider
+    repositoryClass: WebEtDesign\CmsBundle\Repository\CmsContentSliderRepository
     id:
         id:
             type: integer
@@ -14,56 +14,43 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
             generator:
                 strategy: IDENTITY
     fields:
-        code:
+        title:
             type: string
             scale: 0
             length: 255
             unique: false
             nullable: true
             precision: 0
-        label:
+        url:
             type: string
             scale: 0
             length: 255
             unique: false
             nullable: false
             precision: 0
-        type:
+        file:
             type: string
             scale: 0
             length: 255
             unique: false
             nullable: false
             precision: 0
-        value:
+        description:
             type: text
             scale: 0
             length: null
             unique: false
             nullable: true
             precision: 0
-
-    oneToMany:
-        slider:
-            targetEntity: WebEtDesign\CmsBundle\Entity\CmsContentSlider
-            cascade:
-                - persist
-                - remove
-            fetch: LAZY
-            mappedBy: contents
-            inversedBy: null
-            orphanRemoval: false
-            orderBy: null
-
     manyToOne:
-        page:
-            targetEntity: WebEtDesign\CmsBundle\Entity\CmsPage
+        contents:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsContent
             cascade: {  }
             fetch: LAZY
             mappedBy: null
-            inversedBy: contents
+            inversedBy: slider
             joinColumns:
-                page_id:
+                content_id:
                     referencedColumnName: id
             orphanRemoval: false
     lifecycleCallbacks: {  }

@@ -24,6 +24,13 @@ WebEtDesign\CmsBundle\Entity\CmsMenu:
             unique: false
             nullable: false
             precision: 0
+        code:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: false
+            precision: 0
         linkType:
             type: string
             scale: 0
