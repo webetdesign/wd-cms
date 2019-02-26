@@ -82,7 +82,14 @@ services:
         class: '%wd_cms.admin.config.class.content%'
         arguments: [~, '%wd_cms.admin.config.entity.content%', '%wd_cms.admin.config.controller.content%']
         tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: Content }
+            - { name: sonata.admin, manager_type: orm, group: CMS, label: Content, show_in_dashboard: false }
+        public: true
+
+    cms.admin.cms_content_slider:
+        class: '%wd_cms.admin.config.class.content_slider%'
+        arguments: [~, '%wd_cms.admin.config.entity.content_slider%', '%wd_cms.admin.config.controller.content_slider%']
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: CMS, label: ContentSlider, show_in_dashboard: false }
         public: true
 
     cms.admin.cms_menu:

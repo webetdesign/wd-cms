@@ -33,7 +33,7 @@ class CmsContentSlider
 
     /**
      */
-    private $contents;
+    private $content;
 
     /**
      * @return mixed
@@ -118,17 +118,17 @@ class CmsContentSlider
     /**
      * @return mixed
      */
-    public function getContents()
+    public function getContent()
     {
-        return $this->contents;
+        return $this->content;
     }
 
     /**
      * @param mixed $contents
      */
-    public function setContents($contents)
+    public function setContent($content)
     {
-        $this->contents = $contents;
+        $this->content = $content;
     }
 
 

@@ -4,6 +4,8 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use App\Application\Sonata\MediaBundle\Entity\Media;
 use App\Application\Sonata\UserBundle\Entity\User;
+use Sonata\Form\Type\CollectionType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -19,6 +21,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use WebEtDesign\CmsBundle\Form\CmsContentSliderType;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
@@ -29,8 +32,7 @@ final class CmsContentAdmin extends AbstractAdmin
             ->add('id')
             ->add('code')
             ->add('label')
-            ->add('type')
-            ->add('value');
+            ->add('type');
     }
 
     protected function configureListFields(ListMapper $listMapper)
@@ -40,14 +42,13 @@ final class CmsContentAdmin extends AbstractAdmin
             ->add('code')
             ->add('label')
             ->add('type')
-            ->add('value')
             ->add(
                 '_action',
                 null,
                 [
                     'actions' => [
-                        'show'   => [],
-                        'edit'   => [],
+                        'show' => [],
+                        'edit' => [],
                         'delete' => [],
                     ],
                 ]
@@ -59,13 +60,13 @@ final class CmsContentAdmin extends AbstractAdmin
         $formMapper->getFormBuilder()->setMethod('patch');
 
         $roleAdmin = $this->canManageContent();
-        $admin     = $this;
+        $admin = $this;
 
         $formMapper->add(
             'label',
             null,
             [
-                'attr'  => ['disabled' => !$roleAdmin],
+                'attr' => ['disabled' => !$roleAdmin],
                 'label' => 'Libéllé',
             ]
         );
@@ -85,19 +86,22 @@ final class CmsContentAdmin extends AbstractAdmin
             'media',
             ModelListType::class,
             [
-                'class'         => Media::class,
-                'required'      => false,
+                'class' => Media::class,
+                'required' => false,
                 'model_manager' => $admin->getModelManager(),
             ],
             [
                 "link_parameters" => [
-                    'context'  => 'cms_page',
+                    'context' => 'cms_page',
                     'provider' => 'sonata.media.provider.image',
                 ],
             ]
         );
 
         $formMapper->add('value', TextType::class, ['attr' => ['disabled' => 'disabled'], 'required' => false]);
+
+        $formMapper->add('slider', TextType::class, ['attr' => ['disabled' => 'disabled'], 'required' => false]);
+
 
         $formModifier = function (FormInterface $form, FormMapper $formMapper, $type) use ($admin) {
 
@@ -107,6 +111,9 @@ final class CmsContentAdmin extends AbstractAdmin
             if ($form->has('media')) {
                 $form->remove('media');
             }
+            if ($form->has('slider')) {
+                $form->remove('slider');
+            }
 
             $hiddenMediaType = $formMapper->getFormBuilder()->getFormFactory()
                 ->createNamed(
@@ -114,20 +121,31 @@ final class CmsContentAdmin extends AbstractAdmin
                     HiddenType::class,
                     null,
                     [
-                        'required'        => false,
+                        'required' => false,
+                        'auto_initialize' => false,
+                    ]
+                );
+            $hiddenSliderType = $formMapper->getFormBuilder()->getFormFactory()
+                ->createNamed(
+                    'slider',
+                    HiddenType::class,
+                    null,
+                    [
+                        'required' => false,
                         'auto_initialize' => false,
                     ]
                 );
             $hiddenValueType = $formMapper->getFormBuilder()->getFormFactory()
                 ->createNamed(
-                    'value',
+                    'slider',
                     HiddenType::class,
                     null,
                     [
-                        'required'        => false,
+                        'required' => false,
                         'auto_initialize' => false,
                     ]
                 );
+
 
             switch ($type) {
                 case CmsContentTypeEnum::TEXT:
@@ -137,12 +155,13 @@ final class CmsContentAdmin extends AbstractAdmin
                             TextType::class,
                             null,
                             [
-                                'required'        => false,
+                                'required' => false,
                                 'auto_initialize' => false,
                             ]
                         );
                     $form->add($valueType);
                     $form->add($hiddenMediaType);
+                    $form->add($hiddenSliderType);
                     break;
                 case CmsContentTypeEnum::TEXTAREA:
                     $valueType = $formMapper->getFormBuilder()->getFormFactory()
@@ -151,12 +170,13 @@ final class CmsContentAdmin extends AbstractAdmin
                             TextareaType::class,
                             null,
                             [
-                                'required'        => false,
+                                'required' => false,
                                 'auto_initialize' => false,
                             ]
                         );
                     $form->add($valueType);
                     $form->add($hiddenMediaType);
+                    $form->add($hiddenSliderType);
                     break;
                 case CmsContentTypeEnum::WYSYWYG:
                     $valueType = $formMapper->getFormBuilder()->getFormFactory()
@@ -165,14 +185,15 @@ final class CmsContentAdmin extends AbstractAdmin
                             SimpleFormatterType::class,
                             null,
                             [
-                                'format'           => 'richhtml',
+                                'format' => 'richhtml',
                                 'ckeditor_context' => 'cms_page',
-                                'required'         => false,
-                                'auto_initialize'  => false,
+                                'required' => false,
+                                'auto_initialize' => false,
                             ]
                         );
                     $form->add($valueType);
                     $form->add($hiddenMediaType);
+                    $form->add($hiddenSliderType);
                     break;
                 case CmsContentTypeEnum::MEDIA:
                     $mediaType = $formMapper->getFormBuilder()->getFormFactory()
@@ -181,10 +202,10 @@ final class CmsContentAdmin extends AbstractAdmin
                             ModelListType::class,
                             null,
                             [
-                                'class'                    => Media::class,
-                                'required'                 => false,
-                                'auto_initialize'          => false,
-                                'model_manager'            => $admin->getModelManager(),
+                                'class' => Media::class,
+                                'required' => false,
+                                'auto_initialize' => false,
+                                'model_manager' => $admin->getModelManager(),
                                 'sonata_field_description' => $admin->getFormFieldDescription(
                                     'media'
                                 ),
@@ -193,6 +214,23 @@ final class CmsContentAdmin extends AbstractAdmin
                         );
                     $form->add($mediaType);
                     $form->add($hiddenValueType);
+                    $form->add($hiddenSliderType);
+                    break;
+                case CmsContentTypeEnum::SLIDER:
+                    $sliderType = $formMapper->getFormBuilder()->getFormFactory()
+                        ->createNamed(
+                            'slider',
+                            \Sonata\CoreBundle\Form\Type\CollectionType::class,
+                            null,
+                            [
+                                'required' => false,
+                                'auto_initialize' => false,
+                                'type_options' => array('delete' => true),
+                            ]
+                        );
+                    $form->add($sliderType);
+                    $form->add($hiddenValueType);
+                    $form->add($hiddenMediaType);
                     break;
 
             }
@@ -201,7 +239,7 @@ final class CmsContentAdmin extends AbstractAdmin
         $formMapper->getFormBuilder()->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier, $formMapper, $admin) {
-                $form    = $event->getForm();
+                $form = $event->getForm();
                 $subject = $admin->getSubject($event->getData());
 
                 if ($subject) {

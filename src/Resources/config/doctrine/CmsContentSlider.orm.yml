@@ -43,7 +43,7 @@ WebEtDesign\CmsBundle\Entity\CmsContentSlider:
             nullable: true
             precision: 0
     manyToOne:
-        contents:
+        content:
             targetEntity: WebEtDesign\CmsBundle\Entity\CmsContent
             cascade: {  }
             fetch: LAZY

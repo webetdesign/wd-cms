@@ -50,7 +50,7 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
                 - persist
                 - remove
             fetch: LAZY
-            mappedBy: contents
+            mappedBy: content
             inversedBy: null
             orphanRemoval: false
             orderBy: null
