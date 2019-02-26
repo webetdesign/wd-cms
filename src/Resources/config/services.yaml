@@ -51,6 +51,15 @@ services:
         tags:
             - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
 
+    cms.twig.extension:
+        class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
+        arguments:
+          - '@doctrine.orm.entity_manager'
+          - '@router'
+        tags:
+          - { name: twig.extension }
+        public: true
+
     # ===============================================
     # REPOSITORY
     # ===============================================
