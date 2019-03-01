@@ -1,9 +1,11 @@
 <?php
 
 namespace WebEtDesign\CmsBundle\Entity;
+
 use App\Application\Sonata\MediaBundle\Entity\Media;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\PersistentCollection;
 
 
 /**
@@ -50,11 +52,22 @@ class CmsContent
      */
     private $media;
 
-    private $slider;
+    /**
+     *
+     * @var ArrayCollection|PersistentCollection
+     *
+     */
+    private $sliders;
+
+    public function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return $this->label;
+    }
 
     public function __construct()
     {
-        $this->slider = new ArrayCollection();
+        $this->sliders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -142,28 +155,39 @@ class CmsContent
         $this->media = $media;
     }
 
-    /**
-     * @return Collection|CmsContentSlider[]
-     */
-    public function getSlider(): Collection
+    public function setSliders($sliders)
     {
-        return $this->slider;
-    }
-
-    public function addSlider($slider): self
-    {
-        if (!$this->slider->contains($slider)) {
-            $this->slider[] = $slider;
-            $slider->setContent($this);
+        if (count($sliders) > 0) {
+            foreach ($sliders as $i) {
+                $this->addSlider($i);
+            }
         }
 
         return $this;
     }
 
-    public function removeSlider($slider): self
+    /**
+     * @return Collection|CmsContentSlider[]
+     */
+    public function getSliders(): ?Collection
     {
-        if ($this->slider->contains($slider)) {
-            $this->slider->removeElement($slider);
+        return $this->sliders;
+    }
+
+    public function addSlider(CmsContentSlider $slider): self
+    {
+        if (!$this->sliders->contains($slider)) {
+            $slider->setContent($this);
+            $this->sliders[] = $slider;
+        }
+
+        return $this;
+    }
+
+    public function removeSlider(CmsContentSlider $slider): self
+    {
+        if ($this->sliders->contains($slider)) {
+            $this->sliders->removeElement($slider);
             // set the owning side to null (unless already changed)
             if ($slider->getContent() === $this) {
                 $slider->setContent(null);
@@ -172,4 +196,5 @@ class CmsContent
 
         return $this;
     }
+
 }

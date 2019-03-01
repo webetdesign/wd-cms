@@ -25,7 +25,7 @@ class CmsContentSlider
 
     /**
      */
-    private $file;
+    private $media;
 
     /**
      */
@@ -34,6 +34,12 @@ class CmsContentSlider
     /**
      */
     private $content;
+
+    public function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return $this->title;
+    }
 
     /**
      * @return mixed
@@ -86,17 +92,17 @@ class CmsContentSlider
     /**
      * @return mixed
      */
-    public function getFile()
+    public function getMedia()
     {
-        return $this->file;
+        return $this->media;
     }
 
     /**
-     * @param mixed $file
+     * @param mixed $media
      */
-    public function setFile($file)
+    public function setMedia($media): void
     {
-        $this->file = $file;
+        $this->media = $media;
     }
 
     /**

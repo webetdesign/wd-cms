@@ -86,7 +86,7 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('type')
                                             ->isRequired()
                                             ->validate()
-                                                ->ifNotInArray(['TEXT', 'TEXTAREA', 'WYSYWYG', 'MEDIA', 'SLIDER'])
+                                                ->ifNotInArray(['TEXT', 'TEXTAREA', 'WYSYWYG', 'MEDIA', 'SLIDER', 'HIGHLIGHT'])
                                                 ->thenInvalid('Invalid type %s')
                                             ->end()
                                         ->end()

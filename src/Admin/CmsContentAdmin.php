@@ -4,8 +4,10 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use App\Application\Sonata\MediaBundle\Entity\Media;
 use App\Application\Sonata\UserBundle\Entity\User;
-use Sonata\Form\Type\CollectionType;
+use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Entity\CmsContentSlider;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -22,6 +24,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use WebEtDesign\CmsBundle\Form\CmsContentSliderType;
+use WebEtDesign\CmsBundle\Form\DataTransformer\CmsContentSliderDataTransformer;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
@@ -82,188 +85,77 @@ final class CmsContentAdmin extends AbstractAdmin
             );
         }
 
-        $formMapper->add(
-            'media',
-            ModelListType::class,
-            [
-                'class' => Media::class,
-                'required' => false,
-                'model_manager' => $admin->getModelManager(),
-            ],
-            [
-                "link_parameters" => [
-                    'context' => 'cms_page',
-                    'provider' => 'sonata.media.provider.image',
-                ],
-            ]
-        );
+        if ($formMapper->getAdmin()->getSubject() && $formMapper->getAdmin()->getSubject()->getId()) {
 
-        $formMapper->add('value', TextType::class, ['attr' => ['disabled' => 'disabled'], 'required' => false]);
-
-        $formMapper->add('slider', TextType::class, ['attr' => ['disabled' => 'disabled'], 'required' => false]);
-
-
-        $formModifier = function (FormInterface $form, FormMapper $formMapper, $type) use ($admin) {
-
-            if ($form->has('value')) {
-                $form->remove('value');
-            }
-            if ($form->has('media')) {
-                $form->remove('media');
-            }
-            if ($form->has('slider')) {
-                $form->remove('slider');
-            }
-
-            $hiddenMediaType = $formMapper->getFormBuilder()->getFormFactory()
-                ->createNamed(
-                    'media',
-                    HiddenType::class,
-                    null,
-                    [
-                        'required' => false,
-                        'auto_initialize' => false,
-                    ]
-                );
-            $hiddenSliderType = $formMapper->getFormBuilder()->getFormFactory()
-                ->createNamed(
-                    'slider',
-                    HiddenType::class,
-                    null,
-                    [
-                        'required' => false,
-                        'auto_initialize' => false,
-                    ]
-                );
-            $hiddenValueType = $formMapper->getFormBuilder()->getFormFactory()
-                ->createNamed(
-                    'slider',
-                    HiddenType::class,
-                    null,
-                    [
-                        'required' => false,
-                        'auto_initialize' => false,
-                    ]
-                );
-
-
-            switch ($type) {
+            switch ($formMapper->getAdmin()->getSubject()->getType()) {
                 case CmsContentTypeEnum::TEXT:
-                    $valueType = $formMapper->getFormBuilder()->getFormFactory()
-                        ->createNamed(
-                            'value',
-                            TextType::class,
-                            null,
-                            [
-                                'required' => false,
-                                'auto_initialize' => false,
-                            ]
-                        );
-                    $form->add($valueType);
-                    $form->add($hiddenMediaType);
-                    $form->add($hiddenSliderType);
+                    $formMapper->add('value', TextType::class, ['required' => false]);
                     break;
-                case CmsContentTypeEnum::TEXTAREA:
-                    $valueType = $formMapper->getFormBuilder()->getFormFactory()
-                        ->createNamed(
-                            'value',
-                            TextareaType::class,
-                            null,
-                            [
-                                'required' => false,
-                                'auto_initialize' => false,
-                            ]
-                        );
-                    $form->add($valueType);
-                    $form->add($hiddenMediaType);
-                    $form->add($hiddenSliderType);
-                    break;
-                case CmsContentTypeEnum::WYSYWYG:
-                    $valueType = $formMapper->getFormBuilder()->getFormFactory()
-                        ->createNamed(
-                            'value',
-                            SimpleFormatterType::class,
-                            null,
-                            [
-                                'format' => 'richhtml',
-                                'ckeditor_context' => 'cms_page',
-                                'required' => false,
-                                'auto_initialize' => false,
-                            ]
-                        );
-                    $form->add($valueType);
-                    $form->add($hiddenMediaType);
-                    $form->add($hiddenSliderType);
-                    break;
-                case CmsContentTypeEnum::MEDIA:
-                    $mediaType = $formMapper->getFormBuilder()->getFormFactory()
-                        ->createNamed(
-                            'media',
-                            ModelListType::class,
-                            null,
-                            [
-                                'class' => Media::class,
-                                'required' => false,
-                                'auto_initialize' => false,
-                                'model_manager' => $admin->getModelManager(),
-                                'sonata_field_description' => $admin->getFormFieldDescription(
-                                    'media'
-                                ),
-                                //                            'sonata_admin' => $admin
-                            ]
-                        );
-                    $form->add($mediaType);
-                    $form->add($hiddenValueType);
-                    $form->add($hiddenSliderType);
-                    break;
+
                 case CmsContentTypeEnum::SLIDER:
-                    $sliderType = $formMapper->getFormBuilder()->getFormFactory()
-                        ->createNamed(
-                            'slider',
-                            \Sonata\CoreBundle\Form\Type\CollectionType::class,
-                            null,
-                            [
-                                'required' => false,
-                                'auto_initialize' => false,
-                                'type_options' => array('delete' => true),
-                            ]
-                        );
-                    $form->add($sliderType);
-                    $form->add($hiddenValueType);
-                    $form->add($hiddenMediaType);
+                    $formMapper->add(
+                        'sliders',
+                        CollectionType::class,
+                        [
+                            'label'        => false,
+                            'by_reference' => false,
+//                            'btn_add'      => $roleAdmin ? 'Ajouter' : false,
+                            'type_options' => [
+                                'delete' => $roleAdmin,
+                            ],
+                        ],
+                        [
+                            'inline' => 'table',
+                            'edit' => 'inline'
+                        ]
+                    );
                     break;
 
+                case CmsContentTypeEnum::MEDIA:
+                    $formMapper->add(
+                        'media',
+                        ModelListType::class,
+                        [
+                            'class' => Media::class,
+                            'required' => false,
+                            'model_manager' => $admin->getModelManager(),
+                        ],
+                        [
+                            "link_parameters" => [
+                                'context' => 'cms_page',
+                                'provider' => 'sonata.media.provider.image',
+                            ],
+                        ]
+                    );
+                    break;
+
+                case CmsContentTypeEnum::WYSYWYG:
+                    $formMapper->add(
+                        'value',
+                        SimpleFormatterType::class,
+                        [
+                            'format' => 'richhtml',
+                            'ckeditor_context' => 'cms_page',
+                            'required' => false,
+                            'auto_initialize' => false,
+                        ]
+                    );
+                    break;
+
+                case CmsContentTypeEnum::TEXTAREA:
+                    $formMapper->add(
+                        'value',
+                        TextareaType::class,
+                        [
+                            'required' => false,
+                            'auto_initialize' => false,
+                        ]
+                    );
+                    break;
             }
-        };
 
-        $formMapper->getFormBuilder()->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier, $formMapper, $admin) {
-                $form = $event->getForm();
-                $subject = $admin->getSubject($event->getData());
 
-                if ($subject) {
-                    $formModifier($form, $formMapper, $subject->getType());
-                }
-
-            }
-        );
-
-        if ($roleAdmin) {
-            $formMapper->get('type')->addEventListener(
-                FormEvents::POST_SUBMIT,
-                function (FormEvent $event) use ($formModifier, $formMapper) {
-                    // It's important here to fetch $event->getForm()->getData(), as
-                    // $event->getData() will get you the client data (that is, the ID)
-                    $type = $event->getData();
-
-                    // since we've added the listener to the child, we'll have to pass on
-                    // the parent to the callback functions!
-                    $formModifier($event->getForm()->getParent(), $formMapper, $type);
-                }
-            );
         }
-
     }
 
     protected function configureShowFields(ShowMapper $showMapper)
@@ -282,5 +174,15 @@ final class CmsContentAdmin extends AbstractAdmin
         $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');
+    }
+
+    public function prePersist($content)
+    {
+        $this->preUpdate($content);
+    }
+
+    public function preUpdate($content)
+    {
+        $content->setSliders($content->getSliders());
     }
 }

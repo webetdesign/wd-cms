@@ -28,13 +28,6 @@ WebEtDesign\CmsBundle\Entity\CmsContentSlider:
             unique: false
             nullable: false
             precision: 0
-        file:
-            type: string
-            scale: 0
-            length: 255
-            unique: false
-            nullable: false
-            precision: 0
         description:
             type: text
             scale: 0
@@ -48,7 +41,7 @@ WebEtDesign\CmsBundle\Entity\CmsContentSlider:
             cascade: {  }
             fetch: LAZY
             mappedBy: null
-            inversedBy: slider
+            inversedBy: sliders
             joinColumns:
                 content_id:
                     referencedColumnName: id

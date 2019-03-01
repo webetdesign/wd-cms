@@ -16,6 +16,7 @@ class CmsContentTypeEnum
     const WYSYWYG  = 'WYSYWYG';
     const MEDIA    = 'MEDIA';
     const SLIDER    = 'SLIDER';
+    const HIGHLIGHT    = 'HIGHLIGHT';
 
     /** @var array user friendly named type */
     protected static $typeName = [
@@ -24,6 +25,7 @@ class CmsContentTypeEnum
         self::WYSYWYG  => 'WYSYWYG',
         self::MEDIA    => 'Media',
         self::SLIDER    => 'Slider',
+        self::HIGHLIGHT    => 'Highlight',
     ];
 
     /**
@@ -50,6 +52,7 @@ class CmsContentTypeEnum
             self::WYSYWYG,
             self::MEDIA,
             self::SLIDER,
+            self::HIGHLIGHT,
         ];
     }
 

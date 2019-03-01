@@ -44,11 +44,11 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
             precision: 0
 
     oneToMany:
-        slider:
+        sliders:
             targetEntity: WebEtDesign\CmsBundle\Entity\CmsContentSlider
             cascade:
-                - persist
                 - remove
+                - persist
             fetch: LAZY
             mappedBy: content
             inversedBy: null

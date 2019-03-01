@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Entity\CmsContentSlider;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 
 class WebEtDesignCmsExtension extends Extension
@@ -92,6 +93,22 @@ class WebEtDesignCmsExtension extends Extension
         }
 
         $collector->addAssociation(CmsContent::class, 'mapManyToOne', [
+            'fieldName'     => 'media',
+            'targetEntity'  => $config['class']['media'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => null,
+            'joinColumns'   => [
+                [
+                    'name'                 => 'media_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsContentSlider::class, 'mapManyToOne', [
             'fieldName'     => 'media',
             'targetEntity'  => $config['class']['media'],
             'cascade'       => [
