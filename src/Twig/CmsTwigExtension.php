@@ -44,6 +44,7 @@ class CmsTwigExtension extends AbstractExtension
         return [
             new TwigFunction('cms_render_content', [$this, 'cmsRenderContent'], ['is_safe' => ['html']]),
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
+            new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
         ];
     }
@@ -105,6 +106,34 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         return $content->getMedia();
+    }
+
+    public function cmsSliders(CmsPage $page, $content_code)
+    {
+        /** @var CmsContent $content */
+        $content = $this->em->getRepository(CmsContent::class)
+            ->findOneByPageAndContentCodeAndType(
+                $page,
+                $content_code,
+                [
+                    CmsContentTypeEnum::SLIDER,
+                ]
+            );
+        if (!$content) {
+            if (getenv('APP_ENV') != 'dev') {
+                return null;
+            } else {
+                $message = sprintf(
+                    'No content sliders found with the code "%s" in page "%s" (#%s)',
+                    $content_code,
+                    $page->getTitle(),
+                    $page->getId()
+                );
+                throw new Exception($message);
+            }
+        }
+
+        return $content->getSliders();
     }
 
     public function cmsPath($route, $params = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH)
