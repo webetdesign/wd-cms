@@ -63,6 +63,15 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
+        $paramString  = '';
+        $defaults     = [];
+        $requirements = [];
+        foreach ($config['params'] as $param => $attributes) {
+            $paramString          .= "/{" . $param . "}";
+            $defaults[$param]     = $attributes['default'];
+            $requirements[$param] = $attributes['requirement'];
+        }
+
         // hydrate route
         $CmsRoute = new $this->routeClass();
         $CmsRoute->setName(sprintf('cms_route_%s', $page->getId()));
@@ -72,7 +81,9 @@ class PageAdminListener
         }
 
         $CmsRoute->setMethods([Request::METHOD_GET]);
-        $CmsRoute->setPath('/' . $page->getSlug());
+        $CmsRoute->setPath('/' . $page->getSlug() . $paramString);
+        $CmsRoute->setDefaults(json_encode($defaults));
+        $CmsRoute->setRequirements(json_encode($requirements));
         $CmsRoute->setPage($page);
 
         // link route to current page

@@ -38,6 +38,15 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     private $page;
 
     /**
+     * @var string
+     *
+     */
+    private $defaults;
+
+    /** @var string */
+    private $requirements;
+
+    /**
      * @inheritDoc
      */
     public function __toString()
@@ -118,4 +127,41 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     {
         $this->controller = $controller;
     }
+
+    /**
+     * @return string
+     */
+    public function getDefaults(): ?string
+    {
+        return $this->defaults;
+    }
+
+    /**
+     * @param string $defaults
+     * @return self
+     */
+    public function setDefaults(?string $defaults): self
+    {
+        $this->defaults = $defaults;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequirements(): ?string
+    {
+        return $this->requirements;
+    }
+
+    /**
+     * @param string $requirements
+     * @return self
+     */
+    public function setRequirements(?string $requirements): self
+    {
+        $this->requirements = $requirements;
+        return $this;
+    }
+
 }

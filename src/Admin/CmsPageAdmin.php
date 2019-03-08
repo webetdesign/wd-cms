@@ -100,7 +100,7 @@ class CmsPageAdmin extends AbstractAdmin
                 ->tab('Route')
                 ->with('', ['box_class' => ''])
                 ->add('route.name', null, ['label' => 'Route name (technique)'])
-                ->add('route.path', null, ['label' => 'Chemin'])
+                ->add('route.path', null, ['label' => 'Chemin', 'attr' => ['class' => 'cms_route_path_input']])
                 ->add(
                     'route.methods',
                     ChoiceType::class,
@@ -117,6 +117,16 @@ class CmsPageAdmin extends AbstractAdmin
                     ]
                 )
                 ->add('route.controller', null, ['label' => 'Controller (technique)'])
+                ->add('route.defaults', HiddenType::class, [
+                    'attr' => [
+                        'class' => 'cms_route_default_input'
+                    ]
+                ])
+                ->add('route.requirements', HiddenType::class, [
+                    'attr' => [
+                        'class' => 'cms_route_requirements_input'
+                    ]
+                ])
                 ->end()
                 ->end();
         }

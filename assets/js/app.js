@@ -1,5 +1,6 @@
 require('../sass/app.scss')
 import $ from "jquery"
+import "./cms_route_params"
 
 $(document).ready(function () {
 // show active tab on reload

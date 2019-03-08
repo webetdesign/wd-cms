@@ -43,6 +43,12 @@ WebEtDesign\CmsBundle\Entity\AbstractCmsRoute:
             unique: false
             nullable: true
             precision: 0
+        defaults:
+            type: text
+            nullable: true
+        requirements:
+            type: text
+            nullable: true
     oneToOne:
         page:
             targetEntity: WebEtDesign\CmsBundle\Entity\CmsPage
