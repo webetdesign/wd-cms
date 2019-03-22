@@ -68,6 +68,15 @@ class CmsMenu
      */
     private $moveMode;
 
+    /** @var string */
+    private $classes;
+
+    /** @var string */
+    private $connected;
+    
+    /** @var string */
+    private $role;
+
     /**
      * @var null|CmsMenu
      */
@@ -293,5 +302,59 @@ class CmsMenu
     public function setLinkType(?string $linkType): void
     {
         $this->linkType = $linkType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClasses(): ?string
+    {
+        return $this->classes;
+    }
+
+    /**
+     * @param string $classes
+     * @return CmsMenu
+     */
+    public function setClasses(?string $classes): CmsMenu
+    {
+        $this->classes = $classes;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConnected(): ?string
+    {
+        return $this->connected;
+    }
+
+    /**
+     * @param string $connected
+     * @return CmsMenu
+     */
+    public function setConnected(?string $connected): CmsMenu
+    {
+        $this->connected = $connected;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param string $roles
+     * @return CmsMenu
+     */
+    public function setRole(?string $role): CmsMenu
+    {
+        $this->role = $role;
+        return $this;
     }
 }

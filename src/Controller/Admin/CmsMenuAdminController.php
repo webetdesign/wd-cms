@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
 use Sonata\AdminBundle\Controller\CRUDController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormRenderer;
@@ -10,10 +11,94 @@ use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Bridge\Twig\Command\DebugCommand;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Form\TwigRenderer;
+use Symfony\Component\HttpFoundation\Request;
+use WebEtDesign\CmsBundle\Entity\CmsMenu;
 
 
 class CmsMenuAdminController extends CRUDController
 {
+    public function createRootNodeAction()
+    {
+        $em   = $this->getDoctrine()->getManager();
+        $root = new CmsMenu();
+        $root->setName('Root');
+        $root->setCode('root');
+
+        $menu = new CmsMenu();
+        $menu->setName('Menu principal');
+        $menu->setCode('main_menu');
+        $menu->setParent($root);
+
+        $home = new CmsMenu();
+        $home->setName("Page d'accueil");
+        $home->setCode('homepage');
+        $home->setParent($menu);
+
+        $em->persist($root);
+        $em->persist($menu);
+        $em->persist($home);
+        $em->flush();
+
+        return $this->redirectToList();
+    }
+
+    public function moveAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $source = $em->getRepository('WebEtDesignCmsBundle:CmsMenu')->find($request->request->get('source'));
+        $target = $em->getRepository('WebEtDesignCmsBundle:CmsMenu')->find($request->request->get('target'));
+
+        $source->setMoveMode($request->request->get('moveMode'));
+        $source->setMoveTarget($target);
+
+        $this->moveItems($source);
+
+        return new JsonResponse(['status' => 'ok']);
+
+    }
+
+    public function listAction()
+    {
+
+        $request = $this->getRequest();
+
+        $this->admin->checkAccess('list');
+
+        $preResponse = $this->preList($request);
+        if (null !== $preResponse) {
+            return $preResponse;
+        }
+
+        if ($listMode = $request->get('_list_mode')) {
+            $this->admin->setListMode($listMode);
+        }
+
+        $datagrid = $this->admin->getDatagrid();
+        $formView = $datagrid->getForm()->createView();
+
+        // set the theme for the current Admin Form
+        $this->setFormTheme($formView, $this->admin->getFilterTheme());
+
+        // NEXT_MAJOR: Remove this line and use commented line below it instead
+        $template = $this->admin->getTemplate('list');
+        // $template = $this->templateRegistry->getTemplate('list');
+
+        $root = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu')->getByCode('root');
+
+        return $this->renderWithExtraParams($template, [
+            'root'           => $root,
+            'action'         => 'list',
+            'form'           => $formView,
+            'datagrid'       => $datagrid,
+            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
+            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
+                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
+                $this->admin->getExportFormats(),
+        ], null);
+    }
+
+
     /**
      * @inheritDoc
      */
@@ -23,15 +108,15 @@ class CmsMenuAdminController extends CRUDController
         // the key used to lookup the template
         $templateKey = 'edit';
 
-        $id = $request->get($this->admin->getIdParameter());
+        $id             = $request->get($this->admin->getIdParameter());
         $existingObject = $this->admin->getObject($id);
-        $cmsReop = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu');
+        $cmsReop        = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu');
 
         if (!$existingObject) {
             throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
         }
 
-//        $this->checkParentChildAssociation($request, $existingObject);
+        //        $this->checkParentChildAssociation($request, $existingObject);
 
         $this->admin->checkAccess('edit', $existingObject);
 
@@ -69,8 +154,8 @@ class CmsMenuAdminController extends CRUDController
 
                     if ($this->isXmlHttpRequest()) {
                         return $this->renderJson([
-                            'result' => 'ok',
-                            'objectId' => $objectId,
+                            'result'     => 'ok',
+                            'objectId'   => $objectId,
                             'objectName' => $this->escapeHtml($this->admin->toString($existingObject)),
                         ], 200, []);
                     }
@@ -92,9 +177,9 @@ class CmsMenuAdminController extends CRUDController
                     $isFormValid = false;
                 } catch (LockException $e) {
                     $this->addFlash('sonata_flash_error', $this->trans('flash_lock_error', [
-                        '%name%' => $this->escapeHtml($this->admin->toString($existingObject)),
-                        '%link_start%' => '<a href="'.$this->admin->generateObjectUrl('edit', $existingObject).'">',
-                        '%link_end%' => '</a>',
+                        '%name%'       => $this->escapeHtml($this->admin->toString($existingObject)),
+                        '%link_start%' => '<a href="' . $this->admin->generateObjectUrl('edit', $existingObject) . '">',
+                        '%link_end%'   => '</a>',
                     ], 'SonataAdminBundle'));
                 }
             }
@@ -128,9 +213,9 @@ class CmsMenuAdminController extends CRUDController
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
-            'action' => 'edit',
-            'form' => $formView,
-            'object' => $existingObject,
+            'action'   => 'edit',
+            'form'     => $formView,
+            'object'   => $existingObject,
             'objectId' => $objectId,
         ], null);
     }
@@ -153,18 +238,20 @@ class CmsMenuAdminController extends CRUDController
                 '@SonataAdmin/CRUD/select_subclass.html.twig',
                 [
                     'base_template' => $this->getBaseTemplate(),
-                    'admin' => $this->admin,
-                    'action' => 'create',
+                    'admin'         => $this->admin,
+                    'action'        => 'create',
                 ],
                 null
             );
         }
 
+        /** @var CmsMenu $newObject */
         $newObject = $this->admin->getNewInstance();
 
-        $preResponse = $this->preCreate($request, $newObject);
-        if (null !== $preResponse) {
-            return $preResponse;
+        if ($request->query->has('target')) {
+            $target = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu')->find($request->query->get('target'));
+            $newObject->setMoveTarget($target);
+            $newObject->setMoveMode('persistAsLastChildOf');
         }
 
         $this->admin->setSubject($newObject);
@@ -196,7 +283,7 @@ class CmsMenuAdminController extends CRUDController
 
                     if ($this->isXmlHttpRequest()) {
                         return $this->renderJson([
-                            'result' => 'ok',
+                            'result'   => 'ok',
                             'objectId' => $this->admin->getNormalizedIdentifier($newObject),
                         ], 200, []);
                     }
@@ -250,13 +337,25 @@ class CmsMenuAdminController extends CRUDController
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
-            'action' => 'create',
-            'form' => $formView,
-            'object' => $newObject,
+            'action'   => 'create',
+            'form'     => $formView,
+            'object'   => $newObject,
             'objectId' => null,
         ], null);
     }
 
+    public function customRedirectToList($inEdit)
+    {
+        $parameters = [];
+
+        if ($filter = $this->admin->getFilterParameters()) {
+            $parameters['filter'] = $filter;
+        }
+
+        $parameters['in_edit'] = $inEdit;
+
+        return $this->redirect($this->admin->generateUrl('list', $parameters));
+    }
 
     /**
      * @inheritDoc
@@ -268,10 +367,10 @@ class CmsMenuAdminController extends CRUDController
         $url = false;
 
         if (null !== $request->get('btn_update_and_list')) {
-            return $this->redirectToList();
+            return $this->customRedirectToList($object->getId());
         }
         if (null !== $request->get('btn_create_and_list')) {
-            return $this->redirectToList();
+            return $this->customRedirectToList($object->getId());
         }
 
         if (null !== $request->get('btn_create_and_create')) {
@@ -303,7 +402,8 @@ class CmsMenuAdminController extends CRUDController
         return new RedirectResponse($url);
     }
 
-    protected function moveItems($submittedObject) {
+    protected function moveItems($submittedObject)
+    {
         $cmsReop = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu');
 
         switch ($submittedObject->getMoveMode()) {

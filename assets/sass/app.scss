@@ -1,15 +1,148 @@
-@for $i from 0 through 6 {
-    .offset-#{$i} {
-        padding-left : $i * 25px
+//@for $i from 0 through 6 {
+//    .offset-#{$i} {
+//        padding-left : $i * 25px
+//    }
+//}
+
+//.cmsMenuAdmin {
+//    border-top: none;
+//    border-right: solid 1px black;
+//    border-left: solid 1px black;
+//    border-bottom: solid 1px black;
+//    border-radius: 5px;
+//    li {
+//        cursor     : grab;
+//        list-style : none;
+//        border-bottom: solid 1px black;
+//        .StackedList {
+//            min-height: 15px;
+//        }
+//        &:first-child {
+//            border-top: 1px solid black;
+//        }
+//        &:last-child {
+//            border-bottom: none;
+//        }
+//    }
+//    ul {
+//        padding: 0px;
+//    }
+//}
+
+@mixin btnNoStyle() {
+    background : none;
+    color      : inherit;
+    border     : none;
+    padding    : 0px;
+    font       : inherit;
+    cursor     : pointer;
+    outline    : inherit;
+}
+
+.cmsMenuAdmin {
+    .box {
+        overflow : hidden;
+    }
+    & > div {
+        h4 {
+            code {
+                font-size : 0.7em;
+            }
+            float        : left;
+            padding-left : 10px;
+        }
+        button {
+            @include btnNoStyle();
+            float   : right;
+            padding : 10px;
+        }
+    }
+    & > ul {
+        border-left      : solid 1px #ddd;
+        border-right     : solid 1px #ddd;
+        border-bottom    : 1px solid #ddd;
+        background-color : #fff;
+        overflow         : hidden;
+        margin-bottom    : 15px;
+    }
+    ul {
+        margin          : 0;
+        padding         : 0;
+        list-style-type : none;
+        //min-height      : 15px;
+    }
+    li {
+        line-height : 2em;
+        position    : relative;
+        //margin-left: 10px;
+        padding     : 0px 0px 0px 15px;
+        > div {
+            display         : flex;
+            justify-content : space-between;
+            align-items     : center;
+            button {
+                @include btnNoStyle();
+                padding : 10px;
+            }
+        }
+        ul {
+            padding-left : 1em;
+        }
+        .active {
+            background-color : #337ab7;
+        }
+        &:focus {
+            outline : none;
+        }
+        &:after {
+            content    : "\00A0";
+            position   : absolute;
+            width      : 220%;
+            height     : 1px;
+            left       : -100%;
+            top        : 0;
+            border-top : 1px solid #ddd;
+            z-index    : 0;
+        }
+    }
+    //&.dragging {
+    .StackedList {
+        .StackedListGhost:only-child {
+            display : list-item;
+        }
+    }
+    //}
+    //.StackedListGhost:only-child {
+    //    display: list-item;
+    //}
+    .StackedListGhost {
+        display : none;
     }
 }
 
 .cms-menu-item {
-    cursor: pointer;
+    cursor : pointer;
+    &__btn-edit {
+        float      : right;
+        background : none;
+        color      : inherit;
+        border     : none;
+        padding    : 0;
+        font       : inherit;
+        cursor     : pointer;
+        outline    : inherit;
+    }
+    &__drop-item {
+        list-style : none;
+        &-ondrag {
+            height           : 40px;
+            background-color : #dedede;
+        }
+    }
 }
 
 .spinbox {
-    height: 120px;
+    height : 120px;
     .spinner {
         width         : 80px;
         height        : 80px;

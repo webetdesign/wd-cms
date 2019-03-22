@@ -29,7 +29,7 @@ WebEtDesign\CmsBundle\Entity\CmsMenu:
             scale: 0
             length: null
             unique: false
-            nullable: false
+            nullable: true
             precision: 0
         linkType:
             type: string
@@ -74,6 +74,28 @@ WebEtDesign\CmsBundle\Entity\CmsMenu:
             precision: 0
             gedmo:
                 - treeRight
+        classes:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
+        role:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
+        connected:
+            type: string
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
+
     manyToOne:
         page:
             targetEntity: WebEtDesign\CmsBundle\Entity\CmsPage

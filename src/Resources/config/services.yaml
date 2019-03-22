@@ -42,15 +42,6 @@ services:
             - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
             - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
 
-    cms.menu_builder:
-        class: WebEtDesign\CmsBundle\Services\CmsMenuBuilder
-        arguments:
-          - "@knp_menu.factory"
-          - "@doctrine.orm.entity_manager"
-          - "@router"
-        tags:
-            - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
-
     cms.twig.extension:
         class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
         arguments:
@@ -59,6 +50,43 @@ services:
         tags:
           - { name: twig.extension }
         public: true
+
+    # ===============================================
+    # MENU
+    # ===============================================
+
+    cms.menu_builder:
+        class: WebEtDesign\CmsBundle\Services\CmsMenuBuilder
+        arguments:
+          - "@knp_menu.factory"
+          - "@doctrine.orm.entity_manager"
+          - "@router"
+          - "@security.token_storage"
+          - "@security.authorization_checker"
+        tags:
+            - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
+
+
+    cms.menu_admin_builder:
+        class: WebEtDesign\CmsBundle\Services\CmsMenuAdminBuilder
+        arguments:
+          - "@knp_menu.factory"
+          - "@doctrine.orm.entity_manager"
+          - "@router"
+        tags:
+            - { name: knp_menu.menu_builder, method: cmsAdminMenu, alias: cmsAdminMenu }
+
+    cms.menu_admin_renderer:
+        # The class implements Knp\Menu\Renderer\RendererInterface
+        class: Knp\Menu\Renderer\TwigRenderer
+        arguments:
+            - "@twig"
+            - "@@WebEtDesignCms/menu/menu_admin_renderer.html.twig"
+            - "@knp_menu.matcher"
+            # add your own dependencies here
+        tags:
+            # The alias is what is used to retrieve the menu
+            - { name: knp_menu.renderer, alias: 'cms_menu_admin_renderer' }
 
     # ===============================================
     # REPOSITORY

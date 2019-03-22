@@ -12,17 +12,25 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Sonata\AdminBundle\Route\RouteCollection;
 
 final class CmsMenuAdmin extends AbstractAdmin
 {
-    public function createQuery($context = 'list')
+    protected function configureRoutes(RouteCollection $collection)
     {
-        $proxyQuery = parent::createQuery('list');
-        $proxyQuery->addOrderBy($proxyQuery->getRootAlias() . '.root', 'ASC');
-        $proxyQuery->addOrderBy($proxyQuery->getRootAlias() . '.lft', 'ASC');
-
-        return $proxyQuery;
+        $collection
+            ->add('createRootNode', 'initRoot')
+            ->add('move', 'move');
     }
+
+//    public function createQuery($context = 'list')
+//    {
+//        $proxyQuery = parent::createQuery('list');
+//        $proxyQuery->addOrderBy($proxyQuery->getRootAlias() . '.root', 'ASC');
+//        $proxyQuery->addOrderBy($proxyQuery->getRootAlias() . '.lft', 'ASC');
+//
+//        return $proxyQuery;
+//    }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
@@ -51,28 +59,69 @@ final class CmsMenuAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $formMapper)
     {
+        /** @var CmsMenu $subject */
+        $subject = $formMapper->getAdmin()->getSubject();
+
         $formMapper
             ->with('Configuration')
             ->add('name', null, [
                 'label' => 'Nom',
-            ])
-            ->add('linkType', ChoiceType::class, [
-                'choices'  => CmsMenuLinkTypeEnum::getChoices(),
-                'label'    => 'Type de lien',
+            ]);
+
+        if ($subject && $subject->getMoveTarget() && $subject->getMoveTarget()->getLvl() == 0) {
+            $formMapper
+                ->add('code', null, [
+                    'label'    => 'Code',
+                    'required' => true,
+                ]);
+        }
+
+        if ($subject && $subject->getId() != null) {
+            $formMapper
+                ->add('linkType', ChoiceType::class, [
+                    'choices'  => CmsMenuLinkTypeEnum::getChoices(),
+                    'label'    => 'Type de lien',
+                    'required' => false,
+                ])
+                ->addHelp('page', 'help page')
+                ->add('page', null, [
+                    'sonata_help' => 'Si le type de lien utilisé est Page cms',
+                    'required'    => false,
+                    'label'       => 'Page cms',
+                ])
+                ->add('linkValue', null, [
+                    'sonata_help' => 'Valeur pour les autres types de liens',
+                    'required'    => false,
+                    'label'       => 'Valeur du lien',
+                ]);
+        }
+
+        // end configuration
+        $formMapper->end();
+
+        if ($subject && $subject->getId() != null) {
+
+            $formMapper
+            ->with('Configuration avancé')
+            ->add('classes', null, [
+                'label'    => 'Classes',
                 'required' => false,
             ])
-            ->addHelp('page', 'help page')
-            ->add('page', null, [
-                'sonata_help' => 'Si le type de lien utilisé est Page cms',
-                'required' => false,
-                'label'    => 'Page cms',
+            ->add('connected', ChoiceType::class, [
+                'choices' => [
+                    'Tout les temps' => '',
+                    'uniquement si connecté' => 'ONLY_LOGIN',
+                    'uniquement si non connecté' => 'ONLY_LOGOUT'
+                ],
+                'label' => 'Visible',
             ])
-            ->add('linkValue', null, [
-                'sonata_help' => 'Valeur pour les autres types de liens',
-                'required' => false,
-                'label'    => 'Valeur du lien',
-            ])
-            ->end()
+            ->add('role')
+
+            ->end();
+
+        }
+
+        $formMapper
             ->with('Déplacer')
             ->add('moveMode', ChoiceType::class, [
                 'choices'  => [

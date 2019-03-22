@@ -3,7 +3,10 @@
 namespace WebEtDesign\CmsBundle\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
+use FOS\UserBundle\Model\User;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use Doctrine\ORM\EntityManager;
@@ -22,18 +25,31 @@ class CmsMenuBuilder
     /** @var Router */
     private $router;
 
+    /** @var TokenStorageInterface */
+    private $storage;
+
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
+
     /**
      * CmsMenuBuilder constructor.
      * @param FactoryInterface $factory
      * @param EntityManager $entityManager
      * @param Router $router
      */
-    public function __construct(FactoryInterface $factory, EntityManagerInterface $entityManager, RouterInterface $router)
-    {
-        $this->em = $entityManager;
-        $this->repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
-        $this->router = $router;
-        $this->factory = $factory;
+    public function __construct(
+        FactoryInterface $factory,
+        EntityManagerInterface $entityManager,
+        RouterInterface $router,
+        TokenStorageInterface $storage,
+        AuthorizationCheckerInterface $authorizationChecker
+    ) {
+        $this->em                   = $entityManager;
+        $this->repo                 = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
+        $this->router               = $router;
+        $this->factory              = $factory;
+        $this->storage              = $storage;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     public function __cmsMenu(array $options)
@@ -44,7 +60,7 @@ class CmsMenuBuilder
         $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
 
 
-        $menu = $this->factory->createItem('root');
+        $menu     = $this->factory->createItem('root');
         $rootItem = $repo->getRootByName($menuRootName);
         $this->buildNodes($menu, $repo->children($rootItem, true), $parentActive);
 
@@ -53,14 +69,14 @@ class CmsMenuBuilder
 
     public function cmsMenu(array $options)
     {
-        $menuRootCode = $options['menuRootCode'];
+        $menuRootCode = $options['code'];
         $parentActive = $options['parentActive'] ?? false;
 
         $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
 
 
-        $menu = $this->factory->createItem('root');
-        $rootItem = $repo->getRootByCode($menuRootCode);
+        $menu     = $this->factory->createItem('root');
+        $rootItem = $repo->getByCode($menuRootCode);
         $this->buildNodes($menu, $repo->children($rootItem, true), $parentActive);
 
         return $menu;
@@ -68,10 +84,29 @@ class CmsMenuBuilder
 
     public function buildNodes(ItemInterface $menu, $items, $parentActive)
     {
+        /** @var User $user */
+        $user = $this->storage->getToken()->getUser();
+
         /** @var CmsMenu $child */
         foreach ($items as $child) {
-            $children = $this->repo->getChildren($child, true);
+            if ($child->getRole() && !$this->authorizationChecker->isGranted($child->getRole())) {
+                continue;
+            }
+            if ($child->getConnected() == 'ONLY_LOGIN' && $user === 'anon.') {
+                continue;
+            }
+            if ($child->getConnected() == 'ONLY_LOGOUT' && $user !== 'anon.') {
+                continue;
+            }
+
+            $children  = $this->repo->getChildren($child, true);
             $childItem = $menu->addChild($child->getName());
+
+
+            if ($child->getClasses()) {
+                $childItem->setAttribute('class', $child->getClasses());
+            }
+
             if (sizeof($children) == 0 || (sizeof($children) > 0 && $parentActive)) {
                 switch ($child->getLinkType()) {
                     case CmsMenuLinkTypeEnum::CMS_PAGE:

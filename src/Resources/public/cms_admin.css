@@ -1,26 +1,91 @@
-.offset-0 {
-  padding-left: 0px; }
+.cmsMenuAdmin .box {
+  overflow: hidden; }
 
-.offset-1 {
-  padding-left: 25px; }
+.cmsMenuAdmin > div h4 {
+  float: left;
+  padding-left: 10px; }
+  .cmsMenuAdmin > div h4 code {
+    font-size: 0.7em; }
 
-.offset-2 {
-  padding-left: 50px; }
+.cmsMenuAdmin > div button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0px;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  float: right;
+  padding: 10px; }
 
-.offset-3 {
-  padding-left: 75px; }
+.cmsMenuAdmin > ul {
+  border-left: solid 1px #ddd;
+  border-right: solid 1px #ddd;
+  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+  overflow: hidden;
+  margin-bottom: 15px; }
 
-.offset-4 {
-  padding-left: 100px; }
+.cmsMenuAdmin ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none; }
 
-.offset-5 {
-  padding-left: 125px; }
+.cmsMenuAdmin li {
+  line-height: 2em;
+  position: relative;
+  padding: 0px 0px 0px 15px; }
+  .cmsMenuAdmin li > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; }
+    .cmsMenuAdmin li > div button {
+      background: none;
+      color: inherit;
+      border: none;
+      padding: 0px;
+      font: inherit;
+      cursor: pointer;
+      outline: inherit;
+      padding: 10px; }
+  .cmsMenuAdmin li ul {
+    padding-left: 1em; }
+  .cmsMenuAdmin li .active {
+    background-color: #337ab7; }
+  .cmsMenuAdmin li:focus {
+    outline: none; }
+  .cmsMenuAdmin li:after {
+    content: "\A0";
+    position: absolute;
+    width: 220%;
+    height: 1px;
+    left: -100%;
+    top: 0;
+    border-top: 1px solid #ddd;
+    z-index: 0; }
 
-.offset-6 {
-  padding-left: 150px; }
+.cmsMenuAdmin .StackedList .StackedListGhost:only-child {
+  display: list-item; }
+
+.cmsMenuAdmin .StackedListGhost {
+  display: none; }
 
 .cms-menu-item {
   cursor: pointer; }
+  .cms-menu-item__btn-edit {
+    float: right;
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit; }
+  .cms-menu-item__drop-item {
+    list-style: none; }
+    .cms-menu-item__drop-item-ondrag {
+      height: 40px;
+      background-color: #dedede; }
 
 .spinbox {
   height: 120px; }

@@ -1,0 +1,14 @@
+{% extends 'knp_menu.html.twig' %}
+
+{% block spanElement %}
+    {% import 'knp_menu.html.twig' as knp_menu %}
+    <div{{ knp_menu.attributes(item.labelAttributes) }}>
+        <span>{% if item.name != 'ghost' %}<span class="glyphicon glyphicon-move" aria-hidden="true"></span>{% endif %} {{ block('label') }}</span>
+        {% if item.name != 'ghost' %}
+            <div class="cms-menu-item__btn">
+                <button class="cms-menu-item__btn-edit"><i class="fa fa-pencil"></i></button>
+                <button class="cms-menu-item__btn-add"><i class="fa fa-plus"></i></button>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
