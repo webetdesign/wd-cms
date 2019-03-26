@@ -37,6 +37,20 @@ class CmsContentRepository extends ServiceEntityRepository
         return $qb->getQuery()
             ->getOneOrNullResult();
     }
+    public function findByCode(CmsPage $page, $contentCode)
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        $qb->where('c.code LIKE :code')
+            ->andWhere('c.page = :page')
+            ->setParameter('page', $page)
+            ->setParameter('code', $contentCode);
+
+        return $qb->getQuery()
+            ->getResult();
+    }
+
+
 
     // /**
     //  * @return CmsContent[] Returns an array of CmsContent objects

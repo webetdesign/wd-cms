@@ -42,6 +42,11 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
+        if($config['association']) {
+            $page->setClassAssociation($config['association']['class']);
+            $page->setQueryAssociation($config['association']['queryMethod']);
+        }
+
         // hydrate content
         foreach ($config['contents'] as $content) {
             $CmsContent = new CmsContent();

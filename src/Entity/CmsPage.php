@@ -53,6 +53,72 @@ class CmsPage
     private $slug;
 
     /**
+     * @var string
+     *
+     */
+    private $class_association;
+
+    /**
+     * @var string
+     *
+     */
+    private $query_association;
+
+    /**
+     * @var int
+     *
+     */
+    private $association;
+
+    /**
+     * @return mixed
+     */
+    public function getClassAssociation()
+    {
+        return $this->class_association;
+    }
+
+    /**
+     * @param mixed $class_association
+     */
+    public function setClassAssociation($class_association)
+    {
+        $this->class_association = $class_association;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQueryAssociation()
+    {
+        return $this->query_association;
+    }
+
+    /**
+     * @param mixed $query_association
+     */
+    public function setQueryAssociation($query_association)
+    {
+        $this->query_association = $query_association;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAssociation()
+    {
+        return $this->association;
+    }
+
+    /**
+     * @param mixed $association
+     */
+    public function setAssociation($association)
+    {
+        $this->association = $association;
+    }
+
+    /**
      * @var boolean
      *
      */
