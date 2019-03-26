@@ -21,6 +21,26 @@ WebEtDesign\CmsBundle\Entity\CmsPage:
             unique: false
             nullable: false
             precision: 0
+        class_association:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: true
+            precision: 0
+        query_association:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: true
+            precision: 0
+        association:
+            type: integer
+            scale: 0
+            unique: false
+            nullable: true
+            precision: 0
         template:
             type: string
             scale: 0

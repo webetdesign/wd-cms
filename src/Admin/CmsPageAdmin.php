@@ -3,6 +3,8 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use App\Application\Sonata\UserBundle\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Form\TemplateType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -53,22 +55,46 @@ class CmsPageAdmin extends AbstractAdmin
     {
         $roleAdmin = $this->canManageContent();
 
+        /** @var CmsPage $object */
+        $object = $this->getSubject();
+
+        $container = $this->getConfigurationPool()->getContainer();
+        /** @var EntityManagerInterface $em */
+        $em = $container->get('doctrine.orm.entity_manager');
+
         $formMapper
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => ''])
-            ->add('title', null, ['label' => 'title'])
+            ->add('title', null, ['label' => 'Title'])
             ->add('template', TemplateType::class, ['label' => 'Modèle de page'])
             ->end()// End form group
             ->end()// End tab
         ;
+
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
             $formMapper->getFormBuilder()->setMethod('patch');
             $formMapper
                 ->tab('Général')// The tab call is optional
                 ->with('', ['box_class' => ''])
-                ->add('active')
-                ->end()// End form group
+                ->add('active');
+
+            if($object->getClassAssociation()) {
+                $entities = $em->getRepository($object->getClassAssociation())->{$object->getQueryAssociation()}();
+                $choices = [];
+                foreach ($entities as $entity) {
+                    $choices[$entity->__toString()] = $entity->getId();
+                }
+                $formMapper->add('association', ChoiceType::class,
+                    [
+                        'label' => 'Association',
+                        'choices' => $choices
+                    ]
+                );
+            }
+
+
+            $formMapper->end()// End form group
                 ->end()// End tab
                 ->tab('SEO')// The tab call is optional
                 ->with(' ')

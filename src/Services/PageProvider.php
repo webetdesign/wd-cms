@@ -2,6 +2,8 @@
 
 namespace WebEtDesign\CmsBundle\Services;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 /**
  * Class PageProvider
  * @package WebEtDesign\CmsBundle\Services
