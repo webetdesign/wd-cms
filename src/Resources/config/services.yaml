@@ -68,6 +68,7 @@ services:
 
 
     cms.menu_admin_builder:
+        public: true
         class: WebEtDesign\CmsBundle\Services\CmsMenuAdminBuilder
         arguments:
           - "@knp_menu.factory"

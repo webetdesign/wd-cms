@@ -50,7 +50,8 @@ class CmsMenuRepository extends NestedTreeRepository
     {
         $qb = $this->createQueryBuilder('m')
             ->where('m.code = :code')
-            ->setParameter('code', $code);
+            ->setParameter('code', $code)
+            ->setMaxResults(1);
         return $qb->getQuery()->getOneOrNullResult();
     }
 
