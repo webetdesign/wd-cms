@@ -50,8 +50,6 @@
       padding: 10px; }
   .cmsMenuAdmin li ul {
     padding-left: 1em; }
-  .cmsMenuAdmin li .active {
-    background-color: #337ab7; }
   .cmsMenuAdmin li:focus {
     outline: none; }
   .cmsMenuAdmin li:after {

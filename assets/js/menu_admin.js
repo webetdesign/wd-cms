@@ -57,7 +57,7 @@ $(document).ready(function () {
     }, time)
   })
 
-  $('.sonata-action-element').on('click', function (e) {
+  $('.sonata-action-element__cms-menu').on('click', function (e) {
     e.preventDefault();
     $('.cms-menu-item').removeClass('active');
     $('.edit-container').fadeOut(time);

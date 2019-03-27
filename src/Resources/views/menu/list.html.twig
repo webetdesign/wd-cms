@@ -2,7 +2,7 @@
 
 {%- block actions -%}
     <li>
-        <a class="sonata-action-element" href="{{ admin.generateUrl('create', {target: root.id}) }}">
+        <a class="sonata-action-element sonata-action-element__cms-menu" href="{{ admin.generateUrl('create', {target: root.id}) }}">
             <i class="fa fa-plus-circle" aria-hidden="true"></i>
             {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
         </a>
