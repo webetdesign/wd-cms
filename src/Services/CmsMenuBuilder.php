@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CmsMenuBuilder
 {
@@ -31,6 +32,9 @@ class CmsMenuBuilder
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
+    /** @var RequestStack */
+    private $requestStack;
+
     /**
      * CmsMenuBuilder constructor.
      * @param FactoryInterface $factory
@@ -42,7 +46,8 @@ class CmsMenuBuilder
         EntityManagerInterface $entityManager,
         RouterInterface $router,
         TokenStorageInterface $storage,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        RequestStack $requestStack
     ) {
         $this->em                   = $entityManager;
         $this->repo                 = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
@@ -50,6 +55,7 @@ class CmsMenuBuilder
         $this->factory              = $factory;
         $this->storage              = $storage;
         $this->authorizationChecker = $authorizationChecker;
+        $this->requestStack         = $requestStack;
     }
 
     public function __cmsMenu(array $options)
@@ -73,7 +79,6 @@ class CmsMenuBuilder
         $parentActive = $options['parentActive'] ?? false;
 
         $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
-
 
         $menu     = $this->factory->createItem('root');
         $rootItem = $repo->getByCode($menuRootCode);
@@ -102,15 +107,18 @@ class CmsMenuBuilder
             $children  = $this->repo->getChildren($child, true);
             $childItem = $menu->addChild($child->getName());
 
-
+            $childItemClass = '';
             if ($child->getClasses()) {
-                $childItem->setAttribute('class', $child->getClasses());
+                $childItemClass .= $child->getClasses() . ' ';
             }
 
             if (sizeof($children) == 0 || (sizeof($children) > 0 && $parentActive)) {
                 switch ($child->getLinkType()) {
                     case CmsMenuLinkTypeEnum::CMS_PAGE:
                         if ($child->getPage()) {
+                            if ($this->isActive($child)) {
+                                $childItemClass .= 'active ';
+                            }
                             $childItem->setUri($this->router->generate($child->getPage()->getRoute()->getName()));
                         }
                         break;
@@ -134,7 +142,32 @@ class CmsMenuBuilder
             if (sizeof($children) > 0) {
                 $this->buildNodes($childItem, $children, $parentActive);
             }
+
+            $childItem->setAttribute('class', $childItemClass);
         }
+    }
+
+    public function isActive(CmsMenu $item)
+    {
+
+        $request = $this->requestStack->getCurrentRequest();
+        $activeRouteName = $request->get('_route');
+
+        $escapeString = preg_quote($item->getPage()->getRoute()->getPath(), '/');
+
+        $active = false;
+
+        if ($item->getPage()->getRoute()->getPath() != '/') {
+            if (preg_match('/'. $escapeString .'/', $request->getPathInfo())) {
+                $active = true;
+            }
+        }
+
+        if ($item->getPage()->getRoute()->getName() == $activeRouteName) {
+            $active = true;
+        }
+
+        return $active;
     }
 
 }

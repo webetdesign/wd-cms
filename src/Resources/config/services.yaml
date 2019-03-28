@@ -63,6 +63,7 @@ services:
           - "@router"
           - "@security.token_storage"
           - "@security.authorization_checker"
+          - "@request_stack"
         tags:
             - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
 
