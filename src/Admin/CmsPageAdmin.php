@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use App\Application\Sonata\UserBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Form\TemplateType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
