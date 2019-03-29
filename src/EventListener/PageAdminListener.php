@@ -42,7 +42,7 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
-        if($config['association']) {
+        if(isset($config['association'])) {
             $page->setClassAssociation($config['association']['class']);
             $page->setQueryAssociation($config['association']['queryMethod']);
         }

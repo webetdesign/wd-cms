@@ -118,8 +118,8 @@ class CmsPageAdmin extends AbstractAdmin
                         ],
                     ],
                     [
-//                        'edit'   => 'inline',
-//                        'inline' => 'table',
+                        'edit'   => 'inline',
+                        'inline' => 'table',
                     ]
                 )
                 ->end()
