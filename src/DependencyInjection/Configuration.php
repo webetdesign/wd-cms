@@ -99,6 +99,7 @@ class Configuration implements ConfigurationInterface
                             ->arrayNode('contents')
                                 ->arrayPrototype()
                                     ->children()
+                                        ->scalarNode('code')->cannotBeEmpty()->end()
                                         ->scalarNode('label')->cannotBeEmpty()->end()
                                         ->scalarNode('type')
                                             ->isRequired()

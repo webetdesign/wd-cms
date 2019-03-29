@@ -50,7 +50,7 @@ class PageAdminListener
         // hydrate content
         foreach ($config['contents'] as $content) {
             $CmsContent = new CmsContent();
-            $CmsContent->setCode($content['label']);
+            $CmsContent->setCode($content['code'] ?? $content['label']);
             $CmsContent->setLabel($content['label']);
             $CmsContent->setType($content['type']);
             $page->addContent($CmsContent);

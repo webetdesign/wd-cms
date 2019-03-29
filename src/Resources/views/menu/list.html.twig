@@ -2,10 +2,18 @@
 
 {%- block actions -%}
     <li>
-        <a class="sonata-action-element sonata-action-element__cms-menu" href="{{ admin.generateUrl('create', {target: root.id}) }}">
-            <i class="fa fa-plus-circle" aria-hidden="true"></i>
-            {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
-        </a>
+        {% if root %}
+            <a class="sonata-action-element sonata-action-element__cms-menu" href="{{ admin.generateUrl('create', {target: root.id}) }}">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                {{ 'link_action_create'|trans({}, 'SonataAdminBundle') }}
+            </a>
+        {% else %}
+            <a class="sonata-action-element sonata-action-element__cms-menu" href="{{ path('admin_webetdesign_cms_cmsmenu_createRootNode') }}">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                init
+            </a>
+        {% endif %}
+
     </li>
 {%- endblock -%}
 
@@ -20,8 +28,6 @@
         <div class="col-xs-6 col-md-6">
             <div class="cmsMenuAdmin" data-move-url="{{ url('admin_webetdesign_cms_cmsmenu_move', [], true) }}">
                 {% set items = admin.datagrid.results %}
-                {#{% set menu = knp_menu_get('cmsAdminMenu', [], {code: 'root'}) %}#}
-                {#{{ knp_menu_render(menu, [], 'cms_menu_admin_renderer') }}#}
                 {% for item in items if item.lvl == 1 %}
                     <div class="box box-primary">
                         <div class="box-header item-data" data-id="{{ item.id }}" data-edit-url="{{ admin.generateUrl('edit', {id: item.id}) }}" data-add-url="{{ admin.generateUrl('create', {target: item.id}) }}">
@@ -34,79 +40,9 @@
                             {{ knp_menu_render(menu, [], 'cms_menu_admin_renderer') }}
                         </div>
                     </div>
-                    {#<div class="item-data" data-id="{{ item.id }}" data-edit-url="{{ admin.generateUrl('edit', {id: item.id}) }}" data-add-url="{{ admin.generateUrl('create', {target: item.id}) }}">#}
-                        {#<h4>{{ item.name }} <code>{{ item.code }}</code></h4>#}
-                        {#<button class="cms-menu-item__btn-edit"><i class="fa fa-pencil"></i></button>#}
-                        {#<button class="cms-menu-item__btn-add"><i class="fa fa-plus"></i></button>#}
-                        {#<div class="clearfix"></div>#}
-                    {#</div>#}
-                    {#{% set menu = knp_menu_get('cmsAdminMenu', [], {code: item.code, admin: admin}) %}#}
-                    {#{{ knp_menu_render(menu, [], 'cms_menu_admin_renderer') }}#}
                 {% endfor %}
             </div>
             <br><br>
-
-            {#<div class="cmsMenuAdmin">#}
-            {#<ul class="StackedList">#}
-            {#<li class="StackedListItem">#}
-            {#<span class="offset-0">1</span>#}
-            {#<ul class="StackedList">#}
-            {#<li class="StackedListItem"><span class="offset-1">1.1</span>#}
-            {#<ul class="StackedList">#}
-            {#<li class="StackedListGhost">GHOST</li>#}
-            {#</ul>#}
-            {#</li>#}
-            {#<li class="StackedListItem"><span class="offset-1">1.2</span>#}
-            {#<ul class="StackedList"></ul>#}
-            {#</li>#}
-            {#<li class="StackedListItem"><span class="offset-1">1.3</span>#}
-            {#<ul class="StackedList">#}
-            {#<li class="StackedListItem"><span class="offset-2">1.3.1</span><ul class="StackedList"></ul></li>#}
-            {#<li class="StackedListItem"><span class="offset-2">1.3.2</span><ul class="StackedList"></ul></li>#}
-            {#<li class="StackedListItem"><span class="offset-2">1.3.3</span><ul class="StackedList"></ul></li>#}
-            {#<li class="StackedListItem"><span class="offset-2">1.3.4</span><ul class="StackedList"></ul></li>#}
-            {#</ul>#}
-            {#</li>#}
-            {#<li class="StackedListItem"><span class="offset-1">1.4</span>#}
-            {#<ul class="StackedList"></ul>#}
-            {#</li>#}
-            {#</ul>#}
-            {#</li>#}
-            {#<li class="StackedListItem">#}
-            {#<span class="offset-0">2</span>#}
-            {#<ul class="StackedList">#}
-            {#<li class="StackedListItem"><span class="offset-1">2.1</span>#}
-            {#<ul class="StackedList"></ul>#}
-            {#</li>#}
-            {#<li class="StackedListItem"><span class="offset-1">2.2</span>#}
-            {#<ul class="StackedList"></ul>#}
-            {#</li>#}
-            {#</ul>#}
-            {#</li>#}
-            {#</ul>#}
-            {#</div>#}
-            <br><br>
-
-            <div>
-                <ul class="list-group cms-menu-list">
-                    {% set lastItem = null %}
-                    {% for item in items if item.lvl != 0 %}
-                    {% if not loop.first and item.lvl == 1 %}
-                </ul>
-                <ul class="list-group cms-menu-list">
-                    {% endif %}
-                    {% if item.lvl == 1 %}
-                        <li class="cms-menu-item__drop-item"></li>
-                    {% endif %}
-                    <li class="cms-menu-item list-group-item" data-id="{{ item.id }}" data-edit-url="{{ admin.generateUrl('edit', {id: item.id}) }}">
-                        <span class="offset-{{ item.lvl -1 }}">{{ item.name }}{% if item.page is not null %} => {{ item.page.title }}{% endif %} {{ item.linkValue is not empty ? '=> ' ~ item.linkValue : '' }}</span>
-                        <button class="cms-menu-item__btn-edit"><i class="fa fa-pencil"></i></button>
-                    </li>
-                    <li class="cms-menu-item__drop-item"></li>
-                    {% set lastItem = item %}
-                    {% endfor %}
-                </ul>
-            </div>
         </div>
         <div class="col-xs-6 col-md-6">
             <div class="spinbox" style="display: none">

@@ -7,16 +7,19 @@
 
 ## Installation
 Add the repo to your composer.json
-``` json
- "repositories": [
-     {
-       "type": "git",
-       "url": "https://github.com/webetdesign/wd-cms.git"
-     }
-   ],
- ```
+
+```json
+"repositories": [
+	 {
+	   "type": "git",
+	   "url": "https://github.com/webetdesign/wd-cms.git"
+	 }
+],
+```
+
  And add it in require section
- ``` json
+
+```json
 "require" : {
   ...
   "webetdesign/wd-cms": "^1.0"
@@ -44,7 +47,8 @@ web_et_design_cms:
 
 ```
 
-In class you must define sonata entity
+In class section you must define sonata entity.
+
 In pages section you will able to register all cms page template of your project
 
 ```yaml
@@ -57,6 +61,7 @@ doctrine:
 ```
 
 Add CMS page context in sonata media
+
 ```yaml
 #config/packages/sonata_media.yaml
 sonata_media:
@@ -75,6 +80,7 @@ sonata_media:
 ```
 
 Configuration of ckeditor bundle
+
 ```yaml
 #config/packages/fos_ck_editor.yaml
 fos_ck_editor:
@@ -104,6 +110,7 @@ fos_ck_editor:
 ```
 
 Register CMS routes
+
 ````yaml
 #config/routes/cms.yaml
 cms_routing:
@@ -114,6 +121,7 @@ cms_routing:
 Add CMS ROLE
 
 Attention to visualize all roles in admin, your user must have the role ROLE_SUPER_ADMIN otherwise you will only see roles lower than yours.
+
 ````yaml
 #config/packages/security.yaml
 security:
@@ -122,6 +130,7 @@ security:
 ````
 
 Add admin assets
+
 ```yaml
 #config/packages/sonata_admin.yaml
 sonata_admin:
