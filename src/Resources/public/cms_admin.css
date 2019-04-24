@@ -112,3 +112,3730 @@
 
 .logo img {
   max-width: 100%; }
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+@custom-media --break-sm (min-width: 420px);
+@custom-media --break-md (min-width: 570px);
+@custom-media --break-lg (min-width: 1024px);
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+:root {
+
+  --ga-gray: #75787d;
+  --ga-orange-dark: hsl(16, 87%, 54%); /* #f05721; */
+  --ga-orange-light: hsl(34, 93%, 54%); /* #f7991c; */
+
+  --ga-logo-height: 26px;
+  --ga-logo-width: 303px;
+
+  --gap: 1.5em;
+  --gap-lg: 2em;
+
+  --text-color: #333;
+  --text-color-light: #ddd;
+  --text-color-faded: #777;
+  --text-color-faint: #aaa;
+
+  --action-color: hsl(217, 91%, 63%);
+  --action-color-dark: hsl(217, 91%, 53%);
+
+  --error-color: hsl(0, 60%, 50%);
+  --error-color-bg: hsl(0, 60%, 97%);
+
+  --success-color: hsl(135, 60%, 40%);
+  --success-color-dark: hsl(135, 60%, 33%);
+  --success-color-bg: hsl(135, 60%, 97%);
+
+  --info-color: hsl(200, 75%, 55%);
+
+  --bg-color-dark: #333;
+  --bg-color-dark-faded: #444;
+  --bg-color-light: hsl(30, 10%, 95%);
+
+  --border-color: #d4d2d0;
+  --border-color-active: #3b99fc;
+
+  --sidebar-width: 260px;
+  --sidebar-width-md: 280px;
+
+  --quantum-timing: cubic-bezier(.4,0,.2,1);
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+*,
+*:after,
+*:before {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+body {
+  color: var(--text-color);
+  font:  'Open Sans', sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+
+
+p, ul, ol, pre, dl {
+  margin: var(--gap) 0;
+}
+
+ul {
+  list-style: square;
+  padding: 0 0 0 1.5em;
+}
+
+dt {
+  font-weight: 700;
+}
+
+dd {
+  margin: .4em 0 1em 2em;
+}
+
+h1, h2 {
+  color: var(--text-color-faded);
+  font-weight: 300;
+}
+
+
+
+
+h3.H3--underline {
+  border-bottom: 1px solid hsl(30, 10%, 85%);
+  margin: calc(var(--gap)/1.25) 0;
+  padding-bottom: .5em;
+}
+
+i {
+  display: inline-block;
+  font: inherit;
+}
+
+a {
+  color: var(--ga-orange-dark);
+  text-decoration: none;
+}
+a.A--normal {
+  font-weight: 400;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+b,
+strong {
+  font-weight: 600;
+}
+
+code {
+  background: rgba(0, 0, 0, 0.075);
+  border-radius: 2px;
+  color: #000;
+  font-family: "Menlo", monospace;
+  font-size: .9em;
+  padding: 2px 5px 1px;
+}
+
+a code {
+  color: inherit;
+}
+
+figure {
+  margin: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+input::placeholder {
+  color: #aaa;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+@media (--break-lg) {
+  h1 {
+    margin: 0 0 calc(var(--gap-lg)/2.5);
+  }
+  h2 {
+    margin: calc(var(--gap-lg)/1.75) 0;
+  }
+  h3.H3--underline {
+    margin: calc(var(--gap-lg)/1.25) 0;
+  }
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/*@import "highlight.js/styles/github";*/
+
+/* Override the github styles. */
+.hljs {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: Menlo, monospace;
+  font-size: .9em;
+  max-width: 52em;
+  overflow: auto;
+  padding: var(--gap);
+}
+
+.react-tabs [role=tablist] {
+  margin: 1.5em 0;
+}
+
+/*
+.react-tabs [role=tablist] {
+  border-bottom: 1px solid #aaa;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.react-tabs [role=tab] {
+  display: inline-block;
+  border: 1px solid transparent;
+  border-bottom: none;
+  bottom: -1px;
+  position: relative;
+  list-style: none;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.react-tabs [role=tab][aria-selected=true] {
+  background: #fff;
+  border-color: #aaa;
+  color: black;
+  border-radius: 5px 5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-radius: 5px 5px 0 0;
+}
+
+.react-tabs [role=tab][aria-disabled=true] {
+  color: GrayText;
+  cursor: default;
+}
+
+.react-tabs [role=tab]:focus {
+  box-shadow: 0 0 5px hsl(208, 99%, 50%);
+  border-color: hsl(208, 99%, 50%);
+  outline: none;
+}
+
+.react-tabs [role=tab]:focus:after {
+  content: "";
+  position: absolute;
+  height: 5px;
+  left: -4px;
+  right: -4px;
+  bottom: -5px;
+  background: #fff;
+}.react-tabs [role=tablist] {
+  border-bottom: 1px solid #aaa;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.react-tabs [role=tab] {
+  display: inline-block;
+  border: 1px solid transparent;
+  border-bottom: none;
+  bottom: -1px;
+  position: relative;
+  list-style: none;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.react-tabs [role=tab][aria-selected=true] {
+  background: #fff;
+  border-color: #aaa;
+  color: black;
+  border-radius: 5px 5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-radius: 5px 5px 0 0;
+}
+
+.react-tabs [role=tab][aria-disabled=true] {
+  color: GrayText;
+  cursor: default;
+}
+
+.react-tabs [role=tab]:focus {
+  box-shadow: 0 0 5px hsl(208, 99%, 50%);
+  border-color: hsl(208, 99%, 50%);
+  outline: none;
+}
+
+.react-tabs [role=tab]:focus:after {
+  content: "";
+  position: absolute;
+  height: 5px;
+  left: -4px;
+  right: -4px;
+  bottom: -5px;
+  background: #fff;
+}
+*//*
+Version: 3.5.2 Timestamp: Sat Nov  1 14:43:36 EDT 2014
+*/
+.select2-container {
+  margin: 0;
+  position: relative;
+  display: inline-block;
+
+  vertical-align: middle;
+}
+
+.select2-container,
+.select2-drop,
+.select2-search,
+.select2-search input {
+  box-sizing: border-box;
+}
+
+.select2-container .select2-choice {
+  display: block;
+  height: 26px;
+  padding: 0 0 0 8px;
+  overflow: hidden;
+  position: relative;
+
+  border: 1px solid #aaa;
+  white-space: nowrap;
+  line-height: 26px;
+  color: #444;
+  text-decoration: none;
+
+  border-radius: 4px;
+
+  background-clip: padding-box;
+
+  -webkit-touch-callout: none;
+  user-select: none;
+
+  background-color: #fff;
+  /*background-image: linear-gradient(to top, #eee 0%, #fff 50%);*/
+}
+
+html[dir="rtl"] .select2-container .select2-choice {
+  padding: 0 8px 0 0;
+}
+
+.select2-container.select2-drop-above .select2-choice {
+  border-bottom-color: #aaa;
+  border-radius: 0 0 4px 4px;
+  /*background-image: linear-gradient(to bottom, #eee 0%, #fff 90%);*/
+}
+
+.select2-container.select2-allowclear .select2-choice .select2-chosen {
+  margin-right: 42px;
+}
+
+.select2-container .select2-choice > .select2-chosen {
+  margin-right: 26px;
+  display: block;
+  overflow: hidden;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+  float: none;
+  width: auto;
+}
+
+html[dir="rtl"] .select2-container .select2-choice > .select2-chosen {
+  margin-left: 26px;
+  margin-right: 0;
+}
+
+.select2-container .select2-choice abbr {
+  display: none;
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  right: 24px;
+  top: 8px;
+
+  font-size: 1px;
+  text-decoration: none;
+
+  border: 0;
+  /*background: url('select2.png') right top no-repeat;*/
+  cursor: pointer;
+  outline: 0;
+}
+
+.select2-container.select2-allowclear .select2-choice abbr {
+  display: inline-block;
+}
+
+.select2-container .select2-choice abbr:hover {
+  /*background-position: right -11px;*/
+  cursor: pointer;
+}
+
+.select2-drop-mask {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  min-height: 100%;
+  min-width: 100%;
+  height: auto;
+  width: auto;
+  opacity: 0;
+  z-index: 9998;
+  /* styles required for IE to work */
+  background-color: #fff;
+  filter: alpha(opacity=0);
+}
+
+.select2-drop {
+  width: 100%;
+  margin-top: -1px;
+  position: absolute;
+  z-index: 9999;
+  top: 100%;
+
+  background: #fff;
+  color: #000;
+  border: 1px solid #aaa;
+  border-top: 0;
+
+  border-radius: 0 0 4px 4px;
+  /*box-shadow: 0 4px 5px rgba(0, 0, 0, .15);*/
+}
+
+.select2-drop.select2-drop-above {
+  margin-top: 1px;
+  border-top: 1px solid #aaa;
+  border-bottom: 0;
+
+  border-radius: 4px 4px 0 0;
+  /*box-shadow: 0 -4px 5px rgba(0, 0, 0, .15);*/
+}
+
+.select2-drop-active {
+  border: 1px solid #5897fb;
+  border-top: none;
+}
+
+.select2-drop.select2-drop-above.select2-drop-active {
+  border-top: 1px solid #5897fb;
+}
+
+.select2-drop-auto-width {
+  border-top: 1px solid #aaa;
+  width: auto;
+}
+
+.select2-drop-auto-width .select2-search {
+  padding-top: 4px;
+}
+
+.select2-container .select2-choice .select2-arrow {
+  display: inline-block;
+  width: 18px;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  border-left: 1px solid #aaa;
+  border-radius: 0 4px 4px 0;
+
+  background-clip: padding-box;
+
+  background: #ccc;
+  /*background-image: linear-gradient(to top, #ccc 0%, #eee 60%);*/
+}
+
+html[dir="rtl"] .select2-container .select2-choice .select2-arrow {
+  left: 0;
+  right: auto;
+
+  border-left: none;
+  border-right: 1px solid #aaa;
+  border-radius: 4px 0 0 4px;
+}
+
+.select2-container .select2-choice .select2-arrow b {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /*background: url('select2.png') no-repeat 0 1px;*/
+}
+
+html[dir="rtl"] .select2-container .select2-choice .select2-arrow b {
+  /*background-position: 2px 1px;*/
+}
+
+.select2-search {
+  display: inline-block;
+  width: 100%;
+  min-height: 26px;
+  margin: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+
+  position: relative;
+  z-index: 10000;
+
+  white-space: nowrap;
+}
+
+.select2-search input {
+  width: 100%;
+  height: auto !important;
+  min-height: 26px;
+  padding: 4px 20px 4px 5px;
+  margin: 0;
+
+  outline: 0;
+  font-family: sans-serif;
+  font-size: 1em;
+
+  border: 1px solid #aaa;
+  border-radius: 0;
+
+  /*box-shadow: none;*/
+
+  /*background: url('select2.png') no-repeat 100% -22px, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0;*/
+}
+
+html[dir="rtl"] .select2-search input {
+  padding: 4px 5px 4px 20px;
+  /*background: url('select2.png') no-repeat -37px -22px, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0;*/
+}
+
+.select2-drop.select2-drop-above .select2-search input {
+  margin-top: 4px;
+}
+
+.select2-search input.select2-active {
+  /*background: url('select2-spinner.gif') no-repeat 100%, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0;*/
+}
+
+.select2-container-active .select2-choice,
+.select2-container-active .select2-choices {
+  border: 1px solid #5897fb;
+  outline: none;
+  /*box-shadow: 0 0 5px rgba(0, 0, 0, .3);*/
+}
+
+.select2-dropdown-open .select2-choice {
+  border-bottom-color: transparent;
+  /*box-shadow: 0 1px 0 #fff inset;*/
+
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  background-color: #eee;
+  /*background-image: linear-gradient(to top, #fff 0%, #eee 50%);*/
+}
+
+.select2-dropdown-open.select2-drop-above .select2-choice,
+.select2-dropdown-open.select2-drop-above .select2-choices {
+  border: 1px solid #5897fb;
+  border-top-color: transparent;
+  /*background-image: linear-gradient(to bottom, #fff 0%, #eee 50%);*/
+}
+
+.select2-dropdown-open .select2-choice .select2-arrow {
+  background: transparent;
+  border-left: none;
+  filter: none;
+}
+html[dir="rtl"] .select2-dropdown-open .select2-choice .select2-arrow {
+  border-right: none;
+}
+
+.select2-dropdown-open .select2-choice .select2-arrow b {
+  /*background-position: -18px 1px;*/
+}
+
+html[dir="rtl"] .select2-dropdown-open .select2-choice .select2-arrow b {
+  /*background-position: -16px 1px;*/
+}
+
+.select2-hidden-accessible {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+/* results */
+.select2-results {
+  max-height: 300px;
+  padding: 0 0 0 4px;
+  margin: 4px 4px 4px 0;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+html[dir="rtl"] .select2-results {
+  padding: 0 4px 0 0;
+  margin: 4px 0 4px 4px;
+}
+
+.select2-results ul.select2-result-sub {
+  margin: 0;
+  padding-left: 0;
+}
+
+.select2-results li {
+  list-style: none;
+  display: list-item;
+  /*background-image: none;*/
+}
+
+.select2-results li.select2-result-with-children > .select2-result-label {
+  font-weight: bold;
+}
+
+.select2-results .select2-result-label {
+  padding: 3px 7px 4px;
+  margin: 0;
+  cursor: pointer;
+
+  min-height: 1em;
+
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.select2-results-dept-1 .select2-result-label { padding-left: 20px }
+.select2-results-dept-2 .select2-result-label { padding-left: 40px }
+.select2-results-dept-3 .select2-result-label { padding-left: 60px }
+.select2-results-dept-4 .select2-result-label { padding-left: 80px }
+.select2-results-dept-5 .select2-result-label { padding-left: 100px }
+.select2-results-dept-6 .select2-result-label { padding-left: 110px }
+.select2-results-dept-7 .select2-result-label { padding-left: 120px }
+
+.select2-results .select2-highlighted {
+  background: #3875d7;
+  color: #fff;
+}
+
+.select2-results li em {
+  background: #feffde;
+  font-style: normal;
+}
+
+.select2-results .select2-highlighted em {
+  background: transparent;
+}
+
+.select2-results .select2-highlighted ul {
+  background: #fff;
+  color: #000;
+}
+
+.select2-results .select2-no-results,
+.select2-results .select2-searching,
+.select2-results .select2-ajax-error,
+.select2-results .select2-selection-limit {
+  background: #f4f4f4;
+  display: list-item;
+  padding-left: 5px;
+}
+
+/*
+disabled look for disabled choices in the results dropdown
+*/
+.select2-results .select2-disabled.select2-highlighted {
+  color: #666;
+  background: #f4f4f4;
+  display: list-item;
+  cursor: default;
+}
+.select2-results .select2-disabled {
+  background: #f4f4f4;
+  display: list-item;
+  cursor: default;
+}
+
+.select2-results .select2-selected {
+  display: none;
+}
+
+.select2-more-results.select2-active {
+  /*background: #f4f4f4 url('select2-spinner.gif') no-repeat 100%;*/
+}
+
+.select2-results .select2-ajax-error {
+  background: rgba(255, 50, 50, .2);
+}
+
+.select2-more-results {
+  background: #f4f4f4;
+  display: list-item;
+}
+
+/* disabled styles */
+
+.select2-container.select2-container-disabled .select2-choice {
+  background-color: #f4f4f4;
+  /*background-image: none;*/
+  border: 1px solid #ddd;
+  cursor: default;
+}
+
+.select2-container.select2-container-disabled .select2-choice .select2-arrow {
+  background-color: #f4f4f4;
+  /*background-image: none;*/
+  border-left: 0;
+}
+
+.select2-container.select2-container-disabled .select2-choice abbr {
+  display: none;
+}
+
+
+/* multiselect */
+
+.select2-container-multi .select2-choices {
+  height: auto !important;
+  height: 1%;
+  margin: 0;
+  padding: 0 5px 0 0;
+  position: relative;
+
+  border: 1px solid #aaa;
+  cursor: text;
+  overflow: hidden;
+
+  background-color: #fff;
+  /*background-image: linear-gradient(to bottom, #eee 1%, #fff 15%);*/
+}
+
+html[dir="rtl"] .select2-container-multi .select2-choices {
+  padding: 0 0 0 5px;
+}
+
+.select2-locked {
+  padding: 3px 5px 3px 5px !important;
+}
+
+.select2-container-multi .select2-choices {
+  min-height: 26px;
+}
+
+.select2-container-multi.select2-container-active .select2-choices {
+  border: 1px solid #5897fb;
+  outline: none;
+
+  /*box-shadow: 0 0 5px rgba(0, 0, 0, .3);*/
+}
+.select2-container-multi .select2-choices li {
+  float: left;
+  list-style: none;
+}
+html[dir="rtl"] .select2-container-multi .select2-choices li
+{
+  float: right;
+}
+.select2-container-multi .select2-choices .select2-search-field {
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.select2-container-multi .select2-choices .select2-search-field input {
+  padding: 5px;
+  margin: 1px 0;
+
+  font-family: sans-serif;
+  font-size: 100%;
+  color: #666;
+  outline: 0;
+  border: 0;
+  /*box-shadow: none;*/
+  background: transparent !important;
+}
+
+.select2-container-multi .select2-choices .select2-search-field input.select2-active {
+  /*background: #fff url('select2-spinner.gif') no-repeat 100% !important;*/
+}
+
+.select2-default {
+  color: #999 !important;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+  padding: 3px 5px 3px 18px;
+  margin: 3px 0 3px 5px;
+  position: relative;
+
+  line-height: 13px;
+  color: #333;
+  cursor: default;
+  border: 1px solid #aaaaaa;
+
+  border-radius: 3px;
+
+  /*box-shadow: 0 0 2px #fff inset, 0 1px 0 rgba(0, 0, 0, 0.05);*/
+
+  background-clip: padding-box;
+
+  -webkit-touch-callout: none;
+  user-select: none;
+
+  background-color: #e4e4e4;
+  /*background-image: linear-gradient(to bottom, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eee 100%);*/
+}
+html[dir="rtl"] .select2-container-multi .select2-choices .select2-search-choice
+{
+  margin: 3px 5px 3px 0;
+  padding: 3px 18px 3px 5px;
+}
+.select2-container-multi .select2-choices .select2-search-choice .select2-chosen {
+  cursor: default;
+}
+.select2-container-multi .select2-choices .select2-search-choice-focus {
+  background: #d4d4d4;
+}
+
+.select2-search-choice-close {
+  display: block;
+  width: 12px;
+  height: 13px;
+  position: absolute;
+  right: 3px;
+  top: 4px;
+
+  font-size: 1px;
+  outline: none;
+  /*background: url('select2.png') right top no-repeat;*/
+}
+html[dir="rtl"] .select2-search-choice-close {
+  right: auto;
+  left: 3px;
+}
+
+.select2-container-multi .select2-search-choice-close {
+  left: 3px;
+}
+
+html[dir="rtl"] .select2-container-multi .select2-search-choice-close {
+  left: auto;
+  right: 2px;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice .select2-search-choice-close:hover {
+  /*background-position: right -11px;*/
+}
+.select2-container-multi .select2-choices .select2-search-choice-focus .select2-search-choice-close {
+  /*background-position: right -11px;*/
+}
+
+/* disabled styles */
+.select2-container-multi.select2-container-disabled .select2-choices {
+  background-color: #f4f4f4;
+  /*background-image: none;*/
+  border: 1px solid #ddd;
+  cursor: default;
+}
+
+.select2-container-multi.select2-container-disabled .select2-choices .select2-search-choice {
+  padding: 3px 5px 3px 5px;
+  border: 1px solid #ddd;
+  /*background-image: none;*/
+  background-color: #f4f4f4;
+}
+
+.select2-container-multi.select2-container-disabled .select2-choices .select2-search-choice .select2-search-choice-close {    display: none;
+  background: none;
+}
+/* end multiselect */
+
+
+.select2-result-selectable .select2-match,
+.select2-result-unselectable .select2-match {
+  text-decoration: underline;
+}
+
+.select2-offscreen, .select2-offscreen:focus {
+  clip: rect(0 0 0 0) !important;
+  width: 1px !important;
+  height: 1px !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  outline: 0 !important;
+  left: 0px !important;
+  top: 0px !important;
+}
+
+.select2-display-none {
+  display: none;
+}
+
+.select2-measure-scrollbar {
+  position: absolute;
+  top: -10000px;
+  left: -10000px;
+  width: 100px;
+  height: 100px;
+  overflow: scroll;
+}
+
+/* Retina-ize icons */
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-resolution: 2dppx)  {
+  .select2-search input,
+  .select2-search-choice-close,
+  .select2-container .select2-choice abbr,
+  .select2-container .select2-choice .select2-arrow b {
+    /*background-image: url('select2x2.png') !important;*/
+    background-repeat: no-repeat !important;
+    background-size: 60px 40px !important;
+  }
+
+  .select2-search input {
+    /*background-position: 100% -21px !important;*/
+  }
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.select2-container-multi  {
+  display: block!important;
+  vertical-align: inherit!important;
+}
+
+/**
+ * The generated input box (looks like a text field).
+ */
+
+.select2-container-multi .select2-choices {
+  background: #fff!important;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box;
+  font: inherit;
+  font-weight: 400;
+  height: auto;
+  line-height: inherit;
+  min-height: 0;
+  padding: calc(6em/14) calc(6em/14) 0;
+}
+
+.select2-container-multi.select2-container-active .select2-choices {
+  border-color: var(--border-color-active);
+}
+
+.select2-container-multi.select2-dropdown-open .select2-choices {
+  border-radius: 4px 4px 0 0;
+}
+
+.select2-container-multi.select2-dropdown-open.select2-drop-above .select2-choices {
+  border-radius: 0 0 4px 4px;
+}
+
+
+/**
+ * The select dropdown and its contents.
+ */
+
+.select2-drop {
+  borde-radius: 0 0 4px 4px!important;
+}
+.select2-drop.select2-drop-above {
+  borde-radius: 4px 4px 0 0!important;
+  border-width: 1px 1px 0;
+}
+.select2-drop.select2-drop-active {
+  border-color: var(--border-color-active);
+  border-width: 0 1px 1px;
+}
+
+.select2-drop .select2-results {
+  border: solid #eee;
+  border-width: 1px 0 0;
+  max-height: 300px;
+  margin: 0;
+  padding: 0;
+}
+
+.select2-drop.select2-drop-above .select2-results {
+  border-width: 0 0 1px;
+}
+
+.select2-drop .select2-result {
+  border: solid #eee;
+  border-width: 1px 0 0;
+}
+
+.select2-drop .select2-result:first-child {
+  border-width: 0;
+}
+
+.select2-drop .select2-result.select2-highlighted {
+  border-color: transparent;
+  background: var(--border-color-active);
+}
+
+.select2-drop .select2-result.select2-highlighted * {
+  color: #fff!important;
+}
+
+.select2-drop .select2-results .select2-result-label {
+  padding: 0;
+}
+
+.select2-drop .select2-results .select2-selection-limit {
+  background: 0;
+  color: var(--text-color-faded);
+  font-size: .85em;
+  padding: .5em;
+}
+
+
+/**
+ * The search field within the input box.
+ */
+
+.select2-container-multi .select2-choices .select2-search-field {
+  display: inline-block;
+  float: none;
+  margin: 0 0 calc(6em/14);
+  padding: calc(2em/14) 0;
+}
+
+.select2-container-multi .select2-choices .select2-search-field input {
+  color: inherit;
+  font: inherit;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+
+
+/**
+ * The tags.
+ */
+
+.select2-container-multi .select2-choices .select2-search-choice {
+  background: hsl(0,0%,92.5%);
+  border: 0;
+  display: inline-flex;
+  float: none;
+  font: inherit;
+  margin: 0 calc(6em/14) calc(6em/14) 0;
+  max-width: 100%;
+  padding: calc(2em/14) calc(6em/14);
+}
+
+.select2-container-multi .select2-choices .select2-search-choice-focus {
+  background: hsl(0,0%,87.5%);
+}
+
+.select2-container-multi .select2-choices .select2-search-choice > div {
+  cursor: text;
+  font: inherit;
+  margin-right: .4em;
+  user-select: initial;
+  word-wrap: break-word;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice-close {
+  color: inherit;
+  font: inherit;
+  height: auto;
+  opacity: .25;
+  position: static;
+  width: auto;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice-focus .select2-search-choice-close,
+.select2-container-multi .select2-choices .select2-search-choice-close:hover {
+  opacity: 1;
+}
+
+.select2-container-multi .select2-choices  .select2-search-choice-close::after {
+  display: inline-block;
+  content: '\2715';
+  font-size: .9em;
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+/**
+ * Styles for gapi analytics table.
+ */
+
+
+.gapi-analytics-data-chart .gapi-analytics-data-chart-styles-table-tr-odd {
+  background: hsl(30, 15%, 96.7%)!important;
+}
+
+.gapi-analytics-data-chart .gapi-analytics-data-chart-styles-table-tr-over {
+  background: hsl(30, 15%, 93.3%)!important;
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.AccountExplorerResults {
+  padding-top: var(--gap);
+}
+
+.AccountExplorerResults-title {
+  font-size: 1.4em;
+  font-weight: 300;
+  margin: 0 0 var(--gap-lg);
+  text-align: center;
+}
+
+.AccountExplorerResults table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.AccountExplorerResults th,
+.AccountExplorerResults td {
+  text-align: left;
+  padding: .75em 1em;
+  vertical-align: top;
+}
+
+.AccountExplorerResults td {
+  border-top: 1px solid #e8e8e8;
+  word-break: break-word;
+}
+
+.AccountExplorerResults-id {
+  color: var(--text-color-faded);
+  font-size: .9em;
+  margin-top: .5em;
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.FormField {
+  width: 100%;
+}
+
+input.FormField,
+select.FormField,
+textarea.FormField {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font: inherit;
+  font-weight: 400;
+  height: calc(34em/14); /* 34px @ 14px body font */
+  line-height: calc(20em/14); /* 20px @ 14px body font */
+  padding: calc(6em/14); /* 6px @ 14px body font */
+  transition: border-color .2s var(--quantum-timing);
+}
+
+textarea.FormField {
+  display: block;
+  height: auto;
+  resize: vertical;
+}
+
+input.FormField:focus,
+select.FormField:focus,
+textarea.FormField:focus {
+  border-color: var(--border-color-active);
+  outline: 0;
+}
+
+.FormField--invalid {
+  border-color: var(--error-color)!important;
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.AccountExplorerSearch {
+  padding: 1.5em;
+}
+
+.AccountExplorerSearch-title {
+  font-size: 1.4em;
+  font-weight: 300;
+  margin: 0 0 var(--gap-lg);
+  text-align: center;
+}
+
+input.AccountExplorerSearch-field {
+  display: block;
+  height: auto;
+  margin: 0 auto 3em;
+  max-width: 32em;
+  padding: .75em 1em;
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Alert {
+  align-items: flex-start;
+  background: var(--error-color);
+  box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.4);
+  color: #fff;
+  display: flex;
+  padding: var(--gap);
+  position: relative;
+  transform: translate3d(0, 0, 0);
+  transition: transform .2s var(--quantum-timing);
+}
+
+.Alert-enter {
+  transform: translate3d(0, -100%, 0);
+
+}
+
+.Alert-enter-active {
+  transform: translate3d(0, 0, 0);
+}
+
+.Alert-leave {
+  transform: translate3d(0, 0, 0);
+}
+
+.Alert-leave-active {
+  transform: translate3d(0, -100%, 0);
+}
+
+
+.Alert-icon {
+  font-size: 3em;
+}
+
+.Alert-close {
+  background: none;
+  border: 0;
+  font-size: 1.5em;
+  opacity: .4;
+  padding: .5em;
+}
+.Alert-close:active,
+.Alert-close:focus,
+.Alert-close:hover {
+  opacity: 1;
+  outline: 0;
+}
+
+.Alert-body {
+  flex: 1 0 0%;
+  margin: 0 var(--gap);
+}
+
+.Alert-title {
+  color: inherit;
+  font-size: 1.5em;
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.Alert-message {
+  font-weight: 300;
+  margin-top: .4em;
+  opacity: .7;
+}
+
+@media (--break-lg) {
+  .Alert {
+    padding: var(--gap-lg);
+  }
+}/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.AlertDispatcher {
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Box {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: var(--gap);
+  padding: var(--gap);
+}
+
+
+.Box-header {
+  border-bottom: 1px solid var(--border-color);
+  margin: -var(--gap) -var(--gap) var(--gap);
+  padding: var(--gap);
+}
+
+.Box-footer {
+  border-top: 1px solid var(--border-color);
+  margin: var(--gap) -var(--gap) -var(--gap);
+  padding: var(--gap);
+}
+
+@media (--break-lg) {
+  .Box {
+    margin-bottom: var(--gap-lg);
+    padding: var(--gap-lg);
+  }
+  .Box-header {
+    margin: -var(--gap-lg) -var(--gap-lg) var(--gap-lg);
+    padding: var(--gap-lg);
+  }
+  .Box-footer {
+    margin: var(--gap-lg) -var(--gap-lg) -var(--gap-lg);
+    padding: var(--gap-lg);
+  }
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.Button {
+  background: hsla(0,0%,0%, .075);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: inherit;
+  cursor: pointer;
+  display: inline-block;
+  font: inherit;
+  font-weight: 400;
+  line-height: calc(20em/14); /* 20px @ 14px body font */
+  padding: calc(6em/14) 1em; /* 6px @ 14px body font */
+  transition: background-color .2s var(--quantum-timing),
+              border-color .2s var(--quantum-timing);
+}
+
+.Button:disabled {
+  opacity: .4;
+}
+
+.Button:active:enabled,
+.Button:focus:enabled,
+.Button:hover:enabled {
+  background: hsla(0,0%,0%, .15);
+  outline: none;
+  text-decoration: none;
+}
+
+
+.Button-iconWrapper {
+  display: inline-flex;
+  align-items: center;
+}
+
+.Button-icon {
+  margin-right: .6em;
+}
+
+.Button--action {
+  color: #fff;
+  background: var(--action-color);
+  border-color: transparent;
+}
+.Button--action:active:enabled,
+.Button--action:focus:enabled,
+.Button--action:hover:enabled {
+  background: var(--action-color-dark);
+}
+
+.Button--success {
+  color: #fff;
+  background: var(--success-color);
+  border-color: transparent;
+}
+.Button--success:active:enabled,
+.Button--success:focus:enabled,
+.Button--success:hover:enabled {
+  background: var(--success-color-dark);
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.ButtonSet {
+  margin: 0 -1em -1em;
+}
+
+.ButtonSet .Button {
+  margin: 0 0 1em 1em;
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.CampaignUrlForm {
+  margin: var(--gap) 0;
+}
+
+@media (--break-lg) {
+  .CampaignUrlForm {
+    margin: var(--gap-lg) 0;
+  }
+}/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.CampaignUrlResult {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: var(--gap);
+  padding: var(--gap) var(--gap) 0;
+}
+
+.CampaignUrlResult-problem {
+  background: #fff3cd
+}
+
+.CampaignUrlResult-alertBox {
+  background: #f8d7da;
+  padding: .5em 1em;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  border: 1px solid #f5c6cb;
+}
+
+.CampaignUrlResult-title {
+  color: inherit;
+  font-size: 1.5em;
+  font-weight: 300;
+  line-height: 1;
+  margin: 0 0 .667em;
+}
+
+.CampaignUrlResult-item {
+  margin: 0 0 var(--gap);
+}
+
+@media (--break-lg) {
+  .CampaignUrlResult {
+    margin-bottom: var(--gap-lg);
+    padding: var(--gap-lg) var(--gap-lg) 0;
+  }
+  .CampaignUrlResult-item {
+    margin: 0 0 var(--gap-lg);
+  }
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Checkbox {
+  display: inline-block;
+  margin-right: .5em;
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+:root {
+  --CohortTable-borderColor: hsl(30,10%,80%);
+  --CohortTable-borderColorLight: hsl(30,10%,90%);
+  --CohortTable-borderColorDark: hsl(30,10%,70%);
+
+  --CohortTable-divisionColor: #000;
+
+  --CohortTable-metricHeaderBgColor: hsl(30,10%,84%);
+  --CohortTable-dimensionHeaderBgColor: hsl(30,10%,92%);
+}
+
+
+.CohortTable {
+  overflow: auto;
+  max-width: 100%;
+}
+
+.CohortTable-table {
+  width: 100%;
+}
+
+.CohortTable-th,
+.CohortTable-td {
+  background: #fff;
+  border: 1px solid var(--CohortTable-borderColor);
+  padding: .75em 1em;
+  text-align: right;
+  vertical-align: top;
+}
+
+.CohortTable-th {
+  font-weight: bold;
+}
+
+.CohortTable-th:first-child,
+.CohortTable-td:first-child {
+  text-align: left;
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.Site {
+  background: var(--bg-color-light);
+  min-height: 100%;
+  min-width: var(--sidebar-width);
+}
+
+.Site-sidebar {
+  background: var(--bg-color-dark-faded);
+  bottom: 0;
+  box-shadow: 0 0 var(--gap) rgba(0, 0, 0, 0);
+  left: -var(--sidebar-width);
+  max-width: 100%;
+  min-width: var(--sidebar-width);
+  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  transform: translate3d(0, 0, 0);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  width: var(--sidebar-width);
+  z-index: 1;
+}
+
+.Site.is-expanded {
+  overflow: hidden;
+}
+
+.Site.is-expanded .Site-sidebar {
+  box-shadow: 0 0 var(--gap) rgba(0, 0, 0, 0.5);
+  transform: translate3d(var(--sidebar-width), 0, 0);
+}
+
+
+.Site-main {
+  /* TODO(philipwalton): fallback for non-flexbox.
+  min-height: 100%;
+  */
+}
+
+@media (--break-md) {
+  .Site {
+    /* TODO(philipwalton): remove this once Query Explorer is responsive. */
+    /* min-width: 768px; */
+  }
+  .Site-sidebar {
+    left: -var(--sidebar-width-md);
+    min-width: var(--sidebar-width-md);
+    width: var(--sidebar-width-md);
+  }
+  .Site.is-expanded .Site-sidebar {
+    transform: translate3d(var(--sidebar-width-md), 0, 0);
+  }
+}
+
+@media (--break-lg) {
+  .Site {
+    display: flex;
+
+    /* TODO(philipwalton): add fallback for non-supporting browsers; */
+    /* TODO(philipwalton): Two column, equal height hack for fallback.
+    background-image: linear-gradient(
+      to right,
+      var(--bg-color-dark-faded) 0%,
+      var(--bg-color-dark-faded) var(--sidebar-width-lg));
+    background-size: var(--sidebar-width-lg) 1px;
+    background-repeat: repeat-y;
+    */
+  }
+
+  .Site-sidebar {
+    background: var(--bg-color-dark-faded);
+    border-top: .4em solid #222;
+    box-shadow: none;
+    overflow: visible;
+    position: static;
+    transition: none;
+    z-index: 0;
+  }
+
+  .Site.is-expanded .Site-sidebar {
+    transform: none;
+  }
+
+  .Site-main {
+    border-top: .4em solid #f7991c;
+    box-shadow: 0 0 1em rgba(0,0,0,.3);
+    flex: 1;
+    min-width: 0;
+    position: relative; /* To get it stacked above the sidebar */
+
+    /* TODO(philipwalton): fallback for non-flexbox
+    margin-left: var(--sidebar-width-lg);
+    */
+  }
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Content {
+  margin: var(--gap);
+  max-width: 1060px;
+  transition: opacity .5s var(--quantum-timing);
+}
+
+.Site.is-loading .Content,
+.Site.is-needingAuthorization .Content {
+  pointer-events: none;
+  opacity: .333;
+}
+
+@media (--break-lg) {
+  .Content {
+    margin: calc(var(--gap-lg)*1.5);
+  }
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+:root {
+  --Dashboard-maxWidth: 52em;
+}
+
+.Dashboard {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  max-width: var(--Dashboard-maxWidth);
+  padding: var(--gap);
+}
+
+.Dashboard-header {
+  border-bottom: 1px solid var(--border-color);
+  margin: -var(--gap) -var(--gap) var(--gap);
+  padding: var(--gap);
+}
+
+.Dashboard-footer {
+  border-top: 1px solid var(--border-color);
+  margin: -var(--gap) -var(--gap) var(--gap);
+  padding: var(--gap);
+}
+
+.Dashboard--full {
+  max-width: 100%;
+}
+
+.Dashboard--collapseBottom {
+  padding-bottom: 0;
+}
+
+@media (--break-lg) {
+  .Dashboard {
+    padding: var(--gap-lg);
+  }
+  .Dashboard-header {
+    margin: -var(--gap-lg) -var(--gap-lg) var(--gap-lg);
+    padding: var(--gap-lg);
+  }
+  .Dashboard-footer {
+    margin: -var(--gap-lg) -var(--gap-lg) var(--gap-lg);
+    padding: var(--gap);
+  }
+
+  .Dashboard--collapseBottom {
+    padding-bottom: calc(var(--gap-lg) - var(--gap));
+  }
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.DataTable .gapi-analytics-data-chart {
+  overflow-x: auto;
+  word-break: break-all;
+}
+
+.DataTable .gapi-analytics-data-chart .gapi-analytics-data-chart-styles-table-tr-head {
+  background: hsl(30, 10%, 96.7%);
+}
+
+.DataTable .gapi-analytics-data-chart .gapi-analytics-data-chart-styles-table-th {
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+.DataTable .gapi-analytics-data-chart .gapi-analytics-data-chart-styles-table-th:first-child {
+  border-left: 1px solid #ddd;
+}
+
+.DataTable .gapi-analytics-data-chart .gapi-analytics-data-chart-styles-table-th:last-child {
+  border-right: 1px solid #ddd;
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/**
+ * DateRangeSelector Component
+ */
+
+:root {
+  --DateRangeSelector-itemMinWidth: 150px;
+}
+
+.DateRangeSelector {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 -1em -1em;
+}
+
+.DateRangeSelector-item {
+  margin: 0 0 1em 1em;
+  flex: 1 0 calc(100% - 1em);
+}
+
+.DateRangeSelector-item > label {
+  font-weight: 700;
+  margin: 0 .25em .25em 0;
+  display: block;
+}
+
+.DateRangeSelector-item > input {
+  width: 100%;
+}
+
+@media (--break-md) {
+  .DateRangeSelector-item {
+    flex-basis: auto;
+    min-width: var(--DateRangeSelector-itemMinWidth);
+  }
+}
+
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Error {
+  background: hsl(0, 100%, 98%);
+  border: 1px solid hsla(0, 70%, 55%, .5);
+  border-radius: 4px;
+  color: hsla(0, 0%, 0%, 0.5);
+  margin: 2em 0px;
+  padding: 1em 1.5em;
+}
+
+.Error-title {
+  color: hsl(0, 70%, 55%);
+  display: inline-block;
+  font-size: 1.1em;
+  line-height: 1.5;
+  margin: 0 .5em 0 0;
+}
+
+.Error-message {
+  display: inline-block;
+  margin: 0;
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+:root {
+  --FlexGrid-gutter: var(--gap);
+  --FlexGrid-gutter-lg: var(--gap-lg);
+  --FlexGrid-itemMinWidth: 200px;
+}
+
+.FlexGrid {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0 0 -var(--FlexGrid-gutter) -var(--FlexGrid-gutter);
+  padding: 0;
+}
+
+.FlexGrid-item {
+  flex: 1 0 calc(100% - var(--FlexGrid-gutter));
+  margin: 0 0 var(--FlexGrid-gutter) var(--FlexGrid-gutter);
+}
+
+.FlexGrid-item--fixed {
+  /* An `auto` flex-basis will use the size of the contents. */
+  flex: 0 0 auto!important;
+}
+
+
+/**
+ * --halves modifier.
+ * Ensures that an item never takes up more than half of the width, i.e.
+ * no more that two items will ever be in a row.
+ */
+.FlexGrid--halves .FlexGrid-item {
+  flex-basis: 34%;
+}
+
+
+@media (--break-md) {
+  .FlexGrid-item {
+    flex-basis: var(--FlexGrid-itemMinWidth);
+  }
+}
+
+@media (--break-lg) {
+  .FlexGrid {
+    margin: 0 0 -var(--FlexGrid-gutter-lg) -var(--FlexGrid-gutter-lg);
+  }
+  .FlexGrid-item {
+    margin: 0 0 var(--FlexGrid-gutter-lg) var(--FlexGrid-gutter-lg);
+  }
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+
+.FlexLine {
+  /* display: flex; */
+
+  /*
+   * TODO(philipwalton): replace the below with the above once this FF bug is
+   * fixed: https://bugzilla.mozilla.org/show_bug.cgi?id=1146442
+   */
+   display: inline-flex;
+   width: 100%;
+}
+
+.FlexLine > [data-flex] {
+  flex: 1 0 0%;
+}
+
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+:root {
+  --form-label-width: 12em;
+  --form-control-space: 1.25em;
+}
+
+
+.FormControl {
+  display: block;
+  margin: 0 0 var(--form-control-space);
+  max-width: 40em;
+}
+@media (--break-lg) {
+  .FormControl--inline {
+    align-items: baseline;
+    display: flex;
+  }
+}
+
+.FormControl--full {
+  max-width: initial;
+}
+
+.FormControl-label {
+  display: block;
+  font-weight: 600;
+  margin: 0 0 .25em;
+}
+.FormControl--required .FormControl-label::before,
+.FormControl--required .FormControl-label::after {
+  color: hsl(0, 70%, 55%);
+  display: inline-block;
+  font-weight: 600;
+}
+.FormControl--required .FormControl-label::after {
+  content: '*';
+  margin-left: .5em;
+}
+@media (--break-lg) {
+
+  /*
+   * 1. Use with instead of flex-basis to workaround Flexbug 8
+   *    https://github.com/philipwalton/flexbugs
+   */
+  .FormControl--inline .FormControl-label {
+    flex: 0 0 auto; /* 1 */
+    padding-right: var(--form-control-space);
+    text-align: right;
+    width: var(--form-label-width); /* 1 */
+  }
+  .FormControl--required .FormControl-label::after {
+    content: none;
+  }
+  .FormControl--required .FormControl-label::before {
+    content: '*';
+    margin-right: .5em;
+  }
+}
+
+.FormControl-body {
+  flex: 1 0 0%;
+}
+
+.FormControl-info {
+  color: var(--text-color-faded);
+  display: block;
+  font-size: .85em;
+  line-height: 1.2;
+  margin-top: .5em;
+}
+
+.FormControl-helpIcon {
+  align-items: center;
+  color: var(--text-color-faint);
+  display: flex;
+  justify-content: center;
+  font-size: 1.15em;
+  padding: 0 .5em;
+}
+.FormControl-helpIcon:active,
+.FormControl-helpIcon:focus,
+.FormControl-helpIcon:hover {
+  color: inherit;
+  outline: 0;
+}
+
+.FormControl--action {
+  margin: 0 0 var(--gap);
+}
+
+@media (--break-lg) {
+  .FormControl--action {
+    margin: 0 0 var(--gap-lg);
+  }
+  .FormControl--action .FormControl-body {
+    margin-left: var(--form-label-width);
+  }
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.FormFieldAddOn {
+  /* display: flex; */
+
+  /*
+   * TODO(philipwalton): replace the below with the above once this FF bug is
+   * fixed: https://bugzilla.mozilla.org/show_bug.cgi?id=1146442
+   */
+  display: inline-flex;
+  width: 100%;
+}
+
+/* @extends .FormField */
+.FormFieldAddOn-field {
+  flex: 1 0 0%;
+}
+
+.FormFieldAddOn-item {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  display: flex;
+  font: inherit;
+  font-weight: normal;
+  padding: 0 0.6em;
+}
+.FormFieldAddOn-item:focus {
+  outline: 0;
+}
+
+.FormFieldAddOn-field:first-child,
+.FormFieldAddOn-item:first-child {
+  border-radius: 4px 0 0 4px;
+}
+.FormFieldAddOn-field:last-child,
+.FormFieldAddOn-item:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.FormFieldAddOn-item:first-child {
+  border-right: 0;
+}
+.FormFieldAddOn-item:last-child {
+  border-left: 0;
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+:root {
+  --HitBuilderParam-gap: 1.25em;
+  --HitBuilderParam-labelWidth: 7em;
+  --HitBuilderParam-labelInputWidth: 4em;
+}
+
+
+.HitBuilderParam {
+  align-items: baseline;
+  display: inline-flex;
+  margin: 0 0 var(--HitBuilderParam-gap);
+  max-width: 36em;
+  width: 100%;
+}
+
+.HitBuilderParam-label {
+  flex: 0 0 var(--HitBuilderParam-labelWidth);
+  font-weight: 600;
+  margin-right: var(--HitBuilderParam-gap);
+  position: relative;
+  text-align: right;
+}
+
+.HitBuilderParam--required .HitBuilderParam-label::before {
+  color: hsl(0, 70%, 55%);
+  content: '*';
+  display: inline-block;
+  font-weight: 600;
+  margin-right: .5em;
+}
+
+.HitBuilderParam-inputLabel {
+  text-align: right;
+  width: var(--HitBuilderParam-labelInputWidth);
+}
+
+
+.HitBuilderParam-removeIcon {
+  color: var(--error-color);
+  cursor: pointer;
+  right: var(--HitBuilderParam-labelInputWidth);
+  padding: .667em;
+  position: absolute;
+  top: 0;
+}
+
+
+.HitBuilderParam-body {
+  flex: 1 0 0%;
+  padding-right: 2.5em;
+  position: relative;
+}
+
+.HitBuilderParam-info {
+  color: var(--error-color);
+  display: block;
+  font-size: .85em;
+  line-height: 1.2;
+  margin-top: .5em;
+}
+
+.HitBuilderParam-helpIcon {
+  color: #ccc;
+  cursor: pointer;
+  right: 0;
+  padding: .667em;
+  position: absolute;
+  top: 0;
+}
+.HitBuilderParam-helpIcon:active,
+.HitBuilderParam-helpIcon:focus,
+.HitBuilderParam-helpIcon:hover {
+  color: inherit;
+  outline: 0;
+}
+
+
+.HitBuilderParam--action {
+  margin-left: calc(var(--HitBuilderParam-labelWidth) +
+                    var(--HitBuilderParam-gap));
+}
+.HitBuilderParams {
+  transition: opacity .2s var(--quantum-timing);
+}
+
+.is-editing .HitBuilderParams {
+  opacity: .4;
+  pointer-events: none;
+}
+.HitElement {
+  background: #FFF;
+  border-radius: 4px;
+  margin-bottom: var(--gap);
+}
+
+.HitElement-status {
+  background-color: hsl(0, 0%, 98%);
+  border: 1px solid var(--border-color);
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  padding: var(--gap-lg);
+
+  /* Force hardware acceleration for better transition performance. */
+  transform: translate3d(0, 0, 0);
+}
+
+.HitElement-body {
+  background-color: #fff;
+  border: solid var(--border-color);
+  border-radius: 0 0 4px 4px;
+  border-width: 0 1px 1px;
+  padding: var(--gap-lg);
+  transition: border-color .3s var(--quantum-timing);
+}
+
+.HitElement-statusIcon {
+  color: var(--text-color-faded);
+  display: inline-flex;
+  font-size: 2.5em;
+  margin-right: .5em;
+}
+
+.HitElement-statusBody {
+
+}
+
+.HitElement-statusHeading {
+  color: #000;
+  font-size: 1.6em;
+  font-weight: 300;
+  margin: .25em 0;
+}
+
+.HitElement-statusMessage {
+  color: var(--text-color-faded);
+  font-size: .9em;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.HitElement-requestInfo,
+.HitElement-requestBody {
+  font-family: Menlo, monospace;
+  font-size: .9em;
+}
+
+.HitElement-requestBody,
+.HitElement-action {
+  margin-top: var(--gap-lg);
+}
+
+.HitElement-status,
+.HitElement-body,
+.HitElement-requestInfo,
+.HitElement-action {
+  opacity: 1;
+  transition: border-color .3s var(--quantum-timing),
+              opacity .3s var(--quantum-timing);
+}
+
+
+/**
+ * Valid Hits
+ */
+
+.HitElement--valid .HitElement-statusIcon,
+.HitElement--valid .HitElement-statusHeading {
+  color: var(--success-color);
+}
+.HitElement--valid .HitElement-status {
+  border-color: var(--success-color);
+  background-color: var(--success-color-bg);
+}
+
+
+/**
+ * Invalid Hits
+ */
+
+.HitElement--invalid .HitElement-statusIcon,
+.HitElement--invalid .HitElement-statusHeading {
+  color: var(--error-color);
+}
+.HitElement--invalid .HitElement-status {
+  border-color: var(--error-color);
+  background-color: var(--error-color-bg);
+}
+
+
+/**
+ * State: is-editing
+ */
+
+.is-editing .HitElement-status,
+.is-editing .HitElement-requestInfo,
+.is-editing .HitElement-action {
+  opacity: .1;
+  pointer-events: none;
+}
+
+.is-editing .HitElement-status,
+.is-editing .HitElement-body {
+  border-color: transparent;
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Icon {
+  display: inherit;
+  fill: currentColor;
+  height: calc(16em/14);
+  width: calc(16em/14);
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.InlineDefinitionList {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.InlineDefinitionList-item {
+  font-weight: 300;
+  line-height: 1.667;
+  margin-right: 1.5em;
+  white-space: nowrap;
+}
+.InlineDefinitionList-item:last-child {
+  margin-right: 0;
+}
+
+
+.InlineDefinitionList-itemName {
+  display: inline-block;
+  margin-right: .5em;
+}
+
+.InlineDefinitionList-itemValue {
+  font-weight: 700;
+}
+
+@media (--break-lg) {
+  .InlineDefinitionList-item {
+    border-right: 1px solid hsl(30, 10%, 85%);
+    margin-right: 1em;
+    padding-right: 1em;
+  }
+  .InlineDefinitionList-item:last-child {
+    border: 0;
+    margin-right: 0;
+    padding-right: 0;
+  }
+}
+.LinkButton {
+  background: transparent;
+  border: 0;
+  color: var(--ga-orange-dark);
+  font: inherit;
+  padding: 0;
+  text-decoration: none;
+}
+
+.LinkButton:hover {
+  text-decoration: underline;
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Logo {
+  margin: 0 3em;
+}
+
+.Logo-full {
+  display: none;
+}
+
+.Logo-partial {
+  text-align: center;
+}
+
+.Logo-partial > svg {
+  fill: #aaa;
+  height: 16px;
+}
+
+.Logo-partial::after {
+  content: 'Demos & Tools';
+  color: #ddd;
+  display: block;
+  font-size: 1.4em;
+  font-weight: 300;
+  letter-spacing: -.03em;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-spacing: .2em;
+}
+
+@media (--break-sm) {
+  .Logo-partial > svg {
+    display: none;
+  }
+  .Logo-partial::after {
+    content: 'Google Analytics Demos & Tools';
+    line-height: normal;
+  }
+}
+
+@media (--break-lg) {
+  .Logo {
+    margin: 0;
+  }
+  .Logo-full {
+    display: block;
+  }
+  .Logo-full > svg {
+    display: inherit;
+    fill: var(--ga-gray);
+    height: var(--ga-logo-height);
+    width: var(--ga-logo-width);
+  }
+  .Logo-partial {
+    display: none;
+  }
+}
+.Message {
+  background-color: hsl(50, 96%, 94%);
+  border-left: 5px solid hsl(50, 96%, 50%);
+  padding: 1.5em;
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+:root {
+  --ProgressBar-interval: 2s;
+  --ProgressBar-bgColor: hsl(215, 100%, 90%);
+  --ProgressBar-color: hsl(215, 100%, 60%);
+  --ProgressBar-sizeRatio: .6;
+}
+
+
+.ProgressBar {
+  background: var(--ProgressBar-bgColor);
+  overflow: hidden;
+  position: relative;
+}
+
+.ProgressBar::after,
+.ProgressBar::before {
+  background: linear-gradient(to right, var(--ProgressBar-bgColor),
+                                        var(--ProgressBar-color) 10%,
+                                        var(--ProgressBar-color));
+  content: '';
+  height: 100%;
+  position: absolute;
+  transform: translateX(-100%);
+  width: calc(100% * var(--ProgressBar-sizeRatio));
+}
+
+.ProgressBar::before {
+  animation: ProgressBar-leader
+             var(--ProgressBar-interval)
+             ease-in-out
+             infinite;
+
+}
+
+.ProgressBar::after {
+  animation: ProgressBar-follower
+             var(--ProgressBar-interval)
+             ease-in-out
+             calc(var(--ProgressBar-interval) * .5)
+             infinite;
+}
+
+
+@keyframes ProgressBar-leader {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(calc(150% / var(--ProgressBar-sizeRatio)));
+  }
+}
+
+@keyframes ProgressBar-follower {
+  0% {
+    transform: translateX(-100%);
+  }
+  60% {
+    transform: translateX(calc(150% / var(--ProgressBar-sizeRatio)));;
+  }
+  100% {
+    transform: translateX(calc(150% / var(--ProgressBar-sizeRatio)));;
+  }
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+:root {
+  --PivotTable-borderColor: hsl(30,10%,80%);
+  --PivotTable-borderColorLight: hsl(30,10%,90%);
+  --PivotTable-borderColorDark: hsl(30,10%,70%);
+
+  --PivotTable-divisionColor: #000;
+
+  --PivotTable-metricHeaderBgColor: hsl(30,10%,84%);
+  --PivotTable-dimensionHeaderBgColor: hsl(30,10%,92%);
+}
+
+
+.PivotTable {
+  overflow: auto;
+  max-width: 100%;
+}
+
+.PivotTable-table {
+  border: 1px solid var(--PivotTable-borderColor);
+  width: 100%;
+}
+
+.PivotTable-th,
+.PivotTable-td {
+  background: #fff;
+  border: 1px solid var(--PivotTable-borderColor);
+  padding: .75em 1em;
+  vertical-align: top;
+}
+
+.PivotTable-th {
+  font-weight: bold;
+  text-align: left;
+}
+
+.PivotTable-td {
+  text-align: right;
+}
+
+.PivotTable-th:empty {
+  border: none;
+  background: var(--PivotTable-dimensionHeaderBgColor);
+}
+
+.PivotTable-tr > *:last-child {
+  border-right: 0;
+}
+
+.PivotTable-tr:last-child > * {
+  border-bottom: 0;
+  border-right: 0;
+}
+
+.PivotTable-tr:last-child > *:first-child {
+  border-left: 0;
+}
+
+.PivotTable-dimensionHeader {
+  background: var(--PivotTable-dimensionHeaderBgColor);
+  border-color: var(--PivotTable-borderColor);
+}
+
+.PivotTable-dimensionHeader--lastRow.PivotTable-pivot {
+  border-bottom-color: var(--PivotTable-borderColorDark);
+}
+
+.PivotTable-dimensionHeader--lastCol:not(.PivotTable-pivot) {
+  border-right-color: var(--PivotTable-divisionColor);
+}
+
+.PivotTable-metricHeader {
+  background: var(--PivotTable-metricHeaderBgColor);
+  border-color: var(--PivotTable-borderColorDark);
+  border-bottom-color: var(--PivotTable-divisionColor);
+}
+
+.PivotTable-total {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.PivotTable-value--lastRow,
+.PivotTable-dimensionHeader--lastRow:not(.PivotTable-pivot) {
+  border-bottom-color: var(--PivotTable-divisionColor);
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.QueryReport {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: var(--gap);
+  padding: var(--gap) var(--gap) 0;
+}
+
+.QueryReport-title {
+  color: inherit;
+  font-size: 1.5em;
+  font-weight: 300;
+  line-height: 1;
+  margin: 0 0 .667em;
+}
+
+.QueryReport-meta {
+  font-weight: 300;
+  margin: 0 0 var(--gap);
+}
+
+.QueryReport-item {
+  margin: 0 0 var(--gap);
+}
+
+@media (--break-lg) {
+  .QueryReport {
+    margin-bottom: var(--gap-lg);
+    padding: var(--gap-lg) var(--gap-lg) 0;
+  }
+  .QueryReport-meta {
+    margin: 0 0 var(--gap-lg);
+  }
+
+  .QueryReport-item {
+    margin: 0 0 var(--gap-lg);
+  }
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Screenshot {
+  margin-bottom: var(--gap);
+}
+
+.Screenshot img {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  height: auto;
+  max-width: 100%;
+}
+
+.Screenshot figcaption {
+  color: var(--text-color-faint);
+  font-size: .85em;
+  font-style: italic;
+  padding: .5em 4px 0;
+  text-align: right;
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.SearchSuggest {
+  display: block;
+  width: 100%;
+}
+
+.SearchSuggest-matches {
+  background: #fff;
+  border: 1px solid;
+  border-color: #eee var(--border-color-active) var(--border-color-active);
+  border-radius: 0 0 4px 4px;
+  display: none;
+  list-style: none;
+  margin: -1px 0 0;
+  max-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0;
+  position: absolute;
+  top: 100%;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+  z-index: 1;
+}
+
+.SearchSuggest--open {
+  position: relative;
+}
+
+.SearchSuggest--open .SearchSuggest-field {
+  border-color: var(--border-color-active);
+  border-radius: 4px 4px 0 0;
+}
+
+.SearchSuggest--open .SearchSuggest-matches {
+  display: block;
+}
+
+.SearchSuggest--above.SearchSuggest--open .SearchSuggest-matches {
+  bottom: 100%;
+  border-color: var(--border-color-active) var(--border-color-active) #eee;
+  border-radius: 4px 4px 0 0;
+  margin: 0 0 -1px;
+  top: auto;
+}
+
+.SearchSuggest--above.SearchSuggest--open .SearchSuggest-field {
+  border-radius: 0 0 4px 4px;
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.SearchSuggestMatch {
+  border: solid #eee;
+  border-width: 1px 0 0;
+  line-height: 1.2;
+  list-style: none;
+  overflow: hidden;
+  padding: .5em;
+  word-wrap: break-word;
+}
+.SearchSuggestMatch:first-child {
+  border: 0;
+}
+
+.SearchSuggestMatch-category {
+  color: #bbb;
+  float: right;
+  font-size: .6em;
+  font-weight: 700;
+  letter-spacing: .1em;
+  margin: .1em 0 1em .5em;
+  text-transform: uppercase;
+  text-align: right;
+  max-width: 12em;
+}
+
+.SearchSuggestMatch-content {
+  font-weight: 600;
+}
+
+.SearchSuggestMatch-extra {
+  color: #777;
+  font-size: .8em;
+  font-weight: 300;
+  margin-top: .15em;
+  word-wrap: break-word;
+}
+
+
+.SearchSuggestMatch--selected {
+  border-color: transparent;
+  background: var(--border-color-active);
+}
+.SearchSuggestMatch--selected .SearchSuggestMatch-category,
+.SearchSuggestMatch--selected .SearchSuggestMatch-content,
+.SearchSuggestMatch--selected .SearchSuggestMatch-extra {
+  color: #fff;
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.TechInfo {
+  background: #fff;
+  border: 1px solid var(--info-color);
+  border-radius: 4px;
+  display: flex;
+  margin: var(--gap) 0;
+  max-width: 52em;
+  padding: 1.25em;
+}
+
+.TechInfo-icon {
+  fill: var(--info-color);
+  flex: 0 0 auto;
+  margin-right: 1em;
+  height: 1.5em;
+  overflow: visible;
+  width: 1.5em;
+}
+
+.TechInfo-content {
+  color: var(--text-color-faded);
+  flex: 1;
+  font-size: .9em;
+  margin: 0;
+}
+
+.TechInfo-title {
+  color: var(--info-color);
+  font-size: 1.2em;
+  font-weight: 600;
+  margin: 0 0 .5em;
+}
+
+.TechInfo a {
+  color: var(--info-color);
+  text-decoration: underline;
+}
+
+@media (--break-lg) {
+  .TechInfo {
+    margin: var(--gap-lg) 0;
+  }
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Table {
+  background: #fff;
+  margin: 0 0 var(--gap);
+}
+
+.Table td,
+.Table th {
+  border: 1px solid var(--border-color);
+  padding: 1em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.Table th > h4 {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 400;
+}
+
+.Table tbody tr:nth-child(2n-1) {
+  background-color: hsla(0, 0%, 0%, .02);
+}
+
+.Table td > p {
+  margin: 0
+}
+
+.Table td > p + p {
+  margin-top: 0.5em
+}
+
+.Table td > p > strong {
+  font-weight: 600;
+  white-space: nowrap
+}
+
+
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Titles {
+  font-weight: 300;
+  /letter-spacing: -.03em;
+  line-height: 1.2;
+  margin: 0 0 var(--gap);
+  /word-spacing: .2em;
+}
+.Titles-main,
+.Titles-sub {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+.Titles-main {
+  font-size: 1.4em;
+}
+.Titles-sub {
+  opacity: .6;
+  margin-top: .2em;
+}
+.Titles-action {
+  background: var(--ga-orange-dark);
+  border-radius: .25em;
+  color: #fff;
+  display: inline-block;
+  font-weight: 400;
+  margin-top: .8em;
+  padding: .3em .6em .2em;
+  vertical-align: .4em;
+}
+.Titles-action:focus,
+.Titles-action:hover {
+  text-decoration: none;
+}
+
+
+/**
+ * `--hero` modifer
+ * Creates a bigger set of titles for use in page headers. Also
+ * inlines the main and subtitle in larger medias.
+ */
+
+.Titles--hero {
+  color: var(--ga-gray);
+}
+
+.Titles--hero .Titles-main {
+  font-size: 2.25em;
+}
+.Titles--hero .Titles-sub {
+  font-size: 1.25em;
+}
+
+@media (--break-md) {
+  .Titles--hero {
+    margin: 1em 0 var(--gap);
+  }
+  .Titles--hero .Titles-main {
+    display: inline-block;
+    margin-right: .25em;
+  }
+  .Titles--hero .Titles-sub {
+    display: inline-block;
+  }
+}
+
+@media (--break-lg) {
+  .Titles--hero {
+    margin: 4em 0 0;
+  }
+  .Titles--hero .Titles-main {
+    font-size: 3em;
+    margin-right: .5em;
+  }
+  .Titles--hero .Titles-sub {
+    font-size: 1.75em;
+  }
+}
+.Video {
+  position: relative;
+  padding-bottom: 62.5%;
+  height: 0;
+}
+.Video-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+/*
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.ViewSelector,
+.ViewSelector2 {
+  display: block
+}
+
+.ViewSelector2-item,
+/* For the old school view selector. */
+.ViewSelector table {
+  display: block;
+  margin-bottom: 1em;
+  width: 100%;
+}
+
+.ViewSelector2-item > label,
+/* For the old school view selector. */
+.ViewSelector td:first-child {
+  font-weight: 700;
+  margin: 0 .25em .25em 0;
+  display: block;
+}
+
+.ViewSelector2-item > select {
+  width: 100%;
+}
+
+
+/*
+ * Additional hacks to get the native ViewSelector component (which uses
+ * closure widgets) to look like our custom ViewSelector extension.
+ */
+
+.ViewSelector table,
+.ViewSelector tbody,
+.ViewSelector tr,
+.ViewSelector td {
+  display: block;
+}
+
+.ViewSelector table {
+  height: auto!important;
+  width: auto!important;
+}
+
+.ViewSelector td {
+  width: auto!important;
+}
+
+.ViewSelector td:last-child * {
+  display: block;
+  text-align: left;
+}
+
+.ViewSelector td:last-child > div {
+  font-weight: 400;
+  margin: 0;
+}
+
+@media (--break-md) {
+  .ViewSelector,
+  .ViewSelector2 {
+    display: flex;
+    margin: 0 0 -1em -1em;
+    width: calc(100% + 1em);
+  }
+
+  .ViewSelector2-item,
+  /* For the old school view selector. */
+  .ViewSelector table {
+    flex: 1 1 calc(100%/3 - 1em);
+    margin-left: 1em;
+  }
+}
+
+/*
+ * Force each item onto its own line
+ * regardless of the breakpoint.
+ */
+.ViewSelector2--stacked,
+.ViewSelector--stacked {
+  display: block;
+  margin: 0;
+  width: auto;
+}
+
+.ViewSelector2--stacked .ViewSelector2-item,
+/* For the old school view selector. */
+.ViewSelector--stacked table {
+  margin-left: 0;
+}
+.u-visuallyHidden {
+  border: 0!important;
+  clip: rect(1px, 1px, 1px, 1px)!important;
+  height: 1px!important;
+  overflow: hidden!important;
+  padding: 0!important;
+  position: absolute!important;
+  width: 1px!important;
+}/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+.u-hidden {
+  display: none;
+}
+.u-block {
+  display: block;
+}
+
+@media (--break-sm) {
+  .u-sm-hidden {
+    display: none;
+  }
+  .u-sm-block {
+    display: block;
+  }
+}
+
+@media (--break-md) {
+  .u-md-hidden {
+    display: none;
+  }
+  .u-md-block {
+    display: block;
+  }
+}
+
+@media (--break-lg) {
+  .u-lg-hidden {
+    display: none;
+  }
+  .u-lg-block {
+    display: block;
+  }
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.u-spaceDouble {
+  margin: 0 0 calc(2*var(--gap));
+}
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.ActiveUsers {
+  background: var(--bg-color-light);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-weight: 300;
+  padding: .5em var(--gap);
+  white-space: nowrap;
+}
+
+.ActiveUsers-value {
+  display: inline-block;
+  font-weight: 600;
+  margin-right: -.25em;
+}
+
+.ActiveUsers.is-increasing {
+  animation: increase 3s;
+}
+
+.ActiveUsers.is-decreasing {
+  animation: decrease 3s;
+}
+
+@keyframes increase {
+  0% {}
+  10% {
+    background-color: hsl(120, 100%, 96%);
+    border-color: hsla(120, 100%, 25%, .5);
+    color: hsla(120, 100%, 25%, 1);
+  }
+  100% {}
+}
+
+@keyframes decrease {
+  0% {}
+  10% {
+    background-color: hsl(0, 100%, 96%);
+    border-color: hsla(0, 100%, 50%, .5);
+    color: hsl(0, 100%, 50%);
+  }
+  100% {}
+}
+
+/*
+Copyright 2014 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+
+.Chartjs {
+  font-size: .85em;
+}
+
+.Chartjs-figure {
+  height: 250px;
+}
+
+.Chartjs-legend {
+  list-style: none;
+  margin: 0;
+  padding: 1em 0 0;
+  text-align: center;
+}
+
+.Chartjs-legend > li {
+  display: inline-block;
+  padding: .25em .5em
+}
+
+.Chartjs-legend > li > i {
+  display: inline-block;
+  height: 1em;
+  margin-right: .5em;
+  vertical-align: -.1em;
+  width: 1em;
+}
+
+@media (--break-md) {
+  .Chartjs-figure {
+    /* Add some breathing room. */
+    margin-right: var(--gap);
+  }
+}
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/* Base styles, media queries, variables, etc. */
+
+
+/* Components. */
+
+/*
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* Base styles, media queries, variables, etc. */
+/* Vendor styles (which don't necessarily follow conventions) */
+/* Components. */
+/* Utilities. */
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important; }
+
+.shadow {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
+
+.shadow-lg {
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important; }
+
+.bg-block-analytics {
+  background-color: #f8fcff; }
+
+.p-4 {
+  padding: 1.5rem !important; }
+
+.px-4 {
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important; }
+
+.mt-5 {
+  margin-top: 2rem; }
+
+.mt-4 {
+  margin-top: 1.5rem; }
+
+.my-5 {
+  margin-top: 2rem;
+  margin-bottom: 2rem; }
+
+.mx-5 {
+  margin-top: 2rem;
+  margin-bottom: 2rem; }
+
+.text-center {
+  text-align: center; }
