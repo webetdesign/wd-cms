@@ -30,8 +30,12 @@ class Base extends AbstractBlockService
 
     public function execute(BlockContextInterface $blockContext, Response $response = null)
     {
+        $settings = $blockContext->getSettings();
 
-        return $this->renderPrivateResponse("@WebEtDesignCmsBundle/Resources/views/block/analytics/base.html.twig", [], $response);
+        $template = $settings['template'];
+        $client_key = $settings['client_key'];
+
+        return $this->renderPrivateResponse($template, ['client_key' => $client_key ], $response);
     }
 
     public function getName()
@@ -41,6 +45,12 @@ class Base extends AbstractBlockService
 
     public function configureSettings(OptionsResolver $resolver)
     {
+        $resolver->setDefaults([
+            'template' => "@WebEtDesignCmsBundle/Resources/views/block/analytics/base.html.twig",
+            'client_key' => null
+        ]);
 
+        $resolver->setAllowedTypes('template', ['string', 'boolean']);
+        $resolver->setAllowedTypes('client_key', ['string', 'null']);
     }
 }

@@ -142,7 +142,7 @@ services:
             - [setTemplate, ['edit', '@@WebEtDesignCms/menu/edit.html.twig']]
         public: true
 
-    cms.admin.analytics.base:
+    cms.admin.analytics:
       class: WebEtDesign\CmsBundle\Block\Analytics\Base
       arguments:
         - ~
@@ -151,49 +151,5 @@ services:
       tags:
         - { name: sonata.block }
 
-    cms.admin.analytics.userWeek:
-      class: WebEtDesign\CmsBundle\Block\Analytics\UserWeek
-      arguments:
-        - ~
-        - '@templating'
-
-      tags:
-        - { name: sonata.block }
-
-    cms.admin.analytics.userYear:
-      class: WebEtDesign\CmsBundle\Block\Analytics\UserYear
-      arguments:
-        - ~
-        - '@templating'
-
-      tags:
-        - { name: sonata.block }
-
-    cms.admin.analytics.browsers:
-      class: WebEtDesign\CmsBundle\Block\Analytics\Browsers
-      arguments:
-        - ~
-        - '@templating'
-
-      tags:
-        - { name: sonata.block }
-
-    cms.admin.analytics.countries:
-      class: WebEtDesign\CmsBundle\Block\Analytics\Countries
-      arguments:
-        - ~
-        - '@templating'
-
-      tags:
-        - { name: sonata.block }
-
-    cms.admin.analytics.source:
-      class: WebEtDesign\CmsBundle\Block\Analytics\Source
-      arguments:
-        - ~
-        - '@templating'
-
-      tags:
-        - { name: sonata.block }
 
 
