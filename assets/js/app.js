@@ -11,9 +11,6 @@ import '../sass/analytics/index.scss';
 import '../sass/analytics/admin.scss';
 
 
-console.log("test")
-
-
 $(document).ready(function () {
 // show active tab on reload
 //   if (location.hash !== '' && location.hash.substring(1, 5) == 'tab_') {

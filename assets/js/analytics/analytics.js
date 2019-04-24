@@ -2,8 +2,10 @@ import './gapi.js';
 import './date-range-selector.js';
 import './view-selector2.js';
 import './utils.js';
+import './active-users.js';
 
 import Chart from "chart.js"
+
 
 // == NOTE ==
 // This code uses ES6 promises. If you want to use this code in a browser
@@ -11,52 +13,110 @@ import Chart from "chart.js"
 
 gapi.analytics.ready(function() {
 
-    /**
-     * Authorize the user immediately if the user has already granted access.
-     * If no access has been created, render an authorize button inside the
-     * element with the ID "embed-api-auth-container".
-     */
-    gapi.analytics.auth.authorize({
-        container: 'embed-api-auth-container',
-        clientid: '278406372079-p9vg0oof8vuk208r0n85n14p814p5ntp.apps.googleusercontent.com',
-        userInfoLabel : "Vous êtes connecté avec le compte : "
-    });
+    var api = null;
+
+    var colors = ['#4D5360','#949FB1','#D4CCC5','#E2EAE9','#F7464A'];
+
+    if ( $("#client_key_api").length){
+        api = $("#client_key_api").data('client-key');
+        $("#client_key_api").remove();
+    }
+
+    if (api != null){
+        /**
+         * Authorize the user immediately if the user has already granted access.
+         * If no access has been created, render an authorize button inside the
+         * element with the ID "embed-api-auth-container".
+         */
+        gapi.analytics.auth.authorize({
+            container: 'embed-api-auth-container',
+            clientid: api,
+            userInfoLabel : "Vous êtes connecté avec le compte : "
+        });
+
+        /**
+         * Create a new ActiveUsers instance to be rendered inside of an
+         * element with the id "active-users-container" and poll for changes every
+         * five seconds.
+         */
+        var activeUsers = new gapi.analytics.ext.ActiveUsers({
+            container: 'active-users-container',
+            pollingInterval: 5
+        });
+
+        /**
+         * Add CSS animation to visually show the when users come and go.
+         */
+        activeUsers.once('success', function() {
+            var element = this.container.firstChild;
+            var timeout;
+
+            this.on('change', function(data) {
+                var element = this.container.firstChild;
+                var animationClass = data.delta > 0 ? 'is-increasing' : 'is-decreasing';
+                element.className += (' ' + animationClass);
+
+                clearTimeout(timeout);
+                timeout = setTimeout(function() {
+                    element.className =
+                        element.className.replace(/ is-(increasing|decreasing)/g, '');
+                }, 3000);
+            });
+        });
 
 
 
-    /**
-     * Create a new ViewSelector2 instance to be rendered inside of an
-     * element with the id "view-selector-container".
-     */
-    var viewSelector = new gapi.analytics.ext.ViewSelector2({
-        container: 'view-selector-container'
-    });
+        /**
+         * Create a new ViewSelector2 instance to be rendered inside of an
+         * element with the id "view-selector-container".
+         */
+        var viewSelector = new gapi.analytics.ext.ViewSelector2({
+            container: 'view-selector-container'
+        });
 
-    // Render the view selector to the page.
-    viewSelector.execute();
-
-
-    /**
-     * Update the activeUsers component, the Chartjs charts, and the dashboard
-     * title whenever the user changes the view.
-     */
-    viewSelector.on('change', function(data) {
-        var title = document.getElementById('view-name');
-        //title.textContent = data.property.name + ' (' + data.view.name + ')';
-
-        // Start tracking active users for this view.
-        //activeUsers.set(data).execute();
-
-        // Render all the of charts for this view.
-        renderWeekOverWeekChart(data);
-        renderYearOverYearChart(data);
-        renderTopBrowsersChart(data);
-        renderTopCountriesChart(data);
-
-        test(data);
+        // Render the view selector to the page.
+        viewSelector.execute();
 
 
-    });
+        /**
+         * Update the activeUsers component, the Chartjs charts, and the dashboard
+         * title whenever the user changes the view.
+         */
+        viewSelector.on('viewChange', function(data) {
+
+            // Start tracking active users for this view.
+            activeUsers.set(data).execute();
+
+
+            if ($('#week-container').length){
+                renderWeekOverWeekChart(data.ids, colors);
+            }
+
+            if ($('#year-container').length){
+                renderYearOverYearChart(data.ids, colors);
+            }
+
+            if ($('#browsers-container').length){
+                renderTopBrowsersChart(data.ids, colors);
+            }
+
+            if ($('#countries-container').length){
+                renderTopCountriesChart(data.ids, colors);
+            }
+
+            if ($('#source-container').length){
+                renderSourceChart(data.ids, colors);
+            }
+
+            if ($('#devices-container').length){
+                renderDeviceChart(data.ids, colors);
+            }
+
+
+
+
+        });
+    }
 
 
     /**
@@ -64,7 +124,7 @@ gapi.analytics.ready(function() {
      * overlays session data for the current week over session data for the
      * previous week.
      */
-    function renderWeekOverWeekChart(ids) {
+    function renderWeekOverWeekChart(ids, colors) {
 
         // Adjust `now` to experiment with different days, for testing only...
         var now = moment(); // .subtract(3, 'day');
@@ -102,17 +162,17 @@ gapi.analytics.ready(function() {
                 datasets : [
                     {
                         label: 'Last Week',
-                        borderColor : 'rgba(220,220,220,1)',
-                        backgroundColor : 'rgba(220,220,220,0.3)',
-                        pointColor : 'rgba(220,220,220,1)',
+                        borderColor : colors[0],
+                        pointColor : colors[0],
+                        backgroundColor: 'rgb(229, 231, 233, 0.5)',
                         pointStrokeColor : '#fff',
                         data : data2
                     },
                     {
                         label: 'This Week',
-                        borderColor : 'rgba(151,187,205,1)',
-                        backgroundColor : 'rgba(151,187,205,0.3)',
-                        pointColor : 'rgba(151,187,205,1)',
+                        borderColor : colors[1],
+                        pointColor : colors[1],
+                        backgroundColor: 'rgb(229, 231, 233, 0.5)',
                         pointStrokeColor : '#fff',
                         data : data1
                     }
@@ -135,7 +195,7 @@ gapi.analytics.ready(function() {
      * overlays session data for the current year over session data for the
      * previous year, grouped by month.
      */
-    function renderYearOverYearChart(ids) {
+    function renderYearOverYearChart(ids, colors) {
 
         // Adjust `now` to experiment with different days, for testing only...
         var now = moment(); // .subtract(3, 'day');
@@ -176,14 +236,12 @@ gapi.analytics.ready(function() {
                 datasets : [
                     {
                         label: 'Last Year',
-                        fillColor : 'rgba(220,220,220,0.5)',
-                        backgroundColor : 'rgba(220,220,220,1)',
+                        backgroundColor : colors[1],
                         data : data2
                     },
                     {
                         label: 'This Year',
-                        fillColor : 'rgba(151,187,205,0.5)',
-                        backgroundColor : 'rgba(151,187,205,1)',
+                        backgroundColor : colors[1],
                         data : data1
                     }
                 ]
@@ -207,7 +265,7 @@ gapi.analytics.ready(function() {
      * Draw the a chart.js doughnut chart with data from the specified view that
      * show the top 5 browsers over the past seven days.
      */
-    function renderTopBrowsersChart(ids) {
+    function renderTopBrowsersChart(ids, colors) {
 
         query({
             'ids': ids,
@@ -219,7 +277,7 @@ gapi.analytics.ready(function() {
         .then(function(response) {
 
             var data = [];
-            var colors = ['#4D5360','#949FB1','#D4CCC5','#E2EAE9','#F7464A'];
+
 
 
             var values = [];
@@ -258,30 +316,208 @@ gapi.analytics.ready(function() {
      * compares sessions from mobile, desktop, and tablet over the past seven
      * days.
      */
-    function renderTopCountriesChart(ids) {
+    function renderTopCountriesChart(ids, colors) {
+
+        google.charts.load('current', {
+            'packages':['geochart'],
+            'mapsApiKey': 'AIzaSyBN0Z6WtaclpqwuqbH_ArjMz-gnFNd3uLA'
+        });
+
         query({
             'ids': ids,
             'dimensions': 'ga:country',
-            'metrics': 'ga:sessions',
-            'sort': '-ga:sessions',
+            'metrics': 'ga:users',
+            'max-results': 5
+        })
+        .then(function(response) {
+
+            var values = [];
+            values.push(['Country', 'Popularité']);
+
+            response.rows.forEach(function(row, i) {
+
+                values.push([
+                    row[0], parseInt(row[1])
+                ]);
+            });
+
+            google.charts.setOnLoadCallback(drawRegionsMap(values, colors[0]));
+
+        });
+    }
+
+    function drawRegionsMap(values, color) {
+        var data = google.visualization.arrayToDataTable(values);
+
+        var options = {
+            colors: [color],
+            keepAspectRatio: true,
+        };
+
+        var chart = new google.visualization.GeoChart(document.getElementById('countries-container'));
+
+        chart.draw(data, options);
+    }
+
+    /**
+     * Draw the a chart.js bar chart with data from the specified view that
+     * show traffic sources over the past seven days.
+     */
+    function renderSourceChart(ids, colors) {
+
+        query({
+            'ids': ids,
+            'metrics': 'ga:users',
+            'dimensions': 'ga:date,ga:medium',
+            'max-results': 21,
+
+        })
+        .then(function(response) {
+
+
+            var dates = [];
+            var types = [];
+
+
+            response.rows.forEach(function(row, i) {
+
+
+                if (jQuery.inArray(row[1], types) === -1){
+                    types.push(row[1]);
+                }
+
+                if (jQuery.inArray(row[0], dates) === -1){
+                    dates.push(row[0]);
+                }
+
+            });
+
+            var datas_row = initDataRow(dates.length);
+            var datas = [];
+
+            $.each(types, function(i, type) {
+
+                $.each(response.rows, function(k, row) {
+
+                    if (row[1] === type)(
+
+                        $.each(dates, function(j, date) {
+
+                            if (row[0] === date) {
+                                datas_row[j] = row[2];
+                                return false;
+                            }
+
+
+                        })
+                    );
+
+                });
+
+                datas.push({
+                    label: type === '(none)' ? 'direct' : type,
+                    backgroundColor: colors[i],
+                    data: datas_row
+                });
+
+                datas_row = initDataRow(dates.length);
+
+
+            });
+
+            var barData = {
+                labels: formatDateAPI(dates),
+                datasets : datas
+            }
+
+
+            new Chart(makeCanvas('source-container'), {
+                type: 'bar',
+                data: barData,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            stacked: true
+                        }],
+                        yAxes: [{
+                            stacked: true
+                        }]
+                    }
+                }
+            });
+            generateLegend('source-legend', barData);
+
+        });
+
+
+
+
+
+
+
+
+
+    }
+
+    function initDataRow(nb_date){
+        var data_row = [];
+
+        for (let i = 0; i < nb_date; i++) {
+            data_row.push(null);
+        }
+
+        return data_row;
+    }
+
+    function formatDateAPI(dates_old) {
+        var dates = [];
+        $.each(dates_old, function(i, date) {
+            dates.push(
+                date.substring(6, 8) + "/" + date.substring(4, 6)
+            )
+        })
+
+        return dates;
+    }
+
+
+    /**
+     * Draw the a chart.js doughnut chart with data from the specified view that
+     * show the top 5 browsers over the past seven days.
+     */
+    function renderDeviceChart(ids, colors) {
+
+        query({
+            'ids': ids,
+            'dimensions': 'ga:deviceCategory',
+            'metrics': 'ga:users',
             'max-results': 5
         })
         .then(function(response) {
 
             var data = [];
-            var colors = ['#4D5360','#949FB1','#D4CCC5','#E2EAE9','#F7464A'];
+
 
             var values = [];
             var labels = [];
             var colors_chart = [];
+            var id_text = null;
+            var total = 0;
 
             response.rows.forEach(function(row, i) {
-
-                values.push(+row[1]);
-                labels.push(row[0]);
+                total += parseFloat(row[1]);
+                values.push(row[1]);
+                labels.push(formatDeviceName(row[0]));
                 colors_chart.push(colors[i]);
 
             });
+
+            $.each(labels, function(i, label) {
+                id_text = "#text-" + labels[i];
+                $(id_text).html(
+                    getDescriptionDevice(values[i], label, total)
+                );
+            })
 
             data['datasets'] =  [];
             data['datasets'].push({
@@ -291,65 +527,36 @@ gapi.analytics.ready(function() {
 
             data['labels'] =  labels;
 
-            new Chart(makeCanvas('countries-container'), {
+
+            new Chart(makeCanvas('devices-container'), {
                 type: 'doughnut',
                 data: data,
                 options: {}
             });
-            generateLegend('countries-legend', data);
+            generateLegend('devices-legend', data);
         });
     }
 
-    function test(ids) {
-        console.log("passe test");
+    function formatDeviceName(device) {
+        switch (device) {
+            case 'mobile':
+                return 'Mobile';
+            case 'desktop':
+                return 'Ordinateur';
+            case 'tablet':
+                return 'Tablette';
+            default:
+                return device;
+        }
+    }
 
-        query({
-            'ids': ids,
-            'metrics': 'ga:users',
-            'dimensions': 'ga:source',
-        })
-        .then(function(response) {
+    function getDescriptionDevice(value, label, sum){
+        var total = Math.round((value / sum) * 100);
 
-
-
-            response.rows.forEach(function(row, i) {
-
-                var data = [];
-                var colors = ['#4D5360','#949FB1','#D4CCC5','#E2EAE9','#F7464A'];
-
-
-                var values = [];
-                var labels = [];
-                var colors_chart = [];
-
-                response.rows.forEach(function(row, i) {
-
-                    values.push(+row[1]);
-                    labels.push(row[0]);
-                    colors_chart.push(colors[i]);
-
-                });
-
-                data['datasets'] =  [];
-                data['datasets'].push({
-                    "data": values,
-                    "backgroundColor" : colors_chart
-                });
-
-                data['labels'] =  labels;
-
-
-                new Chart(makeCanvas('source-container'), {
-                    type: 'doughnut',
-                    data: data,
-                    options: {}
-                });
-                generateLegend('source-legend', data);
-
-            });
-
-
-        });
+        return '<span style="color: #A8ACAF;"> \n' +
+         label  +   ' <br>\n' +
+            '</span>\n' +
+            '<span>  ' + total  + '% </span>';
     }
 
 
