@@ -1,12 +1,17 @@
 <div class="Chartjs  p-4 shadow bg-block-analytics box box-primary" >
     <div class="box-header text-center">
-        <h3>Utilisateurs </h3>
+        <h3>Utilisateurs par heure </h3>
     </div>
     <div class="box-body">
-        <div class="" id="active-users-container">
+        <div class="row text-center">
+            <div class="col-xs-12 col-xs-offset-2" id="users-container" >
 
+            </div>
         </div>
-        <figure class="Chartjs-figure" id="users-container"></figure>
-        <ol class="Chartjs-legend" id="users-legend"></ol>
     </div>
 </div>
+
+{% if users_color is defined %}
+    <div id="users_color" style="display: none;" data-users-color="{{ users_color }}">
+    </div>
+{% endif %}

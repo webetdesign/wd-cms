@@ -110,8 +110,8 @@ gapi.analytics.ready(function() {
     },
 
     template:
-      '<div class="ActiveUsers">' +
-        'Active Users: <b class="ActiveUsers-value"></b>' +
+      '<div>' +
+        '<b style="font-size: 5rem; font-weight: normal"></b>' +
       '</div>',
 
   });

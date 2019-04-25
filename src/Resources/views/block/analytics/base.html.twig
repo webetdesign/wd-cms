@@ -7,15 +7,31 @@
         </div>
         <div class="row">
             <div class="col-12" style="padding-left: 15px; padding-right: 15px">
-                <div class="box box-primary">
-                    <div class="box-header">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-9">
+                            <div class="box box-primary">
+                                <div class="box-header">
 
+                                </div>
+                                <div class="box-body">
+                                    <div id="view-selector-container"></div>
+                                    <div id="view-name"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-3 ">
+                            <div class="box box-primary">
+                                <div class="box-header text-center">
+                                    Utilisateurs actifs
+                                </div>
+                                <div class="box-body" style="padding: 0;">
+                                    <div id="active-users-container" class="text-center">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="box-body">
-                        <div id="view-selector-container"></div>
-                        <div id="view-name"></div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -23,6 +39,11 @@
 </div>
 {% if client_key is defined %}
     <div id="client_key_api" style="display: none;" data-client-key="{{ client_key }}">
+    </div>
+{% endif %}
+
+{% if colors is defined %}
+    <div id="colors" style="display: none;" data-colors="{{ colors }}">
     </div>
 {% endif %}
 

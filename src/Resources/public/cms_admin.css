@@ -3819,6 +3819,9 @@ limitations under the License.
 .p-4 {
   padding: 1.5rem !important; }
 
+.m-1 {
+  margin: 0.1rem !important; }
+
 .px-4 {
   padding-left: 1.5rem !important;
   padding-right: 1.5rem !important; }
@@ -3847,3 +3850,21 @@ limitations under the License.
 .ml-auto,
 .mx-auto {
   margin-left: auto !important; }
+
+.tooltip-inner {
+  background-color: white; }
+
+.tooltip-arrow {
+  background-color: inherit; }
+
+.tooltip.top .tooltip-arrow {
+  border-top-color: white; }
+
+.tooltip.right .tooltip-arrow {
+  border-right-color: white; }
+
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: white; }
+
+.tooltip.left .tooltip-arrow {
+  border-left-color: white; }
