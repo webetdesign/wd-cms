@@ -690,9 +690,9 @@ gapi.analytics.ready(function() {
 
                 }
 
-                $("[rel=tooltip]").tooltip({html:true});
+                $("[rel=tooltip]").tooltip({html:true});*/
 
-            });*/
+            });
 
         });
 
