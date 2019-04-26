@@ -129,7 +129,6 @@ gapi.analytics.ready(function() {
 
                     var map = $("#map_key_api").data('map-key');
                     $("#map_key_api").remove();
-                    console.log(map);
 
                     renderTopCountriesChart(data.ids, colors, map);
                 }
@@ -626,7 +625,7 @@ gapi.analytics.ready(function() {
         query({
             'ids': ids,
             'metrics': 'ga:sessions',
-            'dimensions': 'ga:hour, ga:dayOfWeekName, ga:day',
+            'dimensions': 'ga:hour, ga:dayOfWeekName, ga:year',
             'start-date': moment(now).subtract(4, 'day').format('YYYY-MM-DD'),
             'end-date': moment(now).subtract(1, 'day').format('YYYY-MM-DD'),
             'sort' : 'ga:day'
@@ -639,7 +638,7 @@ gapi.analytics.ready(function() {
             query({
                 'ids': ids,
                 'metrics': 'ga:sessions',
-                'dimensions': 'ga:hour, ga:dayOfWeekName, ga:day',
+                'dimensions': 'ga:hour, ga:dayOfWeekName, ga:year',
                 'start-date': moment(now).subtract(7, 'day').format('YYYY-MM-DD'),
                 'end-date': moment(now).subtract(5, 'day').format('YYYY-MM-DD'),
                 'sort' : 'ga:day'
@@ -650,7 +649,6 @@ gapi.analytics.ready(function() {
                 var res = formatDatasUser(response.rows, response1);
                 var datas = res[0];
                 var max = res[1];
-
                 $.each(datas, function(i, row) {
                     var id = "row-" + i ;
                     $("#users-container").append('<div class="row " id="'+id+'">\n' +
