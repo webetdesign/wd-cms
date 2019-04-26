@@ -100,7 +100,7 @@ gapi.analytics.ready(function() {
                 var week_colors = null;
 
                 if ( $("#week_colors").length){
-                    week_colors = $("#week_color").data('week-colors');
+                    week_colors = $("#week_colors").data('week-colors');
                     $("#week_colors").remove();
                 }
 
