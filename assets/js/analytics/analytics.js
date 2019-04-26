@@ -126,8 +126,11 @@ gapi.analytics.ready(function() {
             if ($('#countries-container').length){
 
                 if ( $("#map_key_api").length){
+
                     map = $("#map_key_api").data('map-key');
-                    $("#map_key_api").remove();
+                    //$("#map_key_api").remove();
+                    console.log(map);
+
                     renderTopCountriesChart(data.ids, colors, map);
                 }
             }
