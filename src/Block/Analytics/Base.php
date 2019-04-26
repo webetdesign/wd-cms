@@ -62,10 +62,10 @@ class Base extends AbstractBlockService
         $resolver->setDefaults([
             'template' => "@WebEtDesignCmsBundle/Resources/views/block/analytics/base.html.twig",
             'client_key' => null,
-            'users_color' => 'rgb(255, 026, 026)',
-            'week_colors' => ['rgb(255, 026, 026)', 'rgb(255, 120, 026)'],
-            'year_colors' => ['rgb(255, 026, 026)', 'rgb(255, 120, 026)'],
-            'colors' => ['#4D5360','#949FB1','#D4CCC5','#E2EAE9','#F7464A']
+            'users_color' => 'rgb(179, 000, 000)',
+            'week_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
+            'year_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
+            'colors' => ['rgb(255, 102, 102)','rgb(255, 051, 051)','rgb(230, 000, 000)','rgb(179, 000, 000)','rgb(128, 000, 000)']
 
         ]);
 
