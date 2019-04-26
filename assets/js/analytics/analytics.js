@@ -628,7 +628,7 @@ gapi.analytics.ready(function() {
             'dimensions': 'ga:hour, ga:dayOfWeekName, ga:year',
             'start-date': moment(now).subtract(4, 'day').format('YYYY-MM-DD'),
             'end-date': moment(now).subtract(1, 'day').format('YYYY-MM-DD'),
-            'sort' : 'ga:day'
+            'sort' : 'ga:year'
 
         })
         .then(function(response) {
@@ -641,7 +641,7 @@ gapi.analytics.ready(function() {
                 'dimensions': 'ga:hour, ga:dayOfWeekName, ga:year',
                 'start-date': moment(now).subtract(7, 'day').format('YYYY-MM-DD'),
                 'end-date': moment(now).subtract(5, 'day').format('YYYY-MM-DD'),
-                'sort' : 'ga:day'
+                'sort' : 'ga:year'
 
             })
             .then(function(response) {
