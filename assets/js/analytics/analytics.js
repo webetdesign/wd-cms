@@ -131,7 +131,7 @@ gapi.analytics.ready(function() {
                     //$("#map_key_api").remove();
                     console.log(map);
 
-                    renderTopCountriesChart(data.ids, colors, map);
+                    //renderTopCountriesChart(data.ids, colors, map);
                 }
             }
 
