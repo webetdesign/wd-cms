@@ -124,7 +124,12 @@ gapi.analytics.ready(function() {
             }
 
             if ($('#countries-container').length){
-                renderTopCountriesChart(data.ids, colors);
+
+                if ( $("#map_key_api").length){
+                    map = $("#map_key_api").data('map-key');
+                    $("#map_key_api").remove();
+                    renderTopCountriesChart(data.ids, colors, map);
+                }
             }
 
             if ($('#source-container').length){
@@ -358,11 +363,11 @@ gapi.analytics.ready(function() {
      * compares sessions from mobile, desktop, and tablet over the past seven
      * days.
      */
-    function renderTopCountriesChart(ids, colors) {
+    function renderTopCountriesChart(ids, colors, map) {
 
         google.charts.load('current', {
             'packages':['geochart'],
-            'mapsApiKey': 'AIzaSyBN0Z6WtaclpqwuqbH_ArjMz-gnFNd3uLA'
+            'mapsApiKey': map
         });
 
         query({

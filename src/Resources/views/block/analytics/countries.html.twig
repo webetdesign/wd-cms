@@ -9,3 +9,7 @@
     </div>
 </div>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% if map_key is defined %}
+    <div id="map_key_api" style="display: none;" data-map-key="{{ map_key }}">
+    </div>
+{% endif %}

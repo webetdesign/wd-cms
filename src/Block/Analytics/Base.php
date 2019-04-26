@@ -42,6 +42,7 @@ class Base extends AbstractBlockService
 
         return $this->renderPrivateResponse($template, [
             'client_key' => $settings['client_key'] ,
+            'map_key' => $settings['client_key'] ,
             'users_color' => $settings['users_color'],
             'week_colors' => json_encode($settings['week_colors']),
             'year_colors' => json_encode($settings['year_colors']),
@@ -62,6 +63,7 @@ class Base extends AbstractBlockService
         $resolver->setDefaults([
             'template' => "@WebEtDesignCmsBundle/Resources/views/block/analytics/base.html.twig",
             'client_key' => null,
+            'map_key' => null,
             'users_color' => 'rgb(179, 000, 000)',
             'week_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
             'year_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
@@ -71,6 +73,7 @@ class Base extends AbstractBlockService
 
         $resolver->setAllowedTypes('template', ['string', 'boolean']);
         $resolver->setAllowedTypes('client_key', ['string', 'null']);
+        $resolver->setAllowedTypes('map_key', ['string', 'null']);
         $resolver->setAllowedTypes('week_colors', ['array', 'null']);
         $resolver->setAllowedTypes('year_colors', ['array', 'null']);
         $resolver->setAllowedTypes('users_color', ['string', 'null']);
