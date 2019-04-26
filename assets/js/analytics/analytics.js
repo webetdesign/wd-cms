@@ -649,7 +649,9 @@ gapi.analytics.ready(function() {
                 var res = formatDatasUser(response.rows, response1);
                 var datas = res[0];
                 var max = res[1];
-                $.each(datas, function(i, row) {
+
+                console.log(response.rows);
+                /*$.each(datas, function(i, row) {
                     var id = "row-" + i ;
                     $("#users-container").append('<div class="row " id="'+id+'">\n' +
                         '\n' +
@@ -690,7 +692,7 @@ gapi.analytics.ready(function() {
 
                 $("[rel=tooltip]").tooltip({html:true});
 
-            });
+            });*/
 
         });
 
