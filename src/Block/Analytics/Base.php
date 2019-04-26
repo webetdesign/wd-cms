@@ -42,7 +42,7 @@ class Base extends AbstractBlockService
 
         return $this->renderPrivateResponse($template, [
             'client_key' => $settings['client_key'] ,
-            'map_key' => $settings['client_key'] ,
+            'map_key' => $settings['map_key'] ,
             'users_color' => $settings['users_color'],
             'week_colors' => json_encode($settings['week_colors']),
             'year_colors' => json_encode($settings['year_colors']),
