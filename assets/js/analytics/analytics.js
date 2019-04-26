@@ -197,7 +197,7 @@ gapi.analytics.ready(function() {
                         label: 'Last Week',
                         borderColor : colors[0],
                         pointColor : colors[0],
-                        backgroundColor: 'rgb(229, 231, 233, 0.5)',
+                        backgroundColor: (colors[0]).substring(0,17) + ", 0.5)",
                         pointStrokeColor : '#fff',
                         data : data2
                     },
@@ -205,7 +205,7 @@ gapi.analytics.ready(function() {
                         label: 'This Week',
                         borderColor : colors[1],
                         pointColor : colors[1],
-                        backgroundColor: 'rgb(229, 231, 233, 0.5)',
+                        backgroundColor: (colors[1]).substring(0,17) + ", 0.5)",
                         pointStrokeColor : '#fff',
                         data : data1
                     }
