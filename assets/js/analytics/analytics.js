@@ -97,26 +97,26 @@ gapi.analytics.ready(function() {
 
             if ($('#week-container').length){
 
-                var week_color = null;
+                var week_colors = null;
 
-                if ( $("#week_color").length){
-                    week_color = $("#week_color").data('week-color');
-                    $("#week_color").remove();
+                if ( $("#week_colors").length){
+                    week_colors = $("#week_color").data('week-colors');
+                    $("#week_colors").remove();
                 }
 
-                renderWeekOverWeekChart(data.ids, week_color);
+                renderWeekOverWeekChart(data.ids, week_colors);
             }
 
             if ($('#year-container').length){
 
-                var year_color = null;
+                var year_colors = null;
 
-                if ( $("#year_color").length){
-                    year_color = $("#year_color").data('year-color');
-                    $("#year_color").remove();
+                if ( $("#year_colors").length){
+                    year_colors = $("#year_colors").data('year-colors');
+                    $("#year_colors").remove();
                 }
 
-                renderYearOverYearChart(data.ids, year_color);
+                renderYearOverYearChart(data.ids, year_colors);
             }
 
             if ($('#browsers-container').length){
