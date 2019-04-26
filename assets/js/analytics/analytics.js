@@ -92,16 +92,31 @@ gapi.analytics.ready(function() {
         viewSelector.on('viewChange', function(data) {
 
             if ($("#active-users-container").length){
-                // Start tracking active users for this view.
                 activeUsers.set(data).execute();
             }
 
             if ($('#week-container').length){
-                renderWeekOverWeekChart(data.ids, colors);
+
+                var week_color = null;
+
+                if ( $("#week_color").length){
+                    week_color = $("#week_color").data('week-color');
+                    $("#week_color").remove();
+                }
+
+                renderWeekOverWeekChart(data.ids, week_color);
             }
 
             if ($('#year-container').length){
-                renderYearOverYearChart(data.ids, colors);
+
+                var year_color = null;
+
+                if ( $("#year_color").length){
+                    year_color = $("#year_color").data('year-color');
+                    $("#year_color").remove();
+                }
+
+                renderYearOverYearChart(data.ids, year_color);
             }
 
             if ($('#browsers-container').length){
@@ -121,10 +136,12 @@ gapi.analytics.ready(function() {
             }
 
             if ($('#users-container').length){
+
                 if ( $("#users_color").length){
                     var users_color = $("#users_color").data('users-color');
                     $("#users_color").remove();
                 }
+
                 renderUsersChart(data.ids, users_color);
             }
 

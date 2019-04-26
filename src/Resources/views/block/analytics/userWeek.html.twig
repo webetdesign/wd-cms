@@ -7,3 +7,8 @@
         <ol class="Chartjs-legend" id="week-legend"></ol>
     </div>
 </div>
+
+{% if week_colors is defined %}
+    <div id="week_colors" style="display: none;" data-week-colors="{{ week_colors }}">
+    </div>
+{% endif %}
