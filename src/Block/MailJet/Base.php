@@ -44,7 +44,6 @@ class Base extends AbstractBlockService
         $settings = $blockContext->getSettings();
 
         $template = $settings['template'];
-
         $this->updateSettings($settings);
 
         $mj = new Client($this->public_key, $this->private_key,true,['version' => 'v3.1']);
