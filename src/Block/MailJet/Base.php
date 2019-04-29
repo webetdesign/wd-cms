@@ -53,7 +53,7 @@ class Base extends AbstractBlockService
 
     public function getName()
     {
-        return 'Admin Analytics';
+        return 'Admin MailJet';
     }
 
     /**
