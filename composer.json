@@ -15,6 +15,7 @@
         "doctrine/doctrine-bundle": "^1.10",
         "doctrine/inflector": "^1.1",
         "doctrine/orm": "^2.6",
+        "composer require symfony/dotenv": "4.2.7",
         "sonata-project/block-bundle": "^3.15",
         "sonata-project/admin-bundle": "^3.45",
         "sonata-project/formatter-bundle": "^4.1",

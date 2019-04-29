@@ -14,7 +14,8 @@ use Sonata\BlockBundle\Block\BlockContextInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
+use Mailjet\Client;
+use Mailjet\Resources;
 
 class Base extends AbstractBlockService
 {
@@ -44,6 +45,31 @@ class Base extends AbstractBlockService
 
         $template = $settings['template'];
 
+        $this->updateSettings($settings);
+
+        $mj = new Client($this->public_key, $this->private_key,true,['version' => 'v3.1']);
+        $body = [
+            'Messages' => [
+                [
+                    'From' => [
+                        'Email' => "benjamin@webetdesign.com",
+                        'Name' => "Me"
+                    ],
+                    'To' => [
+                        [
+                            'Email' => "tutoxd90@gmail.com",
+                            'Name' => "You"
+                        ]
+                    ],
+                    'Subject' => "My first Mailjet Email!",
+                    'TextPart' => "Greetings from Mailjet!",
+                    'HTMLPart' => "<h3>Dear passenger 1, welcome to <a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3><br />May the delivery force be with you!"
+                ]
+            ]
+        ];
+        $response = $mj->post(Resources::$Email, ['body' => $body]);
+        $response->success() && var_dump($response->getData());
+        die;
 
         return $this->renderPrivateResponse($template, [
             'public_key' =>  $this->public_key,
