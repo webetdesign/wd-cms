@@ -142,3 +142,14 @@ services:
             - [setTemplate, ['edit', '@@WebEtDesignCms/menu/edit.html.twig']]
         public: true
 
+    cms.admin.analytics:
+      class: WebEtDesign\CmsBundle\Block\Analytics\Base
+      arguments:
+        - ~
+        - '@templating'
+
+      tags:
+        - { name: sonata.block }
+
+
+

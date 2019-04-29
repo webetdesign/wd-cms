@@ -1,0 +1,87 @@
+.shadow-sm{
+    box-shadow:0 .125rem .25rem rgba(0,0,0,.075) !important
+}
+
+.shadow{
+    box-shadow:0 .5rem 1rem rgba(0,0,0,.15) !important
+}
+
+.shadow-lg{
+    box-shadow:0 1rem 3rem rgba(0,0,0,.175) !important;
+}
+
+
+.bg-block-analytics{
+    background-color: #f8fcff;
+}
+
+.p-4{
+    padding:1.5rem!important
+}
+
+.m-1{
+    margin:0.1rem!important
+}
+.px-4{
+    padding-left: 1.5rem!important;
+    padding-right: 1.5rem!important;
+
+}
+
+.mt-5{
+    margin-top: 2rem
+}
+.mt-4{
+    margin-top: 1.5rem
+}
+
+.my-5{
+    margin-top: 2rem;
+    margin-bottom: 2rem
+}
+
+.mx-5{
+    margin-top: 2rem;
+    margin-bottom: 2rem
+}
+
+
+.text-center{
+    text-align: center;
+}
+
+
+.mr-auto,
+.mx-auto {
+    margin-right: auto !important;
+}
+
+
+
+.ml-auto,
+.mx-auto {
+    margin-left: auto !important;
+}
+
+ .tooltip-inner  {
+     background-color: white;}
+
+ .tooltip-arrow{
+     background-color: inherit;
+ }
+
+.tooltip.top .tooltip-arrow {
+    border-top-color: white;
+}
+
+.tooltip.right .tooltip-arrow {
+    border-right-color: white;
+}
+
+.tooltip.bottom .tooltip-arrow {
+    border-bottom-color: white;
+}
+
+.tooltip.left .tooltip-arrow {
+    border-left-color: white;
+}
