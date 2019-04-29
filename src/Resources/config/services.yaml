@@ -151,5 +151,14 @@ services:
       tags:
         - { name: sonata.block }
 
+    cms.admin.mailJet:
+      class: WebEtDesign\CmsBundle\Block\MailJet\Base
+      arguments:
+        - ~
+        - '@templating'
+
+      tags:
+        - { name: sonata.block }
+
 
 
