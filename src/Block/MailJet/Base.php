@@ -16,11 +16,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Mailjet\Client;
 use Mailjet\Resources;
+use Symfony\Component\Dotenv\Dotenv;
 
 class Base extends AbstractBlockService
 {
     private $public_key;
     private $private_key;
+    private $params;
 
     /**
      * @param string $name
@@ -43,8 +45,13 @@ class Base extends AbstractBlockService
     {
         $settings = $blockContext->getSettings();
 
+
         $template = $settings['template'];
         $this->updateSettings($settings);
+
+        $dotenv = new Dotenv();
+        $dotenv->load(realpath("./../").'/.env');
+        dump($_ENV['DATABASE_URL']);
 
         $mj = new Client($this->public_key, $this->private_key,true,['version' => 'v3.1']);
         $body = [
