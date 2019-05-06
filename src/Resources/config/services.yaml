@@ -23,7 +23,7 @@ services:
     # TODO: Won't work if not in autowire directories
     WebEtDesign\CmsBundle\Services\PageProvider:
         arguments:
-            $config: %wd_cms.templates%
+            $config: '%wd_cms.templates%'
 
     cms.page_provider:
         alias: WebEtDesign\CmsBundle\Services\PageProvider
