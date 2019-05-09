@@ -76,7 +76,7 @@ class CmsTwigExtension extends AbstractExtension
             }
         }
 
-        return $content->getValue();
+        return '<span id="'.$content_code.'" data-id="'.$page->getId().'" data-type="'.strtolower($content->getType()).'" data-code="'.$content_code.'">'.$content->getValue().'</span>';
     }
 
     public function cmsMedia(CmsPage $page, $content_code)
