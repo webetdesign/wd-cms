@@ -625,23 +625,23 @@ gapi.analytics.ready(function() {
         query({
             'ids': ids,
             'metrics': 'ga:sessions',
-            'dimensions': 'ga:hour, ga:dayOfWeekName, ga:year',
-            'start-date': moment(now).subtract(1, 'year').format('YYYY-MM-DD'),
-            'end-date': moment(now).subtract(6, 'month').format('YYYY-MM-DD'),
-            'sort' : 'ga:year'
+            'dimensions': 'ga:hour, ga:dayOfWeekName, ga:day',
+            'start-date': moment(now).subtract(4, 'day').format('YYYY-MM-DD'),
+            'end-date': moment(now).subtract(1, 'day').format('YYYY-MM-DD'),
+            'sort' : 'ga:day'
 
         })
         .then(function(response) {
 
             response1 = response.rows;
-            console.log(response.rows);
+            // console.log(response.rows);
             query({
                 'ids': ids,
                 'metrics': 'ga:sessions',
-                'dimensions': 'ga:hour, ga:dayOfWeekName, ga:year',
-                'start-date': moment(now).subtract(6, 'month').format('YYYY-MM-DD'),
-                'end-date': moment(now).format('YYYY-MM-DD'),
-                'sort' : 'ga:year'
+                'dimensions': 'ga:hour, ga:dayOfWeekName, ga:day',
+                'start-date': moment(now).subtract(7, 'day').format('YYYY-MM-DD'),
+                'end-date': moment(now).subtract(5, 'day').format('YYYY-MM-DD'),
+                'sort' : 'ga:day'
 
             })
             .then(function(response) {
@@ -649,9 +649,7 @@ gapi.analytics.ready(function() {
                 var res = formatDatasUser(response.rows, response1);
                 var datas = res[0];
                 var max = res[1];
-
-                console.log(response.rows);
-                /*$.each(datas, function(i, row) {
+                $.each(datas, function(i, row) {
                     var id = "row-" + i ;
                     $("#users-container").append('<div class="row " id="'+id+'">\n' +
                         '\n' +
@@ -669,7 +667,7 @@ gapi.analytics.ready(function() {
                             '<span style="font-size: 1.6rem; color: black;">'+ value[3] +'</span>' +
                             '<br>' +
                             '<span style=" color: #A6ACAF;">'+ (parseFloat(value[3]) < 2 ? 'Utilisateur' : 'Utilisateurs') +'</span>' +
-                             '\'' +
+                            '\'' +
                             '>\n</div>'
                         );
                     })
@@ -690,7 +688,7 @@ gapi.analytics.ready(function() {
 
                 }
 
-                $("[rel=tooltip]").tooltip({html:true});*/
+                $("[rel=tooltip]").tooltip({html:true});
 
             });
 
