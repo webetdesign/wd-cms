@@ -657,7 +657,6 @@ gapi.analytics.ready(function() {
                     )
                     $.each(row, function(j, value) {
                         var colorDiv = getColorUser(max, value[3], color);
-
                         $("#"+id).append('<div ' +
                             'class="col-xs-1 m-1 " ' +
                             'style="background-color: '+ colorDiv +'; height: 10px; border: 1px solid lightgrey" ' +
