@@ -634,7 +634,7 @@ gapi.analytics.ready(function() {
         .then(function(response) {
 
             response1 = response.rows;
-            console.log(response.rows);
+            // console.log(response.rows);
             query({
                 'ids': ids,
                 'metrics': 'ga:sessions',
@@ -657,7 +657,6 @@ gapi.analytics.ready(function() {
                     )
                     $.each(row, function(j, value) {
                         var colorDiv = getColorUser(max, value[3], color);
-
                         $("#"+id).append('<div ' +
                             'class="col-xs-1 m-1 " ' +
                             'style="background-color: '+ colorDiv +'; height: 10px; border: 1px solid lightgrey" ' +
@@ -667,7 +666,7 @@ gapi.analytics.ready(function() {
                             '<span style="font-size: 1.6rem; color: black;">'+ value[3] +'</span>' +
                             '<br>' +
                             '<span style=" color: #A6ACAF;">'+ (parseFloat(value[3]) < 2 ? 'Utilisateur' : 'Utilisateurs') +'</span>' +
-                             '\'' +
+                            '\'' +
                             '>\n</div>'
                         );
                     })
