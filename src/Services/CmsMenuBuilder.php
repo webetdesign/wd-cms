@@ -82,6 +82,7 @@ class CmsMenuBuilder
 
         $menu     = $this->factory->createItem('root');
         $rootItem = $repo->getByCode($menuRootCode);
+        $menu->setChildrenAttribute('class', $rootItem->getClasses());
         $this->buildNodes($menu, $repo->children($rootItem, true), $parentActive);
 
         return $menu;
