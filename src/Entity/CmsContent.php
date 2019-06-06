@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-use App\Application\Sonata\MediaBundle\Entity\Media;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;

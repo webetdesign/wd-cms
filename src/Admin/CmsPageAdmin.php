@@ -2,7 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use App\Application\Sonata\UserBundle\Entity\User;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use WebEtDesign\CmsBundle\Entity\CmsPage;

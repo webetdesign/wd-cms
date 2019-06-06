@@ -9,7 +9,7 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 
-use App\Application\Sonata\MediaBundle\Entity\Media;
+use App\Entity\Media;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;

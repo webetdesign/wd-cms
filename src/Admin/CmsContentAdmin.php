@@ -2,8 +2,8 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use App\Application\Sonata\MediaBundle\Entity\Media;
-use App\Application\Sonata\UserBundle\Entity\User;
+use App\Entity\User;
+use App\Entity\Media;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
