@@ -14,6 +14,7 @@ class CmsContentTypeEnum
     const TEXT     = 'TEXT';
     const TEXTAREA = 'TEXTAREA';
     const WYSYWYG  = 'WYSYWYG';
+    const IMAGE    = 'IMAGE';
     const MEDIA    = 'MEDIA';
     const SLIDER    = 'SLIDER';
     const HIGHLIGHT    = 'HIGHLIGHT';
@@ -23,6 +24,7 @@ class CmsContentTypeEnum
         self::TEXT     => 'Text',
         self::TEXTAREA => 'Textarea',
         self::WYSYWYG  => 'WYSYWYG',
+        self::IMAGE    => 'Image',
         self::MEDIA    => 'Media',
         self::SLIDER    => 'Slider',
         self::HIGHLIGHT    => 'Highlight',
@@ -50,6 +52,7 @@ class CmsContentTypeEnum
             self::TEXT,
             self::TEXTAREA,
             self::WYSYWYG,
+            self::IMAGE,
             self::MEDIA,
             self::SLIDER,
             self::HIGHLIGHT,

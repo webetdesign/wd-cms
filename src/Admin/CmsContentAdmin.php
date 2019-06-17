@@ -111,7 +111,7 @@ final class CmsContentAdmin extends AbstractAdmin
                     );
                     break;
 
-                case CmsContentTypeEnum::MEDIA:
+                case CmsContentTypeEnum::IMAGE:
                     $formMapper->add(
                         'media',
                         ModelListType::class,
@@ -124,6 +124,23 @@ final class CmsContentAdmin extends AbstractAdmin
                             "link_parameters" => [
                                 'context' => 'cms_page',
                                 'provider' => 'sonata.media.provider.image',
+                            ],
+                        ]
+                    );
+                    break;
+
+                case CmsContentTypeEnum::MEDIA:
+                    $formMapper->add(
+                        'media',
+                        ModelListType::class,
+                        [
+                            'class' => Media::class,
+                            'required' => false,
+                            'model_manager' => $admin->getModelManager(),
+                        ],
+                        [
+                            "link_parameters" => [
+                                'context' => 'cms_page'
                             ],
                         ]
                     );
