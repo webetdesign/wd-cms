@@ -167,6 +167,7 @@ class CmsTwigExtension extends AbstractExtension
 
         $objects = $this->em->getRepository($this->contentTypeOption[CmsContentTypeEnum::PROJECT_COLLECTION]['class'])->findBy(['id' => json_decode($content->getValue())]);
 
+        shuffle($objects);
         return $objects;
     }
 
