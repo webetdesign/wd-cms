@@ -6,12 +6,17 @@ use App\Entity\Route;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
+use WebEtDesign\CmsBundle\Utils\SmoFacebookTrait;
+use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
 
 /**
  */
 class CmsPage
 {
     use SeoAwareTrait;
+    use SmoFacebookTrait;
+    use SmoTwitterTrait;
+    
 
     /**
      * @var int
