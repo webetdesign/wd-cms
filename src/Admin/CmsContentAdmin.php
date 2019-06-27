@@ -4,8 +4,11 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use App\Entity\User;
 use App\Entity\Media;
+use Doctrine\ORM\EntityManager;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentSlider;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
@@ -23,11 +26,23 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use WebEtDesign\CmsBundle\Form\BlockType;
 use WebEtDesign\CmsBundle\Form\CmsContentSliderType;
 use WebEtDesign\CmsBundle\Form\DataTransformer\CmsContentSliderDataTransformer;
+use Symfony\Component\Form\CallbackTransformer;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
+    protected $em;
+    protected $contentTypeOption;
+
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $contentTypeOption)
+    {
+        $this->em = $em;
+        $this->contentTypeOption = $contentTypeOption;
+
+        parent::__construct($code, $class, $baseControllerName);
+    }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
@@ -50,8 +65,8 @@ final class CmsContentAdmin extends AbstractAdmin
                 null,
                 [
                     'actions' => [
-                        'show' => [],
-                        'edit' => [],
+                        'show'   => [],
+                        'edit'   => [],
                         'delete' => [],
                     ],
                 ]
@@ -63,13 +78,13 @@ final class CmsContentAdmin extends AbstractAdmin
         $formMapper->getFormBuilder()->setMethod('patch');
 
         $roleAdmin = $this->canManageContent();
-        $admin = $this;
+        $admin     = $this;
 
         $formMapper->add(
             'label',
             null,
             [
-                'attr' => ['disabled' => !$roleAdmin],
+                'attr'  => ['disabled' => !$roleAdmin],
                 'label' => 'Libéllé',
             ]
         );
@@ -99,14 +114,14 @@ final class CmsContentAdmin extends AbstractAdmin
                         [
                             'label'        => false,
                             'by_reference' => false,
-//                            'btn_add'      => $roleAdmin ? 'Ajouter' : false,
+                            //                            'btn_add'      => $roleAdmin ? 'Ajouter' : false,
                             'type_options' => [
                                 'delete' => $roleAdmin,
                             ],
                         ],
                         [
                             'inline' => 'table',
-                            'edit' => 'inline'
+                            'edit'   => 'inline'
                         ]
                     );
                     break;
@@ -116,13 +131,13 @@ final class CmsContentAdmin extends AbstractAdmin
                         'media',
                         ModelListType::class,
                         [
-                            'class' => Media::class,
-                            'required' => false,
+                            'class'         => Media::class,
+                            'required'      => false,
                             'model_manager' => $admin->getModelManager(),
                         ],
                         [
                             "link_parameters" => [
-                                'context' => 'cms_page',
+                                'context'  => 'cms_page',
                                 'provider' => 'sonata.media.provider.image',
                             ],
                         ]
@@ -134,8 +149,8 @@ final class CmsContentAdmin extends AbstractAdmin
                         'media',
                         ModelListType::class,
                         [
-                            'class' => Media::class,
-                            'required' => false,
+                            'class'         => Media::class,
+                            'required'      => false,
                             'model_manager' => $admin->getModelManager(),
                         ],
                         [
@@ -151,10 +166,10 @@ final class CmsContentAdmin extends AbstractAdmin
                         'value',
                         SimpleFormatterType::class,
                         [
-                            'format' => 'richhtml',
+                            'format'           => 'richhtml',
                             'ckeditor_context' => 'cms_page',
-                            'required' => false,
-                            'auto_initialize' => false,
+                            'required'         => false,
+                            'auto_initialize'  => false,
                         ]
                     );
                     break;
@@ -164,10 +179,38 @@ final class CmsContentAdmin extends AbstractAdmin
                         'value',
                         TextareaType::class,
                         [
-                            'required' => false,
+                            'required'        => false,
                             'auto_initialize' => false,
                         ]
                     );
+                    break;
+
+                case CmsContentTypeEnum::PROJECT_COLLECTION:
+                    $formMapper->add(
+                        'value',
+                        EntityType::class,
+                        [
+                            'class'           => $this->contentTypeOption[CmsContentTypeEnum::PROJECT_COLLECTION]['class'],
+                            'required'        => false,
+                            'auto_initialize' => false,
+                            'multiple'        => true,
+                        ]
+                    );
+                    $formMapper->getFormBuilder()->get('value')
+                        ->addModelTransformer(new CallbackTransformer(
+                            function ($ids) {
+                                $objects = $this->em->getRepository($this->contentTypeOption[CmsContentTypeEnum::PROJECT_COLLECTION]['class'])->findBy(['id' => json_decode($ids)]);
+                                return $objects;
+                            },
+                            function ($objects) {
+                                $ids = [];
+                                foreach ($objects as $object) {
+                                    $ids[] = $object->getId();
+                                }
+                                // transform the string back to an array
+                                return json_encode($ids);
+                            }
+                        ));
                     break;
             }
 

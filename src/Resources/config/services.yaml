@@ -47,6 +47,7 @@ services:
         arguments:
           - '@doctrine.orm.entity_manager'
           - '@router'
+          - '%wd_cms.content_type_option%'
         tags:
           - { name: twig.extension }
         public: true
@@ -119,7 +120,13 @@ services:
 
     cms.admin.cms_content:
         class: '%wd_cms.admin.config.class.content%'
-        arguments: [~, '%wd_cms.admin.config.entity.content%', '%wd_cms.admin.config.controller.content%']
+#        arguments: [~, '%wd_cms.admin.config.entity.content%', '%wd_cms.admin.config.controller.content%']
+        arguments:
+          - ~
+          - '%wd_cms.admin.config.entity.content%'
+          - '%wd_cms.admin.config.controller.content%'
+          - '@doctrine.orm.default_entity_manager'
+          - '%wd_cms.content_type_option%'
         tags:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Content, show_in_dashboard: false }
         public: true
@@ -159,6 +166,3 @@ services:
 
       tags:
         - { name: sonata.block }
-
-
-

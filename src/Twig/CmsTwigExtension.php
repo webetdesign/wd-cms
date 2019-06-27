@@ -19,13 +19,16 @@ class CmsTwigExtension extends AbstractExtension
 
     protected $router;
 
+    protected $contentTypeOption;
+
     /**
      * @inheritDoc
      */
-    public function __construct(EntityManagerInterface $entityManager, RouterInterface $router)
+    public function __construct(EntityManagerInterface $entityManager, RouterInterface $router, $contentTypeOption)
     {
-        $this->em = $entityManager;
-        $this->router = $router;
+        $this->em                = $entityManager;
+        $this->router            = $router;
+        $this->contentTypeOption = $contentTypeOption;
     }
 
 
@@ -35,7 +38,7 @@ class CmsTwigExtension extends AbstractExtension
             // If your filter generates SAFE HTML, you should add a third
             // parameter: ['is_safe' => ['html']]
             // Reference: https://twig.symfony.com/doc/2.x/advanced.html#automatic-escaping
-//            new TwigFilter('filter_name', [$this, 'doSomething']),
+            //            new TwigFilter('filter_name', [$this, 'doSomething']),
         ];
     }
 
@@ -46,6 +49,7 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
+            new TwigFunction('cms_project_collection', [$this, 'cmsProjectCollection']),
         ];
     }
 
@@ -53,15 +57,15 @@ class CmsTwigExtension extends AbstractExtension
     {
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
-                            ->findOneByPageAndContentCodeAndType(
-                                $page,
-                                $content_code,
-                                [
-                                    CmsContentTypeEnum::TEXT,
-                                    CmsContentTypeEnum::TEXTAREA,
-                                    CmsContentTypeEnum::WYSYWYG,
-                                ]
-                            );
+            ->findOneByPageAndContentCodeAndType(
+                $page,
+                $content_code,
+                [
+                    CmsContentTypeEnum::TEXT,
+                    CmsContentTypeEnum::TEXTAREA,
+                    CmsContentTypeEnum::WYSYWYG,
+                ]
+            );
 
         if (!$content) {
             if (getenv('APP_ENV') != 'dev') {
@@ -84,13 +88,13 @@ class CmsTwigExtension extends AbstractExtension
     {
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
-                            ->findOneByPageAndContentCodeAndType(
-                                $page,
-                                $content_code,
-                                [
-                                    CmsContentTypeEnum::MEDIA,
-                                ]
-                            );
+            ->findOneByPageAndContentCodeAndType(
+                $page,
+                $content_code,
+                [
+                    CmsContentTypeEnum::MEDIA,
+                ]
+            );
         if (!$content) {
             if (getenv('APP_ENV') != 'dev') {
                 return null;
@@ -136,7 +140,37 @@ class CmsTwigExtension extends AbstractExtension
         return $content->getSliders();
     }
 
-    public function cmsPath($route, $params = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH)
+    public function cmsProjectCollection(CmsPage $page, $content_code)
+    {
+        $content = $this->em->getRepository(CmsContent::class)
+            ->findOneByPageAndContentCodeAndType(
+                $page,
+                $content_code,
+                [
+                    CmsContentTypeEnum::PROJECT_COLLECTION,
+                ]
+            );
+
+        if (!$content) {
+            if (getenv('APP_ENV') != 'dev') {
+                return null;
+            } else {
+                $message = sprintf(
+                    'No content sliders found with the code "%s" in page "%s" (#%s)',
+                    $content_code,
+                    $page->getTitle(),
+                    $page->getId()
+                );
+                throw new Exception($message);
+            }
+        }
+
+        $objects = $this->em->getRepository($this->contentTypeOption[CmsContentTypeEnum::PROJECT_COLLECTION]['class'])->findBy(['id' => json_decode($content->getValue())]);
+
+        return $objects;
+    }
+
+    public function cmsPath($route, $params = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
         try {
             return $this->router->generate($route, $params, $referenceType);

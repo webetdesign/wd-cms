@@ -114,7 +114,24 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->arrayNode('contentTypeOption')
+                ->useAttributeAsKey('name')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('class')->isRequired()->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
+//            $rootNode
+//                ->children()
+//                ->arrayNode('blocks')
+//                ->children()
+//                ->scalarNode('name')->isRequired()->end()
+//                ->scalarNode('service')->isRequired()->end()
+//                ->end()
+//                ->end()
+//                ->end();
 
         return $treeBuilder;
     }

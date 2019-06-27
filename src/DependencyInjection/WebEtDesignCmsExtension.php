@@ -39,6 +39,9 @@ class WebEtDesignCmsExtension extends Extension
 
         // TODO : work for autowired configuration
         $container->setParameter('wd_cms.templates', $config['pages']);
+        $container->setParameter('wd_cms.content_type_option', $config['contentTypeOption']);
+        
+        
     }
 
     /**
