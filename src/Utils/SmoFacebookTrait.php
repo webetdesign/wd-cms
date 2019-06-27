@@ -67,7 +67,7 @@ trait SmoFacebookTrait
      * @param string|null $fb_title
      * @return SmoFacebookTrait
      */
-    public function setFbTitle(?string $fb_title): SmoFacebookTrait
+    public function setFbTitle(?string $fb_title)
     {
         $this->fb_title = $fb_title;
         return $this;
@@ -85,7 +85,7 @@ trait SmoFacebookTrait
      * @param string|null $fb_type
      * @return SmoFacebookTrait
      */
-    public function setFbType(?string $fb_type): SmoFacebookTrait
+    public function setFbType(?string $fb_type)
     {
         $this->fb_type = $fb_type;
         return $this;
@@ -103,7 +103,7 @@ trait SmoFacebookTrait
      * @param string|null $fb_url
      * @return SmoFacebookTrait
      */
-    public function setFbUrl(?string $fb_url): SmoFacebookTrait
+    public function setFbUrl(?string $fb_url)
     {
         $this->fb_url = $fb_url;
         return $this;
@@ -121,7 +121,7 @@ trait SmoFacebookTrait
      * @param string|null $fb_image
      * @return SmoFacebookTrait
      */
-    public function setFbImage(?string $fb_image): SmoFacebookTrait
+    public function setFbImage(?string $fb_image)
     {
         $this->fb_image = $fb_image;
         return $this;
@@ -139,7 +139,7 @@ trait SmoFacebookTrait
      * @param string|null $fb_description
      * @return SmoFacebookTrait
      */
-    public function setFbDescription(?string $fb_description): SmoFacebookTrait
+    public function setFbDescription(?string $fb_description)
     {
         $this->fb_description = $fb_description;
         return $this;
@@ -157,7 +157,7 @@ trait SmoFacebookTrait
      * @param string|null $fb_site_name
      * @return SmoFacebookTrait
      */
-    public function setFbSiteName(?string $fb_site_name): SmoFacebookTrait
+    public function setFbSiteName(?string $fb_site_name)
     {
         $this->fb_site_name = $fb_site_name;
         return $this;
@@ -175,7 +175,7 @@ trait SmoFacebookTrait
      * @param string|null $fb_admins
      * @return SmoFacebookTrait
      */
-    public function setFbAdmins(?string $fb_admins): SmoFacebookTrait
+    public function setFbAdmins(?string $fb_admins)
     {
         $this->fb_admins = $fb_admins;
         return $this;

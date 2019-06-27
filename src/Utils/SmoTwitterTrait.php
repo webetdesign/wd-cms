@@ -58,9 +58,8 @@ trait SmoTwitterTrait
 
     /**
      * @param string|null $twitter_card
-     * @return SmoTwitterTrait
      */
-    public function setTwitterCard(?string $twitter_card): SmoTwitterTrait
+    public function setTwitterCard(?string $twitter_card)
     {
         $this->twitter_card = $twitter_card;
         return $this;
@@ -76,9 +75,8 @@ trait SmoTwitterTrait
 
     /**
      * @param string|null $twitter_site
-     * @return SmoTwitterTrait
      */
-    public function setTwitterSite(?string $twitter_site): SmoTwitterTrait
+    public function setTwitterSite(?string $twitter_site)
     {
         $this->twitter_site = $twitter_site;
         return $this;
@@ -94,9 +92,8 @@ trait SmoTwitterTrait
 
     /**
      * @param string|null $twitter_title
-     * @return SmoTwitterTrait
      */
-    public function setTwitterTitle(?string $twitter_title): SmoTwitterTrait
+    public function setTwitterTitle(?string $twitter_title)
     {
         $this->twitter_title = $twitter_title;
         return $this;
@@ -112,9 +109,8 @@ trait SmoTwitterTrait
 
     /**
      * @param string|null $twitter_description
-     * @return SmoTwitterTrait
      */
-    public function setTwitterDescription(?string $twitter_description): SmoTwitterTrait
+    public function setTwitterDescription(?string $twitter_description)
     {
         $this->twitter_description = $twitter_description;
         return $this;
@@ -130,9 +126,8 @@ trait SmoTwitterTrait
 
     /**
      * @param string|null $twitter_creator
-     * @return SmoTwitterTrait
      */
-    public function setTwitterCreator(?string $twitter_creator): SmoTwitterTrait
+    public function setTwitterCreator(?string $twitter_creator)
     {
         $this->twitter_creator = $twitter_creator;
         return $this;
@@ -148,9 +143,8 @@ trait SmoTwitterTrait
 
     /**
      * @param string|null $twitter_image
-     * @return SmoTwitterTrait
      */
-    public function setTwitterImage(?string $twitter_image): SmoTwitterTrait
+    public function setTwitterImage(?string $twitter_image)
     {
         $this->twitter_image = $twitter_image;
         return $this;
