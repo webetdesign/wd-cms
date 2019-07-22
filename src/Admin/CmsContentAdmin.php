@@ -2,8 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use App\Entity\User;
-use App\Entity\Media;
 use Doctrine\ORM\EntityManager;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -35,11 +33,13 @@ final class CmsContentAdmin extends AbstractAdmin
 {
     protected $em;
     protected $contentTypeOption;
+    protected $media_class;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $contentTypeOption)
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $contentTypeOption, string $media_class)
     {
         $this->em = $em;
         $this->contentTypeOption = $contentTypeOption;
+        $this->media_class = $media_class;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -131,7 +131,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         'media',
                         ModelListType::class,
                         [
-                            'class'         => Media::class,
+                            'class'         => $this->media_class,
                             'required'      => false,
                             'model_manager' => $admin->getModelManager(),
                         ],
@@ -149,7 +149,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         'media',
                         ModelListType::class,
                         [
-                            'class'         => Media::class,
+                            'class'         => $this->media_class,
                             'required'      => false,
                             'model_manager' => $admin->getModelManager(),
                         ],
@@ -230,7 +230,6 @@ final class CmsContentAdmin extends AbstractAdmin
 
     protected function canManageContent()
     {
-        /** @var User $user */
         $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');

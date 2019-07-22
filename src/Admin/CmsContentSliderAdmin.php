@@ -9,7 +9,6 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 
-use App\Entity\Media;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -21,6 +20,13 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class CmsContentSliderAdmin extends AbstractAdmin
 {
+    protected $media_class;
+
+    public function __construct(string $code, string $class, string $baseControllerName, string $media_class)
+    {
+        parent::__construct($code, $class, $baseControllerName);
+        $this->media_class = $media_class;
+    }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
@@ -52,13 +58,13 @@ class CmsContentSliderAdmin extends AbstractAdmin
             'media',
             ModelListType::class,
             [
-                'class' => Media::class,
-                'required' => false,
+                'class'         => $this->media_class,
+                'required'      => false,
                 'model_manager' => $admin->getModelManager(),
             ],
             [
                 "link_parameters" => [
-                    'context' => 'cms_page',
+                    'context'  => 'cms_page',
                     'provider' => 'sonata.media.provider.image',
                 ],
             ]
@@ -67,10 +73,10 @@ class CmsContentSliderAdmin extends AbstractAdmin
             'description',
             SimpleFormatterType::class,
             [
-                'format' => 'richhtml',
+                'format'           => 'richhtml',
                 'ckeditor_context' => 'cms_page',
-                'required' => false,
-                'auto_initialize' => false,
+                'required'         => false,
+                'auto_initialize'  => false,
             ]
         );
     }

@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -80,15 +79,15 @@ class CmsPageAdmin extends AbstractAdmin
                 ->with('', ['box_class' => ''])
                 ->add('active');
 
-            if($object->getClassAssociation()) {
+            if ($object->getClassAssociation()) {
                 $entities = $em->getRepository($object->getClassAssociation())->{$object->getQueryAssociation()}();
-                $choices = [];
+                $choices  = [];
                 foreach ($entities as $entity) {
                     $choices[$entity->__toString()] = $entity->getId();
                 }
                 $formMapper->add('association', ChoiceType::class,
                     [
-                        'label' => 'Association',
+                        'label'   => 'Association',
                         'choices' => $choices
                     ]
                 );
@@ -96,9 +95,9 @@ class CmsPageAdmin extends AbstractAdmin
 
 
             $formMapper->end()// End form group
-                ->end()// End tab
-                ->tab('SEO')// The tab call is optional
-                ->with('Général')
+            ->end()// End tab
+            ->tab('SEO')// The tab call is optional
+            ->with('Général')
                 ->add('seo_title')
                 ->add('seo_description')
                 ->add('seo_keywords')
@@ -187,7 +186,6 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected function canManageContent()
     {
-        /** @var User $user */
         $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');
