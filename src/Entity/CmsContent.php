@@ -50,6 +50,9 @@ class CmsContent
      *
      */
     private $media;
+    
+    /** @var boolean */
+    private $active;
 
     /**
      *
@@ -67,6 +70,7 @@ class CmsContent
     public function __construct()
     {
         $this->sliders = new ArrayCollection();
+        $this->active = true;
     }
 
     public function getId(): ?int
@@ -193,6 +197,24 @@ class CmsContent
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     * @return CmsContent
+     */
+    public function setActive(bool $active): CmsContent
+    {
+        $this->active = $active;
         return $this;
     }
 

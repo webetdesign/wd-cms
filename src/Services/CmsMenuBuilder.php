@@ -38,8 +38,11 @@ class CmsMenuBuilder
     /**
      * CmsMenuBuilder constructor.
      * @param FactoryInterface $factory
-     * @param EntityManager $entityManager
-     * @param Router $router
+     * @param EntityManagerInterface $entityManager
+     * @param RouterInterface $router
+     * @param TokenStorageInterface $storage
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param RequestStack $requestStack
      */
     public function __construct(
         FactoryInterface $factory,

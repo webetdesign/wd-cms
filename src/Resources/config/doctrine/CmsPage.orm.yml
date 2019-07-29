@@ -69,6 +69,13 @@ WebEtDesign\CmsBundle\Entity\CmsPage:
             precision: 0
             options:
                 default: 0
+        roles:
+            type: array
+            scale: 0
+            length: null
+            unique: false
+            nullable: true
+            precision: 0
         seo_title:
             type: string
             scale: 0

@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Twig;
 
+use Symfony\Component\DependencyInjection\Container;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
@@ -15,20 +16,23 @@ use Twig\TwigFunction;
 
 class CmsTwigExtension extends AbstractExtension
 {
+    private $container;
+
     private $em;
 
     protected $router;
 
-    protected $contentTypeOption;
+    protected $customContents;
 
     /**
      * @inheritDoc
      */
-    public function __construct(EntityManagerInterface $entityManager, RouterInterface $router, $contentTypeOption)
+    public function __construct(EntityManagerInterface $entityManager, RouterInterface $router, $customContents, Container $container)
     {
-        $this->em                = $entityManager;
-        $this->router            = $router;
-        $this->contentTypeOption = $contentTypeOption;
+        $this->em             = $entityManager;
+        $this->router         = $router;
+        $this->customContents = $customContents;
+        $this->container      = $container;
     }
 
 
@@ -60,11 +64,11 @@ class CmsTwigExtension extends AbstractExtension
             ->findOneByPageAndContentCodeAndType(
                 $page,
                 $content_code,
-                [
+                array_merge([
                     CmsContentTypeEnum::TEXT,
                     CmsContentTypeEnum::TEXTAREA,
                     CmsContentTypeEnum::WYSYWYG,
-                ]
+                ], array_keys($this->customContents))
             );
 
         if (!$content) {
@@ -79,6 +83,15 @@ class CmsTwigExtension extends AbstractExtension
                 );
                 throw new Exception($message);
             }
+        }
+
+        if (!$content->isActive()) {
+            return null;
+        }
+
+        if (in_array($content->getType(), array_keys($this->customContents))) {
+            $contentService = $this->container->get($this->customContents[$content->getType()]['service']);
+            return $contentService->render($content);
         }
 
         return $content->getValue();
@@ -165,7 +178,7 @@ class CmsTwigExtension extends AbstractExtension
             }
         }
 
-        $objects = $this->em->getRepository($this->contentTypeOption[CmsContentTypeEnum::PROJECT_COLLECTION]['class'])->findBy(['id' => json_decode($content->getValue())]);
+        $objects = $this->em->getRepository($this->customContents[CmsContentTypeEnum::PROJECT_COLLECTION]['class'])->findBy(['id' => json_decode($content->getValue())]);
 
         shuffle($objects);
         return $objects;

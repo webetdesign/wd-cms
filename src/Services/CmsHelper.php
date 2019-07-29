@@ -4,28 +4,33 @@ namespace WebEtDesign\CmsBundle\Services;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Twig_Environment;
-use WebEtDesign\CmsBundle\Services\PageProvider;
 
 class CmsHelper
 {
     private $em;
     private $provider;
     private $twig;
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
     /**
-     * @inheritDoc
+     * @param EntityManagerInterface $em
+     * @param PageProvider $provider
+     * @param Twig_Environment $twig
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function __construct(EntityManagerInterface $em, PageProvider $provider, Twig_Environment $twig)
+    public function __construct(EntityManagerInterface $em, PageProvider $provider, Twig_Environment $twig, AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->em       = $em;
-        $this->provider = $provider;
-        $this->twig     = $twig;
+        $this->em                   = $em;
+        $this->provider             = $provider;
+        $this->twig                 = $twig;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     public function getPage(Request $request)
@@ -51,6 +56,25 @@ class CmsHelper
                 )
             )
         );
+    }
+
+    public function isGranted(Request $request)
+    {
+        /** @var CmsPage $page */
+        $page = $this->getPage($request);
+
+
+        if (sizeof($page->getRoles()) < 1) {
+            return true;
+        }
+
+        foreach ($page->getRoles() as $role) {
+            if ($this->authorizationChecker->isGranted($role)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

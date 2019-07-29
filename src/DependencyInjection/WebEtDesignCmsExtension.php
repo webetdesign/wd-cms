@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Sonata\EasyExtendsBundle\Mapper\DoctrineCollector;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
@@ -39,9 +40,8 @@ class WebEtDesignCmsExtension extends Extension
 
         // TODO : work for autowired configuration
         $container->setParameter('wd_cms.templates', $config['pages']);
-        $container->setParameter('wd_cms.content_type_option', $config['contentTypeOption']);
-        
-        
+        $container->setParameter('wd_cms.shared_block', $config['sharedBlock']);
+        $container->setParameter('wd_cms.custom_contents', $config['customContents']);
     }
 
     /**

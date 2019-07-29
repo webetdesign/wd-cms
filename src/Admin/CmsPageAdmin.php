@@ -3,9 +3,10 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Form\TemplateType;
+use WebEtDesign\CmsBundle\Form\PageTemplateType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -66,14 +67,14 @@ class CmsPageAdmin extends AbstractAdmin
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => ''])
             ->add('title', null, ['label' => 'Title'])
-            ->add('template', TemplateType::class, ['label' => 'Modèle de page'])
+            ->add('template', PageTemplateType::class, ['label' => 'Modèle de page'])
             ->end()// End form group
             ->end()// End tab
         ;
 
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
-            $formMapper->getFormBuilder()->setMethod('patch');
+            $formMapper->getFormBuilder()->setMethod('put');
             $formMapper
                 ->tab('Général')// The tab call is optional
                 ->with('', ['box_class' => ''])
@@ -171,7 +172,18 @@ class CmsPageAdmin extends AbstractAdmin
                     ]
                 ])
                 ->end()
-                ->end();
+                ->end()
+                ->tab('Sécurité')
+                ->with('', ['box_class' => ''])
+                ->add('roles', SecurityRolesType::class, [
+                    'label' => 'Roles',
+                    'expanded' => true,
+                    'multiple' => true,
+                    'required' => false,
+                ])
+                ->end()
+                ->end()
+            ;
         }
 
     }

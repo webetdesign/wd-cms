@@ -76,6 +76,17 @@ class CmsPage
     private $association;
 
     /**
+     * @var boolean
+     *
+     */
+    private $active;
+
+    /**
+     * @var null|array
+     */
+    private $roles;
+
+    /**
      * @return mixed
      */
     public function getClassAssociation()
@@ -124,17 +135,12 @@ class CmsPage
     }
 
     /**
-     * @var boolean
-     *
-     */
-    private $active;
-
-    /**
      * @inheritDoc
      */
     public function __construct() {
         $this->contents = new ArrayCollection();
         $this->setActive(false);
+        $this->roles = [];
     }
 
     /**
@@ -265,5 +271,23 @@ class CmsPage
     public function getActive(): ?bool
     {
         return $this->active;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getRoles(): ?array
+    {
+        return $this->roles;
+    }
+
+    /**
+     * @param array|null $roles
+     * @return CmsPage
+     */
+    public function setRoles(?array $roles): CmsPage
+    {
+        $this->roles = $roles;
+        return $this;
     }
 }

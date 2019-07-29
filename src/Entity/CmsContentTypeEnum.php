@@ -11,25 +11,25 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 class CmsContentTypeEnum
 {
-    const TEXT               = 'TEXT';
-    const TEXTAREA           = 'TEXTAREA';
-    const WYSYWYG            = 'WYSYWYG';
-    const IMAGE              = 'IMAGE';
-    const MEDIA              = 'MEDIA';
-    const SLIDER             = 'SLIDER';
-    const HIGHLIGHT          = 'HIGHLIGHT';
-    const PROJECT_COLLECTION = 'PROJECT_COLLECTION';
+    const TEXT         = 'TEXT';
+    const TEXTAREA     = 'TEXTAREA';
+    const WYSYWYG      = 'WYSYWYG';
+    const IMAGE        = 'IMAGE';
+    const MEDIA        = 'MEDIA';
+    const SLIDER       = 'SLIDER';
+    const HIGHLIGHT    = 'HIGHLIGHT';
+    const SHARED_BLOCK = 'SHARED_BLOCK';
 
     /** @var array user friendly named type */
     protected static $typeName = [
-        self::TEXT               => 'Text',
-        self::TEXTAREA           => 'Textarea',
-        self::WYSYWYG            => 'WYSYWYG',
-        self::IMAGE              => 'Image',
-        self::MEDIA              => 'Media',
-        self::SLIDER             => 'Slider',
-        self::HIGHLIGHT          => 'Highlight',
-        self::PROJECT_COLLECTION => 'PROJECT_COLLECTION',
+        self::TEXT      => 'Text',
+        self::TEXTAREA  => 'Textarea',
+        self::WYSYWYG   => 'WYSYWYG',
+        self::IMAGE     => 'Image',
+        self::MEDIA     => 'Media',
+        self::SLIDER    => 'Slider',
+        self::HIGHLIGHT => 'Highlight',
+        self::SHARED_BLOCK => 'Shared block',
     ];
 
     /**
@@ -58,7 +58,7 @@ class CmsContentTypeEnum
             self::MEDIA,
             self::SLIDER,
             self::HIGHLIGHT,
-            self::PROJECT_COLLECTION,
+            self::SHARED_BLOCK,
         ];
     }
 

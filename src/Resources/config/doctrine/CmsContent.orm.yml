@@ -14,6 +14,13 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
             generator:
                 strategy: IDENTITY
     fields:
+        active:
+            type: boolean
+            scale: 0
+            length: 255
+            unique: false
+            nullable: false
+            precision: 0
         code:
             type: string
             scale: 0

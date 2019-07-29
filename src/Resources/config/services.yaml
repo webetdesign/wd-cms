@@ -1,10 +1,17 @@
 parameters:
   cms.admin.cms_page_listener.class: WebEtDesign\CmsBundle\EventListener\PageAdminListener
+  cms.admin.cms_shared_block_listener.class: WebEtDesign\CmsBundle\EventListener\SharedBlockAdminListener
 
 services:
-    WebEtDesign\CmsBundle\Form\TemplateType:
+    WebEtDesign\CmsBundle\Form\PageTemplateType:
         arguments:
             - '@cms.page_provider'
+        tags:
+            - { name: form.type }
+
+    WebEtDesign\CmsBundle\Form\BlockTemplateType:
+        arguments:
+            - '@cms.block_provider'
         tags:
             - { name: form.type }
 
@@ -17,7 +24,7 @@ services:
 
     cms.helper:
         class: WebEtDesign\CmsBundle\Services\CmsHelper
-        arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig']
+        arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker"]
         public: true
 
     # TODO: Won't work if not in autowire directories
@@ -28,8 +35,27 @@ services:
     cms.page_provider:
         alias: WebEtDesign\CmsBundle\Services\PageProvider
 
+    cms.block_provider:
+        class: WebEtDesign\CmsBundle\Services\PageProvider
+        arguments:
+            $config: '%wd_cms.shared_block%'
+
     cms.admin.cms_page_listener:
         class: '%cms.admin.cms_page_listener.class%'
+        arguments:
+          - '@cms.page_provider'
+          - '@doctrine.orm.entity_manager'
+          - '@router'
+          - '@filesystem'
+          - '@kernel'
+          - '%wd_cms.admin.config.entity.route%'
+        tags:
+            - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildPage }
+            - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
+            - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
+
+    cms.admin.cms_shared_block_listener:
+        class: '%cms.admin.cms_shared_block_listener.class%'
         arguments:
           - '@cms.page_provider'
           - '@doctrine.orm.entity_manager'
@@ -47,7 +73,8 @@ services:
         arguments:
           - '@doctrine.orm.entity_manager'
           - '@router'
-          - '%wd_cms.content_type_option%'
+          - '%wd_cms.custom_contents%'
+          - '@service_container'
         tags:
           - { name: twig.extension }
         public: true
@@ -101,6 +128,43 @@ services:
         tags: ['doctrine.repository_service']
 
     # ===============================================
+    # PROVIDERS
+    # ===============================================
+
+    cms.media.provider.svg:
+        class: WebEtDesign\CmsBundle\Provider\SvgProvider
+        tags:
+            - { name: sonata.media.provider }
+        arguments:
+            - "cms.media.provider.svg"
+            - "@sonata.media.filesystem.local"
+            - "@sonata.media.cdn.server"
+            - "@sonata.media.generator.default"
+            - "@sonata.media.thumbnail.format"
+            - ['svg']
+            - ['image/svg+xml']
+
+        calls:
+            - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/SVG/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/SVG/view_svg.html.twig' }]]
+
+    cms.media.provider.video:
+        class: WebEtDesign\CmsBundle\Provider\VideoProvider
+        tags:
+            - { name: sonata.media.provider }
+        arguments:
+            - "cms.media.provider.video"
+            - "@sonata.media.filesystem.local"
+            - "@sonata.media.cdn.server"
+            - "@sonata.media.generator.default"
+            - "@sonata.media.thumbnail.format"
+            - ['mp4','ogg','webm']
+            - ['video/mp4','video/ogg','video/webm']
+
+        calls:
+            - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/Video/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/Video/view_video.html.twig' }]]
+
+
+    # ===============================================
     # ADMIN
     # ===============================================
 
@@ -126,8 +190,9 @@ services:
           - '%wd_cms.admin.config.entity.content%'
           - '%wd_cms.admin.config.controller.content%'
           - '@doctrine.orm.default_entity_manager'
-          - '%wd_cms.content_type_option%'
+          - '%wd_cms.custom_contents%'
           - '%wd_cms.admin.content.media%'
+          - '@service_container'
         tags:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Content, show_in_dashboard: false }
         public: true
@@ -154,20 +219,54 @@ services:
             - [setTemplate, ['edit', '@@WebEtDesignCms/menu/edit.html.twig']]
         public: true
 
-    cms.admin.analytics:
-      class: WebEtDesign\CmsBundle\Block\Analytics\Base
-      arguments:
-        - ~
-        - '@templating'
+    cms.admin.cms_shared_block:
+        class: WebEtDesign\CmsBundle\Admin\CmsSharedBlockAdmin
+        arguments:
+            - ~
+            - WebEtDesign\CmsBundle\Entity\CmsSharedBlock
+            - WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: CMS, label: Block partagé }
+        public: true
 
-      tags:
-        - { name: sonata.block }
+    # ===============================================
+    # DASHBOARD BLOCKS
+    # ===============================================
+
+    cms.admin.analytics:
+        class: WebEtDesign\CmsBundle\Block\Analytics\Base
+        arguments:
+            - ~
+            - '@templating'
+
+        tags:
+          - { name: sonata.block }
 
     cms.admin.mailJet:
-      class: WebEtDesign\CmsBundle\Block\MailJet\Base
-      arguments:
-        - ~
-        - '@templating'
+        class: WebEtDesign\CmsBundle\Block\MailJet\Base
+        arguments:
+            - ~
+            - '@templating'
 
-      tags:
-        - { name: sonata.block }
+        tags:
+            - { name: sonata.block }
+
+    # ===============================================
+    # CMS CUSTOM CONTENTS
+    # ===============================================
+
+    cms.custom_content.user:
+        public: true
+        class: WebEtDesign\CmsBundle\Services\EntityContent
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '%wd_cms.admin.content.user%'
+            - false
+
+    cms.custom_content.users:
+        public: true
+        class: WebEtDesign\CmsBundle\Services\EntityContent
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '%wd_cms.admin.content.user%'
+            - true

@@ -3,10 +3,13 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
+use Sonata\AdminBundle\Form\Type\ModelType;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentSlider;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
@@ -28,18 +31,29 @@ use WebEtDesign\CmsBundle\Form\BlockType;
 use WebEtDesign\CmsBundle\Form\CmsContentSliderType;
 use WebEtDesign\CmsBundle\Form\DataTransformer\CmsContentSliderDataTransformer;
 use Symfony\Component\Form\CallbackTransformer;
+use WebEtDesign\CmsBundle\Services\AbstractCustomContent;
+use WebEtDesign\CmsBundle\Services\EntityContent;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
     protected $em;
-    protected $contentTypeOption;
+    protected $customContents;
     protected $media_class;
+    protected $container;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $contentTypeOption, string $media_class)
-    {
-        $this->em = $em;
-        $this->contentTypeOption = $contentTypeOption;
-        $this->media_class = $media_class;
+    public function __construct(
+        string $code,
+        string $class,
+        string $baseControllerName,
+        EntityManager $em,
+        $contentTypeOption,
+        string $media_class,
+        Container $container
+    ) {
+        $this->em             = $em;
+        $this->customContents = $contentTypeOption;
+        $this->media_class    = $media_class;
+        $this->container      = $container;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -48,6 +62,7 @@ final class CmsContentAdmin extends AbstractAdmin
     {
         $datagridMapper
             ->add('id')
+            ->add('active')
             ->add('code')
             ->add('label')
             ->add('type');
@@ -57,6 +72,7 @@ final class CmsContentAdmin extends AbstractAdmin
     {
         $listMapper
             ->add('id')
+            ->add('active')
             ->add('code')
             ->add('label')
             ->add('type')
@@ -80,6 +96,9 @@ final class CmsContentAdmin extends AbstractAdmin
         $roleAdmin = $this->canManageContent();
         $admin     = $this;
 
+        $formMapper->add('active', null, [
+            'label' => 'Actif',
+        ]);
         $formMapper->add(
             'label',
             null,
@@ -95,7 +114,7 @@ final class CmsContentAdmin extends AbstractAdmin
                 'type',
                 ChoiceType::class,
                 [
-                    'choices' => CmsContentTypeEnum::getChoices(),
+                    'choices' => $this->getContentTypeChoices(),
                 ]
             );
         }
@@ -185,36 +204,32 @@ final class CmsContentAdmin extends AbstractAdmin
                     );
                     break;
 
-                case CmsContentTypeEnum::PROJECT_COLLECTION:
-                    $formMapper->add(
-                        'value',
-                        EntityType::class,
-                        [
-                            'class'           => $this->contentTypeOption[CmsContentTypeEnum::PROJECT_COLLECTION]['class'],
-                            'required'        => false,
-                            'auto_initialize' => false,
-                            'multiple'        => true,
-                        ]
-                    );
-                    $formMapper->getFormBuilder()->get('value')
-                        ->addModelTransformer(new CallbackTransformer(
-                            function ($ids) {
-                                $objects = $this->em->getRepository($this->contentTypeOption[CmsContentTypeEnum::PROJECT_COLLECTION]['class'])->findBy(['id' => json_decode($ids)]);
-                                return $objects;
-                            },
-                            function ($objects) {
-                                $ids = [];
-                                foreach ($objects as $object) {
-                                    $ids[] = $object->getId();
-                                }
-                                // transform the string back to an array
-                                return json_encode($ids);
-                            }
-                        ));
-                    break;
+//                case CmsContentTypeEnum::SHARED_BLOCK:
+//                    $formMapper->add(
+//                        'value',
+//                        ModelType::class,
+//                        [
+//                            'required'        => false,
+//                            'auto_initialize' => false,
+//                        ]
+//                    );
+//                    break;
             }
 
+            foreach ($this->customContents as $content => $configuration) {
+                if ($formMapper->getAdmin()->getSubject()->getType() === $content) {
+                    /** @var AbstractCustomContent $contentService */
+                    $contentService = $this->container->get($configuration['service']);
+                    $formMapper->add(
+                        'value',
+                        $contentService->getFormType(),
+                        $contentService->getFormOptions()
+                    );
 
+                    $formMapper->getFormBuilder()->get('value')->addModelTransformer($contentService->getCallbackTransformer());
+
+                }
+            }
         }
     }
 
@@ -243,5 +258,15 @@ final class CmsContentAdmin extends AbstractAdmin
     public function preUpdate($content)
     {
         $content->setSliders($content->getSliders());
+    }
+
+    protected function getContentTypeChoices()
+    {
+        $customs = [];
+        foreach ($this->customContents as $customContent => $configuration) {
+            $customs[$configuration['name']] = $customContent;
+        }
+
+        return array_merge(CmsContentTypeEnum::getChoices(), $customs);
     }
 }
