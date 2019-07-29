@@ -3,15 +3,9 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
-use Sonata\AdminBundle\Form\Type\ModelType;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Entity\CmsContentSlider;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -21,18 +15,11 @@ use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\FormatterBundle\Form\Type\SimpleFormatterType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use WebEtDesign\CmsBundle\Form\BlockType;
-use WebEtDesign\CmsBundle\Form\CmsContentSliderType;
-use WebEtDesign\CmsBundle\Form\DataTransformer\CmsContentSliderDataTransformer;
+use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use Symfony\Component\Form\CallbackTransformer;
 use WebEtDesign\CmsBundle\Services\AbstractCustomContent;
-use WebEtDesign\CmsBundle\Services\EntityContent;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
@@ -40,6 +27,7 @@ final class CmsContentAdmin extends AbstractAdmin
     protected $customContents;
     protected $media_class;
     protected $container;
+    protected $cmsSharedBlockAdmin;
 
     public function __construct(
         string $code,
@@ -204,16 +192,27 @@ final class CmsContentAdmin extends AbstractAdmin
                     );
                     break;
 
-//                case CmsContentTypeEnum::SHARED_BLOCK:
-//                    $formMapper->add(
-//                        'value',
-//                        ModelType::class,
-//                        [
-//                            'required'        => false,
-//                            'auto_initialize' => false,
-//                        ]
-//                    );
-//                    break;
+                case CmsContentTypeEnum::SHARED_BLOCK:
+                    $formMapper->add(
+                        'value',
+                        EntityType::class,
+                        [
+                            'class'           => CmsSharedBlock::class,
+                            'required'        => false,
+                        ]
+                    );
+
+                    $formMapper->getFormBuilder()->get('value')->addModelTransformer(new CallbackTransformer(
+                        function ($value) {
+                            return $this->em->getRepository(CmsSharedBlock::class)->find((int)$value);
+                        },
+                        function ($value) {
+                            return $value !== null ? $value->getId() : null;
+                        }
+                    ));
+
+                    break;
+
             }
 
             foreach ($this->customContents as $content => $configuration) {

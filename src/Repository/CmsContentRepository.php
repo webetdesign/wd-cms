@@ -6,6 +6,7 @@ use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 
 /**
  * @method CmsContent|null find($id, $lockMode = null, $lockVersion = null)
@@ -20,14 +21,22 @@ class CmsContentRepository extends ServiceEntityRepository
         parent::__construct($registry, CmsContent::class);
     }
 
-    public function findOneByPageAndContentCodeAndType(CmsPage $page, $contentCode, $type = [])
+    public function findOneByObjectAndContentCodeAndType($object, $contentCode, $type = [])
     {
         $qb = $this->createQueryBuilder('c');
 
-        $qb->where('c.code = :code')
-            ->andWhere('c.page = :page')
-            ->setParameter('page', $page)
-            ->setParameter('code', $contentCode);
+        $qb->where('c.code = :code');
+
+        if ($object instanceof CmsPage) {
+            $qb->andWhere('c.page = :page')
+                ->setParameter('page', $object);
+        }
+        if ($object instanceof CmsSharedBlock) {
+            $qb->andWhere('c.sharedBlock = :sharedBlock')
+                ->setParameter('sharedBlock', $object);
+        }
+
+        $qb->setParameter('code', $contentCode);
 
         if (sizeof($type) > 0) {
             $qb->andWhere($qb->expr()->in('c.type', ':type'))
@@ -37,6 +46,7 @@ class CmsContentRepository extends ServiceEntityRepository
         return $qb->getQuery()
             ->getOneOrNullResult();
     }
+
     public function findByCode(CmsPage $page, $contentCode)
     {
         $qb = $this->createQueryBuilder('c');

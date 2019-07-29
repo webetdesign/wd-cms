@@ -46,6 +46,12 @@ class CmsContent
     private $page;
 
     /**
+     * @var null|CmsSharedBlock
+     *
+     */
+    private $sharedBlock;
+
+    /**
      * @var mixed
      *
      */
@@ -140,6 +146,22 @@ class CmsContent
     public function setPage(?CmsPage $page): void
     {
         $this->page = $page;
+    }
+
+    /**
+     * @return CmsSharedBlock|null
+     */
+    public function getSharedBlock(): ?CmsSharedBlock
+    {
+        return $this->sharedBlock;
+    }
+
+    /**
+     * @param CmsSharedBlock|null $sharedBlock
+     */
+    public function setSharedBlock(?CmsSharedBlock $sharedBlock): void
+    {
+        $this->sharedBlock = $sharedBlock;
     }
 
     /**

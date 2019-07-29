@@ -21,11 +21,11 @@ class CmsHelper
 
     /**
      * @param EntityManagerInterface $em
-     * @param PageProvider $provider
+     * @param TemplateProvider $provider
      * @param Twig_Environment $twig
      * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function __construct(EntityManagerInterface $em, PageProvider $provider, Twig_Environment $twig, AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(EntityManagerInterface $em, TemplateProvider $provider, Twig_Environment $twig, AuthorizationCheckerInterface $authorizationChecker)
     {
         $this->em                   = $em;
         $this->provider             = $provider;

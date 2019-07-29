@@ -4,7 +4,7 @@ namespace WebEtDesign\CmsBundle\EventListener;
 
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Services\PageProvider;
+use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Doctrine\ORM\EntityManager;
 use Sonata\AdminBundle\Event\PersistenceEvent;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -21,7 +21,7 @@ class PageAdminListener
     protected $kernel;
     protected $routeClass;
 
-    public function __construct(PageProvider $provider, EntityManager $em, Router $router, Filesystem $fs, KernelInterface $kernel, $routeClass)
+    public function __construct(TemplateProvider $provider, EntityManager $em, Router $router, Filesystem $fs, KernelInterface $kernel, $routeClass)
     {
         $this->provider   = $provider;
         $this->em         = $em;

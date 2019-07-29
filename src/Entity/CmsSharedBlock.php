@@ -10,21 +10,21 @@ class CmsSharedBlock
     private $id;
 
     /** @var string */
-    private $title;
+    private $code;
+
+    /** @var string */
+    private $label;
 
     /** @var boolean */
     private $active;
 
     /**
-     *
      * @var ArrayCollection|PersistentCollection
-     *
      */
     private $contents;
 
     /**
      * @var null|string
-     *
      */
     private $template;
 
@@ -36,27 +36,33 @@ class CmsSharedBlock
         $this->setActive(false);
     }
 
+    public function __toString()
+    {
+        return (string) $this->getLabel();
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param string $title
+     * @param string $label
      * @return CmsSharedBlock
      */
-    public function setTitle(string $title): CmsSharedBlock
+    public function setLabel(string $label): CmsSharedBlock
     {
-        $this->title = $title;
+        $this->label = $label;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getTitle(): ?string
+    public function getLabel(): ?string
     {
-        return $this->title;
+        return $this->label;
     }
 
     /**
@@ -71,7 +77,7 @@ class CmsSharedBlock
     {
         if (!$this->contents->contains($content)) {
             $this->contents[] = $content;
-            $content->setPage($this);
+            $content->setSharedBlock($this);
         }
 
         return $this;
@@ -82,8 +88,8 @@ class CmsSharedBlock
         if ($this->contents->contains($content)) {
             $this->contents->removeElement($content);
             // set the owning side to null (unless already changed)
-            if ($content->getPage() === $this) {
-                $content->setPage(null);
+            if ($content->getSharedBlock() === $this) {
+                $content->setSharedBlock(null);
             }
         }
 
@@ -131,6 +137,24 @@ class CmsSharedBlock
     public function setActive(bool $active): CmsSharedBlock
     {
         $this->active = $active;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param string $code
+     * @return CmsSharedBlock
+     */
+    public function setCode(?string $code): CmsSharedBlock
+    {
+        $this->code = $code;
         return $this;
     }
 
