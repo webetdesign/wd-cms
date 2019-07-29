@@ -73,4 +73,14 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
                 page_id:
                     referencedColumnName: id
             orphanRemoval: false
+        sharedBlock:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsSharedBlock
+            cascade: {  }
+            fetch: LAZY
+            mappedBy: null
+            inversedBy: contents
+            joinColumns:
+                shared_block_id:
+                    referencedColumnName: id
+            orphanRemoval: false
     lifecycleCallbacks: {  }

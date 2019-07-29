@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Twig;
 
 use Symfony\Component\DependencyInjection\Container;
+use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
@@ -13,9 +14,13 @@ use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
+use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class CmsTwigExtension extends AbstractExtension
 {
+    private $sharedBlockProvider;
+    private $twig;
     private $container;
 
     private $em;
@@ -27,12 +32,20 @@ class CmsTwigExtension extends AbstractExtension
     /**
      * @inheritDoc
      */
-    public function __construct(EntityManagerInterface $entityManager, RouterInterface $router, $customContents, Container $container)
-    {
-        $this->em             = $entityManager;
-        $this->router         = $router;
-        $this->customContents = $customContents;
-        $this->container      = $container;
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        RouterInterface $router,
+        $customContents,
+        Container $container,
+        Environment $twig,
+        TemplateProvider $templateProvider
+    ) {
+        $this->em                  = $entityManager;
+        $this->router              = $router;
+        $this->customContents      = $customContents;
+        $this->container           = $container;
+        $this->twig                = $twig;
+        $this->sharedBlockProvider = $templateProvider;
     }
 
 
@@ -50,6 +63,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('cms_render_content', [$this, 'cmsRenderContent'], ['is_safe' => ['html']]),
+            new TwigFunction('cms_render_shared_block', [$this, 'cmsSharedBlock'], ['is_safe' => ['html']]),
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
@@ -57,12 +71,18 @@ class CmsTwigExtension extends AbstractExtension
         ];
     }
 
-    public function cmsRenderContent(CmsPage $page, $content_code)
+    /**
+     * @param CmsPage|CmsSharedBlock $object
+     * @param $content_code
+     * @return string|null
+     * @throws Exception
+     */
+    public function cmsRenderContent($object, $content_code)
     {
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByPageAndContentCodeAndType(
-                $page,
+            ->findOneByObjectAndContentCodeAndType(
+                $object,
                 $content_code,
                 array_merge([
                     CmsContentTypeEnum::TEXT,
@@ -75,15 +95,16 @@ class CmsTwigExtension extends AbstractExtension
             if (getenv('APP_ENV') != 'dev') {
                 return null;
             } else {
-                $message = sprintf(
-                    'Content not found with the code "%s" in page "%s" (#%s)',
-                    $content_code,
-                    $page->getTitle(),
-                    $page->getId()
-                );
+                if ($object instanceof CmsPage) {
+                    $message = sprintf('Content not found with the code "%s" in page "%s" (#%s)', $content_code, $object->getTitle(), $object->getId());
+                }
+                if ($object instanceof CmsSharedBlock) {
+                    $message = sprintf('Content not found with the code "%s" in sharedBlock "%s" (#%s)', $content_code, $object->getLabel(), $object->getId());
+                }
                 throw new Exception($message);
             }
         }
+
 
         if (!$content->isActive()) {
             return null;
@@ -101,7 +122,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByPageAndContentCodeAndType(
+            ->findOneByObjectAndContentCodeAndType(
                 $page,
                 $content_code,
                 [
@@ -129,7 +150,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByPageAndContentCodeAndType(
+            ->findOneByObjectAndContentCodeAndType(
                 $page,
                 $content_code,
                 [
@@ -153,10 +174,44 @@ class CmsTwigExtension extends AbstractExtension
         return $content->getSliders();
     }
 
+    public function cmsSharedBlock(CmsPage $page, $content_code)
+    {
+        /** @var CmsContent $content */
+        $content = $this->em->getRepository(CmsContent::class)
+            ->findOneByObjectAndContentCodeAndType(
+                $page,
+                $content_code,
+                [CmsContentTypeEnum::SHARED_BLOCK]
+            );
+
+        if (!$content) {
+            dump('toto');
+            if (getenv('APP_ENV') != 'dev') {
+                return null;
+            } else {
+                $message = sprintf('Content not found with the code "%s" in page "%s" (#%s)', $content_code, $page->getTitle(), $page->getId());
+                throw new Exception($message);
+            }
+        }
+
+        if (!$content->isActive()) {
+            return null;
+        }
+
+        $block = $this->em->getRepository(CmsSharedBlock::class)->find((int)$content->getValue());
+        if (!$block) {
+            return null;
+        }
+
+        return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'], [
+            'block' => $block
+        ]);
+    }
+
     public function cmsProjectCollection(CmsPage $page, $content_code)
     {
         $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByPageAndContentCodeAndType(
+            ->findOneByObjectAndContentCodeAndType(
                 $page,
                 $content_code,
                 [

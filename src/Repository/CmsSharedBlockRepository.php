@@ -19,6 +19,17 @@ class CmsSharedBlockRepository extends ServiceEntityRepository
         parent::__construct($registry, CmsSharedBlock::class);
     }
 
+    public function findDuplicate($code)
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.template = :code')
+            ->setParameter('code', $code);
+
+        $result = $qb->getQuery()->getResult();
+
+        return sizeof($result);
+    }
+
     // /**
     //  * @return CmsSharedBlock[] Returns an array of CmsSharedBlock objects
     //  */

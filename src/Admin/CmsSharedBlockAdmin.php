@@ -7,6 +7,9 @@ use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Sonata\CoreBundle\Form\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Form\BlockTemplateType;
 
 final class CmsSharedBlockAdmin extends AbstractAdmin
@@ -24,7 +27,8 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     {
         $datagridMapper
             ->add('id')
-            ->add('title')
+            ->add('code')
+            ->add('label')
             ->add('active');
     }
 
@@ -32,12 +36,11 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     {
         $listMapper
             ->add('id')
-            ->add('title')
-            ->add('template')
+            ->add('code')
+            ->add('label')
             ->add('active')
             ->add('_action', null, [
                 'actions' => [
-                    'show'   => [],
                     'edit'   => [],
                     'delete' => [],
                 ],
@@ -46,18 +49,66 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $formMapper): void
     {
+        $roleAdmin = $this->canManageContent();
+
         $formMapper
-            ->add('title')
-            ->add('template', BlockTemplateType::class, ['label' => 'Modèle de block'])
-            ->add('active');
+            ->tab('Général')// The tab call is optional
+            ->with('', ['box_class' => ''])
+            ->add('code', !$this->isCurrentRoute('edit') ? HiddenType::class : TextType::class, [
+                'attr' => [
+                    'disabled' => !$roleAdmin
+                ]
+            ])
+            ->add('label')
+            ->add('template', BlockTemplateType::class, ['label' => 'Modèle de page'])
+            ->end()// End form group
+            ->end()// End tab
+        ;
+
+        if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
+            $formMapper->getFormBuilder()->setMethod('put');
+            $formMapper
+                ->tab('Général')// The tab call is optional
+                ->with('', ['box_class' => ''])
+                ->add('active')
+                ->end()
+                ->end()
+                ->tab('Contenus')
+                ->with('', ['box_class' => ''])
+                ->add(
+                    'contents',
+                    CollectionType::class,
+                    [
+                        'label'        => false,
+                        'by_reference' => false,
+                        'btn_add'      => $roleAdmin ? 'Ajouter' : false,
+                        'type_options' => [
+                            'delete' => $roleAdmin,
+                        ],
+                    ],
+                    [
+                        'edit'   => 'inline',
+                        'inline' => 'table',
+                    ]
+                )
+                ->end()
+                ->end()
+            ;
+
+        }
+
     }
 
     protected function configureShowFields(ShowMapper $showMapper): void
     {
         $showMapper
-            ->add('id')
-            ->add('title')
-            ->add('template')
-            ->add('active');
+            ->add('id');
+    }
+
+    protected function canManageContent()
+    {
+        $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
+
+        return $user->hasRole('ROLE_ADMIN_CMS');
     }
 }

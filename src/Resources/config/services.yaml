@@ -28,17 +28,21 @@ services:
         public: true
 
     # TODO: Won't work if not in autowire directories
-    WebEtDesign\CmsBundle\Services\PageProvider:
+    WebEtDesign\CmsBundle\Services\TemplateProvider:
         arguments:
             $config: '%wd_cms.templates%'
 
     cms.page_provider:
-        alias: WebEtDesign\CmsBundle\Services\PageProvider
+        alias: WebEtDesign\CmsBundle\Services\TemplateProvider
 
     cms.block_provider:
-        class: WebEtDesign\CmsBundle\Services\PageProvider
+        class: WebEtDesign\CmsBundle\Services\TemplateProvider
         arguments:
             $config: '%wd_cms.shared_block%'
+
+    # ===============================================
+    # LISTENER
+    # ===============================================
 
     cms.admin.cms_page_listener:
         class: '%cms.admin.cms_page_listener.class%'
@@ -54,19 +58,21 @@ services:
             - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
             - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
 
-#    cms.admin.cms_shared_block_listener:
-#        class: '%cms.admin.cms_shared_block_listener.class%'
-#        arguments:
-#          - '@cms.page_provider'
-#          - '@doctrine.orm.entity_manager'
-#          - '@router'
-#          - '@filesystem'
-#          - '@kernel'
-#          - '%wd_cms.admin.config.entity.route%'
-#        tags:
-#            - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildPage }
-#            - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
-#            - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
+    cms.admin.cms_shared_block_listener:
+        class: '%cms.admin.cms_shared_block_listener.class%'
+        arguments:
+          - '@cms.block_provider'
+          - '@doctrine.orm.entity_manager'
+          - '@router'
+          - '@filesystem'
+          - '@kernel'
+          - '%wd_cms.admin.config.entity.route%'
+        tags:
+            - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildSharedBlock }
+
+    # ===============================================
+    # TWIG EXTENSION
+    # ===============================================
 
     cms.twig.extension:
         class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
@@ -75,6 +81,8 @@ services:
           - '@router'
           - '%wd_cms.custom_contents%'
           - '@service_container'
+          - '@twig'
+          - '@cms.block_provider'
         tags:
           - { name: twig.extension }
         public: true
@@ -178,8 +186,6 @@ services:
     cms.admin.cms_page:
         class: '%wd_cms.admin.config.class.page%'
         arguments: [~, '%wd_cms.admin.config.entity.page%', '%wd_cms.admin.config.controller.page%']
-        calls:
-            - [setTemplate, ['list', '@@WebEtDesignCms/page/list.html.twig']]
         tags:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
         public: true

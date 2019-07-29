@@ -2,7 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Form;
 
-use WebEtDesign\CmsBundle\Services\PageProvider;
+use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,7 +17,7 @@ class PageTemplateType extends AbstractType
 {
     private $provider;
 
-    public function __construct(PageProvider $provider)
+    public function __construct(TemplateProvider $provider)
     {
         $this->provider = $provider;
     }

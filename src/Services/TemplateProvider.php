@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
  * @package WebEtDesign\CmsBundle\Services
  * Provide the configuration set in wd_cms.yaml
  */
-class PageProvider
+class TemplateProvider
 {
     private $config;
 
@@ -44,7 +44,7 @@ class PageProvider
     public function getTemplate($templateName)
     {
         if (!isset($this->config[$templateName])) {
-            throw new \Exception('Template name :'.$templateName.' does not exists. Please add it in wd_cms.yaml');
+            throw new \Exception('Template name :'.$templateName.' does not exists. Please add it in wd_et_design_cms.yaml');
         }
 
         return $this->config[$templateName]['template'];
@@ -60,7 +60,7 @@ class PageProvider
     public function getConfigurationFor($name)
     {
         if (!isset($this->config[$name])) {
-            throw new \Exception('Configuration for :'.$name.' does not exists. Please add it in wd_cms.yaml');
+            throw new \Exception('Configuration for :'.$name.' does not exists. Please add it in wd_et_design_cms.yaml');
         }
 
         return $this->config[$name];
