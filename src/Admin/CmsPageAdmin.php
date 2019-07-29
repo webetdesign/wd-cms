@@ -28,8 +28,12 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected function configureListFields(ListMapper $listMapper)
     {
+        $roleAdmin = $this->canManageContent();
+
+        if($roleAdmin){
+            $listMapper->add('id');
+        }
         $listMapper
-            ->add('id')
             ->add('title', null, [
                 'label' => 'Titre',
             ])

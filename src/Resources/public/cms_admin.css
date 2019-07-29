@@ -112,6 +112,46 @@
 
 .logo img {
   max-width: 100%; }
+.d-flex {
+  display: flex; }
+
+.justify-content-center {
+  justify-content: center; }
+
+.align-items-center {
+  align-items: center; }
+
+#admin-login-video {
+  position: fixed;
+  top: 0;
+  z-index: 1; }
+  #admin-login-video video {
+    position: absolute;
+    height: auto;
+    width: calc(178vh + 53px);
+    min-height: calc(100vh + 30px);
+    min-width: 100vw;
+    z-index: -1; }
+
+.login-container {
+  height: calc(100vh - 50px); }
+
+.login-box, .register-box {
+  position: relative;
+  z-index: 2;
+  width: auto;
+  margin: auto;
+  transform: translateY(-124px); }
+
+.login-box-body, .register-box-body {
+  border-radius: 4px;
+  box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1); }
+
+.checkbox.login-checkbox label {
+  margin-left: 0;
+  padding-left: 0;
+  padding-right: 20px; }
+
 .shadow-sm {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important; }
 

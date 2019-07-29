@@ -103,8 +103,10 @@ final class CmsContentAdmin extends AbstractAdmin
             'label',
             null,
             [
-                'attr'  => ['disabled' => !$roleAdmin],
                 'label' => 'Libéllé',
+                'attr' => [
+                    'class' => 'admin_restriction'
+                ]
             ]
         );
 
