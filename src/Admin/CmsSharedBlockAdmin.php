@@ -54,13 +54,9 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         $formMapper
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => ''])
-            ->add('code', !$this->isCurrentRoute('edit') ? HiddenType::class : TextType::class, [
-                'attr' => [
-                    'disabled' => !$roleAdmin
-                ]
-            ])
+            ->add('code', $this->isCurrentRoute('edit') && $roleAdmin ? TextType::class : HiddenType::class, [])
             ->add('label')
-            ->add('template', BlockTemplateType::class, ['label' => 'Modèle de page'])
+            ->add('template', BlockTemplateType::class, ['label' => 'Modèle de block partagé'])
             ->end()// End form group
             ->end()// End tab
         ;

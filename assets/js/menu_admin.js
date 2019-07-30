@@ -57,6 +57,11 @@ $(document).ready(function () {
     }, time)
   })
 
+  $('.cms-menu-item__btn-hide_child').on('click', function () {
+    $(this).toggleClass('minimalized');
+    $(this).closest('li').find('ul').slideToggle(150);
+  })
+
   $('.sonata-action-element__cms-menu').on('click', function (e) {
     e.preventDefault();
     $('.cms-menu-item').removeClass('active');

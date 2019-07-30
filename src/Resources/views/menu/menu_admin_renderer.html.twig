@@ -8,6 +8,9 @@
             <div class="cms-menu-item__btn">
                 <button class="cms-menu-item__btn-edit"><i class="fa fa-pencil"></i></button>
                 <button class="cms-menu-item__btn-add"><i class="fa fa-plus"></i></button>
+                {#{% if item.children|length > 1 %}#}
+                    {#<button class="cms-menu-item__btn-hide_child"><i class="fa fa-sort-up"></i></button>#}
+                {#{% endif %}#}
             </div>
         {% endif %}
     </div>

@@ -224,3 +224,6 @@
 
 .tooltip.left .tooltip-arrow {
   border-left-color: white; }
+
+.cms-menu-item__btn-hide_child.minimalized {
+  transform: rotate(180deg); }

@@ -71,7 +71,7 @@ class CmsPageAdmin extends AbstractAdmin
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => ''])
             ->add('title', null, ['label' => 'Title'])
-            ->add('template', PageTemplateType::class, ['label' => 'Modèle de page'])
+            ->add('template', PageTemplateType::class, ['label' => 'Modèle de page',])
             ->end()// End form group
             ->end()// End tab
         ;
@@ -102,12 +102,12 @@ class CmsPageAdmin extends AbstractAdmin
             $formMapper->end()// End form group
             ->end()// End tab
             ->tab('SEO')// The tab call is optional
-            ->with('Général')
+            ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
                 ->add('seo_title')
                 ->add('seo_description')
                 ->add('seo_keywords')
                 ->end()
-                ->with('Facebook')
+                ->with('Facebook', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
                 ->add('fb_title')
                 ->add('fb_type')
                 ->add('fb_url')
@@ -116,7 +116,7 @@ class CmsPageAdmin extends AbstractAdmin
                 ->add('fb_site_name')
                 ->add('fb_admins')
                 ->end()
-                ->with('Twitter')
+                ->with('Twitter', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
                 ->add('twitter_card')
                 ->add('twitter_site')
                 ->add('twitter_title')
