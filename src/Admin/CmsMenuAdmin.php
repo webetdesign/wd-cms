@@ -2,6 +2,8 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
+use Doctrine\ORM\EntityManager;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
@@ -21,6 +23,15 @@ use Symfony\Component\Form\FormEvents;
 
 final class CmsMenuAdmin extends AbstractAdmin
 {
+    private $em;
+
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em)
+    {
+        $this->em = $em;
+        parent::__construct($code, $class, $baseControllerName);
+    }
+
+
     protected function configureRoutes(RouteCollection $collection)
     {
         $collection
@@ -154,6 +165,21 @@ final class CmsMenuAdmin extends AbstractAdmin
                     'required'      => false,
                 ])
                 ->end();
+        } else {
+            $formMapper
+                ->with('Configuration')
+                ->add('moveMode', HiddenType::class)
+                ->add('moveTarget', HiddenType::class)
+                ->end();
+
+            $formMapper->getFormBuilder()->get('moveTarget')->addModelTransformer(new CallbackTransformer(
+                function ($value) {
+                    return $value !== null ? $value->getId() : null;
+                },
+                function ($value) {
+                    return $this->em->getRepository(CmsMenu::class)->find((int)$value);
+                }
+            ));
         }
 
     }

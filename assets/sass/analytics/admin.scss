@@ -4,6 +4,9 @@
 .justify-content-center{
     justify-content: center;
 }
+.justify-content-between{
+    justify-content: space-between;
+}
 .align-items-center{
    align-items: center;
 }
@@ -34,6 +37,7 @@
 .login-box-body, .register-box-body{
     border-radius: 4px;
     box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
+    min-width: 320px;
 }
 .checkbox.login-checkbox{
     label{
@@ -41,6 +45,10 @@
         padding-left : 0;
         padding-right : 20px;
     }
+}
+.login-box-msg, .register-box-msg{
+    text-align : left;
+    padding-left : 0;
 }
 .shadow-sm{
     box-shadow:0 .125rem .25rem rgba(0,0,0,.075) !important
