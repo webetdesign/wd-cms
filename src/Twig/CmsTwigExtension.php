@@ -64,6 +64,7 @@ class CmsTwigExtension extends AbstractExtension
         return [
             new TwigFunction('cms_render_content', [$this, 'cmsRenderContent'], ['is_safe' => ['html']]),
             new TwigFunction('cms_render_shared_block', [$this, 'cmsSharedBlock'], ['is_safe' => ['html']]),
+            new TwigFunction('cms_render_shared_block_object', [$this, 'renderSharedBlock'], ['is_safe' => ['html']]),
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
@@ -199,6 +200,17 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         $block = $this->em->getRepository(CmsSharedBlock::class)->find((int)$content->getValue());
+        if (!$block) {
+            return null;
+        }
+
+        return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'], [
+            'block' => $block
+        ]);
+    }
+
+    public function renderSharedBlock(CmsSharedBlock $block)
+    {
         if (!$block) {
             return null;
         }

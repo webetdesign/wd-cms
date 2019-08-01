@@ -2,23 +2,28 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 trait SeoAwareTrait
 {
     /**
      * @var string
      *
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $seo_title;
 
     /**
      * @var string
      *
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $seo_description;
 
     /**
      * @var string
      *
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $seo_keywords;
 
