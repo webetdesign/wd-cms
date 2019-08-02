@@ -68,7 +68,6 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
-            new TwigFunction('cms_project_collection', [$this, 'cmsProjectCollection']),
         ];
     }
 
@@ -218,37 +217,6 @@ class CmsTwigExtension extends AbstractExtension
         return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'], [
             'block' => $block
         ]);
-    }
-
-    public function cmsProjectCollection(CmsPage $page, $content_code)
-    {
-        $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByObjectAndContentCodeAndType(
-                $page,
-                $content_code,
-                [
-                    CmsContentTypeEnum::PROJECT_COLLECTION,
-                ]
-            );
-
-        if (!$content) {
-            if (getenv('APP_ENV') != 'dev') {
-                return null;
-            } else {
-                $message = sprintf(
-                    'No content sliders found with the code "%s" in page "%s" (#%s)',
-                    $content_code,
-                    $page->getTitle(),
-                    $page->getId()
-                );
-                throw new Exception($message);
-            }
-        }
-
-        $objects = $this->em->getRepository($this->customContents[CmsContentTypeEnum::PROJECT_COLLECTION]['class'])->findBy(['id' => json_decode($content->getValue())]);
-
-        shuffle($objects);
-        return $objects;
     }
 
     public function cmsPath($route, $params = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
