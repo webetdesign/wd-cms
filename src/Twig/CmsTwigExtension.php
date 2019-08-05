@@ -68,7 +68,6 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
-            new TwigFunction('cms_project_collection', [$this, 'cmsProjectCollection']),
         ];
     }
 
@@ -205,6 +204,40 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         return $content->getSliders();
+    }
+
+    public function cmsSharedBlock(CmsPage $page, $content_code)
+    {
+        /** @var CmsContent $content */
+        $content = $this->em->getRepository(CmsContent::class)
+            ->findOneByObjectAndContentCodeAndType(
+                $page,
+                $content_code,
+                [CmsContentTypeEnum::SHARED_BLOCK]
+            );
+
+        if (!$content) {
+            dump('toto');
+            if (getenv('APP_ENV') != 'dev') {
+                return null;
+            } else {
+                $message = sprintf('Content not found with the code "%s" in page "%s" (#%s)', $content_code, $page->getTitle(), $page->getId());
+                throw new Exception($message);
+            }
+        }
+
+        if (!$content->isActive()) {
+            return null;
+        }
+
+        $block = $this->em->getRepository(CmsSharedBlock::class)->find((int)$content->getValue());
+        if (!$block) {
+            return null;
+        }
+
+        return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'], [
+            'block' => $block
+        ]);
     }
 
     public function cmsProjectCollection(CmsPage $page, $content_code)
