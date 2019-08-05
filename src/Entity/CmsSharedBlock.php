@@ -24,6 +24,11 @@ class CmsSharedBlock
     private $contents;
 
     /**
+     * @var ArrayCollection
+     */
+    private $contentList;
+
+    /**
      * @var null|string
      */
     private $template;
@@ -32,6 +37,7 @@ class CmsSharedBlock
      * @inheritDoc
      */
     public function __construct() {
+        $this->contentList = new ArrayCollection();
         $this->contents = new ArrayCollection();
         $this->setActive(false);
     }
@@ -41,11 +47,11 @@ class CmsSharedBlock
         return (string) $this->getLabel();
     }
 
-
     public function getId(): ?int
     {
         return $this->id;
     }
+
 
     /**
      * @param string $label
@@ -77,7 +83,7 @@ class CmsSharedBlock
     {
         if (!$this->contents->contains($content)) {
             $this->contents[] = $content;
-            $content->setSharedBlock($this);
+            $content->setSharedBlockParent($this);
         }
 
         return $this;
@@ -88,8 +94,8 @@ class CmsSharedBlock
         if ($this->contents->contains($content)) {
             $this->contents->removeElement($content);
             // set the owning side to null (unless already changed)
-            if ($content->getSharedBlock() === $this) {
-                $content->setSharedBlock(null);
+            if ($content->getSharedBlockParent() === $this) {
+                $content->setSharedBlockParent(null);
             }
         }
 
@@ -156,6 +162,14 @@ class CmsSharedBlock
     {
         $this->code = $code;
         return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getContentList()
+    {
+        return $this->contentList;
     }
 
 }

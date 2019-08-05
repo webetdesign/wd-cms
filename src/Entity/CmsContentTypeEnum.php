@@ -11,25 +11,27 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 class CmsContentTypeEnum
 {
-    const TEXT         = 'TEXT';
-    const TEXTAREA     = 'TEXTAREA';
-    const WYSYWYG      = 'WYSYWYG';
-    const IMAGE        = 'IMAGE';
-    const MEDIA        = 'MEDIA';
-    const SLIDER       = 'SLIDER';
-    const HIGHLIGHT    = 'HIGHLIGHT';
-    const SHARED_BLOCK = 'SHARED_BLOCK';
+    const TEXT                    = 'TEXT';
+    const TEXTAREA                = 'TEXTAREA';
+    const WYSYWYG                 = 'WYSYWYG';
+    const IMAGE                   = 'IMAGE';
+    const MEDIA                   = 'MEDIA';
+    const SLIDER                  = 'SLIDER';
+    const HIGHLIGHT               = 'HIGHLIGHT';
+    const SHARED_BLOCK            = 'SHARED_BLOCK';
+    const SHARED_BLOCK_COLLECTION = 'SHARED_BLOCK_COLLECTION';
 
     /** @var array user friendly named type */
     protected static $typeName = [
-        self::TEXT      => 'Text',
-        self::TEXTAREA  => 'Textarea',
-        self::WYSYWYG   => 'WYSYWYG',
-        self::IMAGE     => 'Image',
-        self::MEDIA     => 'Media',
-        self::SLIDER    => 'Slider',
-        self::HIGHLIGHT => 'Highlight',
-        self::SHARED_BLOCK => 'Shared block',
+        self::TEXT                    => 'Text',
+        self::TEXTAREA                => 'Textarea',
+        self::WYSYWYG                 => 'WYSYWYG',
+        self::IMAGE                   => 'Image',
+        self::MEDIA                   => 'Media',
+        self::SLIDER                  => 'Slider',
+        self::HIGHLIGHT               => 'Highlight',
+        self::SHARED_BLOCK            => 'Shared block',
+        self::SHARED_BLOCK_COLLECTION => 'Shared block list',
     ];
 
     /**
@@ -59,6 +61,7 @@ class CmsContentTypeEnum
             self::SLIDER,
             self::HIGHLIGHT,
             self::SHARED_BLOCK,
+            self::SHARED_BLOCK_COLLECTION,
         ];
     }
 

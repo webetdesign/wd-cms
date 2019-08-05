@@ -61,7 +61,14 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
             inversedBy: null
             orphanRemoval: false
             orderBy: null
-
+        sharedBlockList:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock
+            cascade:
+                - remove
+                - persist
+            mappedBy: content
+            orderBy:
+                position: ASC
     manyToOne:
         page:
             targetEntity: WebEtDesign\CmsBundle\Entity\CmsPage
@@ -73,14 +80,14 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
                 page_id:
                     referencedColumnName: id
             orphanRemoval: false
-        sharedBlock:
+        sharedBlockParent:
             targetEntity: WebEtDesign\CmsBundle\Entity\CmsSharedBlock
             cascade: {  }
             fetch: LAZY
             mappedBy: null
             inversedBy: contents
             joinColumns:
-                shared_block_id:
+                shared_block_parent_id:
                     referencedColumnName: id
             orphanRemoval: false
     lifecycleCallbacks: {  }

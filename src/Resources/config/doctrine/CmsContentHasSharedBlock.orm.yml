@@ -1,0 +1,42 @@
+WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock:
+    type: entity
+    table: cms__content_has_shared_block
+#    repositoryClass: WebEtDesign\CmsBundle\Repository\CmsContentRepository
+    id:
+        content:
+            associationKey: true
+        sharedBlock:
+            associationKey: true
+    fields:
+        position:
+            type: integer
+            scale: 0
+            length: 255
+            unique: false
+            nullable: false
+            precision: 0
+            gedmo:
+                sortable:
+                    groups: [content]
+    manyToOne:
+        content:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsContent
+            inversedBy: sharedBlockList
+            cascade:
+                - remove
+                - persist
+            joinColumn:
+                name: content_id
+                referencedColumnName: id
+
+        sharedBlock:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsSharedBlock
+            inversedBy: contentList
+            cascade:
+                - remove
+                - persist
+            joinColumn:
+                name: shared_block_id
+                referencedColumnName: id
+            orphanRemoval: false
+    lifecycleCallbacks: {  }

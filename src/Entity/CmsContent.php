@@ -41,22 +41,22 @@ class CmsContent
 
     /**
      * @var null|CmsPage
-     *
      */
     private $page;
 
     /**
      * @var null|CmsSharedBlock
-     *
      */
-    private $sharedBlock;
+    private $sharedBlockParent;
+
+    /** @var ArrayCollection */
+    private $sharedBlockList;
 
     /**
      * @var mixed
-     *
      */
     private $media;
-    
+
     /** @var boolean */
     private $active;
 
@@ -75,8 +75,9 @@ class CmsContent
 
     public function __construct()
     {
-        $this->sliders = new ArrayCollection();
-        $this->active = true;
+        $this->sharedBlockList = new ArrayCollection();
+        $this->sliders         = new ArrayCollection();
+        $this->active          = true;
     }
 
     public function getId(): ?int
@@ -132,52 +133,40 @@ class CmsContent
         return $this;
     }
 
-    /**
-     * @return CmsPage|null
-     */
     public function getPage(): ?CmsPage
     {
         return $this->page;
     }
 
-    /**
-     * @param CmsPage|null $page
-     */
-    public function setPage(?CmsPage $page): void
+    public function setPage(?CmsPage $page): self
     {
         $this->page = $page;
+
+        return $this;
     }
 
-    /**
-     * @return CmsSharedBlock|null
-     */
-    public function getSharedBlock(): ?CmsSharedBlock
+    public function getSharedBlockParent(): ?CmsSharedBlock
     {
-        return $this->sharedBlock;
+        return $this->sharedBlockParent;
     }
 
-    /**
-     * @param CmsSharedBlock|null $sharedBlock
-     */
-    public function setSharedBlock(?CmsSharedBlock $sharedBlock): void
+    public function setSharedBlockParent(?CmsSharedBlock $sharedBlockParent): self
     {
-        $this->sharedBlock = $sharedBlock;
+        $this->sharedBlockParent = $sharedBlockParent;
+
+        return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMedia()
+    public function getMedia(): ?Media
     {
         return $this->media;
     }
 
-    /**
-     * @param mixed $media
-     */
-    public function setMedia($media): void
+    public function setMedia($media): self
     {
         $this->media = $media;
+
+        return $this;
     }
 
     public function setSliders($sliders)
@@ -202,8 +191,8 @@ class CmsContent
     public function addSlider(CmsContentSlider $slider): self
     {
         if (!$this->sliders->contains($slider)) {
-            $slider->setContent($this);
             $this->sliders[] = $slider;
+            $slider->setContent($this);
         }
 
         return $this;
@@ -230,13 +219,56 @@ class CmsContent
         return $this->active;
     }
 
-    /**
-     * @param bool $active
-     * @return CmsContent
-     */
-    public function setActive(bool $active): CmsContent
+    public function setActive(bool $active): self
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * @return Collection|CmsContentHasSharedBlock[]
+     */
+    public function getSharedBlockList(): Collection
+    {
+        return $this->sharedBlockList;
+    }
+
+    /**
+     * @param mixed $sharedBlockList
+     * @return CmsContent
+     */
+    public function setSharedBlockList($sharedBlockList)
+    {
+        $this->sharedBlockList = $sharedBlockList;
+        return $this;
+    }
+
+    public function addSharedBlockList(CmsContentHasSharedBlock $sharedBlockList): self
+    {
+        if (!$this->sharedBlockList->contains($sharedBlockList)) {
+            $this->sharedBlockList[] = $sharedBlockList;
+            $sharedBlockList->setContent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSharedBlockList(CmsContentHasSharedBlock $sharedBlockList): self
+    {
+        if ($this->sharedBlockList->contains($sharedBlockList)) {
+            $this->sharedBlockList->removeElement($sharedBlockList);
+            // set the owning side to null (unless already changed)
+            if ($sharedBlockList->getContent() === $this) {
+                $sharedBlockList->setContent(null);
+            }
+        }
+
         return $this;
     }
 

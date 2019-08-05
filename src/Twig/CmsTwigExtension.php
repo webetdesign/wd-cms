@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Twig;
 use Symfony\Component\DependencyInjection\Container;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Doctrine\ORM\EntityManagerInterface;
@@ -63,8 +64,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('cms_render_content', [$this, 'cmsRenderContent'], ['is_safe' => ['html']]),
-            new TwigFunction('cms_render_shared_block', [$this, 'cmsSharedBlock'], ['is_safe' => ['html']]),
-            new TwigFunction('cms_render_shared_block_object', [$this, 'renderSharedBlock'], ['is_safe' => ['html']]),
+            new TwigFunction('cms_render_shared_block', [$this, 'renderSharedBlock'], ['is_safe' => ['html']]),
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
@@ -80,6 +80,7 @@ class CmsTwigExtension extends AbstractExtension
      */
     public function cmsRenderContent($object, $content_code)
     {
+
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
             ->findOneByObjectAndContentCodeAndType(
@@ -89,6 +90,8 @@ class CmsTwigExtension extends AbstractExtension
                     CmsContentTypeEnum::TEXT,
                     CmsContentTypeEnum::TEXTAREA,
                     CmsContentTypeEnum::WYSYWYG,
+                    CmsContentTypeEnum::SHARED_BLOCK,
+                    CmsContentTypeEnum::SHARED_BLOCK_COLLECTION,
                 ], array_keys($this->customContents))
             );
 
@@ -116,7 +119,36 @@ class CmsTwigExtension extends AbstractExtension
             return $contentService->render($content);
         }
 
+        if ($content->getType() === CmsContentTypeEnum::SHARED_BLOCK) {
+            $block = $this->em->getRepository(CmsSharedBlock::class)->find((int)$content->getValue());
+            if (!$block) {
+                return null;
+            }
+
+            return $this->renderSharedBlock($block);
+        }
+
+        if ($content->getType() === CmsContentTypeEnum::SHARED_BLOCK_COLLECTION) {
+            $result = '';
+            /** @var CmsContentHasSharedBlock $item */
+            foreach ($content->getSharedBlockList() as $item) {
+                $result .= $this->renderSharedBlock($item->getSharedBlock());
+            }
+            return $result;
+        }
+
         return $content->getValue();
+    }
+
+    public function renderSharedBlock(CmsSharedBlock $block)
+    {
+        if (!$block) {
+            return null;
+        }
+
+        return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'], [
+            'block' => $block
+        ]);
     }
 
     public function cmsMedia(CmsPage $page, $content_code)
@@ -173,51 +205,6 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         return $content->getSliders();
-    }
-
-    public function cmsSharedBlock(CmsPage $page, $content_code)
-    {
-        /** @var CmsContent $content */
-        $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByObjectAndContentCodeAndType(
-                $page,
-                $content_code,
-                [CmsContentTypeEnum::SHARED_BLOCK]
-            );
-
-        if (!$content) {
-            dump('toto');
-            if (getenv('APP_ENV') != 'dev') {
-                return null;
-            } else {
-                $message = sprintf('Content not found with the code "%s" in page "%s" (#%s)', $content_code, $page->getTitle(), $page->getId());
-                throw new Exception($message);
-            }
-        }
-
-        if (!$content->isActive()) {
-            return null;
-        }
-
-        $block = $this->em->getRepository(CmsSharedBlock::class)->find((int)$content->getValue());
-        if (!$block) {
-            return null;
-        }
-
-        return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'], [
-            'block' => $block
-        ]);
-    }
-
-    public function renderSharedBlock(CmsSharedBlock $block)
-    {
-        if (!$block) {
-            return null;
-        }
-
-        return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'], [
-            'block' => $block
-        ]);
     }
 
     public function cmsProjectCollection(CmsPage $page, $content_code)

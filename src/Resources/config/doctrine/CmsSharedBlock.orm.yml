@@ -42,9 +42,11 @@ WebEtDesign\CmsBundle\Entity\CmsSharedBlock:
             cascade:
                 - remove
                 - persist
-            fetch: LAZY
+            mappedBy: sharedBlockParent
+        contentList:
+            targetEntity: WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock
+            cascade:
+                - remove
+                - persist
             mappedBy: sharedBlock
-            inversedBy: null
-            orphanRemoval: false
-            orderBy: null
     lifecycleCallbacks: {  }

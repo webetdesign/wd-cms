@@ -32,7 +32,7 @@ class CmsContentRepository extends ServiceEntityRepository
                 ->setParameter('page', $object);
         }
         if ($object instanceof CmsSharedBlock) {
-            $qb->andWhere('c.sharedBlock = :sharedBlock')
+            $qb->andWhere('c.sharedBlockParent = :sharedBlock')
                 ->setParameter('sharedBlock', $object);
         }
 
