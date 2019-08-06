@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
+use Sonata\MediaBundle\Model\MediaInterface;
 
 
 /**
@@ -157,7 +158,7 @@ class CmsContent
         return $this;
     }
 
-    public function getMedia(): ?Media
+    public function getMedia(): ?MediaInterface
     {
         return $this->media;
     }
