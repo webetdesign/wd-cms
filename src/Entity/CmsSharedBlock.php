@@ -16,6 +16,9 @@ class CmsSharedBlock
     private $label;
 
     /** @var boolean */
+    private $public;
+
+    /** @var boolean */
     private $active;
 
     /**
@@ -143,6 +146,24 @@ class CmsSharedBlock
     public function setActive(bool $active): CmsSharedBlock
     {
         $this->active = $active;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPublic(): bool
+    {
+        return $this->public;
+    }
+
+    /**
+     * @param bool $public
+     * @return CmsSharedBlock
+     */
+    public function setPublic(bool $public): CmsSharedBlock
+    {
+        $this->public = $public;
         return $this;
     }
 

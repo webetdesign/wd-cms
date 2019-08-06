@@ -21,6 +21,13 @@ WebEtDesign\CmsBundle\Entity\CmsContent:
             unique: false
             nullable: false
             precision: 0
+        parent_heritance:
+            type: boolean
+            scale: 0
+            length: 255
+            unique: false
+            nullable: true
+            precision: 0
         code:
             type: string
             scale: 0
