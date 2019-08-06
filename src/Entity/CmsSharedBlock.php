@@ -154,7 +154,7 @@ class CmsSharedBlock
      */
     public function isPublic(): bool
     {
-        return $this->public;
+        return (bool)$this->public;
     }
 
     /**
