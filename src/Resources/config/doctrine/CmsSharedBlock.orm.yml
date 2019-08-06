@@ -36,6 +36,13 @@ WebEtDesign\CmsBundle\Entity\CmsSharedBlock:
             nullable: false
             options:
                 default: 0
+        public:
+            type: boolean
+            length: null
+            unique: false
+            nullable: true
+            options:
+                default: 1
     oneToMany:
         contents:
             targetEntity: WebEtDesign\CmsBundle\Entity\CmsContent

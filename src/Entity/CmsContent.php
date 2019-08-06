@@ -59,6 +59,9 @@ class CmsContent
     private $media;
 
     /** @var boolean */
+    private $parent_heritance;
+
+    /** @var boolean */
     private $active;
 
     /**
@@ -70,15 +73,15 @@ class CmsContent
 
     public function __toString()
     {
-        // TODO: Implement __toString() method.
         return $this->label;
     }
 
     public function __construct()
     {
-        $this->sharedBlockList = new ArrayCollection();
-        $this->sliders         = new ArrayCollection();
-        $this->active          = true;
+        $this->sharedBlockList  = new ArrayCollection();
+        $this->sliders          = new ArrayCollection();
+        $this->active           = true;
+        $this->parent_heritance = false;
     }
 
     public function getId(): ?int
@@ -233,6 +236,26 @@ class CmsContent
     }
 
     /**
+     * @return bool
+     */
+    public function isParentHeritance(): bool
+    {
+        return $this->parent_heritance;
+    }
+
+    public function setParentHeritance(bool $heritance): self
+    {
+        $this->parent_heritance = $heritance;
+
+        return $this;
+    }
+
+    public function getParentHeritance(): ?bool
+    {
+        return $this->parent_heritance;
+    }
+
+    /**
      * @return Collection|CmsContentHasSharedBlock[]
      */
     public function getSharedBlockList(): Collection
@@ -272,5 +295,4 @@ class CmsContent
 
         return $this;
     }
-
 }

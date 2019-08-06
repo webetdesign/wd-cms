@@ -29,7 +29,8 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             ->add('id')
             ->add('code')
             ->add('label')
-            ->add('active');
+            ->add('active')
+            ->add('public');
     }
 
     protected function configureListFields(ListMapper $listMapper): void
@@ -39,6 +40,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             ->add('code')
             ->add('label')
             ->add('active')
+            ->add('public')
             ->add('_action', null, [
                 'actions' => [
                     'edit'   => [],
@@ -67,6 +69,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
                 ->tab('Général')// The tab call is optional
                 ->with('', ['box_class' => ''])
                 ->add('active')
+                ->add('public')
                 ->end()
                 ->end()
                 ->tab('Contenus')

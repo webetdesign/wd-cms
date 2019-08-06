@@ -216,6 +216,11 @@ final class CmsContentAdmin extends AbstractAdmin
 
                     break;
                 case CmsContentTypeEnum::SHARED_BLOCK_COLLECTION:
+
+                    $formMapper->add('parentHeritance', null, [
+                        'label' => 'Héritage',
+                    ]);
+
                     $formMapper->add(
                         'sharedBlockList',
                         CollectionType::class,
