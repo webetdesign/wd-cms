@@ -217,10 +217,6 @@ final class CmsContentAdmin extends AbstractAdmin
                     break;
                 case CmsContentTypeEnum::SHARED_BLOCK_COLLECTION:
 
-                    $formMapper->add('parent_heritance', null, [
-                        'label' => 'Héritage',
-                    ]);
-
                     $formMapper->add(
                         'sharedBlockList',
                         CollectionType::class,
@@ -234,6 +230,10 @@ final class CmsContentAdmin extends AbstractAdmin
                             'sortable' => 'position',
                         ]
                     );
+
+                    $formMapper->add('parent_heritance', null, [
+                        'label' => 'Héritage',
+                    ]);
 
                     break;
 

@@ -180,7 +180,7 @@ class CmsPageAdmin extends AbstractAdmin
                 ->tab('Sécurité')
                 ->with('', ['box_class' => ''])
                 ->add('roles', SecurityRolesType::class, [
-                    'label' => 'Roles',
+                    'label' => false,
                     'expanded' => true,
                     'multiple' => true,
                     'required' => false,
