@@ -159,6 +159,7 @@ class CmsTwigExtension extends AbstractExtension
                 $content_code,
                 [
                     CmsContentTypeEnum::MEDIA,
+                    CmsContentTypeEnum::IMAGE,
                 ]
             );
         if (!$content) {
