@@ -1,5 +1,9 @@
 {% extends '@SonataAdmin/CRUD/base_list_field.html.twig' %}
 
 {% block field %}
-    {{ value | join(', ') }}
+    {% set transData = [] %}
+    {% for val in value %}
+        {% set transData = transData|merge([val|trans()]) %}
+    {% endfor %}
+    {{ transData | join(', ') }}
 {% endblock %}
