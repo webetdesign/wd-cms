@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Repository;
 
 use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
