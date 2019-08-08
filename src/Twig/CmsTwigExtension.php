@@ -113,6 +113,10 @@ class CmsTwigExtension extends AbstractExtension
             return null;
         }
 
+        if($content->getParentHeritance()){
+            $content = $this->em->getRepository(CmsContent::class)->findParent($content);
+        }
+
         if (in_array($content->getType(), array_keys($this->customContents))) {
             $contentService = $this->container->get($this->customContents[$content->getType()]['service']);
             return $contentService->render($content);

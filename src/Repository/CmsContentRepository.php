@@ -60,7 +60,59 @@ class CmsContentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findParent(CmsContent $content)
+    {
+        $qb = $this->createQueryBuilder('c');
 
+        $qb
+            ->select('m.id AS mid, IDENTITY(m.parent) AS parent_id, m.lvl, m.lft, p.id AS pid, c.id AS cid, c.type, c.code, c.parent_heritance')
+            ->leftJoin('c.page', 'p')
+            ->leftJoin(CmsMenu::class, 'm', 'WITH', 'm.page = p')
+            ->where('c.code LIKE :code')
+            ->andWhere('c.type LIKE :type')
+            ->orderBy('m.lft', 'ASC')
+            ->setParameter('type', $content->getType())
+            ->setParameter('code', $content->getCode());
+
+        $list = $qb->getQuery()->getResult();
+
+        $output_id = $this->search($list, $content->getPage()->getId());
+
+        if ($output_id) {
+            return $this->createQueryBuilder('c')
+                ->where('c.id = :id')
+                ->setParameter('id', $output_id)
+                ->getQuery()
+                ->getOneOrNullResult();
+        } else {
+            return $content;
+        }
+    }
+
+    private function search($list, $page_id)
+    {
+        // parent courant
+        $parent = $list[array_search($page_id, array_column($list, 'pid'))]['parent_id'];
+
+        $exist = array_search($parent, array_column($list, 'mid'));
+
+        if ($exist) {
+            $block = $list[$exist];
+            if ($block['parent_heritance'] == false) {
+                return $block['cid'];
+            } else {
+                return $this->search($list, $block['pid']);
+            }
+        } else {
+            foreach ($list as $block) {
+                if ($block['parent_heritance'] == false) {
+                    return $block['cid'];
+                }
+            }
+        }
+
+        return false;
+    }
 
     // /**
     //  * @return CmsContent[] Returns an array of CmsContent objects
