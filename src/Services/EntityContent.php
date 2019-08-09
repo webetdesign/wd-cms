@@ -16,9 +16,9 @@ use Twig_Environment;
 
 class EntityContent extends AbstractCustomContent
 {
-    private $multiple;
-    private $entity;
-    private $em;
+    protected $multiple;
+    protected $entity;
+    protected $em;
 
     /**
      * @param EntityManagerInterface $em
