@@ -87,6 +87,11 @@ class CmsPage
     private $roles;
 
     /**
+     * @var null|array
+     */
+    private $locales_links;
+
+    /**
      * @return mixed
      */
     public function getClassAssociation()
@@ -288,6 +293,24 @@ class CmsPage
     public function setRoles(?array $roles): CmsPage
     {
         $this->roles = $roles;
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getLocalesLinks(): ?array
+    {
+        return $this->locales_links;
+    }
+
+    /**
+     * @param array|null $localesLinks
+     * @return CmsPage
+     */
+    public function setLocalesLinks(?array $localesLinks): CmsPage
+    {
+        $this->locales_links = $localesLinks;
         return $this;
     }
 }

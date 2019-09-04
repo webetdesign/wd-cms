@@ -176,6 +176,13 @@ services:
     # ADMIN
     # ===============================================
 
+    cms.admin.cms_site:
+      class: '%wd_cms.admin.config.class.site%'
+      arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%']
+      tags:
+            - { name: sonata.admin, manager_type: orm, group: CMS, label: Site}
+      public: true
+
     cms.admin.cms_route:
         class: '%wd_cms.admin.config.class.route%'
         arguments: [~, '%wd_cms.admin.config.entity.route%', '%wd_cms.admin.config.controller.route%']
