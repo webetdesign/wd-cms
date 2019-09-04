@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\UserBundle\Form\Type\SecurityRolesType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Form\PageTemplateType;
@@ -67,6 +68,7 @@ class CmsPageAdmin extends AbstractAdmin
         /** @var EntityManagerInterface $em */
         $em = $container->get('doctrine.orm.entity_manager');
 
+        //region Général
         $formMapper
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => ''])
@@ -75,15 +77,19 @@ class CmsPageAdmin extends AbstractAdmin
             ->end()// End form group
             ->end()// End tab
         ;
-
+        //endregion
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
             $formMapper->getFormBuilder()->setMethod('put');
+
+            //region Général - additional
             $formMapper
                 ->tab('Général')// The tab call is optional
                 ->with('', ['box_class' => ''])
                 ->add('active');
 
+
+            //region Association
             if ($object->getClassAssociation()) {
                 $entities = $em->getRepository($object->getClassAssociation())->{$object->getQueryAssociation()}();
                 $choices  = [];
@@ -97,97 +103,122 @@ class CmsPageAdmin extends AbstractAdmin
                     ]
                 );
             }
+            //endregion
 
 
-            $formMapper->end()// End form group
-            ->end()// End tab
-            ->tab('SEO')// The tab call is optional
+            $formMapper->end();// End form group
+            $formMapper->end();// End tab
+            //endregion
+
+            //region SEO
+            $formMapper->tab('SEO')// The tab call is optional
             ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('seo_title')
-                ->add('seo_description')
-                ->add('seo_keywords')
-                ->end()
-                ->with('Facebook', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('fb_title')
-                ->add('fb_type')
-                ->add('fb_url')
-                ->add('fb_image')
-                ->add('fb_description')
-                ->add('fb_site_name')
-                ->add('fb_admins')
-                ->end()
-                ->with('Twitter', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('twitter_card')
-                ->add('twitter_site')
-                ->add('twitter_title')
-                ->add('twitter_description')
-                ->add('twitter_creator')
-                ->add('twitter_image')
-                ->end()
-                ->end()
-                ->tab('Contenus')
-                ->with('', ['box_class' => ''])
-                ->add(
-                    'contents',
-                    CollectionType::class,
-                    [
-                        'label'        => false,
-                        'by_reference' => false,
-                        'btn_add'      => $roleAdmin ? 'Ajouter' : false,
-                        'type_options' => [
-                            'delete' => $roleAdmin,
-                        ],
+            ->add('seo_title')
+            ->add('seo_description')
+            ->add('seo_keywords')
+            ->end()
+            ->with('Facebook', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
+            ->add('fb_title')
+            ->add('fb_type')
+            ->add('fb_url')
+            ->add('fb_image')
+            ->add('fb_description')
+            ->add('fb_site_name')
+            ->add('fb_admins')
+            ->end()
+            ->with('Twitter', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
+            ->add('twitter_card')
+            ->add('twitter_site')
+            ->add('twitter_title')
+            ->add('twitter_description')
+            ->add('twitter_creator')
+            ->add('twitter_image')
+            ->end()
+            ->end();
+            //endregion
+
+            //region Contenus
+            $formMapper->tab('Contenus')
+            ->with('', ['box_class' => ''])
+            ->add(
+                'contents',
+                CollectionType::class,
+                [
+                    'label'        => false,
+                    'by_reference' => false,
+                    'btn_add'      => $roleAdmin ? 'Ajouter' : false,
+                    'type_options' => [
+                        'delete' => $roleAdmin,
                     ],
-                    [
-                        'edit'   => 'inline',
-                        'inline' => 'table',
-                    ]
-                )
-                ->end()
-                ->end()
-                ->tab('Route')
-                ->with('', ['box_class' => ''])
-                ->add('route.name', null, ['label' => 'Route name (technique)'])
-                ->add('route.path', null, ['label' => 'Chemin', 'attr' => ['class' => 'cms_route_path_input']])
-                ->add(
-                    'route.methods',
-                    ChoiceType::class,
-                    [
-                        'label'    => 'Méthodes',
-                        'choices'  => [
-                            Request::METHOD_GET    => Request::METHOD_GET,
-                            Request::METHOD_POST   => Request::METHOD_POST,
-                            Request::METHOD_DELETE => Request::METHOD_DELETE,
-                            Request::METHOD_PUT    => Request::METHOD_PUT,
-                            Request::METHOD_PATCH  => Request::METHOD_PATCH,
-                        ],
-                        'multiple' => true,
-                    ]
-                )
-                ->add('route.controller', null, ['label' => 'Controller (technique)'])
-                ->add('route.defaults', HiddenType::class, [
-                    'attr' => [
-                        'class' => 'cms_route_default_input'
-                    ]
-                ])
-                ->add('route.requirements', HiddenType::class, [
-                    'attr' => [
-                        'class' => 'cms_route_requirements_input'
-                    ]
-                ])
-                ->end()
-                ->end()
-                ->tab('Sécurité')
-                ->with('', ['box_class' => ''])
-                ->add('roles', SecurityRolesType::class, [
-                    'label' => false,
-                    'expanded' => true,
+                ],
+                [
+                    'edit'   => 'inline',
+                    'inline' => 'table',
+                ]
+            )
+            ->end()
+            ->end();
+            //endregion
+
+            //region Route
+            $formMapper->tab('Route')
+            ->with('', ['box_class' => ''])
+            ->add('route.name', null, ['label' => 'Route name (technique)'])
+            ->add('route.path', null, ['label' => 'Chemin', 'attr' => ['class' => 'cms_route_path_input']])
+            ->add(
+                'route.methods',
+                ChoiceType::class,
+                [
+                    'label'    => 'Méthodes',
+                    'choices'  => [
+                        Request::METHOD_GET    => Request::METHOD_GET,
+                        Request::METHOD_POST   => Request::METHOD_POST,
+                        Request::METHOD_DELETE => Request::METHOD_DELETE,
+                        Request::METHOD_PUT    => Request::METHOD_PUT,
+                        Request::METHOD_PATCH  => Request::METHOD_PATCH,
+                    ],
                     'multiple' => true,
-                    'required' => false,
-                ])
-                ->end()
-                ->end()
-            ;
+                ]
+            )
+            ->add('route.controller', null, ['label' => 'Controller (technique)'])
+            ->add('route.defaults', HiddenType::class, [
+                'attr' => [
+                    'class' => 'cms_route_default_input'
+                ]
+            ])
+            ->add('route.requirements', HiddenType::class, [
+                'attr' => [
+                    'class' => 'cms_route_requirements_input'
+                ]
+            ])
+            ->end()
+            ->end();
+            //endregion
+
+            //region Sécurité
+            $formMapper->tab('Sécurité')
+            ->with('', ['box_class' => ''])
+            ->add('roles', SecurityRolesType::class, [
+                'label' => false,
+                'expanded' => true,
+                'multiple' => true,
+                'required' => false,
+            ])
+            ->end()
+            ->end();
+            //endregion
+            
+            //region MultiLingue
+            $formMapper->tab('MultiLingue')
+            ->with('', ['box_class' => ''])
+            ->add('locales_links', EntityType::class, [
+                'class' => CmsPage::class,
+                // uses the CmsPage.title property as the visible option string
+                'choice_label' => 'title',
+            ])
+            ->end()
+            ->end();
+            //endregion
         }
 
     }

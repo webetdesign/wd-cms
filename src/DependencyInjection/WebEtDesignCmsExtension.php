@@ -62,18 +62,21 @@ class WebEtDesignCmsExtension extends Extension
         $container->setParameter('wd_cms.admin.config.class.menu', $config['admin']['configuration']['class']['menu']);
         $container->setParameter('wd_cms.admin.config.class.page', $config['admin']['configuration']['class']['page']);
         $container->setParameter('wd_cms.admin.config.class.route', $config['admin']['configuration']['class']['route']);
+        $container->setParameter('wd_cms.admin.config.class.site', $config['admin']['configuration']['class']['site']);
 
         $container->setParameter('wd_cms.admin.config.controller.content', $config['admin']['configuration']['controller']['content']);
         $container->setParameter('wd_cms.admin.config.controller.content_slider', $config['admin']['configuration']['controller']['content_slider']);
         $container->setParameter('wd_cms.admin.config.controller.menu', $config['admin']['configuration']['controller']['menu']);
         $container->setParameter('wd_cms.admin.config.controller.page', $config['admin']['configuration']['controller']['page']);
         $container->setParameter('wd_cms.admin.config.controller.route', $config['admin']['configuration']['controller']['route']);
+        $container->setParameter('wd_cms.admin.config.controller.site', $config['admin']['configuration']['controller']['site']);
 
         $container->setParameter('wd_cms.admin.config.entity.content', $config['admin']['configuration']['entity']['content']);
         $container->setParameter('wd_cms.admin.config.entity.content_slider', $config['admin']['configuration']['entity']['content_slider']);
         $container->setParameter('wd_cms.admin.config.entity.menu', $config['admin']['configuration']['entity']['menu']);
         $container->setParameter('wd_cms.admin.config.entity.page', $config['admin']['configuration']['entity']['page']);
         $container->setParameter('wd_cms.admin.config.entity.route', $config['admin']['configuration']['entity']['route']);
+        $container->setParameter('wd_cms.admin.config.entity.site', $config['admin']['configuration']['entity']['site']);
     }
 
     public function getAlias()
