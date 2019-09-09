@@ -8,6 +8,10 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\PersistentCollection;
+
 class CmsSite
 {
     /**
@@ -17,16 +21,46 @@ class CmsSite
     private $id;
 
     /**
+     * @var string|null
+     */
+    private $label;
+
+    /**
      * @var string
      *
      */
-    private $local;
+    private $locale;
 
     /**
      * @var string
      *
      */
     private $host;
+
+    /** @var boolean */
+    private $hostMultilingual = 0;
+
+    /** @var boolean */
+    private $default = 0;
+
+    /** @var ArrayCollection|PersistentCollection */
+    private $pages;
+
+    /** @var string */
+    private $flagIcon;
+
+    public function __construct()
+    {
+        $this->pages = new ArrayCollection();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __toString()
+    {
+        return (string) $this->getLabel() . (!empty($this->getLocale()) ? ' - ' . $this->getLocale() : '');
+    }
 
     /**
      * @return int
@@ -39,7 +73,7 @@ class CmsSite
     /**
      * @param int $id
      */
-    public function setId(int $id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }
@@ -47,23 +81,23 @@ class CmsSite
     /**
      * @return string
      */
-    public function getLocal(): string
+    public function getLocale(): ?string
     {
-        return $this->local;
+        return $this->locale;
     }
 
     /**
-     * @param string $local
+     * @param string $locale
      */
-    public function setLocal(string $local): void
+    public function setLocale(?string $locale): void
     {
-        $this->local = $local;
+        $this->locale = $locale;
     }
 
     /**
      * @return string
      */
-    public function getHost(): string
+    public function getHost(): ?string
     {
         return $this->host;
     }
@@ -71,9 +105,110 @@ class CmsSite
     /**
      * @param string $host
      */
-    public function setHost(string $host): void
+    public function setHost(?string $host): void
     {
         $this->host = $host;
+    }
+
+    /**
+     * @param string|null $label
+     * @return CmsSite
+     */
+    public function setLabel(?string $label): CmsSite
+    {
+        $this->label = $label;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
+    /**
+     * @return Collection|CmsPage[]
+     */
+    public function getPages(): Collection
+    {
+        return $this->pages;
+    }
+
+    public function addPage(CmsPage $page): self
+    {
+        if (!$this->pages->contains($page)) {
+            $this->pages[] = $page;
+            $page->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removePage(CmsPage $page): self
+    {
+        if ($this->pages->contains($page)) {
+            $this->pages->removeElement($page);
+            // set the owning side to null (unless already changed)
+            if ($page->getSite() === $this) {
+                $page->setSite(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param bool $hostMultilingual
+     * @return CmsSite
+     */
+    public function setHostMultilingual(bool $hostMultilingual): CmsSite
+    {
+        $this->hostMultilingual = $hostMultilingual;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHostMultilingual(): bool
+    {
+        return $this->hostMultilingual;
+    }
+
+    /**
+     * @param bool $default
+     * @return CmsSite
+     */
+    public function setDefault(bool $default): CmsSite
+    {
+        $this->default = $default;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDefault(): bool
+    {
+        return $this->default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFlagIcon(): ?string
+    {
+        return $this->flagIcon;
+    }
+
+    /**
+     * @param string $flagIcon
+     */
+    public function setFlagIcon(?string $flagIcon): void
+    {
+        $this->flagIcon = $flagIcon;
     }
 
 

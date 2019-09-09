@@ -1,5 +1,6 @@
 parameters:
   cms.admin.cms_page_listener.class: WebEtDesign\CmsBundle\EventListener\PageAdminListener
+  cms.admin.cms_site_listener.class: WebEtDesign\CmsBundle\EventListener\SiteAdminListener
   cms.admin.cms_shared_block_listener.class: WebEtDesign\CmsBundle\EventListener\SharedBlockAdminListener
 
 services:
@@ -12,6 +13,14 @@ services:
     WebEtDesign\CmsBundle\Form\BlockTemplateType:
         arguments:
             - '@cms.block_provider'
+        tags:
+            - { name: form.type }
+
+    WebEtDesign\CmsBundle\Form\MultilingualType:
+        arguments:
+            - '@doctrine.orm.default_entity_manager'
+            - '%wd_cms.admin.config.entity.page%'
+            - '%wd_cms.admin.config.entity.site%'
         tags:
             - { name: form.type }
 
@@ -57,6 +66,18 @@ services:
             - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildPage }
             - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
             - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
+
+    cms.admin.cms_site_listener:
+        class: '%cms.admin.cms_site_listener.class%'
+        arguments:
+          - '@router'
+          - '@filesystem'
+          - '@kernel'
+          - '%wd_cms.admin.config.entity.site%'
+        tags:
+          - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: postPersist }
+          - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: postUpdate }
+
 
     cms.admin.cms_shared_block_listener:
         class: '%cms.admin.cms_shared_block_listener.class%'
@@ -195,6 +216,8 @@ services:
         arguments: [~, '%wd_cms.admin.config.entity.page%', '%wd_cms.admin.config.controller.page%']
         tags:
             - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
+        calls:
+            - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
         public: true
 
     cms.admin.cms_content:

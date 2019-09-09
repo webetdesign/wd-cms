@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Twig;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock;
@@ -68,6 +69,7 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
+            new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -113,7 +115,7 @@ class CmsTwigExtension extends AbstractExtension
             return null;
         }
 
-        if($content->getParentHeritance()){
+        if ($content->getParentHeritance()) {
             $content = $this->em->getRepository(CmsContent::class)->findParent($content);
         }
 
@@ -218,5 +220,27 @@ class CmsTwigExtension extends AbstractExtension
         } catch (RouteNotFoundException $e) {
             return '#404(route:' . $route . ')';
         }
+    }
+
+    public function renderLocaleSwitch(CmsPage $page, Request $request)
+    {
+        $pages = [];
+
+        foreach ($page->getCrossSitePages() as $page) {
+            preg_match_all('/\{(\w+)\}/', $page->getRoute()->getPath(), $params);
+            $routeParams = [];
+            foreach ($params[1] as $param) {
+                $routeParams[$param] = $request->get($param);
+            }
+
+            $pages[] = [
+                'path' => $this->router->generate($page->getRoute()->getName(), $routeParams),
+                'icon' => $page->getSite()->getFlagIcon(),
+            ];
+        }
+
+        return $this->twig->render('@WebEtDesignCms/block/cms_locale_switch.html.twig', [
+            'pages' => $pages
+        ]);
     }
 }

@@ -1,0 +1,29 @@
+{% block cms_multilingual_page_widget %}
+    {% set currentPage = sonata_admin.admin.subject %}
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="150px">Site</th>
+            <th width="50px">Locale</th>
+            <th>Page</th>
+            <th width="100px">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for site in sites %}
+            <tr>
+                <td>{{ site.label }}</td>
+                <td>{{ site.locale }}</td>
+                <td>{{ form_widget(form.children[site.id]) }}</td>
+                <td>
+                    {% if form.children[site.id].vars.value != null %}
+                        <a href="{{ sonata_admin.admin.generateObjectUrl('edit', form.children[site.id].vars.data) }}" class="btn btn-primary" style="width: 100%"><i class="fa fa-pencil"></i>&nbsp;Modifier</a>
+                    {% else %}
+                        <a href="{{ path('admin_webetdesign_cms_cmspage_create', {siteId: site.id, refId: currentPage.id }) }}" class="btn btn-primary" style="width: 100%"><i class="fa fa-plus-square"></i>&nbsp;Créer</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

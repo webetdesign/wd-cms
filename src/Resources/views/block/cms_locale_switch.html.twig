@@ -1,0 +1,9 @@
+<ul>
+    {% for page in pages %}
+        <li>
+            <a href="{{ page.path }}">
+                <img src="https://www.countryflags.io/{{ page.icon }}/flat/32.png" alt="">
+            </a>
+        </li>
+    {% endfor %}
+</ul>

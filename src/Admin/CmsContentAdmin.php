@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Container;
-use WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;

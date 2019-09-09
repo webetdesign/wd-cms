@@ -14,12 +14,19 @@ WebEtDesign\CmsBundle\Entity\CmsSite:
             generator:
                 strategy: IDENTITY
     fields:
-        local:
+        label:
             type: string
             scale: 0
             length: 255
             unique: false
             nullable: false
+            precision: 0
+        locale:
+            type: string
+            scale: 0
+            length: 255
+            unique: false
+            nullable: true
             precision: 0
         host:
             type: string
@@ -28,4 +35,18 @@ WebEtDesign\CmsBundle\Entity\CmsSite:
             unique: false
             nullable: true
             precision: 0
+        hostMultilingual:
+            type: boolean
+            nullable: false
+            options:
+                default: 0
+        default:
+            column: '`default`'
+            type: boolean
+            nullable: false
+            options:
+                default: 0
+        flagIcon:
+            type: string
+            nullable: true
     lifecycleCallbacks: {  }

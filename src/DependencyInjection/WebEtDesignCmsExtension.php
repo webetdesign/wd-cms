@@ -20,7 +20,9 @@ use Symfony\Component\Config\FileLocator;
 use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentSlider;
+use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 class WebEtDesignCmsExtension extends Extension
 {
@@ -88,12 +90,12 @@ class WebEtDesignCmsExtension extends Extension
     {
         $collector = DoctrineCollector::getInstance();
 
-            $collector->addInheritanceType(AbstractCmsRoute::class, ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE);
-            $collector->addDiscriminator(AbstractCmsRoute::class, 'base', CmsRoute::class);
-            $collector->addDiscriminatorColumn(AbstractCmsRoute::class, [
-                'name' => 'discr',
-                'type' => 'string'
-            ]);
+        $collector->addInheritanceType(AbstractCmsRoute::class, ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE);
+        $collector->addDiscriminator(AbstractCmsRoute::class, 'base', CmsRoute::class);
+        $collector->addDiscriminatorColumn(AbstractCmsRoute::class, [
+            'name' => 'discr',
+            'type' => 'string'
+        ]);
         if ($config['admin']['configuration']['entity']['route'] !== CmsRoute::class) {
             $collector->addDiscriminator(AbstractCmsRoute::class, 'override', $config['admin']['configuration']['entity']['route']);
         }
@@ -128,6 +130,55 @@ class WebEtDesignCmsExtension extends Extension
                 ],
             ],
             'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
+            'fieldName'     => 'site',
+            'targetEntity'  => $config['admin']['configuration']['entity']['site'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'pages',
+            'joinColumns'   => [
+                [
+                    'name'                 => 'site_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsSite::class, 'mapOneToMany', [
+            'fieldName'     => 'pages',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => 'site',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapManyToMany', [
+            'fieldName'    => 'crossSitePages',
+            'targetEntity' => $config['admin']['configuration']['entity']['page'],
+            'cascade'      => [],
+            'joinTable'    => [
+                'name'               => 'cms__page_has_page',
+                'joinColumns'        => [
+                    'page_id' => [
+                        'name'                 => 'page_id',
+                        'referencedColumnName' => 'id',
+                        'onDelete'             => 'CASCADE',
+                    ]
+                ],
+                'inverseJoinColumns' => [
+                    'associated_page_id' => [
+                        'name'                 => 'associated_page_id',
+                        'referencedColumnName' => 'id',
+                        'onDelete'             => 'CASCADE',
+                    ],
+                ]
+            ]
         ]);
 
     }

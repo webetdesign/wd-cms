@@ -8,6 +8,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 class ExtraLoader implements LoaderInterface
 {
@@ -36,8 +37,15 @@ class ExtraLoader implements LoaderInterface
 
         /** @var CmsRoute $cmsRoute */
         foreach ($cmsRoutes as $cmsRoute) {
+            /** @var CmsSite $cmsSite */
+            $cmsSite = $cmsRoute->getPage()->getSite();
+            if ($cmsSite) {
+                $langPrefix = !empty($cmsSite->getLocale()) && !$cmsSite->isHostMultilingual() ? '/'. $cmsSite->getLocale() : null;
+                $host = !empty($cmsSite->getHost()) ? $cmsSite->getHost() : null;
+            }
+
             // prepare a new route
-            $pattern = $cmsRoute->getPath();
+            $pattern = (isset($langPrefix) && !empty($langPrefix) ? $langPrefix : '') . $cmsRoute->getPath();
             $defaults = [
                 '_controller' => !$cmsRoute->getPage()->isActive() ? 'WebEtDesign\CmsBundle\Controller\CmsController::pageDisabled' :
                     $cmsRoute->getController() ?? 'WebEtDesign\CmsBundle\Controller\CmsController::index',
@@ -49,6 +57,9 @@ class ExtraLoader implements LoaderInterface
                 $requirements = json_decode($cmsRoute->getRequirements(), true);
             }
             $route = new Route($pattern, $defaults, $requirements ?? []);
+            if (!empty($host)) {
+                $route->setHost($host);
+            }
             $route->setMethods($cmsRoute->getMethods());
 
             $routes->add($cmsRoute->getName(), $route);

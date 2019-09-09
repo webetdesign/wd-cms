@@ -9,6 +9,7 @@ namespace WebEtDesign\CmsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 /**
  * @method CmsSite|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,6 +22,15 @@ class CmsSiteRepository extends ServiceEntityRepository
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, CmsSite::class);
+    }
+
+    public function findOther($site)
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->where('s <> :site')
+            ->setParameter('site', $site);
+
+        return $qb->getQuery()->getResult();
     }
 
     // /**

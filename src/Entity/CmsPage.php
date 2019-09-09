@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-use App\Entity\Route;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
@@ -86,10 +85,11 @@ class CmsPage
      */
     private $roles;
 
-    /**
-     * @var null|array
-     */
-    private $locales_links;
+    private $crossSitePages;
+
+    private $site;
+
+    private $referencePage;
 
     /**
      * @return mixed
@@ -146,6 +146,7 @@ class CmsPage
         $this->contents = new ArrayCollection();
         $this->setActive(false);
         $this->roles = [];
+        $this->crossSitePages = new ArrayCollection();
     }
 
     /**
@@ -296,21 +297,57 @@ class CmsPage
         return $this;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getLocalesLinks(): ?array
+    public function getSite()
     {
-        return $this->locales_links;
+        return $this->site;
+    }
+
+    public function setSite($site): self
+    {
+        $this->site = $site;
+
+        return $this;
     }
 
     /**
-     * @param array|null $localesLinks
-     * @return CmsPage
+     * @return Collection|CmsPage[]
      */
-    public function setLocalesLinks(?array $localesLinks): CmsPage
+    public function getCrossSitePages(): Collection
     {
-        $this->locales_links = $localesLinks;
+        return $this->crossSitePages;
+    }
+
+    public function addCrossSitePage(CmsPage $crossSitePage): self
+    {
+        if (!$this->crossSitePages->contains($crossSitePage)) {
+            $this->crossSitePages[] = $crossSitePage;
+        }
+
         return $this;
+    }
+
+    public function removeCrossSitePage(CmsPage $crossSitePage): self
+    {
+        if ($this->crossSitePages->contains($crossSitePage)) {
+            $this->crossSitePages->removeElement($crossSitePage);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReferencePage()
+    {
+        return $this->referencePage;
+    }
+
+    /**
+     * @param mixed $referencePage
+     */
+    public function setReferencePage($referencePage): void
+    {
+        $this->referencePage = $referencePage;
     }
 }

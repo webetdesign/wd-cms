@@ -76,13 +76,6 @@ WebEtDesign\CmsBundle\Entity\CmsPage:
             unique: false
             nullable: true
             precision: 0
-        locales_links:
-            type: array
-            scale: 0
-            length: null
-            unique: false
-            nullable: true
-            precision: 0
         seo_title:
             type: string
             scale: 0
@@ -222,4 +215,16 @@ WebEtDesign\CmsBundle\Entity\CmsPage:
                 route_id:
                     referencedColumnName: id
             orphanRemoval: false
+#    manyToMany:
+#        crossSitePages:
+#            targetEntity: WebEtDesign\CmsBundle\Entity\CmsPage
+#            joinTable:
+#                name: cms__page_has_page
+#                joinColumns:
+#                    page_id:
+#                        referencedColumnName: id
+#                inverseJoinColumns:
+#                    associated_page_id:
+#                        referencedColumnName: id
+
     lifecycleCallbacks: {  }
