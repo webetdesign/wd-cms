@@ -4,7 +4,7 @@
   /* Hidden by default */
   position: fixed;
   /* Stay in place */
-  z-index: 200;
+  z-index: 1;
   /* Sit on top */
   left: 0;
   top: 0;
@@ -80,12 +80,3 @@
     opacity: 0; }
   to {
     opacity: 1; } }
-
-.open-modal-edit-content {
-  position: absolute;
-  background: white;
-  border: #008eb9 solid 1px;
-  border-radius: 15px;
-  text-align: center;
-  padding-top: 2px;
-  color: #008eb9; }

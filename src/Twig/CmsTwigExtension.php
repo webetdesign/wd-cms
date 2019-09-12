@@ -2,10 +2,8 @@
 
 namespace WebEtDesign\CmsBundle\Twig;
 
-use App\Entity\User;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock;
@@ -32,7 +30,6 @@ class CmsTwigExtension extends AbstractExtension
     protected $router;
 
     protected $customContents;
-    private   $tokenStorage;
 
     /**
      * @inheritDoc
@@ -43,8 +40,7 @@ class CmsTwigExtension extends AbstractExtension
         $customContents,
         Container $container,
         Environment $twig,
-        TemplateProvider $templateProvider,
-        TokenStorage $tokenStorage
+        TemplateProvider $templateProvider
     ) {
         $this->em                  = $entityManager;
         $this->router              = $router;
@@ -52,7 +48,6 @@ class CmsTwigExtension extends AbstractExtension
         $this->container           = $container;
         $this->twig                = $twig;
         $this->sharedBlockProvider = $templateProvider;
-        $this->tokenStorage = $tokenStorage;
     }
 
 
@@ -150,30 +145,14 @@ class CmsTwigExtension extends AbstractExtension
     }
 
     public function renderContent($content, $type = "text"){
-        /** @var User $user */
-        $user = $this->tokenStorage->getToken()->getUser();
-
-
-        if ($user != "anon." && $user->hasRole('ROLE_ADMIN')){
-            $value = "<button style='display: none' id='btn-edit-content-" . $content->getId() . "' data-id='" . $content->getId() . "'  class='open-modal-edit-content'>";
-            $value .= "<i  data-id='" . $content->getId() . "' class='fa fa-edit'></i></button>";
-            $value .= $this->addClassToContent($content->getValue(), $content->getId());
+        if (true){
+            $value = "<button data-id='" . $content->getId() . "'  class='open-modal-edit-content'><i  data-id='" . $content->getId() . "' class='fa fa-edit'></i></button>" . $content->getValue();
         }else{
-            $value = $content->getValue();
+            $value = $content;
         }
+
 
         return $value;
-    }
-
-    private function addClassToContent($content, $id){
-        $chev = strpos($content, ">");
-
-        if (!$chev || $content[0] !== '<'){
-            $value = "<span class='text-edit-content' data-btn='" . $id . "'>" . $content . "</span>";
-        }else{
-            $value = substr($content, 0, $chev ) . " class='text-edit-content' data-btn='" . $id . "'>" . substr($content, $chev + 1 );
-        }
-        return "<div id='div-content-" . $id . "'>" . $value . "</div>";
     }
 
     public function renderSharedBlock(CmsSharedBlock $block)
