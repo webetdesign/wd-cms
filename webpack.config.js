@@ -16,10 +16,13 @@ function setDevTool () {
 }
 
 const config = {
-  entry: path.resolve('./assets/js/app.js'),
+  entry: {
+    cms_admin: path.resolve('./assets/js/app.js'),
+    cms_front: path.resolve('./assets/js/front.js')
+  },
   output: {
     path: path.resolve('./src/Resources/public'),
-    filename: 'cms_admin.js',
+    filename: '[name].js',
   },
   devtool: setDevTool(),
   module: {
@@ -41,7 +44,7 @@ const config = {
     ]
   },
   plugins: [
-    new ExtractTextWebpackPlugin("cms_admin.css")
+      new ExtractTextWebpackPlugin("[name].css")
   ]
 };
 
