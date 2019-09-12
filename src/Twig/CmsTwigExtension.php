@@ -81,7 +81,6 @@ class CmsTwigExtension extends AbstractExtension
      */
     public function cmsRenderContent($object, $content_code)
     {
-
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
             ->findOneByObjectAndContentCodeAndType(
@@ -142,7 +141,18 @@ class CmsTwigExtension extends AbstractExtension
             return $result;
         }
 
-        return $content->getValue();
+        return $this->renderContent($content);
+    }
+
+    public function renderContent($content, $type = "text"){
+        if (true){
+            $value = "<button data-id='" . $content->getId() . "'  class='open-modal-edit-content'><i  data-id='" . $content->getId() . "' class='fa fa-edit'></i></button>" . $content->getValue();
+        }else{
+            $value = $content;
+        }
+
+
+        return $value;
     }
 
     public function renderSharedBlock(CmsSharedBlock $block)
@@ -181,6 +191,7 @@ class CmsTwigExtension extends AbstractExtension
                 throw new Exception($message);
             }
         }
+
 
         return $content->getMedia();
     }
