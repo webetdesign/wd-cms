@@ -2,8 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Services;
 
-
-use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\DataTransformerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 
 abstract class AbstractCustomContent implements CustomContentInterface
@@ -12,7 +11,7 @@ abstract class AbstractCustomContent implements CustomContentInterface
 
     abstract function getFormType(): string;
 
-    abstract function getCallbackTransformer(): CallbackTransformer;
+    abstract function getCallbackTransformer(): DataTransformerInterface;
 
     abstract function render(CmsContent $content);
 }

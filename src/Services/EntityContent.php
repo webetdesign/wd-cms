@@ -6,6 +6,7 @@ namespace WebEtDesign\CmsBundle\Services;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -47,7 +48,7 @@ class EntityContent extends AbstractCustomContent
         ];
     }
 
-    public function getCallbackTransformer(): CallbackTransformer
+    public function getCallbackTransformer(): DataTransformerInterface
     {
         return new CallbackTransformer(
             function ($value) {
