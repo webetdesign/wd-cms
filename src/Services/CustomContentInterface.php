@@ -2,8 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Services;
 
-
-use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\DataTransformerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 
 interface CustomContentInterface
@@ -12,7 +11,7 @@ interface CustomContentInterface
 
     public function getFormType(): string;
 
-    public function getCallbackTransformer(): CallbackTransformer;
+    public function getCallbackTransformer(): DataTransformerInterface;
 
     public function render(CmsContent $content);
 }
