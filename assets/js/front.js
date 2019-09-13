@@ -1,5 +1,7 @@
 import '../sass/cms_front.scss'
 import $ from "jquery"
+global.$ = global.jQuery = $
+
 
 $(document).ready(function() {
     function lauchModalEditContent(id) {
@@ -8,17 +10,50 @@ $(document).ready(function() {
 
         if (id){
             $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit', function( response ) {
-                $("#modalEditContentBody").html(response)
+                var modal = $("#modalEditContentBody");
+                modal.html(response)
 
-                $("#modalEditContentBody").find('form')[0].onsubmit=function(e) {
+                var modalForm = modal.find('form')[0];
+
+                var uniqid = modalForm[0].name.substring(0, modalForm[0].name.indexOf('['));
+
+
+                modalForm.onsubmit=function(e) {
                     e.preventDefault();
 
-                    let form = $(e.target).serialize()
+                    if (Object.entries(CKEDITOR.instances).length){
+                        for(var instanceName in CKEDITOR.instances)
+                            CKEDITOR.instances[instanceName].updateElement();
+                    }
 
-                    var uniqid = e.target[0].name.substring(0, e.target[0].name.indexOf('['))
+                    let form = $(e.target).serialize();
+                    var form_value = $(e.target).serializeArray();
+                    console.log(e.target);
 
+                    $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit?uniqid=' + uniqid, form).done(function() {
+                        $(form_value).each(function(index, element ) {
+                            if (element.name === uniqid + '[value]'){
+                                var chev = (element.value).indexOf(">");
 
-                    $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit?uniqid=' + uniqid, form)
+                                if (!chev || element.value[0] !== '<'){
+                                    var value = "<span class='text-edit-content' data-btn='" + id + "'>" + element.value + "</span>";
+                                }else{
+                                    var value = (element.value).substring(0, chev ) + " class='text-edit-content' data-btn='" + id + "'>" + (element.value).substring(chev + 1 );
+                                }
+
+                                var divContent = $("#div-content-" + id);
+                                $(divContent).html(value)
+
+                                $(divContent[0].firstChild).hover( function(e) {
+                                    var btn = $("#div-content-" + id)[0].firstChild.dataset.btn;
+
+                                    $("#btn-edit-content-" + btn).show().delay(2000).fadeOut();
+                                })
+
+                                modal.prepend('<div class="alert alert-success" role="alert">Modification effectuée</div>')
+                            }
+                        })
+                    })
 
                 }
 
@@ -27,11 +62,17 @@ $(document).ready(function() {
         }
     }
 
+    function printLoader(){
+        $("#modalEditContentBody").html('<div style="text-align: center; width: 100%">\n' +
+            '    <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>\n' +
+            '</div>'
+        )
+    }
+
     var classname = document.getElementsByClassName("open-modal-edit-content");
 
     for (var i = 0; i < classname.length; i++) {
         classname[i].addEventListener('click', function(e) {
-            // console.log(e.target.next());
             lauchModalEditContent(e.target.dataset["id"])
         }, false);
     }
@@ -44,11 +85,25 @@ $(document).ready(function() {
 // When the user clicks on <span> (x), close the modal
     span.onclick = function() {
         modal.style.display = "none";
+        $("button[id^='btn-edit-content']").hide();
+        printLoader()
     }
 
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";
+            $("button[id^='btn-edit-content']").hide();
+            printLoader()
         }
     }
+
+    $(".text-edit-content").hover( function(e) {
+        if (!e.target.dataset.btn){
+            var btn = e.target.parentNode.dataset.btn;
+        }
+        var btn = e.target.dataset.btn;
+
+        $("#btn-edit-content-" + btn).show().delay(2000).fadeOut();
+    })
+
 })
