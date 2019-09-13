@@ -104,6 +104,7 @@ services:
           - '@service_container'
           - '@twig'
           - '@cms.block_provider'
+          - '@security.token_storage'
         tags:
           - { name: twig.extension }
         public: true
