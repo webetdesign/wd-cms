@@ -39,10 +39,10 @@ final class CmsContentAdmin extends AbstractAdmin
         string $media_class,
         Container $container
     ) {
-        $this->em             = $em;
+        $this->em = $em;
         $this->customContents = $contentTypeOption;
-        $this->media_class    = $media_class;
-        $this->container      = $container;
+        $this->media_class = $media_class;
+        $this->container = $container;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -83,7 +83,7 @@ final class CmsContentAdmin extends AbstractAdmin
         $formMapper->getFormBuilder()->setMethod('patch');
 
         $roleAdmin = $this->canManageContent();
-        $admin     = $this;
+        $admin = $this;
 
         $formMapper->add('active', null, [
             'label' => 'Actif',
@@ -94,8 +94,8 @@ final class CmsContentAdmin extends AbstractAdmin
             [
                 'label' => 'Libéllé',
                 'attr'  => [
-                    'class' => 'admin_restriction'
-                ]
+                    'class' => 'admin_restriction',
+                ],
             ]
         );
 
@@ -131,7 +131,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         ],
                         [
                             'inline' => 'table',
-                            'edit'   => 'inline'
+                            'edit'   => 'inline',
                         ]
                     );
                     break;
@@ -165,7 +165,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         ],
                         [
                             "link_parameters" => [
-                                'context' => 'cms_page'
+                                'context' => 'cms_page',
                             ],
                         ]
                     );
@@ -248,6 +248,10 @@ final class CmsContentAdmin extends AbstractAdmin
                         $contentService->getFormType(),
                         $contentService->getFormOptions()
                     );
+
+                    if (method_exists($contentService, 'getEventSubscriber')) {
+                        $formMapper->getFormBuilder()->get('value')->addEventSubscriber($contentService->getEventSubscriber());
+                    }
 
                     $formMapper->getFormBuilder()->get('value')->addModelTransformer($contentService->getCallbackTransformer());
 
