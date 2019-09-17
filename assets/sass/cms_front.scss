@@ -67,12 +67,22 @@
     to {opacity: 1}
 }
 
-.open-modal-edit-content{
+.open-modal-edit-content, .open-modal-edit-media{
     position : absolute;
     background : white;
-    border: #008eb9 solid 1px;
     border-radius: 15px;
     text-align: center;
     padding-top: 2px;
+    z-index : 200;
+}
+
+.open-modal-edit-content{
+    border: #008eb9 solid 1px;
     color : #008eb9;
+}
+
+
+.open-modal-edit-media{
+    border: #006281 solid 1px;
+    color : #006281;
 }

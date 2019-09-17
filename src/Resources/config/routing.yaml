@@ -1,0 +1,3 @@
+edition.front.get.media:
+  path: /editionFront/getMedia/{id}/{format}
+  controller: 'WebEtDesignCmsBundle:Media:getMedia'
