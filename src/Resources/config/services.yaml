@@ -162,6 +162,7 @@ services:
     # ===============================================
 
     cms.media.provider.svg:
+        public: true
         class: WebEtDesign\CmsBundle\Provider\SvgProvider
         tags:
             - { name: sonata.media.provider }
@@ -178,6 +179,7 @@ services:
             - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/SVG/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/SVG/view_svg.html.twig' }]]
 
     cms.media.provider.video:
+        public: true
         class: WebEtDesign\CmsBundle\Provider\VideoProvider
         tags:
             - { name: sonata.media.provider }

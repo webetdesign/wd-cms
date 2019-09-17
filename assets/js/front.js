@@ -5,7 +5,7 @@ global.$ = global.jQuery = $
 
 $(document).ready(function() {
     function launchModalEditContent(id) {
-        // Get the modal
+        removeAlert()
         if (id){
             $("#modalEditContent").show()
             $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit', function( response ) {
@@ -30,6 +30,7 @@ $(document).ready(function() {
                     var form_value = $(e.target).serializeArray();
 
                     $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit?uniqid=' + uniqid, form).done(function() {
+                        removeAlert()
                         $(form_value).each(function(index, element ) {
                             if (element.name === uniqid + '[value]'){
                                 var chev = (element.value).indexOf(">");
@@ -48,8 +49,7 @@ $(document).ready(function() {
 
                                     $("#btn-edit-content-" + btn).show().delay(2000).fadeOut();
                                 })
-
-                                modal.prepend('<div class="alert alert-success" role="alert">Modification effectuée</div>')
+                                showSuccess("modalEditContentBody")
                             }
                         })
                     })
@@ -61,7 +61,7 @@ $(document).ready(function() {
     }
 
     window.launchModalEditMedia = function(id, format, idImg) {
-        removeError()
+        removeAlert()
         if (id){
             $("#modalEditContent").show()
             $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit', function( response ) {
@@ -86,36 +86,41 @@ $(document).ready(function() {
                     let form = $(e.target).serialize();
 
                     $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit?uniqid=' + uniqid, form).done(function(response) {
-                        modalBody.prepend('<div class="alert alert-success" role="alert">Modification effectuée</div>');
+                        showSuccess("modalEditContentBody")
                     })
                 }
             })
         }
     }
 
-    function printLoader(){
-        $("#modalEditContentBody").html('<div style="text-align: center; width: 100%">\n' +
-            '    <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>\n' +
-            '</div>'
-        )
-        $("#modalListMediaBody").html('<div style="text-align: center; width: 100%">\n' +
+    function printLoader(id){
+        $("#" + id).html('<div style="text-align: center; width: 100%">\n' +
             '    <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>\n' +
             '</div>'
         )
     }
 
-    function removeError() {
+    function removeAlert() {
+        console.log("pass");
         try {
-            $("body").find('.alert-danger').each(function(index, element) {
+            $("div[class^='alert']").each(function(index, element) {
+                console.log(element);
                 $(element).remove()
             })
         }catch (e) {
-            // console.log(e);
+            console.log(e);
         }
+
     }
 
     function showError(id) {
-        $("#" + id).prepend('<div class="alert alert-danger" role="alert">Une erreur s\'est produite. Veuillez recommencer.</div>')
+        removeAlert()
+        $("#" + id).prepend('<div class="alert alert-danger" role="alert">Une erreur s\'est produite. Veuillez recommencer.</div>');
+    }
+
+    function showSuccess(id) {
+        removeAlert()
+        $("#" + id).prepend('<div class="alert alert-success" role="alert">Modification effectuée</div>');
     }
 
     function setCatchMediaList(uniqid, format, idImg){
@@ -154,7 +159,7 @@ $(document).ready(function() {
         var form = $("#modalEditContentBody").find('form')[0];
         var inputs = $(form).find('input');
 
-        removeError()
+        removeAlert()
         inputs.each(function(index, input) {
             if ((input.name).includes('media')){
                 var id = link.attributes.objectid.value;
@@ -217,7 +222,7 @@ $(document).ready(function() {
         modal.style.display = "none";
         $("button[id^='btn-edit-content']").hide();
         $("button[id^='btn-edit-media']").hide();
-        printLoader()
+        printLoader('modalEditContentBody')
     }
 
 
@@ -229,13 +234,13 @@ $(document).ready(function() {
         if (event.target == modal) {
             modal.style.display = "none";
             $("button[id^='btn-edit-content']").hide();
-            printLoader()
+            printLoader('modalEditContentBody')
         }
 
         if (event.target == modalMedia) {
             modalMedia.style.display = "none";
             $("button[id^='btn-edit-media']").hide();
-            printLoader()
+            printLoader('modalListMediaBody')
         }
     }
 

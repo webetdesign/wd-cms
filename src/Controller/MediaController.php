@@ -3,20 +3,20 @@
 namespace WebEtDesign\CmsBundle\Controller;
 
 use App\Entity\Media;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class MediaController extends Controller
+class MediaController extends AbstractController
 {
-    public function getMediaAction(Request $request, $id = 0, $format = 'big'){
+    public function getMediaAction(Request $request,  $id = 0, $format = 'big'){
         /** @var Media $media */
         $media = $this->getDoctrine()->getManager()->getRepository(Media::class)->findOneBy([
             "id" => $id
         ]);
 
         if ($media){
-            $provider = $this->container->get($media->getProviderName());
+            $provider = $this->get($media->getProviderName());
             $format = $provider->getFormatName($media, $format);
 
 
