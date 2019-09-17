@@ -17,6 +17,9 @@ $(document).ready(function() {
 
                 var uniqid = modalForm[0].name.substring(0, modalForm[0].name.indexOf('['));
 
+                var send = $(modal).find('.btn-success')[0];
+                send.parentNode.replaceWith(send)
+
 
                 modalForm.onsubmit=function(e) {
                     e.preventDefault();
@@ -60,7 +63,7 @@ $(document).ready(function() {
         }
     }
 
-    window.launchModalEditMedia = function(id, format, idImg) {
+    window.launchModalEditMedia = function(id, format, idImg, idMedia) {
         removeAlert()
         if (id){
             $("#modalEditContent").show()
@@ -68,10 +71,13 @@ $(document).ready(function() {
                 var modalBody = $("#modalEditContentBody");
                 modalBody.html(response);
 
+                ($(modalBody).find('.btn-warning')[0]).remove();
+
+                var send = ($(modalBody).find('.btn-success')[1])
+                send.parentNode.replaceWith(send)
+
                 var modalForm = modalBody.find('form')[0];
                 var uniqid = modalForm[0].name.substring(0, modalForm[0].name.indexOf('['));
-
-                ($(modalBody).find('.btn-warning')[0]).remove();
 
                 ($(modalBody).find('.btn-info')).on('click', function(e) {
                     e.preventDefault();
@@ -79,9 +85,60 @@ $(document).ready(function() {
                     loadMedia(uniqid, format, idImg)
                 })
 
+                var old = $(modalBody).find('.btn-danger')[0];
+                var parent = old.parentNode;
+
+                var del = document.createElement('button');
+                del.setAttribute('class', 'btn btn-danger');
+                del.setAttribute('id', 'delete-media');
+
+                del.textContent = old.title;
+                parent.replaceWith(del)
+
+                $("#delete-media").on('click', function(e) {
+                    e.preventDefault()
+
+                    $.get('/admin/app/media/' + idMedia + '/delete?context=default&hide_context=0', function(response) {
+                        modalBody.append(response)
+
+
+                        var formDelete = modalBody.find('form')[1];
+                        var old = $(formDelete).find('.btn-success')[0];
+
+                        var parent = old.parentNode;
+
+                        var edit = document.createElement('button');
+                        edit.setAttribute('class', 'btn btn-info');
+
+                        edit.textContent = "Annuler";
+                        old.remove()
+                        parent.append(edit)
+
+                        $(edit).on('click', function(e) {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            $($(".sonata-ba-delete")[0]).remove()
+                        })
+
+                        formDelete.onsubmit=function(e) {
+                            e.preventDefault();
+                            let form = $(e.target).serialize();
+
+                            $.post('/admin/app/media/' + idMedia + '/delete?context=default&hide_context=0', form).done(function(response) {
+                                showSuccess("modalEditContentBody", "delete")
+                                $($(".sonata-ba-delete")[0]).remove()
+                            }).fail(
+                                showError("modalEditContentBody"),
+                                $($(".sonata-ba-delete")[0]).remove()
+                            )
+                        }
+
+                    })
+
+                })
+
                 modalForm.onsubmit=function(e) {
                     e.preventDefault();
-
 
                     let form = $(e.target).serialize();
 
@@ -101,7 +158,6 @@ $(document).ready(function() {
     }
 
     function removeAlert() {
-        console.log("pass");
         try {
             $("div[class^='alert']").each(function(index, element) {
                 console.log(element);
@@ -118,9 +174,15 @@ $(document).ready(function() {
         $("#" + id).prepend('<div class="alert alert-danger" role="alert">Une erreur s\'est produite. Veuillez recommencer.</div>');
     }
 
-    function showSuccess(id) {
+    function showSuccess(id, type = "modify") {
         removeAlert()
-        $("#" + id).prepend('<div class="alert alert-success" role="alert">Modification effectuée</div>');
+        switch (type) {
+            case 'modify':
+                $("#" + id).prepend('<div class="alert alert-success" role="alert">Modification effectuée</div>');
+                break;
+            case 'delete':
+                $("#" + id).prepend('<div class="alert alert-success" role="alert">Suppression effectuée</div>');
+        }
     }
 
     function setCatchMediaList(uniqid, format, idImg){
@@ -251,7 +313,7 @@ $(document).ready(function() {
             var btn = e.target.dataset.btn;
         }
 
-        $("#btn-edit-content-" + btn).show().delay(2000).fadeOut();
+        $("#btn-edit-content-" + btn).show().delay(5000).fadeOut();
     })
 
 })

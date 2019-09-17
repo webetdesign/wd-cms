@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
+use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Container;
@@ -294,5 +295,16 @@ final class CmsContentAdmin extends AbstractAdmin
         }
 
         return array_merge(CmsContentTypeEnum::getChoices(), $customs);
+    }
+
+    protected function configureRoutes(RouteCollection $collection)
+    {
+
+//        dump($this);
+//        die;
+//
+//        if ($this->isGranted('ROLE_ADMIN_CMS')){
+//            $collection->remove('delete');
+//        }
     }
 }

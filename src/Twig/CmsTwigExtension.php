@@ -248,13 +248,13 @@ class CmsTwigExtension extends AbstractExtension
         $script .= "var content = $('#" . $id . "');";
         $script .= "content.before(\"<button style='display: none' id='btn-edit-media-" . $content->getId() ."' data-id='" . $content->getId() ."' data-format='" ;
         $script.= $format ."' data-idimg='" . $idImg ."' class='open-modal-edit-media'>";
-        $script .= "<i  data-id='" . $content->getId() . "' class='fa fa-edit'></i></button>\"); console.log('" . $idImg ."');";
+        $script .= "<i  data-id='" . $content->getId() . "' class='fa fa-edit'></i></button>\");";
         $script .= "$('#btn-edit-media-" .  $content->getId() . "').on('click', function(e) {";
-        $script  .="launchModalEditMedia('" . $content->getId() . "','" . $format ."','" . $idImg . "')";
+        $script  .="launchModalEditMedia('" . $content->getId() . "','" . $format ."','" . $idImg . "', " . $content->getMedia()->getId() .")";
         $script .= "}); ";
         $script .= "$(content).hover( function(e) {";
         $script .= "var btn = $('#btn-edit-media-" . $content->getId() ."'); ";
-        $script .= "btn.show().delay(2000).fadeOut();";
+        $script .= "btn.show().delay(5000).fadeOut();";
         $script .= "})";
         $script .= "</script>";
 
