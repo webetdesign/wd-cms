@@ -4,12 +4,12 @@ global.$ = global.jQuery = $
 
 
 $(document).ready(function() {
-    function lauchModalEditContent(id) {
+    function launchModalEditContent(id) {
         // Get the modal
-        var modal = document.getElementById("modalEditContent");
-
         if (id){
+            $("#modalEditContent").show()
             $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit', function( response ) {
+
                 var modal = $("#modalEditContentBody");
                 modal.html(response)
 
@@ -28,7 +28,6 @@ $(document).ready(function() {
 
                     let form = $(e.target).serialize();
                     var form_value = $(e.target).serializeArray();
-                    console.log(e.target);
 
                     $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit?uniqid=' + uniqid, form).done(function() {
                         $(form_value).each(function(index, element ) {
@@ -58,7 +57,39 @@ $(document).ready(function() {
                 }
 
             });
-            modal.style.display = "block";
+        }
+    }
+
+    window.launchModalEditMedia = function(id, format, idImg) {
+        removeError()
+        if (id){
+            $("#modalEditContent").show()
+            $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit', function( response ) {
+                var modalBody = $("#modalEditContentBody");
+                modalBody.html(response);
+
+                var modalForm = modalBody.find('form')[0];
+                var uniqid = modalForm[0].name.substring(0, modalForm[0].name.indexOf('['));
+
+                ($(modalBody).find('.btn-warning')[0]).remove();
+
+                ($(modalBody).find('.btn-info')).on('click', function(e) {
+                    e.preventDefault();
+                    toggleMediaAndContent()
+                    loadMedia(uniqid, format, idImg)
+                })
+
+                modalForm.onsubmit=function(e) {
+                    e.preventDefault();
+
+
+                    let form = $(e.target).serialize();
+
+                    $.post('admin/webetdesign/cms/cmscontent/'+ id +'/edit?uniqid=' + uniqid, form).done(function(response) {
+                        modalBody.prepend('<div class="alert alert-success" role="alert">Modification effectuée</div>');
+                    })
+                }
+            })
         }
     }
 
@@ -67,26 +98,131 @@ $(document).ready(function() {
             '    <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>\n' +
             '</div>'
         )
+        $("#modalListMediaBody").html('<div style="text-align: center; width: 100%">\n' +
+            '    <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>\n' +
+            '</div>'
+        )
+    }
+
+    function removeError() {
+        try {
+            $("body").find('.alert-danger').each(function(index, element) {
+                $(element).remove()
+            })
+        }catch (e) {
+            // console.log(e);
+        }
+    }
+
+    function showError(id) {
+        $("#" + id).prepend('<div class="alert alert-danger" role="alert">Une erreur s\'est produite. Veuillez recommencer.</div>')
+    }
+
+    function setCatchMediaList(uniqid, format, idImg){
+        var links = $("#modalListMediaBody").find('.mosaic-box');
+
+        links.each(function(index, link) {
+            $(link).on('click', function(e) {
+                e.preventDefault()
+                catchMediaList(link, uniqid, format, idImg)
+            })
+        })
+    }
+
+    function loadMedia(uniqid, format, idImg, page = 1) {
+        $.get('/admin/app/media/list?context=cms_page&filter[_sort_order]=ASC&filter[_sort_by]=id&filter[_page]=' + page, function(response) {
+            var modalMediaBody = $("#modalListMediaBody");
+
+            modalMediaBody.html(response);
+
+            setCatchMediaList(uniqid, format, idImg)
+            catchPagination(uniqid, format, idImg)
+
+
+            $("div[id^='filter-container']").remove()
+            $(modalMediaBody).find('.navbar').remove()
+
+        })
+    }
+
+    function toggleMediaAndContent() {
+        $('#modalListMedia').toggle()
+        $('#modalEditContent').toggle()
+    }
+
+    function catchMediaList(link, uniqid, format, idImg) {
+        var form = $("#modalEditContentBody").find('form')[0];
+        var inputs = $(form).find('input');
+
+        removeError()
+        inputs.each(function(index, input) {
+            if ((input.name).includes('media')){
+                var id = link.attributes.objectid.value;
+                $(input).val(id);
+
+                $.get('editionFront/getMedia/'+ id + '/' + format).done(function(response) {
+                   if (response.id) {
+                       var divName = $("#field_widget_" + uniqid + "_media");
+                       divName.html('<a href="/admin/app/media/' + response.id +'/edit?context=cms_page&hide_context=0" target="_blank">' + response.name+ '</a>')
+                       $("#" + idImg)[0].href.baseVal = response.link;
+                       $("#" + idImg)[0].src = response.link;
+                       toggleMediaAndContent()
+                   }else{
+                    showError("modalListMediaBody")
+                   }
+                }).fail(function() {
+                    showError("modalListMediaBody")
+                })
+
+            }
+        })
+
+    }
+
+    function catchPagination(uniqid, format, idImg) {
+        var modalMediaBody = $("#modalListMediaBody");
+        var pagination = $(modalMediaBody).find('.pagination');
+        var links = pagination.find('a');
+
+        links.each(function(index, link) {
+            if (link.title !== ""){
+                link.remove()
+            }
+        })
+
+        links = pagination.find('a');
+
+        links.each(function(index, link) {
+            $(link).on('click', function(e) {
+                e.preventDefault()
+                loadMedia(uniqid, format, idImg, index + 1)
+            })
+        })
     }
 
     var classname = document.getElementsByClassName("open-modal-edit-content");
 
     for (var i = 0; i < classname.length; i++) {
         classname[i].addEventListener('click', function(e) {
-            lauchModalEditContent(e.target.dataset["id"])
+            launchModalEditContent(e.target.dataset["id"])
         }, false);
     }
 
     var modal = $("#modalEditContent")[0];
+    var modalMedia = $("#modalListMedia")[0];
 
-// Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close-edit")[0];
+    var span = document.getElementsByClassName("close-edit");
 
-// When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
+    span[0].onclick = function() {
         modal.style.display = "none";
         $("button[id^='btn-edit-content']").hide();
+        $("button[id^='btn-edit-media']").hide();
         printLoader()
+    }
+
+
+    span[1].onclick = function() {
+        toggleMediaAndContent()
     }
 
     window.onclick = function(event) {
@@ -95,13 +231,20 @@ $(document).ready(function() {
             $("button[id^='btn-edit-content']").hide();
             printLoader()
         }
+
+        if (event.target == modalMedia) {
+            modalMedia.style.display = "none";
+            $("button[id^='btn-edit-media']").hide();
+            printLoader()
+        }
     }
 
     $(".text-edit-content").hover( function(e) {
         if (!e.target.dataset.btn){
             var btn = e.target.parentNode.dataset.btn;
+        }else {
+            var btn = e.target.dataset.btn;
         }
-        var btn = e.target.dataset.btn;
 
         $("#btn-edit-content-" + btn).show().delay(2000).fadeOut();
     })

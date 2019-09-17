@@ -75,6 +75,7 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
             new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'], ['is_safe' => ['html']]),
+            new TwigFunction('cms_add_button_media', [$this, 'cmsAddButtonMedia'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -215,6 +216,49 @@ class CmsTwigExtension extends AbstractExtension
 
 
         return $content->getMedia();
+    }
+
+    public function cmsAddButtonMedia(CmsPage $page, $content_code, $id, $format = 'big', $idImg){
+
+        /** @var CmsContent $content */
+        $content = $this->em->getRepository(CmsContent::class)
+            ->findOneByObjectAndContentCodeAndType(
+                $page,
+                $content_code,
+                [
+                    CmsContentTypeEnum::MEDIA,
+                    CmsContentTypeEnum::IMAGE,
+                ]
+            );
+        if (!$content) {
+            if (getenv('APP_ENV') != 'dev') {
+                return null;
+            } else {
+                $message = sprintf(
+                    'No content media found with the code "%s" in page "%s" (#%s)',
+                    $content_code,
+                    $page->getTitle(),
+                    $page->getId()
+                );
+                throw new Exception($message);
+            }
+        }
+
+        $script = "<script>";
+        $script .= "var content = $('#" . $id . "');";
+        $script .= "content.before(\"<button style='display: none' id='btn-edit-media-" . $content->getId() ."' data-id='" . $content->getId() ."' data-format='" ;
+        $script.= $format ."' data-idimg='" . $idImg ."' class='open-modal-edit-media'>";
+        $script .= "<i  data-id='" . $content->getId() . "' class='fa fa-edit'></i></button>\"); console.log('" . $idImg ."');";
+        $script .= "$('#btn-edit-media-" .  $content->getId() . "').on('click', function(e) {";
+        $script  .="launchModalEditMedia('" . $content->getId() . "','" . $format ."','" . $idImg . "')";
+        $script .= "}); ";
+        $script .= "$(content).hover( function(e) {";
+        $script .= "var btn = $('#btn-edit-media-" . $content->getId() ."'); ";
+        $script .= "btn.show().delay(2000).fadeOut();";
+        $script .= "})";
+        $script .= "</script>";
+
+        return $script;
     }
 
     public function cmsSliders(CmsPage $page, $content_code)
