@@ -105,10 +105,11 @@ $(document).ready(function() {
                     e.preventDefault()
 
                     $.get('/admin/app/media/' + idMedia + '/delete?context=default&hide_context=0', function(response) {
-                        modalBody.prepend(response)
+                        modalBody.prepend("<div id='container-alert'></div>")
+                        $("#container-alert").hide().html(response).show(300)
 
 
-                        var formDelete = modalBody.find('form')[1];
+                        var formDelete = modalBody.find('form')[0];
                         var old = $(formDelete).find('.btn-success')[0];
 
                         var parent = old.parentNode;
@@ -123,7 +124,12 @@ $(document).ready(function() {
                         $(edit).on('click', function(e) {
                             e.preventDefault()
                             e.stopPropagation()
-                            $($(".sonata-ba-delete")[0]).remove()
+                            $($(".sonata-ba-delete")[0]).hide(300)
+
+                            setTimeout(function(){
+                                $($(".sonata-ba-delete")[0]).remove()
+                            }, 1000);
+
                         })
 
                         formDelete.onsubmit=function(e) {
@@ -132,10 +138,10 @@ $(document).ready(function() {
 
                             $.post('/admin/app/media/' + idMedia + '/delete?context=default&hide_context=0', form).done(function(response) {
                                 showSuccess("modalEditContentBody", "delete")
-                                $($(".sonata-ba-delete")[0]).remove()
+                                $($(".sonata-ba-delete")[0]).hide(300).remove()
                             }).fail(
                                 showError("modalEditContentBody"),
-                                $($(".sonata-ba-delete")[0]).remove()
+                                $($(".sonata-ba-delete")[0]).hide(300).remove()
                             )
                         }
 
