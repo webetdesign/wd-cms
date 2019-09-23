@@ -105,7 +105,7 @@ $(document).ready(function() {
                     e.preventDefault()
 
                     $.get('/admin/app/media/' + idMedia + '/delete?context=default&hide_context=0', function(response) {
-                        modalBody.append(response)
+                        modalBody.prepend(response)
 
 
                         var formDelete = modalBody.find('form')[1];
@@ -224,6 +224,7 @@ $(document).ready(function() {
             var modalMediaBody = $("#modalAddMediaBody");
             modalMediaBody.html(response);
             var links = modalMediaBody.find('a');
+            $(modalMediaBody.find('.box-body')[0]).addClass('row');
 
             links.each(function(index, link) {
                 $(link).on('click', function(e) {
@@ -360,6 +361,7 @@ $(document).ready(function() {
 
     var modal = $("#modalEditContent")[0];
     var modalMedia = $("#modalListMedia")[0];
+    var modalAddMedia = $("#modalAddMedia")[0];
 
     var span = document.getElementsByClassName("close-edit");
 
@@ -375,6 +377,10 @@ $(document).ready(function() {
         toggleMediaAndContent()
     }
 
+    span[2].onclick = function() {
+        toggleMediaAndContent(2)
+    }
+
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";
@@ -386,6 +392,11 @@ $(document).ready(function() {
             modalMedia.style.display = "none";
             $("button[id^='btn-edit-media']").hide();
             printLoader('modalListMediaBody')
+        }
+
+        if (event.target == modalAddMedia) {
+            modalAddMedia.style.display = "none";
+            printLoader('modalAddMediaBody')
         }
     }
 
