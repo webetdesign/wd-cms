@@ -82,7 +82,13 @@ $(document).ready(function() {
                 ($(modalBody).find('.btn-info')).on('click', function(e) {
                     e.preventDefault();
                     toggleMediaAndContent()
-                    loadMedia(uniqid, format, idImg)
+                    loadMedias(uniqid, format, idImg)
+                })
+
+                $($(modalBody).find('.btn-success')[0]).on('click', function(e) {
+                    e.preventDefault();
+                    loadAdd(uniqid, format, idImg)
+                    toggleMediaAndContent(2)
                 })
 
                 var old = $(modalBody).find('.btn-danger')[0];
@@ -196,7 +202,7 @@ $(document).ready(function() {
         })
     }
 
-    function loadMedia(uniqid, format, idImg, page = 1) {
+    function loadMedias(uniqid, format, idImg, page = 1) {
         $.get('/admin/app/media/list?context=cms_page&filter[_sort_order]=ASC&filter[_sort_by]=id&filter[_page]=' + page, function(response) {
             var modalMediaBody = $("#modalListMediaBody");
 
@@ -212,9 +218,86 @@ $(document).ready(function() {
         })
     }
 
-    function toggleMediaAndContent() {
-        $('#modalListMedia').toggle()
-        $('#modalEditContent').toggle()
+    function loadAdd(uniqid, format, idImg) {
+        var uniqidParent = uniqid;
+        $.get('/admin/app/media/create?context=cms_page&hide_context=0&uniqid=' + uniqidParent, function(response) {
+            var modalMediaBody = $("#modalAddMediaBody");
+            modalMediaBody.html(response);
+            var links = modalMediaBody.find('a');
+
+            links.each(function(index, link) {
+                $(link).on('click', function(e) {
+                    printLoader("modalAddMediaBody")
+                    e.preventDefault()
+                    $.get(link.href, function(response) {
+
+                        modalMediaBody.html(response)
+
+                        var form = modalMediaBody.find('form')[0]
+                        form.onsubmit = function(e) {
+                            e.preventDefault();
+
+                            var formData = new FormData();
+
+                            var provider = form[0]
+                            var file = form[1].files[0]
+                            var token = form[2]
+
+                            var uniqid = form[0].name.substring(0, form[0].name.indexOf('['));
+                            formData.set(uniqid + "[binaryContent]", file , file.name);
+                            formData.set(uniqid + "[providerName]", provider.value);
+                            formData.set(uniqid + "[_token]", token.value);
+
+
+                            var request = new XMLHttpRequest();
+                            request.open("POST", "http://foo.com/submitform.php");
+                            request.send(formData);
+
+                            $.ajax({
+                                url: '/admin/app/media/create?context=cms_page&hide_context=0&uniqid=' + uniqid,
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                type: 'POST',
+                                success: function(response){
+                                    if (response.result.indexOf("ok") > -1){
+                                       $.get('editionFront/getMedia/'+ response.objectId + '/' + format).done(function(response) {
+                                           if (response.id) {
+                                               var divName = $("#field_widget_" + uniqidParent + "_media");
+                                               divName.html('<a href="/admin/app/media/' + response.id +'/edit?context=cms_page&hide_context=0" target="_blank">' + response.name+ '</a>')
+                                               $("#" + idImg)[0].href.baseVal = response.link;
+                                               $("#" + idImg)[0].src = response.link;
+                                               $("#" + uniqidParent + "_media").val(response.id)
+                                               toggleMediaAndContent(2)
+                                           }else{
+                                               showError("modalEditContent")
+                                           }
+                                       }).fail(function() {
+                                           showError("modalEditContent")
+                                       })
+                                   }else{
+                                       modalMediaBody.html(response)
+                                   }
+
+                                }
+                            });
+                        }
+                    })
+                })
+            })
+
+
+        })
+    }
+
+    function toggleMediaAndContent(type = 1) {
+        if (type === 2){
+            $('#modalAddMedia').toggle()
+            $('#modalEditContent').toggle()
+        } else {
+            $('#modalListMedia').toggle()
+            $('#modalEditContent').toggle()
+        }
     }
 
     function catchMediaList(link, uniqid, format, idImg) {
@@ -228,15 +311,15 @@ $(document).ready(function() {
                 $(input).val(id);
 
                 $.get('editionFront/getMedia/'+ id + '/' + format).done(function(response) {
-                   if (response.id) {
-                       var divName = $("#field_widget_" + uniqid + "_media");
-                       divName.html('<a href="/admin/app/media/' + response.id +'/edit?context=cms_page&hide_context=0" target="_blank">' + response.name+ '</a>')
-                       $("#" + idImg)[0].href.baseVal = response.link;
-                       $("#" + idImg)[0].src = response.link;
-                       toggleMediaAndContent()
-                   }else{
-                    showError("modalListMediaBody")
-                   }
+                    if (response.id) {
+                        var divName = $("#field_widget_" + uniqid + "_media");
+                        divName.html('<a href="/admin/app/media/' + response.id +'/edit?context=cms_page&hide_context=0" target="_blank">' + response.name+ '</a>')
+                        $("#" + idImg)[0].href.baseVal = response.link;
+                        $("#" + idImg)[0].src = response.link;
+                        toggleMediaAndContent()
+                    }else{
+                        showError("modalListMediaBody")
+                    }
                 }).fail(function() {
                     showError("modalListMediaBody")
                 })
@@ -262,7 +345,7 @@ $(document).ready(function() {
         links.each(function(index, link) {
             $(link).on('click', function(e) {
                 e.preventDefault()
-                loadMedia(uniqid, format, idImg, index + 1)
+                loadMedias(uniqid, format, idImg, index + 1)
             })
         })
     }
