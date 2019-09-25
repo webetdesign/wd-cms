@@ -23,8 +23,21 @@ function parsePath ($el) {
 }
 
 function buildTable ($el, params) {
-  let defaults = JSON.parse($('.cms_route_default_input').val())
-  let requirements = JSON.parse($('.cms_route_requirements_input').val())
+
+    let defaults;
+    let requirements;
+
+    if ($('.cms_route_default_input').val() === "[]"){
+        defaults = {}
+    }else {
+        defaults = JSON.parse($('.cms_route_default_input').val())
+    }
+
+    if ($('.cms_route_requirements_input').val() === "[]"){
+        requirements = {}
+    }else {
+        requirements = JSON.parse($('.cms_route_requirements_input').val());
+    }
 
   $.each(defaults, param => {
     if (!params.includes(param)) {
@@ -63,10 +76,12 @@ function buildTable ($el, params) {
 
     inputDefault.on('change', function () {
       defaults[params] = $(this).val()
+      console.log(defaults);
       $('.cms_route_default_input').val(JSON.stringify(defaults))
     })
 
     inputRequirement.on('change', function () {
+      console.log(requirements);
       requirements[params] = $(this).val()
       $('.cms_route_requirements_input').val(JSON.stringify(requirements))
     })
