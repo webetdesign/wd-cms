@@ -11,6 +11,7 @@ namespace WebEtDesign\CmsBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
+use Cocur\Slugify\Slugify;
 
 class CmsSite
 {
@@ -48,6 +49,8 @@ class CmsSite
 
     /** @var string */
     private $flagIcon;
+
+    private $menu;
 
     public function __construct()
     {
@@ -210,6 +213,28 @@ class CmsSite
     {
         $this->flagIcon = $flagIcon;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getMenu()
+    {
+        return $this->menu;
+    }
+
+    /**
+     * @param mixed $menu
+     */
+    public function setMenu($menu): void
+    {
+        $this->menu = $menu;
+    }
+
+    public function getSlug(){
+        $slugify = new Slugify();
+        return $slugify->slugify($this->getLabel(), "_");
+    }
+
 
 
 }

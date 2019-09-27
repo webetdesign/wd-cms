@@ -2,6 +2,7 @@ parameters:
   cms.admin.cms_page_listener.class: WebEtDesign\CmsBundle\EventListener\PageAdminListener
   cms.admin.cms_site_listener.class: WebEtDesign\CmsBundle\EventListener\SiteAdminListener
   cms.admin.cms_shared_block_listener.class: WebEtDesign\CmsBundle\EventListener\SharedBlockAdminListener
+  cms.admin.cms_site_entity_listener.class: WebEtDesign\CmsBundle\EventListener\CmsSiteListener
 
 services:
     WebEtDesign\CmsBundle\Form\PageTemplateType:
@@ -90,6 +91,11 @@ services:
           - '%wd_cms.admin.config.entity.route%'
         tags:
             - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildSharedBlock }
+
+    cms.admin.cms_site_entity_listener:
+      class: '%cms.admin.cms_site_entity_listener.class%'
+      public: true
+      tags: [doctrine.event_subscriber]
 
     # ===============================================
     # TWIG EXTENSION

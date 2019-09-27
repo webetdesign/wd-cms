@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -73,7 +74,7 @@ class CmsMenu
 
     /** @var string */
     private $connected;
-    
+
     /** @var string */
     private $role;
 
@@ -81,6 +82,8 @@ class CmsMenu
      * @var null|CmsMenu
      */
     private $moveTarget;
+
+    private $site;
 
     public function __construct()
     {
@@ -357,4 +360,27 @@ class CmsMenu
         $this->role = $role;
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getSite()
+    {
+        return $this->site;
+    }
+
+    /**
+     * @param mixed $site
+     */
+    public function setSite($site): void
+    {
+        $this->site = $site;
+    }
+
+    public function getSlug(){
+        $slugify = new Slugify();
+        return $slugify->slugify($this->getName(), "_");
+    }
+
+
 }

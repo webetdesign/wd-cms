@@ -158,6 +158,22 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
         ]);
 
+        $collector->addAssociation(CmsSite::class, 'mapManyToOne', [
+            'fieldName'     => 'menu',
+            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => 'site',
+            'inversedBy'    => null,
+            'joinColumns'   => [
+                [
+                    'name'                 => 'menu_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
         $collector->addAssociation(CmsPage::class, 'mapManyToMany', [
             'fieldName'    => 'crossSitePages',
             'targetEntity' => $config['admin']['configuration']['entity']['page'],

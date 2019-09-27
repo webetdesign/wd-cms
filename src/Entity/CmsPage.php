@@ -15,7 +15,7 @@ class CmsPage
     use SeoAwareTrait;
     use SmoFacebookTrait;
     use SmoTwitterTrait;
-    
+
 
     /**
      * @var int
@@ -90,6 +90,7 @@ class CmsPage
     private $site;
 
     private $referencePage;
+
 
     /**
      * @return mixed
