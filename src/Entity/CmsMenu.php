@@ -2,29 +2,45 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
+ * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsMenuRepository")
+ * @ORM\Table(name="cms__menu")
+ * @Gedmo\Tree(type="nested")
  */
 class CmsMenu
 {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(type="integer")
+     */
     private $id;
 
     /**
-     * @var null|string
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
     private $name;
 
     /**
-     * @var null|string
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $code;
 
     /**
-     * @var null|string
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=true, name="link_type")
+     *
      */
     private $linkType;
 
@@ -34,28 +50,43 @@ class CmsMenu
     private $page;
 
     /**
-     * @var null|string
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=true, name="link_value")
      *
      */
     private $linkValue;
 
     /**
-     */
-    private $lft;
-
-    /**
+     * @var int
+     * @Gedmo\TreeLevel
+     * @ORM\Column(type="integer", nullable=false)
+     *
      */
     private $lvl;
 
     /**
+     * @var int
+     * @Gedmo\TreeLeft
+     * @ORM\Column(type="integer", nullable=false)
+     *
+     */
+    private $lft;
+
+    /**
+     * @var int
+     * @Gedmo\TreeRight
+     * @ORM\Column(type="integer", nullable=false)
+     *
      */
     private $rgt;
 
     /**
+     * @Gedmo\TreeRoot
      */
     private $root;
 
     /**
+     * @Gedmo\TreeParent
      */
     private $parent;
 
@@ -68,19 +99,33 @@ class CmsMenu
      */
     private $moveMode;
 
-    /** @var string */
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     *
+     */
     private $classes;
 
-    /** @var string */
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
     private $connected;
-    
-    /** @var string */
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     *
+     */
     private $role;
 
     /**
      * @var null|CmsMenu
      */
     private $moveTarget;
+
+
+    private $site;
 
     public function __construct()
     {
@@ -357,4 +402,27 @@ class CmsMenu
         $this->role = $role;
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getSite()
+    {
+        return $this->site;
+    }
+
+    /**
+     * @param mixed $site
+     */
+    public function setSite($site): void
+    {
+        $this->site = $site;
+    }
+
+    public function getSlug(){
+        $slugify = new Slugify();
+        return $slugify->slugify($this->getName(), "_");
+    }
+
+
 }

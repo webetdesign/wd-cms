@@ -45,6 +45,8 @@ class CmsHelper
         /** @var CmsPage $page */
         $page = $this->getPage($request);
 
+        $request->setLocale($this->getLocale($request));
+
         return new Response(
             $this->twig->render(
                 $this->provider->getTemplate($page->getTemplate()),
@@ -56,6 +58,15 @@ class CmsHelper
                 )
             )
         );
+    }
+
+    public function getLocale(Request $request)
+    {
+        /** @var CmsPage $page */
+        $page = $this->getPage($request);
+
+        return $page->getSite() ? $page->getSite()->getLocale() : null;
+
     }
 
     public function isGranted(Request $request)

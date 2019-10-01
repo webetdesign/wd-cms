@@ -33,6 +33,13 @@ class CmsSiteRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findSitesMenu()
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->where('s.menu > 0');
+        return $qb->getQuery()->getResult();
+    }
+
     // /**
     //  * @return CmsPage[] Returns an array of CmsPage objects
     //  */

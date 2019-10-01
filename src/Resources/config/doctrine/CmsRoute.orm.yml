@@ -1,4 +1,0 @@
-WebEtDesign\CmsBundle\Entity\CmsRoute:
-    type: entity
-    table: cms__route
-    lifecycleCallbacks: {  }

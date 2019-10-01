@@ -11,43 +11,71 @@ namespace WebEtDesign\CmsBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
+use Cocur\Slugify\Slugify;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsSiteRepository")
+ * @ORM\Table(name="cms__site")
+ */
 class CmsSite
 {
     /**
-     * @var int
-     *
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
-     * @var string|null
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
+     *
      */
     private $label;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $locale;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $host;
 
-    /** @var boolean */
-    private $hostMultilingual = 0;
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean", options={"default" : 0})
+     *
+     */
+    private $hostMultilingual;
 
-    /** @var boolean */
-    private $default = 0;
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean", options={"default" : 0})
+     *
+     */
+    private $default;
 
     /** @var ArrayCollection|PersistentCollection */
     private $pages;
 
-    /** @var string */
+    /**
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     */
     private $flagIcon;
+
+    /**
+     * @var mixed $menu
+     */
+    private $menu;
 
     public function __construct()
     {
@@ -129,14 +157,14 @@ class CmsSite
     }
 
     /**
-     * @return Collection|CmsPage[]
+     *
      */
     public function getPages(): Collection
     {
         return $this->pages;
     }
 
-    public function addPage(CmsPage $page): self
+    public function addPage($page): self
     {
         if (!$this->pages->contains($page)) {
             $this->pages[] = $page;
@@ -146,7 +174,7 @@ class CmsSite
         return $this;
     }
 
-    public function removePage(CmsPage $page): self
+    public function removePage($page): self
     {
         if ($this->pages->contains($page)) {
             $this->pages->removeElement($page);
@@ -161,9 +189,8 @@ class CmsSite
 
     /**
      * @param bool $hostMultilingual
-     * @return CmsSite
      */
-    public function setHostMultilingual(bool $hostMultilingual): CmsSite
+    public function setHostMultilingual(bool $hostMultilingual)
     {
         $this->hostMultilingual = $hostMultilingual;
         return $this;
@@ -179,9 +206,8 @@ class CmsSite
 
     /**
      * @param bool $default
-     * @return CmsSite
      */
-    public function setDefault(bool $default): CmsSite
+    public function setDefault(bool $default)
     {
         $this->default = $default;
         return $this;
@@ -210,6 +236,28 @@ class CmsSite
     {
         $this->flagIcon = $flagIcon;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getMenu()
+    {
+        return $this->menu;
+    }
+
+    /**
+     * @param mixed $menu
+     */
+    public function setMenu($menu): void
+    {
+        $this->menu = $menu;
+    }
+
+    public function getSlug(){
+        $slugify = new Slugify();
+        return $slugify->slugify($this->getLabel(), "_");
+    }
+
 
 
 }

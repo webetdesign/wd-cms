@@ -86,16 +86,24 @@ class CmsMenuAdminController extends CRUDController
 
         $root = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu')->getByCode('root');
 
+        $menuRepo = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu');
+
+        $rootNodes = $menuRepo->findRoot();
+        $sites = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->findSitesMenu();
+
         return $this->renderWithExtraParams($template, [
-            'root'           => $root,
             'action'         => 'list',
             'form'           => $formView,
+            'root'           => $root,
             'datagrid'       => $datagrid,
+            'rootNodes'      => $rootNodes,
+            'sites'          => $sites,
             'csrf_token'     => $this->getCsrfToken('sonata.batch'),
             'export_formats' => $this->has('sonata.admin.admin_exporter') ?
                 $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
                 $this->admin->getExportFormats(),
         ], null);
+
     }
 
 
@@ -460,6 +468,7 @@ class CmsMenuAdminController extends CRUDController
 
         $twig->getRuntime(FormRenderer::class)->setTheme($formView, $theme);
     }
+
 
 
 }
