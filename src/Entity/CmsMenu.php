@@ -58,19 +58,19 @@ class CmsMenu
 
     /**
      * @var int
-     * @Gedmo\TreeLeft
-     * @ORM\Column(type="integer", nullable=false)
-     *
-     */
-    private $lft;
-
-    /**
-     * @var int
      * @Gedmo\TreeLevel
      * @ORM\Column(type="integer", nullable=false)
      *
      */
     private $lvl;
+
+    /**
+     * @var int
+     * @Gedmo\TreeLeft
+     * @ORM\Column(type="integer", nullable=false)
+     *
+     */
+    private $lft;
 
     /**
      * @var int

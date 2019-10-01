@@ -70,7 +70,7 @@ class CmsContent
 
     /**
      * @var boolean
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $parent_heritance;
 

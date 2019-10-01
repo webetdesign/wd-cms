@@ -73,7 +73,7 @@ class CmsSite
     private $flagIcon;
 
     /**
-     * @var CmsMenu $menu
+     * @var mixed $menu
      */
     private $menu;
 
@@ -157,14 +157,14 @@ class CmsSite
     }
 
     /**
-     * @return Collection|CmsPage[]
+     *
      */
     public function getPages(): Collection
     {
         return $this->pages;
     }
 
-    public function addPage(CmsPage $page): self
+    public function addPage($page): self
     {
         if (!$this->pages->contains($page)) {
             $this->pages[] = $page;
@@ -174,7 +174,7 @@ class CmsSite
         return $this;
     }
 
-    public function removePage(CmsPage $page): self
+    public function removePage($page): self
     {
         if ($this->pages->contains($page)) {
             $this->pages->removeElement($page);
@@ -189,9 +189,8 @@ class CmsSite
 
     /**
      * @param bool $hostMultilingual
-     * @return CmsSite
      */
-    public function setHostMultilingual(bool $hostMultilingual): CmsSite
+    public function setHostMultilingual(bool $hostMultilingual)
     {
         $this->hostMultilingual = $hostMultilingual;
         return $this;
@@ -207,9 +206,8 @@ class CmsSite
 
     /**
      * @param bool $default
-     * @return CmsSite
      */
-    public function setDefault(bool $default): CmsSite
+    public function setDefault(bool $default)
     {
         $this->default = $default;
         return $this;

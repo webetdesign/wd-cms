@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class CmsRoute
  * @package WebEtDesign\CmsBundle\Entity
  *
+ * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsRouteRepository")
  * @ORM\Table(name="cms__route")
  */
 class CmsRoute extends AbstractCmsRoute

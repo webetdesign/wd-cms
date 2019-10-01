@@ -5,27 +5,27 @@ namespace WebEtDesign\CmsBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-
-
 /**
+ * @ORM\Entity()
  * @ORM\Table(name="cms__content_has_shared_block")
  */
 class CmsContentHasSharedBlock
 {
     /**
-     * @ORM\Id
+     * @Gedmo\SortableGroup
+     * Mapping defined in WebEtDesignCmsExtension
      */
     private $content;
-
+    
     /**
-     * @ORM\Id
+     * Mapping defined in WebEtDesignCmsExtension
      */
     private $sharedBlock;
 
     /**
      * @var int
-     * @ORM\Column(type="integer", nullable=false, length=255)
-     * @Gedmo\Sortable(groups={"content"})
+     * @ORM\Column(type="integer", nullable=false)
+     * @Gedmo\SortablePosition
      *
      */
     private $position;
@@ -56,7 +56,6 @@ class CmsContentHasSharedBlock
 
     /**
      * @param mixed $content
-     * @return CmsContentHasSharedBlock
      */
     public function setContent($content)
     {
@@ -66,7 +65,6 @@ class CmsContentHasSharedBlock
 
     /**
      * @param mixed $sharedBlock
-     * @return CmsContentHasSharedBlock
      */
     public function setSharedBlock($sharedBlock)
     {
@@ -76,7 +74,6 @@ class CmsContentHasSharedBlock
 
     /**
      * @param mixed $position
-     * @return CmsContentHasSharedBlock
      */
     public function setPosition($position)
     {

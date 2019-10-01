@@ -103,7 +103,11 @@ class WebEtDesignCmsExtension extends Extension
             $collector->addDiscriminator(AbstractCmsRoute::class, 'override', $config['admin']['configuration']['entity']['route']);
         }
 
-        // CmsContent
+        /* *******************************
+         * 
+         * CmsContent
+         * 
+         *********************************/
 
         $collector->addAssociation(CmsContent::class, 'mapManyToOne', [
             'fieldName'     => 'media',
@@ -175,12 +179,16 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'content',
             'inversedBy'    => null,
             'orphanRemoval' => false,
-            'orderBy' => [
+            'orderBy'       => [
                 "position" => "ASC"
             ]
         ]);
 
-        // CmsSharedBlock
+        /* *******************************
+         * 
+         * CmsSharedBlock
+         * 
+         *********************************/
 
         $collector->addAssociation(CmsSharedBlock::class, 'mapOneToMany', [
             'fieldName'     => 'contents',
@@ -206,7 +214,11 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
         ]);
 
-        // CmsContentSlider
+        /* *******************************
+         * 
+         * CmsContentSlider
+         * 
+         *********************************/
 
         $collector->addAssociation(CmsContentSlider::class, 'mapManyToOne', [
             'fieldName'     => 'media',
@@ -230,7 +242,7 @@ class WebEtDesignCmsExtension extends Extension
             'cascade'       => [
             ],
             'mappedBy'      => null,
-            'inversedBy'    => null,
+            'inversedBy'    => "sliders",
             'joinColumns'   => [
                 [
                     'name'                 => 'content_id',
@@ -240,7 +252,11 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
         ]);
 
-        // CmsPage
+        /* *******************************
+         * 
+         * CmsPage
+         * 
+         *********************************/
 
         $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
             'fieldName'     => 'site',
@@ -294,8 +310,8 @@ class WebEtDesignCmsExtension extends Extension
         ]);
 
         $collector->addAssociation(CmsPage::class, 'mapOneToOne', [
-            'fieldName'    => 'route',
-            'targetEntity' => $config['admin']['configuration']['entity']['route_interface'],
+            'fieldName'     => 'route',
+            'targetEntity'  => $config['admin']['configuration']['entity']['route'],
             'cascade'       => [
                 "remove",
                 "persist"
@@ -311,7 +327,12 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
         ]);
 
-        // CmsSite
+
+        /* *******************************
+         * 
+         * CmsSite
+         * 
+         *********************************/
 
         $collector->addAssociation(CmsSite::class, 'mapOneToMany', [
             'fieldName'     => 'pages',
@@ -328,8 +349,8 @@ class WebEtDesignCmsExtension extends Extension
             'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
             'cascade'       => [
             ],
-            'mappedBy'      => 'site',
-            'inversedBy'    => null,
+            'mappedBy'      => null,
+            'inversedBy'    => 'site',
             'joinColumns'   => [
                 [
                     'name'                 => 'menu_id',
@@ -339,7 +360,11 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
         ]);
 
-        // CmsContentHasSharedBlock
+        /* *******************************
+         *
+         * CmsContentHasSharedBlock
+         *
+         *********************************/
 
         $collector->addAssociation(CmsContentHasSharedBlock::class, 'mapManyToOne', [
             'fieldName'     => 'content',
@@ -356,6 +381,7 @@ class WebEtDesignCmsExtension extends Extension
                 ],
             ],
             'orphanRemoval' => false,
+            'id'            => true
         ]);
 
         $collector->addAssociation(CmsContentHasSharedBlock::class, 'mapManyToOne', [
@@ -373,9 +399,14 @@ class WebEtDesignCmsExtension extends Extension
                 ],
             ],
             'orphanRemoval' => false,
+            'id'            => true
         ]);
 
-        // CmsMenu
+        /* *******************************
+         *
+         * CmsMenu
+         *
+         *********************************/
 
         $collector->addAssociation(CmsMenu::class, 'mapManyToOne', [
             'fieldName'     => 'page',
@@ -383,12 +414,12 @@ class WebEtDesignCmsExtension extends Extension
             'cascade'       => [
             ],
             'inversedBy'    => null,
-            'mappedBy'    => null,
+            'mappedBy'      => null,
             'joinColumns'   => [
                 [
                     'name'                 => 'page_id',
                     'referencedColumnName' => 'id',
-                    'onDelete' => 'SET NULL'
+                    'onDelete'             => 'SET NULL'
                 ],
             ],
             'orphanRemoval' => false,
@@ -400,12 +431,12 @@ class WebEtDesignCmsExtension extends Extension
             'cascade'       => [
             ],
             'inversedBy'    => null,
-            'mappedBy'    => null,
+            'mappedBy'      => null,
             'joinColumns'   => [
                 [
                     'name'                 => 'tree_root',
                     'referencedColumnName' => 'id',
-                    'onDelete' => 'CASCADE'
+                    'onDelete'             => 'CASCADE'
                 ],
             ],
             'orphanRemoval' => false,
@@ -416,13 +447,13 @@ class WebEtDesignCmsExtension extends Extension
             'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
             'cascade'       => [
             ],
+            'mappedBy'      => null,
             'inversedBy'    => 'children',
-            'mappedBy'    => null,
             'joinColumns'   => [
                 [
                     'name'                 => 'parent_id',
                     'referencedColumnName' => 'id',
-                    'onDelete' => 'CASCADE'
+                    'onDelete'             => 'CASCADE'
                 ],
             ],
             'orphanRemoval' => false,
@@ -436,16 +467,30 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'parent',
             'inversedBy'    => null,
             'orphanRemoval' => false,
-            'orderBy' => [
+            'orderBy'       => [
                 "lft" => 'ASC'
             ]
         ]);
 
-        // AbstractCmsRoute
+        $collector->addAssociation(CmsMenu::class, 'mapOneToMany', [
+            'fieldName'     => 'site',
+            'targetEntity'  => $config['admin']['configuration']['entity']['site'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => 'menu',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        /* *******************************
+         *
+         * AbstractCmsRoute
+         *
+         *********************************/
 
         $collector->addAssociation(AbstractCmsRoute::class, 'mapOneToOne', [
-            'fieldName'    => 'page',
-            'targetEntity' => $config['admin']['configuration']['entity']['page'],
+            'fieldName'     => 'page',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
             'cascade'       => [
                 "remove"
             ],
