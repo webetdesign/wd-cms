@@ -7,8 +7,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 
 /**
+ * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageRepository")
+ * @ORM\Table(name="cms__page")
  */
 class CmsPage
 {
@@ -18,20 +23,22 @@ class CmsPage
 
 
     /**
-     * @var int
-     *
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
     private $title;
 
     /**
-     * @var null|string
-     *
+     * @var string | null
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $template;
 
@@ -50,26 +57,29 @@ class CmsPage
 
     /**
      * @var string
-     *
-     * Slug is only used to create CmsRoute path
+     * @ORM\Column(type="string", length=255, nullable=false)
+     * @Gedmo\Slug(fields={"title"}, separator="-")
      *
      */
     private $slug;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $class_association;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $query_association;
 
     /**
      * @var int
+     * @ORM\Column(type="integer", nullable=true)
      *
      */
     private $association;
@@ -77,11 +87,14 @@ class CmsPage
     /**
      * @var boolean
      *
+     * @ORM\Column(type="boolean", options={"default" = 0})
      */
     private $active;
 
     /**
-     * @var null|array
+     * @var array
+     *
+     * @ORM\Column(type="array", nullable=true)
      */
     private $roles;
 

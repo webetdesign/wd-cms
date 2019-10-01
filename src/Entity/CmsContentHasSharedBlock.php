@@ -2,21 +2,34 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 
 
 /**
+ * @ORM\Table(name="cms__content_has_shared_block")
  */
 class CmsContentHasSharedBlock
 {
+    /**
+     * @ORM\Id
+     */
     private $content;
-    
+
+    /**
+     * @ORM\Id
+     */
     private $sharedBlock;
-    
+
+    /**
+     * @var int
+     * @ORM\Column(type="integer", nullable=false, length=255)
+     * @Gedmo\Sortable(groups={"content"})
+     *
+     */
     private $position;
-    
+
     /**
      * @return mixed
      */
@@ -70,5 +83,5 @@ class CmsContentHasSharedBlock
         $this->position = $position;
         return $this;
     }
-    
+
 }

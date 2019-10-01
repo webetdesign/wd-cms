@@ -12,44 +12,69 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use Cocur\Slugify\Slugify;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsSiteRepository")
+ * @ORM\Table(name="cms__site")
+ */
 class CmsSite
 {
     /**
-     * @var int
-     *
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
-     * @var string|null
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
+     *
      */
     private $label;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $locale;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $host;
 
-    /** @var boolean */
-    private $hostMultilingual = 0;
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean", options={"default" : 0})
+     *
+     */
+    private $hostMultilingual;
 
-    /** @var boolean */
-    private $default = 0;
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean", options={"default" : 0})
+     *
+     */
+    private $default;
 
     /** @var ArrayCollection|PersistentCollection */
     private $pages;
 
-    /** @var string */
+    /**
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     */
     private $flagIcon;
 
+    /**
+     * @var CmsMenu $menu
+     */
     private $menu;
 
     public function __construct()

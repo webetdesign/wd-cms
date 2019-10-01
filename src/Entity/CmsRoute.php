@@ -8,6 +8,14 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Class CmsRoute
+ * @package WebEtDesign\CmsBundle\Entity
+ *
+ * @ORM\Table(name="cms__route")
+ */
 class CmsRoute extends AbstractCmsRoute
 {
 

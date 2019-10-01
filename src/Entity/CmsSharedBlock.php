@@ -4,21 +4,43 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsSharedBlockRepository")
+ * @ORM\Table(name="cms__shared_block")
+ */
 class CmsSharedBlock
 {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
+     */
     private $id;
 
-    /** @var string */
+    /**
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
     private $code;
 
-    /** @var string */
+    /**
+     * @var string | null
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
     private $label;
 
-    /** @var boolean */
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean")
+     */
     private $public;
 
-    /** @var boolean */
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean")
+     */
     private $active;
 
     /**
@@ -32,7 +54,8 @@ class CmsSharedBlock
     private $contentList;
 
     /**
-     * @var null|string
+     * @var string | null
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $template;
 
