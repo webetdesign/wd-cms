@@ -2,6 +2,8 @@
 
 namespace WebEtDesign\CmsBundle\Routing;
 
+use Exception;
+use PDOException;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -27,6 +29,13 @@ class ExtraLoader implements LoaderInterface
 
     public function load($resource, $type = null)
     {
+        try {
+            $con = $this->em->getConnection();
+            $con->connect();
+        } catch (Exception $exception) {
+            return new RouteCollection();
+        }
+
         if (true === $this->loaded) {
             throw new \RuntimeException('Do not add the "extra" loader twice');
         }
