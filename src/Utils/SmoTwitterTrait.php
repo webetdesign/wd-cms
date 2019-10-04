@@ -30,7 +30,7 @@ trait SmoTwitterTrait
     /**
      * @var string|null
      *
-     * @ORM\Column(name="twitter_description", type="text", length=200, nullable=true)
+     * @ORM\Column(name="twitter_description", type="text", nullable=true)
      */
     private $twitter_description;
 

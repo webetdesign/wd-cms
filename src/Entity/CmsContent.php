@@ -6,36 +6,46 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use Sonata\MediaBundle\Model\MediaInterface;
+use Doctrine\ORM\Mapping as ORM;
 
 
 /**
+ * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsContentRepository")
+ * @ORM\Table(name="cms__content")
  */
 class CmsContent
 {
     /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $code;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
     private $label;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
     private $type;
 
     /**
      * @var string
+     * @ORM\Column(type="text", nullable=true)
      *
      */
     private $value;
@@ -58,10 +68,17 @@ class CmsContent
      */
     private $media;
 
-    /** @var boolean */
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean", nullable=true)
+     */
     private $parent_heritance;
 
-    /** @var boolean */
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean")
+     */
     private $active;
 
     /**

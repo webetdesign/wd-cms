@@ -3,30 +3,51 @@
 namespace WebEtDesign\CmsBundle\Entity;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\ORM\Mapping as ORM;
+
 
 /**
  * @UniqueEntity("path")
+ * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsRouteRepository")
+ * @ORM\Table(name="cms__route")
  */
 abstract class AbstractCmsRoute implements CmsRouteInterface
 {
     /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(type="integer")
      */
     private $id;
 
+
     /**
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
+     *
      */
     private $name;
 
+
     /**
+     * @var array
+     * @ORM\Column(type="array", nullable=false)
+     *
      */
     private $methods = [];
 
+
     /**
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
+     *
      */
     private $path;
 
+
     /**
-     * @var null|string
+     * @var string|null
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     private $controller;
@@ -37,13 +58,19 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      */
     private $page;
 
+
     /**
      * @var string
+     * @ORM\Column(type="text", nullable=true)
      *
      */
     private $defaults;
 
-    /** @var string */
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     *
+     */
     private $requirements;
 
     /**
