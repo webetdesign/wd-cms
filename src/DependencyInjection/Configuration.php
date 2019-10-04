@@ -21,6 +21,14 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->arrayNode('cms')->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('multisite')->defaultValue(false)->end()
+                        ->scalarNode('multilingual')->defaultValue(false)->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->children()
                 ->arrayNode('admin')->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('configuration')->addDefaultsIfNotSet()

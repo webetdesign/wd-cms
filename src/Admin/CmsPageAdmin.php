@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\Boolean;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -22,6 +23,16 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CmsPageAdmin extends AbstractAdmin
 {
+    protected $multilingual;
+    protected $multisite;
+
+    public function __construct(string $code, string $class, string $baseControllerName, $multisite, $multilingual)
+    {
+        $this->multisite    = $multisite;
+        $this->multilingual = $multilingual;
+        parent::__construct($code, $class, $baseControllerName);
+    }
+
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
@@ -37,11 +48,12 @@ class CmsPageAdmin extends AbstractAdmin
         if ($roleAdmin) {
             $listMapper->add('id');
         }
-        $listMapper
-            ->add('site')
-            ->add('title', null, [
-                'label' => 'Titre',
-            ])
+        if ($this->multisite) {
+            $listMapper->add('site');
+        }
+        $listMapper->add('title', null, [
+            'label' => 'Titre',
+        ])
             ->add('route.path', null, [
                 'label' => 'Chemin',
             ])
@@ -76,8 +88,14 @@ class CmsPageAdmin extends AbstractAdmin
         //region Général
         $formMapper
             ->tab('Général')// The tab call is optional
-            ->with('', ['box_class' => ''])
-            ->add('site')
+            ->with('', ['box_class' => '']);
+
+        if ($this->multisite) {
+            $formMapper
+                ->add('site');
+        }
+
+        $formMapper
             ->add('title', null, ['label' => 'Title'])
             ->add('template', PageTemplateType::class, ['label' => 'Modèle de page',])
             ->end()// End form group
@@ -214,37 +232,40 @@ class CmsPageAdmin extends AbstractAdmin
                 ->end();
             //endregion
 
-            //region MultiLingue
-            $formMapper->tab('MultiLingue')
-                ->with('', ['box_class' => '']);
 
-            if ($object->getSite()) {
+            if ($this->multilingual) {
+                //region MultiLingue
+                $formMapper->tab('MultiLingue')
+                    ->with('', ['box_class' => '']);
+
+                if ($object->getSite()) {
 
 
-                $formMapper->add('crossSitePages', MultilingualType::class, [
-                    'site'  => $object->getSite(),
-                    'page'  => $object,
-                    'label' => 'Page associées',
-                ]);
+                    $formMapper->add('crossSitePages', MultilingualType::class, [
+                        'site'  => $object->getSite(),
+                        'page'  => $object,
+                        'label' => 'Page associées',
+                    ]);
 
-                $formMapper->getFormBuilder()->get('crossSitePages')->addModelTransformer(new CallbackTransformer(
-                    function ($value) {
-                        $tab = [];
-                        if ($value !== null) {
-                            foreach ($value as $item) {
-                                $tab[$item->getSite()->getId()] = $item;
+                    $formMapper->getFormBuilder()->get('crossSitePages')->addModelTransformer(new CallbackTransformer(
+                        function ($value) {
+                            $tab = [];
+                            if ($value !== null) {
+                                foreach ($value as $item) {
+                                    $tab[$item->getSite()->getId()] = $item;
+                                }
                             }
+                            return $tab;
+                        },
+                        function ($value) {
+                            return array_values(array_filter($value));
                         }
-                        return $tab;
-                    },
-                    function ($value) {
-                        return array_values(array_filter($value));
-                    }
-                ));
-            }
+                    ));
+                }
 
-            $formMapper->end();
-            //endregion
+                $formMapper->end();
+                //endregion
+            }
         }
 
     }
