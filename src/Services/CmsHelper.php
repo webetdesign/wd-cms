@@ -40,6 +40,15 @@ class CmsHelper
         return $route ? $route->getPage() : null;
     }
 
+    /**
+     * @param Request $request
+     * @param array $params
+     * @return Response
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     * @deprecated since 1.2.0, use CmsController::defaultRender instead
+     */
     public function getDefaultRender(Request $request, array $params)
     {
         /** @var CmsPage $page */
