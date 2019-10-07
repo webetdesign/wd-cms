@@ -1,17 +1,17 @@
 <!-- Twitter Card data -->
-<meta name="twitter:card" content="{{ object.twitterCard }}">
-<meta name="twitter:site" content="{{ object.twitterSite }}">
-<meta name="twitter:title" content="{{ object.twitterTitle }}">
-<meta name="twitter:description" content="{{ object.twitterDescription }}">
-<meta name="twitter:creator" content="{{ object.twitterCreator }}">
+<meta name="twitter:card" content="{{ cms_render_seo_smo_value(object, 'twitterCard') }}">
+<meta name="twitter:site" content="{{ cms_render_seo_smo_value(object, 'twitterSite') }}">
+<meta name="twitter:title" content="{{ cms_render_seo_smo_value(object, 'twitterTitle') }}">
+<meta name="twitter:description" content="{{ cms_render_seo_smo_value(object, 'twitterDescription') }}">
+<meta name="twitter:creator" content="{{ cms_render_seo_smo_value(object, 'twitterCreator') }}">
 {#Twitter Summary card images must be at least 120x120px #}
-<meta name="twitter:image" content="{{ object.twitterImage }}">
+<meta name="twitter:image" content="{{ cms_render_seo_smo_value(object, 'twitterImage') }}">
 
 <!-- Open Graph data -->
-<meta property="og:title" content="{{ object.fbTitle }}" />
-<meta property="og:type" content="{{ object.fbType }}" />
-<meta property="og:url" content="{{ object.fbUrl }}" />
-<meta property="og:image" content="{{ object.fbImage }}" />
-<meta property="og:description" content="{{ object.fbDescription }}" />
-<meta property="og:site_name" content="{{ object.fbSiteName }}" />
-<meta property="fb:admins" content="{{ object.fbAdmins }}" />
+<meta property="og:title" content="{{ cms_render_seo_smo_value(object, 'fbTitle') }}" />
+<meta property="og:type" content="{{ cms_render_seo_smo_value(object, 'fbType') }}" />
+<meta property="og:url" content="{{ cms_render_seo_smo_value(object, 'fbUrl') }}" />
+<meta property="og:image" content="{{ cms_render_seo_smo_value(object, 'fbImage') }}" />
+<meta property="og:description" content="{{ cms_render_seo_smo_value(object, 'fbDescription') }}" />
+<meta property="og:site_name" content="{{ cms_render_seo_smo_value(object, 'fbSiteName') }}" />
+<meta property="fb:admins" content="{{ cms_render_seo_smo_value(object, 'fbAdmins') }}" />

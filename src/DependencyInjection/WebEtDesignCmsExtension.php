@@ -23,6 +23,7 @@ use WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsContentSlider;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
@@ -46,7 +47,7 @@ class WebEtDesignCmsExtension extends Extension
         // TODO : work for autowired configuration
         $container->setParameter('wd_cms.cms.multisite', $config['cms']['multilingual'] || $config['cms']['multisite'] ? true : false);
         $container->setParameter('wd_cms.cms.multilingual', $config['cms']['multilingual']);
-        $container->setParameter('wd_cms.templates', $config['pages']);
+        $container->setParameter('wd_cms.cms.declination', $config['cms']['declination']);
         $container->setParameter('wd_cms.templates', $config['pages']);
         $container->setParameter('wd_cms.shared_block', $config['sharedBlock']);
         $container->setParameter('wd_cms.custom_contents', $config['customContents']);
@@ -138,6 +139,22 @@ class WebEtDesignCmsExtension extends Extension
             'joinColumns'   => [
                 [
                     'name'                 => 'page_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsContent::class, 'mapManyToOne', [
+            'fieldName'     => 'declination',
+            'targetEntity'  => CmsPageDeclination::class,
+            'cascade'       => [
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'contents',
+            'joinColumns'   => [
+                [
+                    'name'                 => 'declination_id',
                     'referencedColumnName' => 'id',
                 ],
             ],
@@ -280,6 +297,18 @@ class WebEtDesignCmsExtension extends Extension
         $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
             'fieldName'     => 'contents',
             'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'mappedBy'      => 'page',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
+            'fieldName'     => 'declinations',
+            'targetEntity'  => CmsPageDeclination::class,
             'cascade'       => [
                 "remove",
                 "persist"
@@ -500,6 +529,41 @@ class WebEtDesignCmsExtension extends Extension
             'joinColumns'   => [
             ],
             'mappedBy'      => 'route',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        /* *******************************
+         *
+         * AbstractCmsRoute
+         *
+         *********************************/
+
+        $collector->addAssociation(CmsPageDeclination::class, 'mapManyToOne', [
+            'fieldName'     => 'page',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'declinations',
+            'joinColumns'   => [
+                [
+                    'name'                 => 'page_id',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPageDeclination::class, 'mapOneToMany', [
+            'fieldName'     => 'contents',
+            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'mappedBy'      => 'declination',
             'inversedBy'    => null,
             'orphanRemoval' => false,
         ]);

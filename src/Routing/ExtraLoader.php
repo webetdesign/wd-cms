@@ -22,7 +22,8 @@ class ExtraLoader implements LoaderInterface
      * ExtraLoader constructor.
      * @param EntityManager $entityManager
      */
-    public function __construct(EntityManager $entityManager) {
+    public function __construct(EntityManager $entityManager)
+    {
         $this->em = $entityManager;
     }
 
@@ -49,12 +50,12 @@ class ExtraLoader implements LoaderInterface
             /** @var CmsSite $cmsSite */
             $cmsSite = $cmsRoute->getPage()->getSite();
             if ($cmsSite) {
-                $langPrefix = !empty($cmsSite->getLocale()) && !$cmsSite->isHostMultilingual() ? '/'. $cmsSite->getLocale() : null;
-                $host = !empty($cmsSite->getHost()) ? $cmsSite->getHost() : null;
+                $langPrefix = !empty($cmsSite->getLocale()) && !$cmsSite->isHostMultilingual() ? '/' . $cmsSite->getLocale() : null;
+                $host       = !empty($cmsSite->getHost()) ? $cmsSite->getHost() : null;
             }
 
             // prepare a new route
-            $pattern = (isset($langPrefix) && !empty($langPrefix) ? $langPrefix : '') . $cmsRoute->getPath();
+            $pattern  = (isset($langPrefix) && !empty($langPrefix) ? $langPrefix : '') . $cmsRoute->getPath();
             $defaults = [
                 '_controller' => !$cmsRoute->getPage()->isActive() ? 'WebEtDesign\CmsBundle\Controller\CmsController::pageDisabled' :
                     $cmsRoute->getController() ?? 'WebEtDesign\CmsBundle\Controller\CmsController::index',
@@ -64,6 +65,11 @@ class ExtraLoader implements LoaderInterface
             }
             if ($cmsRoute->getRequirements()) {
                 $requirements = json_decode($cmsRoute->getRequirements(), true);
+                foreach ($requirements as $key => $requirement) {
+                    if (empty($requirement)) {
+                        unset($requirements[$key]);
+                    }
+                }
             }
             $route = new Route($pattern, $defaults, $requirements ?? []);
             if (!empty($host)) {

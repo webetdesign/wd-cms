@@ -3,7 +3,9 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Menu\ItemInterface as MenuItemInterface;
 use phpDocumentor\Reflection\Types\Boolean;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -20,17 +22,47 @@ use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
+use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
+use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
 
 class CmsPageAdmin extends AbstractAdmin
 {
+    use SmoTwitterAdminTrait;
+    use SmoFacebookAdminTrait;
+
     protected $multilingual;
     protected $multisite;
+    protected $declination;
 
-    public function __construct(string $code, string $class, string $baseControllerName, $multisite, $multilingual)
+    public function __construct(string $code, string $class, string $baseControllerName, $multisite, $multilingual, $declination)
     {
         $this->multisite    = $multisite;
         $this->multilingual = $multilingual;
+        $this->declination  = $declination;
+
         parent::__construct($code, $class, $baseControllerName);
+    }
+
+    protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
+    {
+        if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
+            return;
+        }
+
+        $admin = $this->isChild() ? $this->getParent() : $this;
+        $id    = $this->getRequest()->get('id');
+
+        if ($this->declination) {
+            $menu->addChild(
+                'Page',
+                ['uri' => $admin->generateUrl('edit', ['id' => $id])]
+            );
+
+            $menu->addChild(
+                'Déclinaison',
+                ['uri' => $admin->generateUrl('cms.admin.cms_page_declination.list', ['id' => $id])]
+            );
+        }
     }
 
 
@@ -140,25 +172,10 @@ class CmsPageAdmin extends AbstractAdmin
                 ->add('seo_title')
                 ->add('seo_description')
                 ->add('seo_keywords')
-                ->end()
-                ->with('Facebook', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('fb_title')
-                ->add('fb_type')
-                ->add('fb_url')
-                ->add('fb_image')
-                ->add('fb_description')
-                ->add('fb_site_name')
-                ->add('fb_admins')
-                ->end()
-                ->with('Twitter', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('twitter_card')
-                ->add('twitter_site')
-                ->add('twitter_title')
-                ->add('twitter_description')
-                ->add('twitter_creator')
-                ->add('twitter_image')
-                ->end()
                 ->end();
+            $this->addFormFieldSmoFacebook($formMapper);
+            $this->addFormFieldSmoTwitter($formMapper);
+            $formMapper->end();
             //endregion
 
             //region Contenus

@@ -25,8 +25,12 @@ class CmsHelper
      * @param Twig_Environment $twig
      * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function __construct(EntityManagerInterface $em, TemplateProvider $provider, Twig_Environment $twig, AuthorizationCheckerInterface $authorizationChecker)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        TemplateProvider $provider,
+        Twig_Environment $twig,
+        AuthorizationCheckerInterface $authorizationChecker
+    ) {
         $this->em                   = $em;
         $this->provider             = $provider;
         $this->twig                 = $twig;
@@ -74,6 +78,10 @@ class CmsHelper
         /** @var CmsPage $page */
         $page = $this->getPage($request);
 
+        if (!$page) {
+            return null;
+        }
+
         return $page->getSite() ? $page->getSite()->getLocale() : null;
 
     }
@@ -82,6 +90,10 @@ class CmsHelper
     {
         /** @var CmsPage $page */
         $page = $this->getPage($request);
+
+        if (!$page) {
+            return true;
+        }
 
 
         if (sizeof($page->getRoles()) < 1) {

@@ -14,5 +14,4 @@
         'subclass': app.request.get('subclass')
     } %}
 {% endif %}
-{% dump(options) %}
 {% block sonata_form_action_url %}{{ admin.generateUrl(url, options) }}{% endblock %}

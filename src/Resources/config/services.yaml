@@ -73,6 +73,13 @@ services:
       - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
       - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
 
+  cms.admin.cms_page_declination_listener:
+    class: WebEtDesign\CmsBundle\EventListener\PageDeclinationAdminListener
+    arguments:
+      - '@doctrine.orm.entity_manager'
+    tags:
+      - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: prePersist }
+
   cms.admin.cms_site_listener:
     class: '%cms.admin.cms_site_listener.class%'
     arguments:
@@ -122,6 +129,8 @@ services:
       - '@service_container'
       - '@twig'
       - '@cms.block_provider'
+      - '@request_stack'
+      - '%wd_cms.cms.declination%'
     tags:
       - { name: twig.extension }
     public: true
@@ -237,10 +246,12 @@ services:
       - '%wd_cms.admin.config.controller.page%'
       - '%wd_cms.cms.multisite%'
       - '%wd_cms.cms.multilingual%'
+      - '%wd_cms.cms.declination%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
     calls:
       - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
+      - [addChild, ['@cms.admin.cms_page_declination']]
     public: true
 
   cms.admin.cms_content:
@@ -298,6 +309,18 @@ services:
       - ~
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: content has sharedBlock, show_in_dashboard: false }
+    public: true
+
+  cms.admin.cms_page_declination:
+    class: WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsPageDeclination
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsPageDeclinationAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.templates%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: true }
     public: true
 
   # ===============================================

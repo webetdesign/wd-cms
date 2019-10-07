@@ -88,6 +88,8 @@ class CmsContent
      */
     private $sliders;
 
+    private $declination;
+
     public function __toString()
     {
         return $this->label;
@@ -99,6 +101,19 @@ class CmsContent
         $this->sliders          = new ArrayCollection();
         $this->active           = true;
         $this->parent_heritance = false;
+    }
+
+    public function isSet()
+    {
+        switch (true) {
+            case $this->getValue() !== null:
+                return true;
+            case $this->getMedia() !== null:
+                return true;
+            case $this->getSharedBlockList() !== null:
+                return true;
+        }
+        return false;
     }
 
     public function getId(): ?int
@@ -311,5 +326,23 @@ class CmsContent
         }
 
         return $this;
+    }
+
+    /**
+     * @param mixed $declination
+     * @return CmsContent
+     */
+    public function setDeclination($declination)
+    {
+        $this->declination = $declination;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDeclination()
+    {
+        return $this->declination;
     }
 }

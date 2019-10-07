@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class BaseCmsController extends AbstractController
@@ -31,13 +32,28 @@ class BaseCmsController extends AbstractController
     {
         /** @var CmsPage $page */
         $page = $this->getPage();
+        $baseParams = ['page' => $page];
 
-        return $this->render($this->provider->getTemplate($page->getTemplate()), [
-            $params,
-            [
-                'page' => $page,
-            ]
-        ]);
+        if ($this->getParameter('wd_cms.cms.declination')) {
+            $baseParams['declination'] = $this->getDeclination($page);
+        }
+
+        return $this->render($this->provider->getTemplate($page->getTemplate()), array_merge($params, $baseParams));
+    }
+
+    private function getDeclination($page)
+    {
+        $requestStack = $this->get('request_stack');
+        $request = $requestStack->getCurrentRequest();
+        $path = $request->getRequestUri();
+
+        /** @var CmsPageDeclination $declination */
+        foreach ($page->getDeclinations() as $declination) {
+            if ($declination->getPath() == $path) {
+                return $declination;
+            }
+        }
+        return null;
     }
 
     /**
@@ -62,7 +78,7 @@ class BaseCmsController extends AbstractController
      * @param CmsPage $page
      * @return CmsController
      */
-    public function setPage(CmsPage $page): BaseCmsController
+    public function setPage(?CmsPage $page): BaseCmsController
     {
         $this->page = $page;
         return $this;
@@ -71,7 +87,7 @@ class BaseCmsController extends AbstractController
     /**
      * @return CmsPage
      */
-    public function getPage(): CmsPage
+    public function getPage(): ?CmsPage
     {
         return $this->page;
     }

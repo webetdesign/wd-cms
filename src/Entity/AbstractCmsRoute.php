@@ -81,6 +81,16 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
         return (string) $this->getName();
     }
 
+    public function idDynamic()
+    {
+        return (bool) preg_match('/\{.*\}/', $this->getPath());
+    }
+
+    public function getParams()
+    {
+        preg_match_all('/\{(\w+)\}/', $this->getPath(), $matches);
+        return $matches[1];
+    }
 
     public function getId(): ?int
     {
