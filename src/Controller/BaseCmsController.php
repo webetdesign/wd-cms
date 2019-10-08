@@ -5,6 +5,8 @@ namespace WebEtDesign\CmsBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
+use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
+use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class BaseCmsController extends AbstractController
@@ -21,11 +23,39 @@ class BaseCmsController extends AbstractController
     /** @var TemplateProvider */
     protected $provider;
 
+    /** @var AbstractCmsGlobalVars */
+    private $globalVars;
+
+    public function setVarsObject(GlobalVarsInterface $object)
+    {
+        if ($this->globalVars) {
+            $this->globalVars->setObject($object);
+        }
+    }
+
     /**
-     * BaseCmsController constructor.
+     * @param mixed $globalVars
+     */
+    public function setGlobalVars($globalVars): void
+    {
+        $this->globalVars = $globalVars;
+    }
+
+    /**
+     * @return TemplateProvider
+     */
+    public function getProvider(): TemplateProvider
+    {
+        return $this->provider;
+    }
+
+    /**
      * @param TemplateProvider $provider
      */
-    public function __construct(TemplateProvider $provider) { $this->provider = $provider; }
+    public function setProvider(TemplateProvider $provider): void
+    {
+        $this->provider = $provider;
+    }
 
 
     protected function defaultRender(array $params)

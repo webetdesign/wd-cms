@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock;
+use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,12 +20,17 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
+use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class CmsTwigExtension extends AbstractExtension
 {
     protected $declination;
     protected $requestStack;
+    /** @var AbstractCmsGlobalVars */
+    protected $globalVars;
+    protected $globalVarsEnable;
+    protected $pageProvider;
     private   $sharedBlockProvider;
     private   $twig;
     private   $container;
@@ -44,18 +50,26 @@ class CmsTwigExtension extends AbstractExtension
         $customContents,
         Container $container,
         Environment $twig,
+        TemplateProvider $pageProvider,
         TemplateProvider $templateProvider,
         RequestStack $requestStack,
-        $declination
+        $declination,
+        $globalVarsDefinition
     ) {
         $this->em                  = $entityManager;
         $this->router              = $router;
         $this->customContents      = $customContents;
         $this->container           = $container;
         $this->twig                = $twig;
+        $this->pageProvider        = $pageProvider;
         $this->sharedBlockProvider = $templateProvider;
-        $this->declination         = $declination;
         $this->requestStack        = $requestStack;
+        $this->declination         = $declination;
+
+        $this->globalVarsEnable = $globalVarsDefinition['enable'];
+        if ($globalVarsDefinition['enable']) {
+            $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
+        }
     }
 
 
@@ -79,6 +93,7 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_path', [$this, 'cmsPath']),
             new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'], ['is_safe' => ['html']]),
             new TwigFunction('cms_render_seo_smo_value', [$this, 'renderSeoSmo']),
+            new TwigFunction('test', [$this, 'test']),
         ];
     }
 
@@ -174,7 +189,7 @@ class CmsTwigExtension extends AbstractExtension
             return $result;
         }
 
-        return $content->getValue();
+        return $this->globalVarsEnable ? $this->replaceVars($content->getValue()) : $content->getValue();
     }
 
     public function renderSharedBlock(CmsSharedBlock $block)
@@ -271,7 +286,7 @@ class CmsTwigExtension extends AbstractExtension
 
     public function renderSeoSmo($object, $name, $default = null)
     {
-        $method = 'get'.ucfirst($name);
+        $method = 'get' . ucfirst($name);
 
         $value = null;
         if ($object instanceof CmsPage && $this->declination && ($declination = $this->getDeclination($object))) {
@@ -290,6 +305,23 @@ class CmsTwigExtension extends AbstractExtension
 
         $value = !empty($value) ? $value : $default;
 
+        if ($this->globalVarsEnable) {
+            $value = $this->replaceVars($value);
+        }
+
         return $value;
+    }
+
+    public function replaceVars($str)
+    {
+        $values = $this->globalVars->computeValues($this->globalVars);
+
+        $d = $this->globalVars->getDelimiters();
+
+        foreach ($values as $name => $value) {
+            $str = str_replace($d['s'].$name.$d['e'], $value, $str);
+        }
+
+        return $str;
     }
 }

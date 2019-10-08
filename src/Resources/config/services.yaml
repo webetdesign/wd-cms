@@ -25,9 +25,13 @@ services:
     tags:
       - { name: form.type }
 
-  WebEtDesign\CmsBundle\Controller\BaseCmsController:
+  WebEtDesign\CmsBundle\Form\GlobalVarsType:
     arguments:
       - '@cms.page_provider'
+      - '@service_container'
+      - '%wd_cms.vars%'
+    tags:
+      - { name: form.type }
 
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
@@ -113,6 +117,9 @@ services:
     class: WebEtDesign\CmsBundle\EventListener\CmsControllerListener
     arguments:
       - '@cms.helper'
+      - '@cms.page_provider'
+      - '@service_container'
+      - '%wd_cms.vars%'
     tags:
       - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
@@ -128,9 +135,11 @@ services:
       - '%wd_cms.custom_contents%'
       - '@service_container'
       - '@twig'
+      - '@cms.page_provider'
       - '@cms.block_provider'
       - '@request_stack'
       - '%wd_cms.cms.declination%'
+      - '%wd_cms.vars%'
     tags:
       - { name: twig.extension }
     public: true

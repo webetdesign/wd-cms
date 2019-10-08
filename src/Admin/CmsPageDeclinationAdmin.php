@@ -17,6 +17,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
+use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
 
@@ -24,6 +25,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 {
     use SmoTwitterAdminTrait;
     use SmoFacebookAdminTrait;
+    use GlobalVarsAdminTrait;
 
     protected $em;
     protected $pageConfig;
@@ -68,6 +70,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $formMapper): void
     {
         $roleAdmin = $this->canManageContent();
+        $this->setFormTheme(array_merge($this->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
 
         /** @var CmsPageDeclination $object */
         $object = $this->getSubject();
@@ -131,8 +134,10 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         ;
 
         //region SEO
-        $formMapper->tab('SEO')// The tab call is optional
-        ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
+        $formMapper->tab('SEO');// The tab call is optional
+        $this->addGlobalVarsHelp($formMapper, $object->getPage());
+        $formMapper
+            ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
             ->add('seo_title')
             ->add('seo_description')
             ->add('seo_keywords')
@@ -144,7 +149,9 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         //endregion
 
         //region Contenus
-        $formMapper->tab('Contenus')
+        $formMapper->tab('Contenus');
+        $this->addGlobalVarsHelp($formMapper, $object->getPage());
+        $formMapper
             ->with('', ['box_class' => ''])
             ->add(
                 'contents',

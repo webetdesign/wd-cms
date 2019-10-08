@@ -22,6 +22,7 @@ use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
+use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
 
@@ -29,6 +30,7 @@ class CmsPageAdmin extends AbstractAdmin
 {
     use SmoTwitterAdminTrait;
     use SmoFacebookAdminTrait;
+    use GlobalVarsAdminTrait;
 
     protected $multilingual;
     protected $multisite;
@@ -109,6 +111,7 @@ class CmsPageAdmin extends AbstractAdmin
     {
         $roleAdmin = $this->canManageContent();
         $admin     = $this;
+        $admin->setFormTheme(array_merge($admin->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
 
         /** @var CmsPage $object */
         $object = $this->getSubject();
@@ -167,8 +170,9 @@ class CmsPageAdmin extends AbstractAdmin
             //endregion
 
             //region SEO
-            $formMapper->tab('SEO')// The tab call is optional
-            ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
+            $formMapper->tab('SEO');// The tab call is optional
+            $this->addGlobalVarsHelp($formMapper, $object);
+            $formMapper->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
                 ->add('seo_title')
                 ->add('seo_description')
                 ->add('seo_keywords')
@@ -179,7 +183,9 @@ class CmsPageAdmin extends AbstractAdmin
             //endregion
 
             //region Contenus
-            $formMapper->tab('Contenus')
+            $formMapper->tab('Contenus');
+            $this->addGlobalVarsHelp($formMapper, $object);
+            $formMapper
                 ->with('', ['box_class' => ''])
                 ->add(
                     'contents',

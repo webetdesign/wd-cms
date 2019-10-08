@@ -9,22 +9,37 @@
 namespace WebEtDesign\CmsBundle\EventListener;
 
 
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use WebEtDesign\CmsBundle\Controller\BaseCmsController;
 use WebEtDesign\CmsBundle\Services\CmsHelper;
+use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class CmsControllerListener
 {
 
     protected $helper;
 
+    protected $globalVars;
+    /** @var TemplateProvider */
+    protected $provider;
+
     /**
      * CmsControllerListener constructor.
      * @param CmsHelper $cmsHelper
+     * @param TemplateProvider $provider
+     * @param Container $container
+     * @param $globalVarsDefinition
+     * @throws \Exception
      */
-    public function __construct(CmsHelper $cmsHelper)
+    public function __construct(CmsHelper $cmsHelper, TemplateProvider $provider, Container $container, $globalVarsDefinition)
     {
         $this->helper = $cmsHelper;
+        $this->provider = $provider;
+        if ($globalVarsDefinition['enable']) {
+            $this->globalVars = $container->get($globalVarsDefinition['global_service']);
+            $this->globalVars->setDelimiter($globalVarsDefinition['delimiter']);
+        }
     }
 
     public function onKernelController(ControllerEvent $event)
@@ -45,6 +60,11 @@ class CmsControllerListener
             }
             $controller->setPage($page);
             $controller->setGranted($this->helper->isGranted($request));
+            $controller->setProvider($this->provider);
+
+            if ($this->globalVars) {
+                $controller->setGlobalVars($this->globalVars);
+            }
 
         }
     }
