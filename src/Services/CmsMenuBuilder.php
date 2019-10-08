@@ -123,7 +123,17 @@ class CmsMenuBuilder
                             if ($this->isActive($child)) {
                                 $childItemClass .= 'active ';
                             }
-                            $childItem->setUri($this->router->generate($child->getPage()->getRoute()->getName()));
+                            $route = $child->getPage()->getRoute();
+                            if ($route->isDynamic()) {
+                                $params = json_decode($child->getParams(), true);
+                                $pagePath = $route->getPath();
+                                $path     = preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($params) {
+                                    return $params[$matches[1]];
+                                }, $pagePath);
+                                $childItem->setUri($path);
+                            } else {
+                                $childItem->setUri($this->router->generate($child->getPage()->getRoute()->getName()));
+                            }
                         }
                         break;
                     case CmsMenuLinkTypeEnum::ROUTENAME:

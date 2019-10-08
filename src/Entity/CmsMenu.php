@@ -127,6 +127,12 @@ class CmsMenu
 
     private $site;
 
+    /**
+     * @var null|string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $params;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
@@ -422,6 +428,24 @@ class CmsMenu
     public function getSlug(){
         $slugify = new Slugify();
         return $slugify->slugify($this->getName(), "_");
+    }
+
+    /**
+     * @param string|null $params
+     * @return CmsMenu
+     */
+    public function setParams(?string $params): CmsMenu
+    {
+        $this->params = $params;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getParams(): ?string
+    {
+        return $this->params;
     }
 
 

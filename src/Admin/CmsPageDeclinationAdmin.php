@@ -90,7 +90,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             $type   = !empty($param['entity']) ? EntityType::class : TextType::class;
             $opts   = !empty($param['entity']) ? [
                 'class'        => $param['entity'],
-                'choice_value' => function (Brand $entity = null) use ($param) {
+                'choice_value' => function ($entity = null) use ($param) {
                     $getter = 'get' . ucfirst($param['property']);
                     return $entity ? $entity->$getter() : '';
                 },
