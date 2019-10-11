@@ -78,15 +78,19 @@ class CmsMenuBuilder
 
     public function cmsMenu(array $options)
     {
-        $menuRootCode = $options['code'];
+        $page         = $options['page'] ?? null;
+        $menuCode     = $options['code'];
         $parentActive = $options['parentActive'] ?? false;
 
         $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
-
-        $menu     = $this->factory->createItem('root');
-        $rootItem = $repo->getByCode($menuRootCode);
-        $menu->setChildrenAttribute('class', $rootItem->getClasses());
-        $this->buildNodes($menu, $repo->children($rootItem, true), $parentActive);
+        if ($page) {
+            $cmsMenu = $repo->getByCodeAndRoot($menuCode, $page->getRoot()->getSite()->getMenu());
+        } else {
+            $cmsMenu = $repo->getByCode($menuCode);
+        }
+        $menu = $this->factory->createItem('root');
+        $menu->setChildrenAttribute('class', $cmsMenu->getClasses());
+        $this->buildNodes($menu, $repo->children($cmsMenu, true), $parentActive);
 
         return $menu;
     }
@@ -125,7 +129,7 @@ class CmsMenuBuilder
                             }
                             $route = $child->getPage()->getRoute();
                             if ($route->isDynamic()) {
-                                $params = json_decode($child->getParams(), true);
+                                $params   = json_decode($child->getParams(), true);
                                 $pagePath = $route->getPath();
                                 $path     = preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($params) {
                                     return $params[$matches[1]];
@@ -164,7 +168,7 @@ class CmsMenuBuilder
     public function isActive(CmsMenu $item)
     {
 
-        $request = $this->requestStack->getCurrentRequest();
+        $request         = $this->requestStack->getCurrentRequest();
         $activeRouteName = $request->get('_route');
 
         $escapeString = preg_quote($item->getPage()->getRoute()->getPath(), '/');
@@ -172,7 +176,7 @@ class CmsMenuBuilder
         $active = false;
 
         if ($item->getPage()->getRoute()->getPath() != '/') {
-            if (preg_match('/'. $escapeString .'/', $request->getPathInfo())) {
+            if (preg_match('/' . $escapeString . '/', $request->getPathInfo())) {
                 $active = true;
             }
         }

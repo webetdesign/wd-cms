@@ -36,6 +36,8 @@ class CmsContentSliderAdmin extends AbstractAdmin
 
     protected function configureListFields(ListMapper $listMapper)
     {
+        unset($this->listModes['mosaic']);
+
         $listMapper
             ->add('id')
             ->add('title')

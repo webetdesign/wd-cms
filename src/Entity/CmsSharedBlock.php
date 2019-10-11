@@ -35,7 +35,7 @@ class CmsSharedBlock
      * @var boolean
      * @ORM\Column(type="boolean")
      */
-    private $public;
+    private $public = true;
 
     /**
      * @var boolean

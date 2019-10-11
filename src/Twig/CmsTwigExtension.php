@@ -275,7 +275,7 @@ class CmsTwigExtension extends AbstractExtension
 
             $pages[] = [
                 'path' => $this->router->generate($page->getRoute()->getName(), $routeParams),
-                'icon' => $page->getSite()->getFlagIcon(),
+                'icon' => $page->getRoot()->getSite()->getFlagIcon(),
             ];
         }
 

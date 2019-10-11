@@ -2,8 +2,11 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Doctrine\ORM\EntityManager;
 use Sonata\AdminBundle\Event\PersistenceEvent;
@@ -27,7 +30,22 @@ class SiteAdminListener
         $this->siteClass = $siteClass;
     }
 
-    public function postUpdate(PersistenceEvent $event)
+    public function prePersist(LifecycleEventArgs $event)
+    {
+        $em = $event->getEntityManager();
+        /** @var CmsSite $site */
+        $site = $event->getObject();
+
+        if (!$site instanceof $this->siteClass) {
+            return;
+        }
+
+        $this->createMenu($em, $site);
+
+        $this->createPage($em, $site);
+    }
+
+    public function postUpdate(LifecycleEventArgs $event)
     {
         $site = $event->getObject();
 
@@ -35,10 +53,11 @@ class SiteAdminListener
             return;
         }
 
+
         $this->warmUpRouteCache();
     }
 
-    public function postPersist(PersistenceEvent $event)
+    public function postPersist(LifecycleEventArgs $event)
     {
         $site = $event->getObject();
 
@@ -61,5 +80,48 @@ class SiteAdminListener
         }
 
         $this->router->warmUp($cacheDir);
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param CmsSite $site
+     * @throws \Doctrine\ORM\ORMException
+     */
+    private function createMenu(EntityManager $em, CmsSite $site)
+    {
+        $root = new CmsMenu();
+        $root->setCode("root_" . $site->getSlug());
+        $root->setName('root');
+
+        $em->persist($root);
+
+        $root->setRoot($root);
+
+        $main_menu = new CmsMenu();
+        $main_menu->setCode("main_menu");
+        $main_menu->setname("Main menu");
+        $main_menu->setParent($root);
+
+        $em->persist($main_menu);
+
+        $homepage = new CmsMenu();
+        $homepage->setName("Homepage");
+        $homepage->setParent($main_menu);
+
+        $em->persist($homepage);
+
+        $site->setMenu($root);
+
+    }
+
+    private function createPage(EntityManager $em, CmsSite $site)
+    {
+        $page = new CmsPage();
+        $page->setTemplate('home');
+        $page->setTitle('Homepage');
+        $page->rootPage = true;
+
+        $em->persist($page);
+        $site->setPage($page);
     }
 }

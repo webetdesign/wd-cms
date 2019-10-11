@@ -24,6 +24,14 @@ class CmsSiteRepository extends ServiceEntityRepository
         parent::__construct($registry, CmsSite::class);
     }
 
+    public function getDefault()
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->where('s.default = true');
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
     public function findOther($site)
     {
         $qb = $this->createQueryBuilder('s')

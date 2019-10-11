@@ -109,12 +109,393 @@ class WebEtDesignCmsExtension extends Extension
             $collector->addDiscriminator(AbstractCmsRoute::class, 'override', $config['admin']['configuration']['entity']['route']);
         }
 
-        /* *******************************
-         * 
-         * CmsContent
-         * 
-         *********************************/
+        $this->addCmsPageMapping($collector, $config);
+        $this->addCmsPageDeclinationMapping($collector, $config);
+        $this->addCmsSiteMapping($collector, $config);
+        $this->addCmsMenuMapping($collector, $config);
+        $this->addCmsContentHasSharedBlockMapping($collector, $config);
+        $this->addCmsContentSliderMapping($collector, $config);
+        $this->addCmsSharedBlockMapping($collector, $config);
+        $this->addCmsContentMapping($collector, $config);
+        $this->addAbstractCmsRouteMapping($collector, $config);
 
+    }
+
+    protected function addCmsPageMapping(DoctrineCollector $collector, $config)
+    {
+        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
+            'fieldName'     => 'contents',
+            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'mappedBy'      => 'page',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
+            'fieldName'     => 'declinations',
+            'targetEntity'  => CmsPageDeclination::class,
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'mappedBy'      => 'page',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapManyToMany', [
+            'fieldName'    => 'crossSitePages',
+            'targetEntity' => $config['admin']['configuration']['entity']['page'],
+            'cascade'      => [],
+            'joinTable'    => [
+                'name'               => 'cms__page_has_page',
+                'joinColumns'        => [
+                    'page_id' => [
+                        'name'                 => 'page_id',
+                        'referencedColumnName' => 'id',
+                        'onDelete'             => 'CASCADE',
+                    ]
+                ],
+                'inverseJoinColumns' => [
+                    'associated_page_id' => [
+                        'name'                 => 'associated_page_id',
+                        'referencedColumnName' => 'id',
+                        'onDelete'             => 'CASCADE',
+                    ],
+                ]
+            ]
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapOneToOne', [
+            'fieldName'     => 'route',
+            'targetEntity'  => $config['admin']['configuration']['entity']['route'],
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'joinColumns'   => [
+                [
+                    'name'                 => 'route_id',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
+                ],
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'page',
+            'orphanRemoval' => false,
+        ]);
+
+        //nested set
+        $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
+            'fieldName'     => 'root',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
+            'cascade'       => [],
+            'joinColumns'   => [
+                [
+                    'name'                 => 'tree_root',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
+                ],
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
+            'fieldName'     => 'parent',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
+            'cascade'       => [],
+            'joinColumns'   => [
+                [
+                    'name'                 => 'parent_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'children',
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
+            'fieldName'     => 'children',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
+            'cascade'       => [
+                'remove'
+            ],
+            'mappedBy'      => 'parent',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPage::class, 'mapOneToOne', [
+            'fieldName'     => 'site',
+            'targetEntity'  => $config['admin']['configuration']['entity']['site'],
+            'cascade'       => [],
+            'mappedBy'      => 'page',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+    }
+
+    protected function addCmsPageDeclinationMapping(DoctrineCollector $collector, $config)
+    {
+        $collector->addAssociation(CmsPageDeclination::class, 'mapManyToOne', [
+            'fieldName'     => 'page',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'declinations',
+            'joinColumns'   => [
+                [
+                    'name'                 => 'page_id',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsPageDeclination::class, 'mapOneToMany', [
+            'fieldName'     => 'contents',
+            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'mappedBy'      => 'declination',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+    }
+
+    protected function addCmsSiteMapping(DoctrineCollector $collector, $config)
+    {
+
+        $collector->addAssociation(CmsSite::class, 'mapOneToOne', [
+            'fieldName'     => 'page',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
+            'cascade'       => [
+                'persist',
+                'remove'
+            ],
+            'joinColumns'   => [
+                [
+                    'name'                 => 'page_id',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'SET NULL'
+                ],
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'site',
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsSite::class, 'mapManyToOne', [
+            'fieldName'     => 'menu',
+            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
+            'cascade'       => [
+                'persist',
+                'remove'
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'site',
+            'joinColumns'   => [
+                [
+                    'name'                 => 'menu_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+    }
+
+    protected function addCmsMenuMapping(DoctrineCollector $collector, $config)
+    {
+        $collector->addAssociation(CmsMenu::class, 'mapManyToOne', [
+            'fieldName'     => 'page',
+            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
+            'cascade'       => [
+            ],
+            'inversedBy'    => null,
+            'mappedBy'      => null,
+            'joinColumns'   => [
+                [
+                    'name'                 => 'page_id',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'SET NULL'
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsMenu::class, 'mapManyToOne', [
+            'fieldName'     => 'root',
+            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
+            'cascade'       => [
+            ],
+            'inversedBy'    => null,
+            'mappedBy'      => null,
+            'joinColumns'   => [
+                [
+                    'name'                 => 'tree_root',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsMenu::class, 'mapManyToOne', [
+            'fieldName'     => 'parent',
+            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'children',
+            'joinColumns'   => [
+                [
+                    'name'                 => 'parent_id',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsMenu::class, 'mapOneToMany', [
+            'fieldName'     => 'children',
+            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => 'parent',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+            'orderBy'       => [
+                "lft" => 'ASC'
+            ]
+        ]);
+
+        $collector->addAssociation(CmsMenu::class, 'mapOneToMany', [
+            'fieldName'     => 'site',
+            'targetEntity'  => $config['admin']['configuration']['entity']['site'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => 'menu',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+    }
+
+    protected function addCmsContentHasSharedBlockMapping(DoctrineCollector $collector, $config)
+    {
+        $collector->addAssociation(CmsContentHasSharedBlock::class, 'mapManyToOne', [
+            'fieldName'     => 'content',
+            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+            'cascade'       => [
+                'remove',
+                'persist'
+            ],
+            'inversedBy'    => 'sharedBlockList',
+            'joinColumns'   => [
+                [
+                    'name'                 => 'content_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+            'id'            => true
+        ]);
+
+        $collector->addAssociation(CmsContentHasSharedBlock::class, 'mapManyToOne', [
+            'fieldName'     => 'sharedBlock',
+            'targetEntity'  => $config['admin']['configuration']['entity']['shared_block'],
+            'cascade'       => [
+                'remove',
+                'persist'
+            ],
+            'inversedBy'    => 'contentList',
+            'joinColumns'   => [
+                [
+                    'name'                 => 'shared_block_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+            'id'            => true
+        ]);
+    }
+
+    protected function addCmsContentSliderMapping(DoctrineCollector $collector, $config)
+    {
+        $collector->addAssociation(CmsContentSlider::class, 'mapManyToOne', [
+            'fieldName'     => 'media',
+            'targetEntity'  => $config['class']['media'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => null,
+            'joinColumns'   => [
+                [
+                    'name'                 => 'media_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsContentSlider::class, 'mapManyToOne', [
+            'fieldName'     => 'content',
+            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+            'cascade'       => [
+            ],
+            'mappedBy'      => null,
+            'inversedBy'    => "sliders",
+            'joinColumns'   => [
+                [
+                    'name'                 => 'content_id',
+                    'referencedColumnName' => 'id',
+                ],
+            ],
+            'orphanRemoval' => false,
+        ]);
+    }
+
+    protected function addCmsSharedBlockMapping(DoctrineCollector $collector, $config)
+    {
+        $collector->addAssociation(CmsSharedBlock::class, 'mapOneToMany', [
+            'fieldName'     => 'contents',
+            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'mappedBy'      => 'sharedBlockParent',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsSharedBlock::class, 'mapOneToMany', [
+            'fieldName'     => 'contentList',
+            'targetEntity'  => $config['admin']['configuration']['entity']['cms_content_has_shared_block'],
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'mappedBy'      => 'sharedBlock',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+    }
+
+    protected function addCmsContentMapping(DoctrineCollector $collector, $config)
+    {
         $collector->addAssociation(CmsContent::class, 'mapManyToOne', [
             'fieldName'     => 'media',
             'targetEntity'  => $config['class']['media'],
@@ -205,323 +586,10 @@ class WebEtDesignCmsExtension extends Extension
                 "position" => "ASC"
             ]
         ]);
+    }
 
-        /* *******************************
-         * 
-         * CmsSharedBlock
-         * 
-         *********************************/
-
-        $collector->addAssociation(CmsSharedBlock::class, 'mapOneToMany', [
-            'fieldName'     => 'contents',
-            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
-            'cascade'       => [
-                "remove",
-                "persist"
-            ],
-            'mappedBy'      => 'sharedBlockParent',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsSharedBlock::class, 'mapOneToMany', [
-            'fieldName'     => 'contentList',
-            'targetEntity'  => $config['admin']['configuration']['entity']['cms_content_has_shared_block'],
-            'cascade'       => [
-                "remove",
-                "persist"
-            ],
-            'mappedBy'      => 'sharedBlock',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
-        /* *******************************
-         * 
-         * CmsContentSlider
-         * 
-         *********************************/
-
-        $collector->addAssociation(CmsContentSlider::class, 'mapManyToOne', [
-            'fieldName'     => 'media',
-            'targetEntity'  => $config['class']['media'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => null,
-            'joinColumns'   => [
-                [
-                    'name'                 => 'media_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsContentSlider::class, 'mapManyToOne', [
-            'fieldName'     => 'content',
-            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => "sliders",
-            'joinColumns'   => [
-                [
-                    'name'                 => 'content_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'orphanRemoval' => false,
-        ]);
-
-        /* *******************************
-         * 
-         * CmsPage
-         * 
-         *********************************/
-
-        $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
-            'fieldName'     => 'site',
-            'targetEntity'  => $config['admin']['configuration']['entity']['site'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => 'pages',
-            'joinColumns'   => [
-                [
-                    'name'                 => 'site_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
-            'fieldName'     => 'contents',
-            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
-            'cascade'       => [
-                "remove",
-                "persist"
-            ],
-            'mappedBy'      => 'page',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
-            'fieldName'     => 'declinations',
-            'targetEntity'  => CmsPageDeclination::class,
-            'cascade'       => [
-                "remove",
-                "persist"
-            ],
-            'mappedBy'      => 'page',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsPage::class, 'mapManyToMany', [
-            'fieldName'    => 'crossSitePages',
-            'targetEntity' => $config['admin']['configuration']['entity']['page'],
-            'cascade'      => [],
-            'joinTable'    => [
-                'name'               => 'cms__page_has_page',
-                'joinColumns'        => [
-                    'page_id' => [
-                        'name'                 => 'page_id',
-                        'referencedColumnName' => 'id',
-                        'onDelete'             => 'CASCADE',
-                    ]
-                ],
-                'inverseJoinColumns' => [
-                    'associated_page_id' => [
-                        'name'                 => 'associated_page_id',
-                        'referencedColumnName' => 'id',
-                        'onDelete'             => 'CASCADE',
-                    ],
-                ]
-            ]
-        ]);
-
-        $collector->addAssociation(CmsPage::class, 'mapOneToOne', [
-            'fieldName'     => 'route',
-            'targetEntity'  => $config['admin']['configuration']['entity']['route'],
-            'cascade'       => [
-                "remove",
-                "persist"
-            ],
-            'joinColumns'   => [
-                [
-                    'name'                 => 'route_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => 'page',
-            'orphanRemoval' => false,
-        ]);
-
-
-        /* *******************************
-         * 
-         * CmsSite
-         * 
-         *********************************/
-
-        $collector->addAssociation(CmsSite::class, 'mapOneToMany', [
-            'fieldName'     => 'pages',
-            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => 'site',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsSite::class, 'mapManyToOne', [
-            'fieldName'     => 'menu',
-            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => 'site',
-            'joinColumns'   => [
-                [
-                    'name'                 => 'menu_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'orphanRemoval' => false,
-        ]);
-
-        /* *******************************
-         *
-         * CmsContentHasSharedBlock
-         *
-         *********************************/
-
-        $collector->addAssociation(CmsContentHasSharedBlock::class, 'mapManyToOne', [
-            'fieldName'     => 'content',
-            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
-            'cascade'       => [
-                'remove',
-                'persist'
-            ],
-            'inversedBy'    => 'sharedBlockList',
-            'joinColumns'   => [
-                [
-                    'name'                 => 'content_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'orphanRemoval' => false,
-            'id'            => true
-        ]);
-
-        $collector->addAssociation(CmsContentHasSharedBlock::class, 'mapManyToOne', [
-            'fieldName'     => 'sharedBlock',
-            'targetEntity'  => $config['admin']['configuration']['entity']['shared_block'],
-            'cascade'       => [
-                'remove',
-                'persist'
-            ],
-            'inversedBy'    => 'contentList',
-            'joinColumns'   => [
-                [
-                    'name'                 => 'shared_block_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'orphanRemoval' => false,
-            'id'            => true
-        ]);
-
-        /* *******************************
-         *
-         * CmsMenu
-         *
-         *********************************/
-
-        $collector->addAssociation(CmsMenu::class, 'mapManyToOne', [
-            'fieldName'     => 'page',
-            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
-            'cascade'       => [
-            ],
-            'inversedBy'    => null,
-            'mappedBy'      => null,
-            'joinColumns'   => [
-                [
-                    'name'                 => 'page_id',
-                    'referencedColumnName' => 'id',
-                    'onDelete'             => 'SET NULL'
-                ],
-            ],
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsMenu::class, 'mapManyToOne', [
-            'fieldName'     => 'root',
-            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
-            'cascade'       => [
-            ],
-            'inversedBy'    => null,
-            'mappedBy'      => null,
-            'joinColumns'   => [
-                [
-                    'name'                 => 'tree_root',
-                    'referencedColumnName' => 'id',
-                    'onDelete'             => 'CASCADE'
-                ],
-            ],
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsMenu::class, 'mapManyToOne', [
-            'fieldName'     => 'parent',
-            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => 'children',
-            'joinColumns'   => [
-                [
-                    'name'                 => 'parent_id',
-                    'referencedColumnName' => 'id',
-                    'onDelete'             => 'CASCADE'
-                ],
-            ],
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsMenu::class, 'mapOneToMany', [
-            'fieldName'     => 'children',
-            'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => 'parent',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-            'orderBy'       => [
-                "lft" => 'ASC'
-            ]
-        ]);
-
-        $collector->addAssociation(CmsMenu::class, 'mapOneToMany', [
-            'fieldName'     => 'site',
-            'targetEntity'  => $config['admin']['configuration']['entity']['site'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => 'menu',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
-        /* *******************************
-         *
-         * AbstractCmsRoute
-         *
-         *********************************/
-
+    protected function addAbstractCmsRouteMapping(DoctrineCollector $collector, $config)
+    {
         $collector->addAssociation(AbstractCmsRoute::class, 'mapOneToOne', [
             'fieldName'     => 'page',
             'targetEntity'  => $config['admin']['configuration']['entity']['page'],
@@ -534,41 +602,5 @@ class WebEtDesignCmsExtension extends Extension
             'inversedBy'    => null,
             'orphanRemoval' => false,
         ]);
-
-        /* *******************************
-         *
-         * AbstractCmsRoute
-         *
-         *********************************/
-
-        $collector->addAssociation(CmsPageDeclination::class, 'mapManyToOne', [
-            'fieldName'     => 'page',
-            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
-            'cascade'       => [
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => 'declinations',
-            'joinColumns'   => [
-                [
-                    'name'                 => 'page_id',
-                    'referencedColumnName' => 'id',
-                    'onDelete'             => 'CASCADE'
-                ],
-            ],
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsPageDeclination::class, 'mapOneToMany', [
-            'fieldName'     => 'contents',
-            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
-            'cascade'       => [
-                "remove",
-                "persist"
-            ],
-            'mappedBy'      => 'declination',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
     }
 }

@@ -31,7 +31,7 @@ class MultilingualType extends AbstractType
 
     public function __construct(EntityManager $em, $pageClass, $siteClass)
     {
-        $this->em = $em;
+        $this->em        = $em;
         $this->pageClass = $pageClass;
         $this->siteClass = $siteClass;
     }
@@ -46,14 +46,16 @@ class MultilingualType extends AbstractType
 
         /** @var CmsSite $s */
         foreach ($this->sites as $s) {
+            $root = $s->getPage();
             $builder->add($s->getId(), EntityType::class, [
                 'required'      => false,
                 'label'         => $s->getLabel(),
                 'class'         => $this->pageClass,
-                'query_builder' => function (EntityRepository $er) use ($s) {
+                'query_builder' => function (EntityRepository $er) use ($root) {
                     return $er->createQueryBuilder('p')
-                        ->where('p.site = :site')
-                        ->setParameter('site', $s);
+                        ->join('p.root', 'r')
+                        ->where('r = :root')
+                        ->setParameter('root', $root);
                 },
             ]);
         }

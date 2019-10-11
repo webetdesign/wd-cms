@@ -2,16 +2,21 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 use phpDocumentor\Reflection\Types\Boolean;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Form\Type\ModelListType;
+use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\MultilingualType;
 use WebEtDesign\CmsBundle\Form\PageTemplateType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
@@ -35,26 +40,69 @@ class CmsPageAdmin extends AbstractAdmin
     protected $multilingual;
     protected $multisite;
     protected $declination;
+    protected $em;
 
-    public function __construct(string $code, string $class, string $baseControllerName, $multisite, $multilingual, $declination)
+    protected $datagridValues = [];
+
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $multisite, $multilingual, $declination)
     {
         $this->multisite    = $multisite;
         $this->multilingual = $multilingual;
         $this->declination  = $declination;
+        $this->em           = $em;
 
         parent::__construct($code, $class, $baseControllerName);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getActionButtons($action, $object = null)
+    {
+        $buttons = parent::getActionButtons($action, $object);
+        $buttons['create'] = ['template' => '@WebEtDesignCms/admin/page/create_button.html.twig'];
+        return $buttons;
+    }
+
+
+    protected function configureRoutes(RouteCollection $collection)
+    {
+        $default = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+
+        $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
+        if ($default != null) {
+            $collection->add('tree', 'tree/{id}', ['id' => $default->getId()], ['id' => '\d*']);
+        }
+        $collection->add('create', 'create/{parent}', ['parent' => null], ['parent' => '\d*']);
+
+        parent::configureRoutes($collection);
+    }
+
     protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
     {
+        $admin = $this->isChild() ? $this->getParent() : $this;
+        $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
+
+        $id    = $this->getRequest()->get('id');
+
+        if (!$childAdmin && in_array($action, ['tree'])) {
+            $sites = $this->em->getRepository(CmsSite::class)->findAll();
+            if (sizeof($sites) > 1) {
+                foreach ($sites as $site) {
+                    $active = $site->getId() == $this->request->attributes->get('id');
+                    $menu->addChild(
+                        $site->getLabel(),
+                        ['uri' => $admin->generateUrl('tree', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
+                    );
+                }
+            }
+        }
+
         if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
             return;
         }
 
-        $admin = $this->isChild() ? $this->getParent() : $this;
-        $id    = $this->getRequest()->get('id');
-
-        if ($this->declination) {
+        if ($this->declination && $subject->getId() != null && $subject->getRoute()->isDynamic()) {
             $menu->addChild(
                 'Page',
                 ['uri' => $admin->generateUrl('edit', ['id' => $id])]
@@ -72,18 +120,18 @@ class CmsPageAdmin extends AbstractAdmin
     {
         $datagridMapper
             ->add('id')
-            ->add('title');
+            ->add('title')
+            ->add('site');
     }
 
     protected function configureListFields(ListMapper $listMapper)
     {
+        unset($this->listModes['mosaic']);
+
         $roleAdmin = $this->canManageContent();
 
         if ($roleAdmin) {
             $listMapper->add('id');
-        }
-        if ($this->multisite) {
-            $listMapper->add('site');
         }
         $listMapper->add('title', null, [
             'label' => 'Titre',
@@ -102,6 +150,7 @@ class CmsPageAdmin extends AbstractAdmin
                         'show'   => [],
                         'edit'   => [],
                         'delete' => [],
+                        'create' => ['template' => '@WebEtDesignCms/admin/page/list_action_add.html.twig']
                     ],
                 ]
             );
@@ -111,10 +160,18 @@ class CmsPageAdmin extends AbstractAdmin
     {
         $roleAdmin = $this->canManageContent();
         $admin     = $this;
-        $admin->setFormTheme(array_merge($admin->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
-
         /** @var CmsPage $object */
         $object = $this->getSubject();
+        $parent = null;
+        $root   = null;
+        if ($this->request->attributes->get('parent') != null) {
+            $parent = $this->em->getRepository(CmsPage::class)->find($this->request->attributes->get('parent'));
+        } else {
+            $root = $object->getRoot();
+        }
+
+        $admin->setFormTheme(array_merge($admin->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
+
 
         $container = $this->getConfigurationPool()->getContainer();
         /** @var EntityManagerInterface $em */
@@ -125,15 +182,56 @@ class CmsPageAdmin extends AbstractAdmin
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => '']);
 
-        if ($this->multisite) {
-            $formMapper
-                ->add('site');
-        }
-
         $formMapper
             ->add('title', null, ['label' => 'Title'])
             ->add('template', PageTemplateType::class, ['label' => 'Modèle de page',])
-            ->end()// End form group
+            ->end(); // End form group
+
+        $formMapper
+            ->with('Déplacer')
+            ->add('moveMode', ChoiceType::class, [
+                'choices'  => [
+                    'Déplacer comme premier enfant de'        => 'persistAsFirstChildOf',
+                    'Déplacer en tant que dernier enfant de'  => 'persistAsLastChildOf',
+                    'Déplacer en tant que prochain frère de'  => 'persistAsNextSiblingOf',
+                    'Déplacer en tant que frère antérieur de' => 'persistAsPrevSiblingOf',
+                ],
+                'label'    => false,
+                'required' => false,
+                'data'     => isset($parent) && $parent ? 'persistAsLastChildOf' : null
+            ])
+            ->add('moveTarget', EntityType::class, [
+                'class'         => CmsPage::class,
+                'query_builder' => function (EntityRepository $er) use ($parent, $root, $object) {
+                    if ($parent) {
+                        $root = $parent->getRoot();
+                    }
+                    $qb = $er->createQueryBuilder('p');
+                    if ($root) {
+                        $qb
+                            ->andWhere('p.root = :root')
+                            ->setParameter('root', $root);
+                    }
+                    if ($object and $object->getId() != null) {
+                        $qb
+                            ->andWhere('p <> :object')
+                            ->setParameter('object', $object);
+                    }
+                    $qb
+                        ->addOrderBy('p.root', 'asc')
+                        ->addOrderBy('p.lft', 'asc');
+                    return $qb;
+                },
+                'choice_label'  => function ($object) {
+                    return str_repeat('--', $object->getLvl()) . ' ' . $object->getTitle();
+                },
+                'label'         => false,
+                'required'      => false,
+                'data'          => $parent ?? null,
+            ])
+            ->end();
+
+        $formMapper
             ->end()// End tab
         ;
         //endregion
@@ -261,11 +359,11 @@ class CmsPageAdmin extends AbstractAdmin
                 $formMapper->tab('MultiLingue')
                     ->with('', ['box_class' => '']);
 
-                if ($object->getSite()) {
+                if ($object->getRoot()->getSite()) {
 
 
                     $formMapper->add('crossSitePages', MultilingualType::class, [
-                        'site'  => $object->getSite(),
+                        'site'  => $object->getRoot()->getSite(),
                         'page'  => $object,
                         'label' => 'Page associées',
                     ]);
@@ -275,7 +373,7 @@ class CmsPageAdmin extends AbstractAdmin
                             $tab = [];
                             if ($value !== null) {
                                 foreach ($value as $item) {
-                                    $tab[$item->getSite()->getId()] = $item;
+                                    $tab[$item->getRoot()->getSite()->getId()] = $item;
                                 }
                             }
                             return $tab;

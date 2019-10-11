@@ -1,0 +1,5 @@
+{% if admin.hasAccess('create', object) and admin.hasRoute('create') %}
+    <a href="{{ admin.generateObjectUrl('create', object.root, {root : object.root.id, id: object.id}) }}" class="btn btn-sm btn-default" title="+">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+    </a>
+{% endif %}

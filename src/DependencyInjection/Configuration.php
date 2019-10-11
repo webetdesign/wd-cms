@@ -11,6 +11,7 @@ namespace WebEtDesign\CmsBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 
 class Configuration implements ConfigurationInterface
@@ -114,6 +115,24 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('action')
                                 ->defaultValue('index')
 //                                ->treatNullLike('index')
+                            ->end()
+//                            ->fixXmlConfig('driver')
+                            ->arrayNode('methods')
+                                ->scalarPrototype()
+                                    ->validate()
+                                        ->ifNotInArray([
+                                            Request::METHOD_GET,
+                                            Request::METHOD_POST,
+                                            Request::METHOD_PATCH,
+                                            Request::METHOD_PUT,
+                                            Request::METHOD_PURGE,
+                                            Request::METHOD_DELETE,
+                                            Request::METHOD_CONNECT
+                                        ])
+                                        ->thenInvalid('Invalid type %s')
+                                    ->end()
+                                ->end()
+                                ->defaultValue([Request::METHOD_GET])
                             ->end()
                             ->scalarNode('template')
                                 ->defaultValue('integration/index.html.twig')
