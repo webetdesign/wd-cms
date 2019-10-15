@@ -1,4 +1,1 @@
-<video controls>
-    <source src="/media/{{ options.file }}" {% for name, value in options %}{{name}}="{{value}}{% endfor %}">
-    Your browser does not support the video tag.
-</video>
+<img src="{{ asset('bundles/webetdesigncms/img/files/' ~ media.extension ~ '.png') }}" alt="{{ media.extension }}" width="80">
