@@ -3,6 +3,9 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Menu\ItemInterface as MenuItemInterface;
+use phpDocumentor\Reflection\Types\Boolean;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -19,9 +22,51 @@ use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
+use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
+use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
+use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
 
 class CmsPageAdmin extends AbstractAdmin
 {
+    use SmoTwitterAdminTrait;
+    use SmoFacebookAdminTrait;
+    use GlobalVarsAdminTrait;
+
+    protected $multilingual;
+    protected $multisite;
+    protected $declination;
+
+    public function __construct(string $code, string $class, string $baseControllerName, $multisite, $multilingual, $declination)
+    {
+        $this->multisite    = $multisite;
+        $this->multilingual = $multilingual;
+        $this->declination  = $declination;
+
+        parent::__construct($code, $class, $baseControllerName);
+    }
+
+    protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
+    {
+        if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
+            return;
+        }
+
+        $admin = $this->isChild() ? $this->getParent() : $this;
+        $id    = $this->getRequest()->get('id');
+
+        if ($this->declination) {
+            $menu->addChild(
+                'Page',
+                ['uri' => $admin->generateUrl('edit', ['id' => $id])]
+            );
+
+            $menu->addChild(
+                'Déclinaison',
+                ['uri' => $admin->generateUrl('cms.admin.cms_page_declination.list', ['id' => $id])]
+            );
+        }
+    }
+
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
@@ -37,11 +82,12 @@ class CmsPageAdmin extends AbstractAdmin
         if ($roleAdmin) {
             $listMapper->add('id');
         }
-        $listMapper
-            ->add('site')
-            ->add('title', null, [
-                'label' => 'Titre',
-            ])
+        if ($this->multisite) {
+            $listMapper->add('site');
+        }
+        $listMapper->add('title', null, [
+            'label' => 'Titre',
+        ])
             ->add('route.path', null, [
                 'label' => 'Chemin',
             ])
@@ -65,6 +111,7 @@ class CmsPageAdmin extends AbstractAdmin
     {
         $roleAdmin = $this->canManageContent();
         $admin     = $this;
+        $admin->setFormTheme(array_merge($admin->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
 
         /** @var CmsPage $object */
         $object = $this->getSubject();
@@ -76,8 +123,14 @@ class CmsPageAdmin extends AbstractAdmin
         //region Général
         $formMapper
             ->tab('Général')// The tab call is optional
-            ->with('', ['box_class' => ''])
-            ->add('site')
+            ->with('', ['box_class' => '']);
+
+        if ($this->multisite) {
+            $formMapper
+                ->add('site');
+        }
+
+        $formMapper
             ->add('title', null, ['label' => 'Title'])
             ->add('template', PageTemplateType::class, ['label' => 'Modèle de page',])
             ->end()// End form group
@@ -117,34 +170,22 @@ class CmsPageAdmin extends AbstractAdmin
             //endregion
 
             //region SEO
-            $formMapper->tab('SEO')// The tab call is optional
-            ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
+            $formMapper->tab('SEO');// The tab call is optional
+            $this->addGlobalVarsHelp($formMapper, $object);
+            $formMapper->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
                 ->add('seo_title')
                 ->add('seo_description')
                 ->add('seo_keywords')
-                ->end()
-                ->with('Facebook', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('fb_title')
-                ->add('fb_type')
-                ->add('fb_url')
-                ->add('fb_image')
-                ->add('fb_description')
-                ->add('fb_site_name')
-                ->add('fb_admins')
-                ->end()
-                ->with('Twitter', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('twitter_card')
-                ->add('twitter_site')
-                ->add('twitter_title')
-                ->add('twitter_description')
-                ->add('twitter_creator')
-                ->add('twitter_image')
-                ->end()
                 ->end();
+            $this->addFormFieldSmoFacebook($formMapper);
+            $this->addFormFieldSmoTwitter($formMapper);
+            $formMapper->end();
             //endregion
 
             //region Contenus
-            $formMapper->tab('Contenus')
+            $formMapper->tab('Contenus');
+            $this->addGlobalVarsHelp($formMapper, $object);
+            $formMapper
                 ->with('', ['box_class' => ''])
                 ->add(
                     'contents',
@@ -214,37 +255,40 @@ class CmsPageAdmin extends AbstractAdmin
                 ->end();
             //endregion
 
-            //region MultiLingue
-            $formMapper->tab('MultiLingue')
-                ->with('', ['box_class' => '']);
 
-            if ($object->getSite()) {
+            if ($this->multilingual) {
+                //region MultiLingue
+                $formMapper->tab('MultiLingue')
+                    ->with('', ['box_class' => '']);
+
+                if ($object->getSite()) {
 
 
-                $formMapper->add('crossSitePages', MultilingualType::class, [
-                    'site'  => $object->getSite(),
-                    'page'  => $object,
-                    'label' => 'Page associées',
-                ]);
+                    $formMapper->add('crossSitePages', MultilingualType::class, [
+                        'site'  => $object->getSite(),
+                        'page'  => $object,
+                        'label' => 'Page associées',
+                    ]);
 
-                $formMapper->getFormBuilder()->get('crossSitePages')->addModelTransformer(new CallbackTransformer(
-                    function ($value) {
-                        $tab = [];
-                        if ($value !== null) {
-                            foreach ($value as $item) {
-                                $tab[$item->getSite()->getId()] = $item;
+                    $formMapper->getFormBuilder()->get('crossSitePages')->addModelTransformer(new CallbackTransformer(
+                        function ($value) {
+                            $tab = [];
+                            if ($value !== null) {
+                                foreach ($value as $item) {
+                                    $tab[$item->getSite()->getId()] = $item;
+                                }
                             }
+                            return $tab;
+                        },
+                        function ($value) {
+                            return array_values(array_filter($value));
                         }
-                        return $tab;
-                    },
-                    function ($value) {
-                        return array_values(array_filter($value));
-                    }
-                ));
-            }
+                    ));
+                }
 
-            $formMapper->end();
-            //endregion
+                $formMapper->end();
+                //endregion
+            }
         }
 
     }

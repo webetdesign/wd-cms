@@ -2,21 +2,18 @@
 
 namespace WebEtDesign\CmsBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CmsController extends Controller
+class CmsController extends BaseCmsController
 {
     public function index(Request $request)
     {
-        $helper = $this->get('cms.helper');
-
-        if (!$helper->isGranted($request)) {
+        if (!$this->isPageGranted()) {
             return $this->forward('WebEtDesign\CmsBundle\Controller\CmsController::pageAccessDenied');
         };
 
-        return $helper->getDefaultRender($request, [
+        return $this->defaultRender([
             'controller_name' => 'CmsController',
         ]);
     }

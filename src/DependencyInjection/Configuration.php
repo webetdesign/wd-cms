@@ -11,6 +11,7 @@ namespace WebEtDesign\CmsBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 
 class Configuration implements ConfigurationInterface
 {
@@ -20,6 +21,28 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('web_et_design_cms');
 
         $rootNode
+            ->children()
+                ->arrayNode('cms')->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('multisite')->defaultValue(false)->end()
+                        ->scalarNode('multilingual')->defaultValue(false)->end()
+                        ->scalarNode('declination')->defaultValue(false)->end()
+                        ->arrayNode('vars')->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('enable')->defaultFalse()->end()
+                                ->scalarNode('global_service')->defaultNull()->end()
+                                ->scalarNode('delimiter')
+                                    ->validate()
+                                        ->ifNotInArray(CmsGlobalVarsDelimiterEnum::getAvailableTypes())
+                                        ->thenInvalid('Invalid type %s')
+                                    ->end()
+                                    ->defaultValue(CmsGlobalVarsDelimiterEnum::DOUBLE_UNDERSCORE)
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
             ->children()
                 ->arrayNode('admin')->addDefaultsIfNotSet()
                     ->children()
@@ -83,6 +106,8 @@ class Configuration implements ConfigurationInterface
                                     ->children()
                                         ->scalarNode('default')->end()
                                         ->scalarNode('requirement')->end()
+                                        ->scalarNode('entity')->end()
+                                        ->scalarNode('property')->end()
                                     ->end()
                                 ->end()
                             ->end()
@@ -111,6 +136,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                            ->scalarNode('entityVars')->defaultNull()->end()
                         ->end()
                     ->end()
                 ->end()

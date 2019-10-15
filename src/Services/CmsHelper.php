@@ -25,8 +25,12 @@ class CmsHelper
      * @param Twig_Environment $twig
      * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function __construct(EntityManagerInterface $em, TemplateProvider $provider, Twig_Environment $twig, AuthorizationCheckerInterface $authorizationChecker)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        TemplateProvider $provider,
+        Twig_Environment $twig,
+        AuthorizationCheckerInterface $authorizationChecker
+    ) {
         $this->em                   = $em;
         $this->provider             = $provider;
         $this->twig                 = $twig;
@@ -40,6 +44,15 @@ class CmsHelper
         return $route ? $route->getPage() : null;
     }
 
+    /**
+     * @param Request $request
+     * @param array $params
+     * @return Response
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     * @deprecated since 1.2.0, use CmsController::defaultRender instead
+     */
     public function getDefaultRender(Request $request, array $params)
     {
         /** @var CmsPage $page */
@@ -65,6 +78,10 @@ class CmsHelper
         /** @var CmsPage $page */
         $page = $this->getPage($request);
 
+        if (!$page) {
+            return null;
+        }
+
         return $page->getSite() ? $page->getSite()->getLocale() : null;
 
     }
@@ -73,6 +90,10 @@ class CmsHelper
     {
         /** @var CmsPage $page */
         $page = $this->getPage($request);
+
+        if (!$page) {
+            return true;
+        }
 
 
         if (sizeof($page->getRoles()) < 1) {

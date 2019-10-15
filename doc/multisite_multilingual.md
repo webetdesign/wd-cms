@@ -4,6 +4,17 @@
 
 For start a Multisite / Multilingual app you must configure your **site** in backoffice. 
 
+Add the lines in bundle configuration
+
+```yml 
+web_et_design_cms:
+  cms:
+    multisite: true
+    multilingual: true
+```
+
+> Multisite can be activate alone but multilingual need multisite.
+
 ### Attributes
 
 | Name          | Description   | Exemple |

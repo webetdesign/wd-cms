@@ -7,6 +7,7 @@ use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 
 /**
@@ -35,6 +36,11 @@ class CmsContentRepository extends ServiceEntityRepository
         if ($object instanceof CmsSharedBlock) {
             $qb->andWhere('c.sharedBlockParent = :sharedBlock')
                 ->setParameter('sharedBlock', $object);
+        }
+
+        if ($object instanceof CmsPageDeclination) {
+            $qb->andWhere('c.declination = :declination')
+                ->setParameter('declination', $object);
         }
 
         $qb->setParameter('code', $contentCode);

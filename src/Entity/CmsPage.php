@@ -104,6 +104,7 @@ class CmsPage
 
     private $referencePage;
 
+    private $declinations;
 
     /**
      * @return mixed
@@ -363,5 +364,44 @@ class CmsPage
     public function setReferencePage($referencePage): void
     {
         $this->referencePage = $referencePage;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getDeclinations()
+    {
+        return $this->declinations;
+    }
+
+    /**
+     * @param ArrayCollection $declinations
+     */
+    public function setDeclinations(ArrayCollection $declinations): void
+    {
+        $this->declinations = $declinations;
+    }
+
+    public function addDeclination($declination): self
+    {
+        if (!$this->declinations->contains($declination)) {
+            $this->declinations[] = $declination;
+            $declination->setPage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeclination($declination): self
+    {
+        if ($this->declinations->contains($declination)) {
+            $this->declinations->removeElement($declination);
+            // set the owning side to null (unless already changed)
+            if ($declination->getPage() === $this) {
+                $declination->setPage(null);
+            }
+        }
+
+        return $this;
     }
 }

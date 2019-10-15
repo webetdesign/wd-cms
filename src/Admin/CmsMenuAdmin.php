@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
+use Sonata\Form\Type\ImmutableArrayType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -19,15 +20,19 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use WebEtDesign\CmsBundle\Entity\CmsRoute;
+use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 
 final class CmsMenuAdmin extends AbstractAdmin
 {
-    private $em;
+    protected $pageProvider;
+    private   $em;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em)
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, TemplateProvider $pageProvider)
     {
         $this->em = $em;
+        $this->pageProvider = $pageProvider;
         parent::__construct($code, $class, $baseControllerName);
     }
 
@@ -106,7 +111,18 @@ final class CmsMenuAdmin extends AbstractAdmin
                     'sonata_help' => 'Si le type de lien utilisé est Page cms',
                     'required'    => false,
                     'label'       => 'Page cms',
-                ])
+                ]);
+            
+            if ($subject && $subject->getId() != null && $subject->getPage() != null) {
+                /** @var CmsRoute $route */
+                $route = $subject->getPage()->getRoute();
+                if ($route->isDynamic()) {
+                    $this->getRouteParamsField($formMapper, $subject, $route);
+                }
+                
+            }
+            
+            $formMapper
                 ->add('linkValue', null, [
                     'sonata_help' => 'Valeur pour les autres types de liens',
                     'required'    => false,
@@ -200,5 +216,52 @@ final class CmsMenuAdmin extends AbstractAdmin
         $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');
+    }
+
+    protected function getRouteParamsField(FormMapper $formMapper, $subject, $route)
+    {
+        $config = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
+        $keys = [];
+        foreach ($route->getParams() as $name) {
+            $param  = $config['params'][$name] ?? null;
+            $type   = !empty($param['entity']) ? EntityType::class : TextType::class;
+            $opts   = !empty($param['entity']) ? [
+                'class'        => $param['entity'],
+                'choice_value' => function ($entity = null) use ($param) {
+                    $getter = 'get' . ucfirst($param['property']);
+                    return $entity ? $entity->$getter() : '';
+                },
+            ] : [];
+            $keys[] = [$name, $type, $opts];
+        }
+        $formMapper->add('params', ImmutableArrayType::class, [
+            'keys'  => $keys,
+            'label' => false
+        ]);
+        $formMapper->getFormBuilder()->get('params')->addModelTransformer(new CallbackTransformer(
+            function ($values) use ($config) {
+                if ($values != null) {
+                    $values = json_decode($values, true);
+                    foreach ($values as $name => $value) {
+                        $param = $config['params'][$name] ?? null;
+                        if ($param) {
+                            $object        = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
+                            $values[$name] = $object;
+                        }
+                    }
+                }
+                return $values;
+            },
+            function ($values) use ($config) {
+                foreach ($values as $name => $value) {
+                    $param = $config['params'][$name] ?? null;
+                    if ($param) {
+                        $getter        = 'get' . ucfirst($param['property']);
+                        $values[$name] = $value->$getter();
+                    }
+                }
+                return json_encode($values);
+            }
+        ));
     }
 }

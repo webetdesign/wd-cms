@@ -42,6 +42,32 @@ The content section offers you the possibility to preset variables that are in y
 
 The authorized types are `'TEXT','TEXTAREA','WYSYWYG','MEDIA','SLIDER'`.
 
+### Example of custom controller
+
+Custom controllers must extend from `WebEtDesign\CmsBundle\Controller\BaseCmsController`
+
+```php 
+<?php
+
+namespace App\Controller;
+
+use WebEtDesign\CmsBundle\Controller\BaseCmsController;
+
+class exempleController extends BaseCmsController
+{
+    public function index()
+    {
+        //do custom stuf here;
+   
+        return $this->defaultRender([
+            //add custom vars here;
+        ]);
+    }
+}
+
+```
+
+
 ## Rendering contents in your page
 
 ### TEXT, TEXTAREA, WYSYWYG

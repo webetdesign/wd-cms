@@ -5,322 +5,371 @@ parameters:
   cms.admin.cms_site_entity_listener.class: WebEtDesign\CmsBundle\EventListener\CmsSiteListener
 
 services:
-    WebEtDesign\CmsBundle\Form\PageTemplateType:
-        arguments:
-            - '@cms.page_provider'
-        tags:
-            - { name: form.type }
+  WebEtDesign\CmsBundle\Form\PageTemplateType:
+    arguments:
+      - '@cms.page_provider'
+    tags:
+      - { name: form.type }
 
-    WebEtDesign\CmsBundle\Form\BlockTemplateType:
-        arguments:
-            - '@cms.block_provider'
-        tags:
-            - { name: form.type }
+  WebEtDesign\CmsBundle\Form\BlockTemplateType:
+    arguments:
+      - '@cms.block_provider'
+    tags:
+      - { name: form.type }
 
-    WebEtDesign\CmsBundle\Form\MultilingualType:
-        arguments:
-            - '@doctrine.orm.default_entity_manager'
-            - '%wd_cms.admin.config.entity.page%'
-            - '%wd_cms.admin.config.entity.site%'
-        tags:
-            - { name: form.type }
+  WebEtDesign\CmsBundle\Form\MultilingualType:
+    arguments:
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.admin.config.entity.page%'
+      - '%wd_cms.admin.config.entity.site%'
+    tags:
+      - { name: form.type }
 
-    cms.routing_loader:
-        class: WebEtDesign\CmsBundle\Routing\ExtraLoader
-        public: true
-        arguments: ['@doctrine.orm.entity_manager']
-        tags:
-            - { name: routing.loader }
+  WebEtDesign\CmsBundle\Form\GlobalVarsType:
+    arguments:
+      - '@cms.page_provider'
+      - '@service_container'
+      - '%wd_cms.vars%'
+    tags:
+      - { name: form.type }
 
-    cms.helper:
-        class: WebEtDesign\CmsBundle\Services\CmsHelper
-        arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker"]
-        public: true
+  cms.routing_loader:
+    class: WebEtDesign\CmsBundle\Routing\ExtraLoader
+    public: true
+    arguments: ['@doctrine.orm.entity_manager']
+    tags:
+      - { name: routing.loader }
 
-    # TODO: Won't work if not in autowire directories
-    WebEtDesign\CmsBundle\Services\TemplateProvider:
-        arguments:
-            $config: '%wd_cms.templates%'
+  cms.helper:
+    class: WebEtDesign\CmsBundle\Services\CmsHelper
+    arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker"]
+    public: true
 
-    cms.page_provider:
-        alias: WebEtDesign\CmsBundle\Services\TemplateProvider
+  # TODO: Won't work if not in autowire directories
+  WebEtDesign\CmsBundle\Services\TemplateProvider:
+    arguments:
+      $config: '%wd_cms.templates%'
 
-    cms.block_provider:
-        class: WebEtDesign\CmsBundle\Services\TemplateProvider
-        arguments:
-            $config: '%wd_cms.shared_block%'
+  cms.page_provider:
+    alias: WebEtDesign\CmsBundle\Services\TemplateProvider
+    public: true
 
-    # ===============================================
-    # LISTENER
-    # ===============================================
+  cms.block_provider:
+    class: WebEtDesign\CmsBundle\Services\TemplateProvider
+    arguments:
+      $config: '%wd_cms.shared_block%'
 
-    cms.admin.cms_page_listener:
-        class: '%cms.admin.cms_page_listener.class%'
-        arguments:
-          - '@cms.page_provider'
-          - '@doctrine.orm.entity_manager'
-          - '@router'
-          - '@filesystem'
-          - '@kernel'
-          - '%wd_cms.admin.config.entity.route%'
-        tags:
-            - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildPage }
-            - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
-            - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
+  # ===============================================
+  # LISTENER
+  # ===============================================
 
-    cms.admin.cms_site_listener:
-        class: '%cms.admin.cms_site_listener.class%'
-        arguments:
-          - '@router'
-          - '@filesystem'
-          - '@kernel'
-          - '%wd_cms.admin.config.entity.site%'
-        tags:
-          - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: postPersist }
-          - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: postUpdate }
+  cms.admin.cms_page_listener:
+    class: '%cms.admin.cms_page_listener.class%'
+    arguments:
+      - '@cms.page_provider'
+      - '@doctrine.orm.entity_manager'
+      - '@router'
+      - '@filesystem'
+      - '@kernel'
+      - '%wd_cms.admin.config.entity.route%'
+    tags:
+      - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildPage }
+      - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
+      - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
 
+  cms.admin.cms_page_declination_listener:
+    class: WebEtDesign\CmsBundle\EventListener\PageDeclinationAdminListener
+    arguments:
+      - '@doctrine.orm.entity_manager'
+    tags:
+      - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: prePersist }
 
-    cms.admin.cms_shared_block_listener:
-        class: '%cms.admin.cms_shared_block_listener.class%'
-        arguments:
-          - '@cms.block_provider'
-          - '@doctrine.orm.entity_manager'
-          - '@router'
-          - '@filesystem'
-          - '@kernel'
-          - '%wd_cms.admin.config.entity.route%'
-        tags:
-            - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildSharedBlock }
-
-    cms.admin.cms_site_entity_listener:
-      class: '%cms.admin.cms_site_entity_listener.class%'
-      public: true
-      tags: [doctrine.event_subscriber]
-
-    # ===============================================
-    # TWIG EXTENSION
-    # ===============================================
-
-    cms.twig.extension:
-        class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
-        arguments:
-          - '@doctrine.orm.entity_manager'
-          - '@router'
-          - '%wd_cms.custom_contents%'
-          - '@service_container'
-          - '@twig'
-          - '@cms.block_provider'
-        tags:
-          - { name: twig.extension }
-        public: true
-
-    # ===============================================
-    # MENU
-    # ===============================================
-
-    cms.menu_builder:
-        class: WebEtDesign\CmsBundle\Services\CmsMenuBuilder
-        arguments:
-          - "@knp_menu.factory"
-          - "@doctrine.orm.entity_manager"
-          - "@router"
-          - "@security.token_storage"
-          - "@security.authorization_checker"
-          - "@request_stack"
-        tags:
-            - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
+  cms.admin.cms_site_listener:
+    class: '%cms.admin.cms_site_listener.class%'
+    arguments:
+      - '@router'
+      - '@filesystem'
+      - '@kernel'
+      - '%wd_cms.admin.config.entity.site%'
+    tags:
+      - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: postPersist }
+      - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: postUpdate }
 
 
-    cms.menu_admin_builder:
-        public: true
-        class: WebEtDesign\CmsBundle\Services\CmsMenuAdminBuilder
-        arguments:
-          - "@knp_menu.factory"
-          - "@doctrine.orm.entity_manager"
-          - "@router"
-        tags:
-            - { name: knp_menu.menu_builder, method: cmsAdminMenu, alias: cmsAdminMenu }
+  cms.admin.cms_shared_block_listener:
+    class: '%cms.admin.cms_shared_block_listener.class%'
+    arguments:
+      - '@cms.block_provider'
+      - '@doctrine.orm.entity_manager'
+      - '@router'
+      - '@filesystem'
+      - '@kernel'
+      - '%wd_cms.admin.config.entity.route%'
+    tags:
+      - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildSharedBlock }
 
-    cms.menu_admin_renderer:
-        # The class implements Knp\Menu\Renderer\RendererInterface
-        class: Knp\Menu\Renderer\TwigRenderer
-        arguments:
-            - "@twig"
-            - "@@WebEtDesignCms/menu/menu_admin_renderer.html.twig"
-            - "@knp_menu.matcher"
-            # add your own dependencies here
-        tags:
-            # The alias is what is used to retrieve the menu
-            - { name: knp_menu.renderer, alias: 'cms_menu_admin_renderer' }
+  cms.admin.cms_site_entity_listener:
+    class: '%cms.admin.cms_site_entity_listener.class%'
+    public: true
+    tags: [doctrine.event_subscriber]
 
-    # ===============================================
-    # REPOSITORY
-    # ===============================================
+  cms.controller.listener:
+    class: WebEtDesign\CmsBundle\EventListener\CmsControllerListener
+    arguments:
+      - '@cms.helper'
+      - '@cms.page_provider'
+      - '@service_container'
+      - '%wd_cms.vars%'
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
-    WebEtDesign\CmsBundle\Repository\:
-        resource: '../../Repository'
-        autowire: true
-        tags: ['doctrine.repository_service']
+  # ===============================================
+  # TWIG EXTENSION
+  # ===============================================
 
-    # ===============================================
-    # PROVIDERS
-    # ===============================================
+  cms.twig.extension:
+    class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@router'
+      - '%wd_cms.custom_contents%'
+      - '@service_container'
+      - '@twig'
+      - '@cms.page_provider'
+      - '@cms.block_provider'
+      - '@request_stack'
+      - '%wd_cms.cms.declination%'
+      - '%wd_cms.vars%'
+    tags:
+      - { name: twig.extension }
+    public: true
 
-    cms.media.provider.svg:
-        class: WebEtDesign\CmsBundle\Provider\SvgProvider
-        tags:
-            - { name: sonata.media.provider }
-        arguments:
-            - "cms.media.provider.svg"
-            - "@sonata.media.filesystem.local"
-            - "@sonata.media.cdn.server"
-            - "@sonata.media.generator.default"
-            - "@sonata.media.thumbnail.format"
-            - ['svg']
-            - ['image/svg+xml']
+  # ===============================================
+  # MENU
+  # ===============================================
 
-        calls:
-            - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/SVG/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/SVG/view_svg.html.twig' }]]
-
-    cms.media.provider.video:
-        class: WebEtDesign\CmsBundle\Provider\VideoProvider
-        tags:
-            - { name: sonata.media.provider }
-        arguments:
-            - "cms.media.provider.video"
-            - "@sonata.media.filesystem.local"
-            - "@sonata.media.cdn.server"
-            - "@sonata.media.generator.default"
-            - "@sonata.media.thumbnail.format"
-            - ['mp4','ogg','webm']
-            - ['video/mp4','video/ogg','video/webm']
-
-        calls:
-            - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/Video/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/Video/view_video.html.twig' }]]
+  cms.menu_builder:
+    class: WebEtDesign\CmsBundle\Services\CmsMenuBuilder
+    arguments:
+      - "@knp_menu.factory"
+      - "@doctrine.orm.entity_manager"
+      - "@router"
+      - "@security.token_storage"
+      - "@security.authorization_checker"
+      - "@request_stack"
+    tags:
+      - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
 
 
-    # ===============================================
-    # ADMIN
-    # ===============================================
+  cms.menu_admin_builder:
+    public: true
+    class: WebEtDesign\CmsBundle\Services\CmsMenuAdminBuilder
+    arguments:
+      - "@knp_menu.factory"
+      - "@doctrine.orm.entity_manager"
+      - "@router"
+    tags:
+      - { name: knp_menu.menu_builder, method: cmsAdminMenu, alias: cmsAdminMenu }
 
-    cms.admin.cms_site:
-      class: '%wd_cms.admin.config.class.site%'
-      arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%']
-      tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: Site}
-      public: true
+  cms.menu_admin_renderer:
+    # The class implements Knp\Menu\Renderer\RendererInterface
+    class: Knp\Menu\Renderer\TwigRenderer
+    arguments:
+      - "@twig"
+      - "@@WebEtDesignCms/menu/menu_admin_renderer.html.twig"
+      - "@knp_menu.matcher"
+      # add your own dependencies here
+    tags:
+      # The alias is what is used to retrieve the menu
+      - { name: knp_menu.renderer, alias: 'cms_menu_admin_renderer' }
 
-    cms.admin.cms_route:
-        class: '%wd_cms.admin.config.class.route%'
-        arguments: [~, '%wd_cms.admin.config.entity.route%', '%wd_cms.admin.config.controller.route%']
-        tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: Route, show_in_dashboard: false }
-        public: true
+  # ===============================================
+  # REPOSITORY
+  # ===============================================
 
-    cms.admin.cms_page:
-        class: '%wd_cms.admin.config.class.page%'
-        arguments: [~, '%wd_cms.admin.config.entity.page%', '%wd_cms.admin.config.controller.page%']
-        tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
-        calls:
-            - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
-        public: true
+  WebEtDesign\CmsBundle\Repository\:
+    resource: '../../Repository'
+    autowire: true
+    tags: ['doctrine.repository_service']
 
-    cms.admin.cms_content:
-        class: '%wd_cms.admin.config.class.content%'
-#        arguments: [~, '%wd_cms.admin.config.entity.content%', '%wd_cms.admin.config.controller.content%']
-        arguments:
-          - ~
-          - '%wd_cms.admin.config.entity.content%'
-          - '%wd_cms.admin.config.controller.content%'
-          - '@doctrine.orm.default_entity_manager'
-          - '%wd_cms.custom_contents%'
-          - '%wd_cms.admin.content.media%'
-          - '@service_container'
-        tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: Content, show_in_dashboard: false }
-        public: true
+  # ===============================================
+  # PROVIDERS
+  # ===============================================
 
-    cms.admin.cms_content_slider:
-        class: '%wd_cms.admin.config.class.content_slider%'
-        arguments:
-            - ~
-            - '%wd_cms.admin.config.entity.content_slider%'
-            - '%wd_cms.admin.config.controller.content_slider%'
-            - '%wd_cms.admin.content.media%'
-        tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: ContentSlider, show_in_dashboard: false }
-        public: true
+  cms.media.provider.svg:
+    class: WebEtDesign\CmsBundle\Provider\SvgProvider
+    tags:
+      - { name: sonata.media.provider }
+    arguments:
+      - "cms.media.provider.svg"
+      - "@sonata.media.filesystem.local"
+      - "@sonata.media.cdn.server"
+      - "@sonata.media.generator.default"
+      - "@sonata.media.thumbnail.format"
+      - ['svg']
+      - ['image/svg+xml']
 
-    cms.admin.cms_menu:
-        class: '%wd_cms.admin.config.class.menu%'
-        arguments: [~, '%wd_cms.admin.config.entity.menu%', '%wd_cms.admin.config.controller.menu%', '@doctrine.orm.default_entity_manager']
-        tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: Menu }
-        calls:
-            - [setTranslationDomain, ['cms']]
-            - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
-            - [setTemplate, ['edit', '@@WebEtDesignCms/menu/edit.html.twig']]
-        public: true
+    calls:
+      - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/SVG/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/SVG/view_svg.html.twig' }]]
 
-    cms.admin.cms_shared_block:
-        class: WebEtDesign\CmsBundle\Admin\CmsSharedBlockAdmin
-        arguments:
-            - ~
-            - WebEtDesign\CmsBundle\Entity\CmsSharedBlock
-            - WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController
-        tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: Block partagé }
-        public: true
+  cms.media.provider.video:
+    class: WebEtDesign\CmsBundle\Provider\VideoProvider
+    tags:
+      - { name: sonata.media.provider }
+    arguments:
+      - "cms.media.provider.video"
+      - "@sonata.media.filesystem.local"
+      - "@sonata.media.cdn.server"
+      - "@sonata.media.generator.default"
+      - "@sonata.media.thumbnail.format"
+      - ['mp4','ogg','webm']
+      - ['video/mp4','video/ogg','video/webm']
 
-    cms.admin.cms_content_has_shared_block:
-        class: WebEtDesign\CmsBundle\Admin\CmsContentHasSharedBlockAdmin
-        arguments:
-            - ~
-            - WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock
-            - ~
-        tags:
-            - { name: sonata.admin, manager_type: orm, group: CMS, label: content has sharedBlock, show_in_dashboard: false }
-        public: true
+    calls:
+      - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/Video/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/Video/view_video.html.twig' }]]
 
-    # ===============================================
-    # DASHBOARD BLOCKS
-    # ===============================================
 
-    cms.admin.analytics:
-        class: WebEtDesign\CmsBundle\Block\Analytics\Base
-        arguments:
-            - ~
-            - '@templating'
+  # ===============================================
+  # ADMIN
+  # ===============================================
 
-        tags:
-          - { name: sonata.block }
+  cms.admin.cms_site:
+    class: '%wd_cms.admin.config.class.site%'
+    arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%']
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Site, show_in_dashboard: '%wd_cms.cms.multisite%'}
+    public: true
 
-    cms.admin.mailJet:
-        class: WebEtDesign\CmsBundle\Block\MailJet\Base
-        arguments:
-            - ~
-            - '@templating'
+  cms.admin.cms_route:
+    class: '%wd_cms.admin.config.class.route%'
+    arguments: [~, '%wd_cms.admin.config.entity.route%', '%wd_cms.admin.config.controller.route%']
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Route, show_in_dashboard: false }
+    public: true
 
-        tags:
-            - { name: sonata.block }
+  cms.admin.cms_page:
+    class: '%wd_cms.admin.config.class.page%'
+    arguments:
+      - ~
+      - '%wd_cms.admin.config.entity.page%'
+      - '%wd_cms.admin.config.controller.page%'
+      - '%wd_cms.cms.multisite%'
+      - '%wd_cms.cms.multilingual%'
+      - '%wd_cms.cms.declination%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
+    calls:
+      - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
+      - [addChild, ['@cms.admin.cms_page_declination']]
+    public: true
 
-    # ===============================================
-    # CMS CUSTOM CONTENTS
-    # ===============================================
+  cms.admin.cms_content:
+    class: '%wd_cms.admin.config.class.content%'
+    #        arguments: [~, '%wd_cms.admin.config.entity.content%', '%wd_cms.admin.config.controller.content%']
+    arguments:
+      - ~
+      - '%wd_cms.admin.config.entity.content%'
+      - '%wd_cms.admin.config.controller.content%'
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.custom_contents%'
+      - '%wd_cms.admin.content.media%'
+      - '@service_container'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Content, show_in_dashboard: false }
+    public: true
 
-    cms.custom_content.user:
-        public: true
-        class: WebEtDesign\CmsBundle\Services\EntityContent
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '%wd_cms.admin.content.user%'
-            - false
+  cms.admin.cms_content_slider:
+    class: '%wd_cms.admin.config.class.content_slider%'
+    arguments:
+      - ~
+      - '%wd_cms.admin.config.entity.content_slider%'
+      - '%wd_cms.admin.config.controller.content_slider%'
+      - '%wd_cms.admin.content.media%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: ContentSlider, show_in_dashboard: false }
+    public: true
 
-    cms.custom_content.users:
-        public: true
-        class: WebEtDesign\CmsBundle\Services\EntityContent
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '%wd_cms.admin.content.user%'
-            - true
+  cms.admin.cms_menu:
+    class: '%wd_cms.admin.config.class.menu%'
+    arguments: [~, '%wd_cms.admin.config.entity.menu%', '%wd_cms.admin.config.controller.menu%', '@doctrine.orm.default_entity_manager', '@cms.page_provider']
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Menu }
+    calls:
+      - [setTranslationDomain, ['cms']]
+      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
+      - [setTemplate, ['edit', '@@WebEtDesignCms/menu/edit.html.twig']]
+    public: true
+
+  cms.admin.cms_shared_block:
+    class: WebEtDesign\CmsBundle\Admin\CmsSharedBlockAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsSharedBlock
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Block partagé }
+    public: true
+
+  cms.admin.cms_content_has_shared_block:
+    class: WebEtDesign\CmsBundle\Admin\CmsContentHasSharedBlockAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock
+      - ~
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: content has sharedBlock, show_in_dashboard: false }
+    public: true
+
+  cms.admin.cms_page_declination:
+    class: WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsPageDeclination
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsPageDeclinationAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.templates%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: true }
+    public: true
+
+  # ===============================================
+  # DASHBOARD BLOCKS
+  # ===============================================
+
+  cms.admin.analytics:
+    class: WebEtDesign\CmsBundle\Block\Analytics\Base
+    arguments:
+      - ~
+      - '@templating'
+
+    tags:
+      - { name: sonata.block }
+
+  cms.admin.mailJet:
+    class: WebEtDesign\CmsBundle\Block\MailJet\Base
+    arguments:
+      - ~
+      - '@templating'
+
+    tags:
+      - { name: sonata.block }
+
+  # ===============================================
+  # CMS CUSTOM CONTENTS
+  # ===============================================
+
+  cms.custom_content.user:
+    public: true
+    class: WebEtDesign\CmsBundle\Services\EntityContent
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '%wd_cms.admin.content.user%'
+      - false
+
+  cms.custom_content.users:
+    public: true
+    class: WebEtDesign\CmsBundle\Services\EntityContent
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '%wd_cms.admin.content.user%'
+      - true
