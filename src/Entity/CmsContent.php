@@ -110,7 +110,7 @@ class CmsContent
                 return true;
             case $this->getMedia() !== null:
                 return true;
-            case $this->getSharedBlockList() !== null:
+            case $this->getSharedBlockList() !== null && $this->getSharedBlockList()->count() > 0:
                 return true;
         }
         return false;
