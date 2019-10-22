@@ -60,6 +60,18 @@ services:
       $config: '%wd_cms.shared_block%'
 
   # ===============================================
+  # Command
+  # ===============================================
+
+  WebEtDesign\CmsBundle\Command\CmsMigrationArboCommand:
+    arguments:
+      - ~
+      - '@doctrine.orm.default_entity_manager'
+    tags:
+      - { name: 'console.command', command: 'cms:migration-arbo' }
+
+
+  # ===============================================
   # LISTENER
   # ===============================================
 
@@ -73,9 +85,9 @@ services:
       - '@kernel'
       - '%wd_cms.admin.config.entity.route%'
     tags:
-      - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildPage }
-      - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: buildRoute }
-      - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: updateRoute }
+      - { name: doctrine.event_listener, event: prePersist }
+      - { name: doctrine.event_listener, event: postPersist }
+      - { name: doctrine.event_listener, event: postUpdate }
 
   cms.admin.cms_page_declination_listener:
     class: WebEtDesign\CmsBundle\EventListener\PageDeclinationAdminListener
@@ -92,8 +104,9 @@ services:
       - '@kernel'
       - '%wd_cms.admin.config.entity.site%'
     tags:
-      - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_persist, method: postPersist }
-      - { name: kernel.event_listener, event: sonata.admin.event.persistence.post_update, method: postUpdate }
+      - { name: doctrine.event_listener, event: prePersist }
+      - { name: doctrine.event_listener, event: postPersist }
+      - { name: doctrine.event_listener, event: postUpdate }
 
 
   cms.admin.cms_shared_block_listener:
@@ -107,11 +120,6 @@ services:
       - '%wd_cms.admin.config.entity.route%'
     tags:
       - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildSharedBlock }
-
-  cms.admin.cms_site_entity_listener:
-    class: '%cms.admin.cms_site_entity_listener.class%'
-    public: true
-    tags: [doctrine.event_subscriber]
 
   cms.controller.listener:
     class: WebEtDesign\CmsBundle\EventListener\CmsControllerListener
@@ -235,9 +243,9 @@ services:
 
   cms.admin.cms_site:
     class: '%wd_cms.admin.config.class.site%'
-    arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%']
+    arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%', '%wd_cms.cms.multilingual%']
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Site, show_in_dashboard: '%wd_cms.cms.multisite%'}
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Site}
     public: true
 
   cms.admin.cms_route:
@@ -253,6 +261,7 @@ services:
       - ~
       - '%wd_cms.admin.config.entity.page%'
       - '%wd_cms.admin.config.controller.page%'
+      - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.cms.multisite%'
       - '%wd_cms.cms.multilingual%'
       - '%wd_cms.cms.declination%'
@@ -329,7 +338,7 @@ services:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.templates%'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: true }
+      - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
     public: true
 
   # ===============================================

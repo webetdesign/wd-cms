@@ -53,17 +53,20 @@ class CmsSite
      * @ORM\Column(type="boolean", options={"default" : 0})
      *
      */
-    private $hostMultilingual;
+    private $hostMultilingual = false;
 
     /**
      * @var boolean
-     * @ORM\Column(type="boolean", options={"default" : 0})
+     * @ORM\Column(name="`default`", type="boolean", options={"default" : 0})
      *
      */
     private $default;
 
-    /** @var ArrayCollection|PersistentCollection */
-    private $pages;
+    /**
+     * @var CmsPage
+     * Mapping Relation in WebEtDesignCmsExtension
+     */
+    private $page;
 
     /**
      * @var string
@@ -77,10 +80,7 @@ class CmsSite
      */
     private $menu;
 
-    public function __construct()
-    {
-        $this->pages = new ArrayCollection();
-    }
+    public function __construct() {}
 
     /**
      * @inheritDoc
@@ -157,37 +157,6 @@ class CmsSite
     }
 
     /**
-     *
-     */
-    public function getPages(): Collection
-    {
-        return $this->pages;
-    }
-
-    public function addPage($page): self
-    {
-        if (!$this->pages->contains($page)) {
-            $this->pages[] = $page;
-            $page->setSite($this);
-        }
-
-        return $this;
-    }
-
-    public function removePage($page): self
-    {
-        if ($this->pages->contains($page)) {
-            $this->pages->removeElement($page);
-            // set the owning side to null (unless already changed)
-            if ($page->getSite() === $this) {
-                $page->setSite(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @param bool $hostMultilingual
      */
     public function setHostMultilingual(bool $hostMultilingual)
@@ -199,7 +168,7 @@ class CmsSite
     /**
      * @return bool
      */
-    public function isHostMultilingual(): bool
+    public function isHostMultilingual(): ?bool
     {
         return $this->hostMultilingual;
     }
@@ -216,7 +185,7 @@ class CmsSite
     /**
      * @return bool
      */
-    public function isDefault(): bool
+    public function isDefault(): ?bool
     {
         return $this->default;
     }
@@ -258,6 +227,18 @@ class CmsSite
         return $slugify->slugify($this->getLabel(), "_");
     }
 
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
+     * @param $page
+     */
+    public function setPage($page): void
+    {
+        $this->page = $page;
+    }
 
 
 }

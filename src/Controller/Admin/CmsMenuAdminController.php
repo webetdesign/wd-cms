@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
 use Sonata\AdminBundle\Controller\CRUDController;
+use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Form\FormView;
@@ -10,7 +11,6 @@ use Symfony\Component\Form\FormRenderer;
 use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Bridge\Twig\Command\DebugCommand;
 use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 
@@ -58,10 +58,15 @@ class CmsMenuAdminController extends CRUDController
 
     }
 
-    public function listAction()
+    public function listAction($id = null)
     {
 
         $request = $this->getRequest();
+
+        if ($this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault() == null) {
+            $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+            return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+        }
 
         $this->admin->checkAccess('list');
 
@@ -75,6 +80,9 @@ class CmsMenuAdminController extends CRUDController
         }
 
         $datagrid = $this->admin->getDatagrid();
+        if ($id) {
+            $datagrid->setValue('site',null, $id);
+        }
         $formView = $datagrid->getForm()->createView();
 
         // set the theme for the current Admin Form

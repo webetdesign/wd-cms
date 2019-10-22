@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\Form\Type\ImmutableArrayType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -21,7 +22,9 @@ use Sonata\AdminBundle\Route\RouteCollection;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use Knp\Menu\ItemInterface as MenuItemInterface;
 
 
 final class CmsMenuAdmin extends AbstractAdmin
@@ -31,7 +34,7 @@ final class CmsMenuAdmin extends AbstractAdmin
 
     public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, TemplateProvider $pageProvider)
     {
-        $this->em = $em;
+        $this->em           = $em;
         $this->pageProvider = $pageProvider;
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -42,6 +45,33 @@ final class CmsMenuAdmin extends AbstractAdmin
         $collection
             ->add('createRootNode', 'initRoot')
             ->add('move', 'move');
+
+        $default = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+        if ($default != null) {
+            $collection->add('list', 'list/{id}', ['id' => $default->getId()], ['id' => '\d*']);
+        }
+
+    }
+
+    protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
+    {
+        $admin   = $this->isChild() ? $this->getParent() : $this;
+        $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
+
+        $id = $this->getRequest()->get('id');
+
+        if (!$childAdmin && in_array($action, ['list'])) {
+            $sites = $this->em->getRepository(CmsSite::class)->findAll();
+            if (sizeof($sites) > 1) {
+                foreach ($sites as $site) {
+                    $active = $site->getId() == $this->request->attributes->get('id');
+                    $menu->addChild(
+                        $site->getLabel(),
+                        ['uri' => $admin->generateUrl('list', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
+                    );
+                }
+            }
+        }
     }
 
     //    public function createQuery($context = 'list')
@@ -58,11 +88,14 @@ final class CmsMenuAdmin extends AbstractAdmin
         $datagridMapper
             ->add('id')
             ->add('name')
-            ->add('lvl');
+            ->add('lvl')
+            ->add('site');
     }
 
     protected function configureListFields(ListMapper $listMapper)
     {
+        unset($this->listModes['mosaic']);
+
         $listMapper
             ->add('id')
             ->add('name')
@@ -112,16 +145,16 @@ final class CmsMenuAdmin extends AbstractAdmin
                     'required'    => false,
                     'label'       => 'Page cms',
                 ]);
-            
+
             if ($subject && $subject->getId() != null && $subject->getPage() != null) {
                 /** @var CmsRoute $route */
                 $route = $subject->getPage()->getRoute();
                 if ($route->isDynamic()) {
                     $this->getRouteParamsField($formMapper, $subject, $route);
                 }
-                
+
             }
-            
+
             $formMapper
                 ->add('linkValue', null, [
                     'sonata_help' => 'Valeur pour les autres types de liens',
@@ -221,7 +254,7 @@ final class CmsMenuAdmin extends AbstractAdmin
     protected function getRouteParamsField(FormMapper $formMapper, $subject, $route)
     {
         $config = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
-        $keys = [];
+        $keys   = [];
         foreach ($route->getParams() as $name) {
             $param  = $config['params'][$name] ?? null;
             $type   = !empty($param['entity']) ? EntityType::class : TextType::class;

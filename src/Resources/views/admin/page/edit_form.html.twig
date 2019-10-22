@@ -4,6 +4,7 @@
         'id': objectId|default(admin.id(object)),
         'uniqid': admin.uniqid,
         'subclass': app.request.get('subclass'),
+        'parent': app.request.attributes.get('parent'),
         'siteId': app.request.get('siteId'),
         'refId': app.request.get('refId')
     } %}
@@ -14,4 +15,4 @@
         'subclass': app.request.get('subclass')
     } %}
 {% endif %}
-{% block sonata_form_action_url %}{{ admin.generateUrl(url, options) }}{% endblock %}
+{% block sonata_form_action_url %}{{ admin.generateUrl(action, options) }}{% endblock %}

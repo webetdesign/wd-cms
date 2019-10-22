@@ -15,6 +15,8 @@ You can pass the `parentActive` argument, it allows to make nodes containing chi
 {{ knp_menu_render(menu, []) }}
 ```
 
+> In a multilingual context, the menus must have the same `code` between the different navigation (site). It is also necessary to pass the `page` parameter as an option, to render the menu in the correct language.
+
 ## Custom rendering 
 
 It is possible that the rendering of your menu made by KnpMenu is not suitable for specific needs. Here is a brief example to override the template.

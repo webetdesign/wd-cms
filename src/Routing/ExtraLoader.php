@@ -47,8 +47,11 @@ class ExtraLoader implements LoaderInterface
 
         /** @var CmsRoute $cmsRoute */
         foreach ($cmsRoutes as $cmsRoute) {
-            /** @var CmsSite $cmsSite */
-            $cmsSite = $cmsRoute->getPage()->getSite();
+            if ($cmsRoute->getPage() == null || $cmsRoute->getPage()->getRoot() == null) {
+                continue;
+            }
+//            /** @var CmsSite $cmsSite */
+            $cmsSite = $cmsRoute->getPage()->getRoot()->getSite();
             if ($cmsSite) {
                 $langPrefix = !empty($cmsSite->getLocale()) && !$cmsSite->isHostMultilingual() ? '/' . $cmsSite->getLocale() : null;
                 $host       = !empty($cmsSite->getHost()) ? $cmsSite->getHost() : null;

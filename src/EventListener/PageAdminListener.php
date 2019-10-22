@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
@@ -32,14 +33,13 @@ class PageAdminListener
     }
 
     // create page form template configuration
-    public function buildPage(PersistenceEvent $event)
+    public function prePersist(LifecycleEventArgs $event)
     {
         $page = $event->getObject();
 
         if (!$page instanceof CmsPage) {
             return;
         }
-
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
         if(isset($config['association'])) {
@@ -58,7 +58,7 @@ class PageAdminListener
     }
 
     // create route from template configuration
-    public function buildRoute(PersistenceEvent $event)
+    public function postPersist(LifecycleEventArgs $event)
     {
         $page = $event->getObject();
 
@@ -85,8 +85,8 @@ class PageAdminListener
             $CmsRoute->setController(sprintf('%s::%s', $config['controller'], $config['action']));
         }
 
-        $CmsRoute->setMethods([Request::METHOD_GET]);
-        $CmsRoute->setPath('/' . $page->getSlug() . $paramString);
+        $CmsRoute->setMethods($config['methods']);
+        $CmsRoute->setPath($page->rootPage ? '/' : '/' . $page->getSlug() . $paramString);
         $CmsRoute->setDefaults(json_encode($defaults));
         $CmsRoute->setRequirements(json_encode($requirements));
         $CmsRoute->setPage($page);
@@ -102,7 +102,7 @@ class PageAdminListener
     }
 
     // clear cache routing on update
-    public function updateRoute(PersistenceEvent $event)
+    public function postUpdate(LifecycleEventArgs $event)
     {
         $page = $event->getObject();
 

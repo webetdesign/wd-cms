@@ -11,8 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 
+// * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageRepository")
 /**
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageRepository")
+ * @Gedmo\Tree(type="nested")
+ * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\NestedTreeRepository")
  * @ORM\Table(name="cms__page")
  */
 class CmsPage
@@ -46,12 +48,14 @@ class CmsPage
      *
      * @var ArrayCollection|PersistentCollection
      *
+     * Mapping Relation in WebEtDesignCmsExtension.php
      */
     private $contents;
 
     /**
      * @var null | CmsRouteInterface
      *
+     * Mapping Relation in WebEtDesignCmsExtension.php
      */
     private $route;
 
@@ -100,11 +104,57 @@ class CmsPage
 
     private $crossSitePages;
 
-    private $site;
-
     private $referencePage;
 
     private $declinations;
+
+    /**
+     * @var CmsSite
+     *
+     * Mapping Relation in WebEtDesignCmsExtension
+     */
+    private $site;
+
+    /**
+     * @Gedmo\TreeLeft
+     * @ORM\Column(name="lft", type="integer")
+     */
+    private $lft;
+
+    /**
+     * @Gedmo\TreeLevel
+     * @ORM\Column(name="lvl", type="integer")
+     */
+    private $lvl;
+
+    /**
+     * @Gedmo\TreeRight
+     * @ORM\Column(name="rgt", type="integer")
+     */
+    private $rgt;
+
+    /**
+     * @Gedmo\TreeRoot
+     * Mapping Relation in WebEtDesignCmsExtension
+     */
+    private $root;
+
+    /**
+     * @Gedmo\TreeParent
+     * Mapping Relation in WebEtDesignCmsExtension
+     */
+    private $parent;
+
+    /**
+     * Mapping Relation in WebEtDesignCmsExtension
+     */
+    private $children;
+
+    private $moveMode;
+
+    private $moveTarget;
+
+    public $rootPage = false;
 
     /**
      * @return mixed
@@ -172,6 +222,15 @@ class CmsPage
         return (string) $this->getTitle();
     }
 
+    public function isRoot()
+    {
+        return $this->getId() == $this->getRoot()->getId();
+    }
+
+    public function isHybrid()
+    {
+        return !empty($this->getRoute()->getController());
+    }
 
     public function getId(): ?int
     {
@@ -312,14 +371,17 @@ class CmsPage
         return $this;
     }
 
-    public function getSite()
-    {
-        return $this->site;
-    }
 
-    public function setSite($site): self
+    /**
+     * @param ArrayCollection $crossSitePages
+     */
+    public function setCrossSitePages(Collection $crossSitePages): self
     {
-        $this->site = $site;
+        dump('set');
+        /** @var CmsPage $crossSitePage */
+        foreach ($crossSitePages as $crossSitePage) {
+            $this->addCrossSitePage($crossSitePage);
+        }
 
         return $this;
     }
@@ -334,8 +396,10 @@ class CmsPage
 
     public function addCrossSitePage(CmsPage $crossSitePage): self
     {
-        if (!$this->crossSitePages->contains($crossSitePage)) {
+        if (!$this->crossSitePages->contains($crossSitePage) && $crossSitePage != $this) {
             $this->crossSitePages[] = $crossSitePage;
+            $crossSitePage->addCrossSitePage($this);
+            $crossSitePage->setCrossSitePages($this->crossSitePages);
         }
 
         return $this;
@@ -345,9 +409,22 @@ class CmsPage
     {
         if ($this->crossSitePages->contains($crossSitePage)) {
             $this->crossSitePages->removeElement($crossSitePage);
+            $crossSitePage->removeCrossSitePageBis($this);
+            /** @var CmsPage $v */
+            foreach ($this->crossSitePages as $v) {
+//                $crossSitePage->removeCrossSitePageBis($v);
+                $v->removeCrossSitePage($crossSitePage);
+            }
         }
 
         return $this;
+    }
+
+    public function removeCrossSitePageBis(CmsPage $crossSitePage)
+    {
+        if ($this->crossSitePages->contains($crossSitePage)) {
+            $this->crossSitePages->removeElement($crossSitePage);
+        }
     }
 
     /**
@@ -403,5 +480,147 @@ class CmsPage
         }
 
         return $this;
+    }
+
+    public function getSite()
+    {
+        return $this->site;
+    }
+
+    /**
+     * @param CmsSite $site
+     */
+    public function setSite($site): void
+    {
+        $this->site = $site;
+        $site->setPage($this);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMoveMode()
+    {
+        return $this->moveMode;
+    }
+
+    /**
+     * @param mixed $moveMode
+     */
+    public function setMoveMode($moveMode): void
+    {
+        $this->moveMode = $moveMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMoveTarget()
+    {
+        return $this->moveTarget;
+    }
+
+    /**
+     * @param mixed $moveTarget
+     */
+    public function setMoveTarget($moveTarget): void
+    {
+        $this->moveTarget = $moveTarget;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLvl()
+    {
+        return $this->lvl;
+    }
+
+    /**
+     * @param mixed $lvl
+     */
+    public function setLvl($lvl): void
+    {
+        $this->lvl = $lvl;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRgt()
+    {
+        return $this->rgt;
+    }
+
+    /**
+     * @param mixed $rgt
+     */
+    public function setRgt($rgt): void
+    {
+        $this->rgt = $rgt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRoot()
+    {
+        return $this->root;
+    }
+
+    /**
+     * @param mixed $root
+     */
+    public function setRoot($root): void
+    {
+        $this->root = $root;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param mixed $parent
+     */
+    public function setParent($parent): void
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param mixed $children
+     */
+    public function setChildren($children): void
+    {
+        $this->children = $children;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLft()
+    {
+        return $this->lft;
+    }
+
+    /**
+     * @param mixed $lft
+     */
+    public function setLft($lft): void
+    {
+        $this->lft = $lft;
     }
 }

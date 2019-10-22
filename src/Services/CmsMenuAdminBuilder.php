@@ -41,12 +41,11 @@ class CmsMenuAdminBuilder
 
     public function cmsAdminMenu(array $options)
     {
-        $code = $options['code'];
+        $rootItem = $options['item'];
         $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
         $this->admin = $options['admin'] ?? null;
 
         /** @var MenuItem $menu */
-        $rootItem = $repo->getByCode($code);
         $menu     = $this->factory->createItem('root', [
             'childrenAttributes' => [
                 'class' => 'StackedList',
