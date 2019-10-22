@@ -2,7 +2,7 @@
 
 ## Requirement
 - PHP ^7
-- symfony ^3.4 | ^4
+- symfony ^4
 - sonata admin and media bundle
 
 ## Installation
@@ -22,7 +22,7 @@ Add the repo to your composer.json
 ```json
 "require" : {
   ...
-  "webetdesign/wd-cms": "^1.0"
+  "webetdesign/wd-cms": "^2.0"
   ...
 },
 ```
@@ -147,43 +147,86 @@ sonata_admin:
 ```yaml
 #config/packages/web_et_design_cms.yaml
 web_et_design_cms:
-    class:
-        user: App\Application\Sonata\UserBundle\Entity\User
-        media: App\Application\Sonata\MediaBundle\Entity\Media
+    cms:
+        multisite:            false
+        multilingual:         false
+        declination:          false
+        vars:
+            enable:               false
+            global_service:       null
+            delimiter:            DOUBLE_UNDERSCORE
     admin:
         configuration:
             class:
-                content_slider: WebEtDesign\CmsBundle\Admin\CmsContentSliderAdmin
-                content: WebEtDesign\CmsBundle\Admin\CmsContentAdmin
-                menu: WebEtDesign\CmsBundle\Admin\CmsMenuAdmin
-                page: WebEtDesign\CmsBundle\Admin\CmsPageAdmin
-                route: WebEtDesign\CmsBundle\Admin\CmsRouteAdmin
+                content_slider:       WebEtDesign\CmsBundle\Admin\CmsContentSliderAdmin
+                content:              WebEtDesign\CmsBundle\Admin\CmsContentAdmin
+                menu:                 WebEtDesign\CmsBundle\Admin\CmsMenuAdmin
+                page:                 WebEtDesign\CmsBundle\Admin\CmsPageAdmin
+                route:                WebEtDesign\CmsBundle\Admin\CmsRouteAdmin
+                site:                 WebEtDesign\CmsBundle\Admin\CmsSiteAdmin
             controller:
-                content_slider: WebEtDesign\CmsBundle\Controller\Admin\CmsContentSliderAdminController
-                content: WebEtDesign\CmsBundle\Controller\Admin\CmsContentAdminController
-                menu: WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController
-                page: WebEtDesign\CmsBundle\Controller\Admin\CmsPageAdminController
-                route: WebEtDesign\CmsBundle\Controller\Admin\CmsRouteAdminController
+                content_slider:       WebEtDesign\CmsBundle\Controller\Admin\CmsContentSliderAdminController
+                content:              WebEtDesign\CmsBundle\Controller\Admin\CmsContentAdminController
+                menu:                 WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController
+                page:                 WebEtDesign\CmsBundle\Controller\Admin\CmsPageAdminController
+                route:                WebEtDesign\CmsBundle\Controller\Admin\CmsRouteAdminController
+                site:                 WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController
             entity:
-                content_slider: WebEtDesign\CmsBundle\Entity\CmsContentSlider
-                content: WebEtDesign\CmsBundle\Entity\CmsContent
-                menu: WebEtDesign\CmsBundle\Entity\CmsMenu
-                page: WebEtDesign\CmsBundle\Entity\CmsPage
-                route: WebEtDesign\CmsBundle\Entity\CmsRoute
+                content_slider:       WebEtDesign\CmsBundle\Entity\CmsContentSlider
+                shared_block:         WebEtDesign\CmsBundle\Entity\CmsSharedBlock
+                cms_content_has_shared_block: WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock
+                content:              WebEtDesign\CmsBundle\Entity\CmsContent
+                menu:                 WebEtDesign\CmsBundle\Entity\CmsMenu
+                page:                 WebEtDesign\CmsBundle\Entity\CmsPage
+                route:                WebEtDesign\CmsBundle\Entity\CmsRoute
+                route_interface:      WebEtDesign\CmsBundle\Entity\CmsRouteInterface
+                site:                 WebEtDesign\CmsBundle\Entity\CmsSite
+    class:
+        user:                 ~
+        media:                ~
     pages:
-        default:
-            label: 'Page par défaut'
-            controller: null
-            action: null
-            template: a_twig_template.html.twig
+        # Prototype
+        name:
+            label:                ~
+            controller:           WebEtDesign\CmsBundle\Controller\CmsController
+            params:
+                # Prototype
+                name:
+                    default:              ~
+                    requirement:          ~
+                    entity:               ~
+                    property:             ~
+            action:               index
+            methods:
+                # Default:
+                - GET
+            template:             integration/index.html.twig
+            association:
+                class:                ~
+                queryMethod:          findAll
             contents:
+                # Prototype
                 -
-                    label: title
-                    type: TEXT
+                    code:                 ~
+                    label:                ~
+                    type:                 ~ # Required
+            entityVars:           null
+    sharedBlock:
+        # Prototype
+        name:
+            label:                ~
+            template:             ~ # Required
+            contents:
+                # Prototype
                 -
-                    label: content
-                    type: WYSYWYG
-            params: {  }
+                    code:                 ~
+                    label:                ~
+                    type:                 ~ # Required
+    customContents:
+        # Prototype
+        code:
+            name:                 ~ # Required
+            service:              ~ # Required
 ```
 
 In admin section you will able to override bundle's classes by your own for specific usage
