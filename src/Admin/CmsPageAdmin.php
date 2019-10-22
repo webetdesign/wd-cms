@@ -43,13 +43,23 @@ class CmsPageAdmin extends AbstractAdmin
     protected $em;
 
     protected $datagridValues = [];
+    protected $globalVarsEnable;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $multisite, $multilingual, $declination)
-    {
-        $this->multisite    = $multisite;
-        $this->multilingual = $multilingual;
-        $this->declination  = $declination;
-        $this->em           = $em;
+    public function __construct(
+        string $code,
+        string $class,
+        string $baseControllerName,
+        EntityManager $em,
+        $multisite,
+        $multilingual,
+        $declination,
+        $globalVarsDefinition
+    ) {
+        $this->multisite        = $multisite;
+        $this->multilingual     = $multilingual;
+        $this->declination      = $declination;
+        $this->em               = $em;
+        $this->globalVarsEnable = $globalVarsDefinition['enable'];
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -59,7 +69,7 @@ class CmsPageAdmin extends AbstractAdmin
      */
     public function getActionButtons($action, $object = null)
     {
-        $buttons = parent::getActionButtons($action, $object);
+        $buttons           = parent::getActionButtons($action, $object);
         $buttons['create'] = ['template' => '@WebEtDesignCms/admin/page/create_button.html.twig'];
         return $buttons;
     }
@@ -80,10 +90,10 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
     {
-        $admin = $this->isChild() ? $this->getParent() : $this;
+        $admin   = $this->isChild() ? $this->getParent() : $this;
         $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
 
-        $id    = $this->getRequest()->get('id');
+        $id = $this->getRequest()->get('id');
 
         if (!$childAdmin && in_array($action, ['tree'])) {
             $sites = $this->em->getRepository(CmsSite::class)->findAll();
@@ -269,7 +279,7 @@ class CmsPageAdmin extends AbstractAdmin
 
             //region SEO
             $formMapper->tab('SEO');// The tab call is optional
-            $this->addGlobalVarsHelp($formMapper, $object);
+            $this->addGlobalVarsHelp($formMapper, $object, $this->globalVarsEnable);
             $formMapper->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
                 ->add('seo_title')
                 ->add('seo_description')
@@ -282,7 +292,7 @@ class CmsPageAdmin extends AbstractAdmin
 
             //region Contenus
             $formMapper->tab('Contenus');
-            $this->addGlobalVarsHelp($formMapper, $object);
+            $this->addGlobalVarsHelp($formMapper, $object, $this->globalVarsEnable);
             $formMapper
                 ->with('', ['box_class' => ''])
                 ->add(

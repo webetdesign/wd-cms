@@ -26,7 +26,7 @@ file that was distributed with this source code.
                 </div>
                 {% import _self as macro %}
                 {% if page.children|length %}
-                    {{ macro.pages(page.children, admin, false) }}
+                    {{ macro.pages(page.childrenRight, admin, false) }}
                 {% endif %}
             </li>
         {% endfor %}
