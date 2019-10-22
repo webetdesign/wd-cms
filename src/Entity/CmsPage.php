@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\PersistentCollection;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
@@ -155,6 +156,14 @@ class CmsPage
     private $moveTarget;
 
     public $rootPage = false;
+
+
+    public function getChildrenRight()
+    {
+        $criteria = Criteria::create()->orderBy(['rgt'=>'ASC']);
+
+        return $this->children->matching($criteria);
+    }
 
     /**
      * @return mixed
