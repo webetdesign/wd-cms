@@ -24,6 +24,8 @@ class CmsControllerListener
     /** @var TemplateProvider */
     protected $provider;
 
+    protected $cmsConfig;
+
     /**
      * CmsControllerListener constructor.
      * @param CmsHelper $cmsHelper
@@ -32,10 +34,11 @@ class CmsControllerListener
      * @param $globalVarsDefinition
      * @throws \Exception
      */
-    public function __construct(CmsHelper $cmsHelper, TemplateProvider $provider, Container $container, $globalVarsDefinition)
+    public function __construct(CmsHelper $cmsHelper, TemplateProvider $provider, Container $container, $globalVarsDefinition, $cmsConfig)
     {
         $this->helper = $cmsHelper;
         $this->provider = $provider;
+        $this->cmsConfig = $cmsConfig;
         if ($globalVarsDefinition['enable']) {
             $this->globalVars = $container->get($globalVarsDefinition['global_service']);
             $this->globalVars->setDelimiter($globalVarsDefinition['delimiter']);
@@ -61,6 +64,7 @@ class CmsControllerListener
             $controller->setPage($page);
             $controller->setGranted($this->helper->isGranted($request));
             $controller->setProvider($this->provider);
+            $controller->setCmsConfig($this->cmsConfig);
 
             if ($this->globalVars) {
                 $controller->setGlobalVars($this->globalVars);

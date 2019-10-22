@@ -128,6 +128,7 @@ services:
       - '@cms.page_provider'
       - '@service_container'
       - '%wd_cms.vars%'
+      - '%wd_cms.cms%'
     tags:
       - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 

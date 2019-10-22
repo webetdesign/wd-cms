@@ -25,6 +25,8 @@ class BaseCmsController extends AbstractController
 
     /** @var AbstractCmsGlobalVars */
     private $globalVars;
+    
+    private $cmsConfig;
 
     public function setVarsObject(GlobalVarsInterface $object)
     {
@@ -63,8 +65,8 @@ class BaseCmsController extends AbstractController
         /** @var CmsPage $page */
         $page = $this->getPage();
         $baseParams = ['page' => $page];
-
-        if ($this->getParameter('wd_cms.cms.declination')) {
+      
+        if ($this->getCmsConfig()['declination']) {
             $baseParams['declination'] = $this->getDeclination($page);
         }
 
@@ -138,5 +140,23 @@ class BaseCmsController extends AbstractController
     public function getLocale()
     {
         return $this->locale;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCmsConfig()
+    {
+        return $this->cmsConfig;
+    }
+
+    /**
+     * @param mixed $cmsConfig
+     * @return BaseCmsController
+     */
+    public function setCmsConfig($cmsConfig)
+    {
+        $this->cmsConfig = $cmsConfig;
+        return $this;
     }
 }
