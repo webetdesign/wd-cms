@@ -87,7 +87,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('cms_render_content', [$this, 'cmsRenderContent'], ['is_safe' => ['html']]),
-            new TwigFunction('cms_render_shared_block', [$this, 'renderSharedBlock'], ['is_safe' => ['html']]),
+            new TwigFunction('cms_render_shared_block', [$this, 'getSharedBlock'], ['is_safe' => ['html']]),
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
@@ -190,6 +190,13 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         return $this->globalVarsEnable ? $this->replaceVars($content->getValue()) : $content->getValue();
+    }
+
+    public function getSharedBlock($code)
+    {
+        $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code]);
+
+        return $this->renderSharedBlock($block);
     }
 
     public function renderSharedBlock(CmsSharedBlock $block)
