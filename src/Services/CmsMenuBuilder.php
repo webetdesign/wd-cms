@@ -71,7 +71,7 @@ class CmsMenuBuilder
 
         $menu     = $this->factory->createItem('root');
         $rootItem = $repo->getRootByName($menuRootName);
-        $this->buildNodes($menu, $repo->children($rootItem, true), $parentActive);
+        $this->buildNodes($menu, $rootItem->getChildren(), $parentActive);
 
         return $menu;
     }
@@ -90,7 +90,7 @@ class CmsMenuBuilder
         }
         $menu = $this->factory->createItem('root');
         $menu->setChildrenAttribute('class', $cmsMenu->getClasses());
-        $this->buildNodes($menu, $repo->children($cmsMenu, true), $parentActive);
+        $this->buildNodes($menu, $cmsMenu->getChildren(), $parentActive);
 
         return $menu;
     }
@@ -112,7 +112,7 @@ class CmsMenuBuilder
                 continue;
             }
 
-            $children  = $this->repo->getChildren($child, true);
+            $children  = $child->getChildren();
             $childItem = $menu->addChild($child->getName());
 
             $childItemClass = '';

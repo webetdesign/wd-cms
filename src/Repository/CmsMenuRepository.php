@@ -49,6 +49,8 @@ class CmsMenuRepository extends NestedTreeRepository
     public function getByCode($code)
     {
         $qb = $this->createQueryBuilder('m')
+            ->leftJoin('m.children', 'c')
+            ->addSelect('c')
             ->where('m.code = :code')
             ->setParameter('code', $code)
             ->setMaxResults(1);
@@ -58,6 +60,8 @@ class CmsMenuRepository extends NestedTreeRepository
     public function getByCodeAndRoot($code, $root)
     {
         $qb = $this->createQueryBuilder('m')
+            ->leftJoin('m.children', 'c')
+            ->addSelect('c')
             ->where('m.code = :code')
             ->andWhere('m.root = :root')
             ->setParameter('code', $code)

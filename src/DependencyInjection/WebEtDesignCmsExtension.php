@@ -380,7 +380,7 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
             'orderBy'       => [
                 "lft" => 'ASC'
-            ]
+            ],
         ]);
 
         $collector->addAssociation(CmsMenu::class, 'mapOneToMany', [
