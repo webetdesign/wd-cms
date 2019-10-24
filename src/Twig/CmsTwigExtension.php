@@ -147,7 +147,22 @@ class CmsTwigExtension extends AbstractExtension
             if ($this->getDeclination($object)) {
                 $content = $this->getContent($this->getDeclination($object), $content_code);
             }
-            if (!$content || !$content->isSet()) {
+            if ($content) {
+                $isSet = false;
+                if (in_array($content->getType(), array_keys($this->customContents))) {
+                    $contentService = $this->container->get($this->customContents[$content->getType()]['service']);
+                    if (method_exists($contentService, 'isSet')) {
+                        $isSet = $contentService->isSet($content);
+                    } else {
+                        throw new Exception('You must defined an isSet method in ' . get_class($contentService) . ' for work with the declinations system');
+                    }
+                } else {
+                    $isSet = $content->isSet();
+                }
+                if (!$isSet) {
+                    $content = $this->getContent($object, $content_code);
+                }
+            } else {
                 $content = $this->getContent($object, $content_code);
             }
         } else {
