@@ -23,6 +23,9 @@ file that was distributed with this source code.
                     {% if page.declinations.count > 0 %}
                         <span class="label label-primary pull-right">{{ page.declinations.count }} {{ page.declinations.count > 1 ? 'Déclinaisons' : "Déclinaison" }}</span>
                     {% endif %}
+                    {% if app.user.hasRole('ROLE_ADMIN_CMS') %}
+                        <span><code class="pull-right">{{ page.route.name }}</code></span>
+                    {% endif %}
                 </div>
                 {% import _self as macro %}
                 {% if page.children|length %}

@@ -93,6 +93,7 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_path', [$this, 'cmsPath']),
             new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'], ['is_safe' => ['html']]),
             new TwigFunction('cms_render_seo_smo_value', [$this, 'renderSeoSmo']),
+            new TwigFunction('cms_breadcrumb', [$this, 'breadcrumb']),
             new TwigFunction('test', [$this, 'test']),
         ];
     }
@@ -341,9 +342,30 @@ class CmsTwigExtension extends AbstractExtension
         $d = $this->globalVars->getDelimiters();
 
         foreach ($values as $name => $value) {
-            $str = str_replace($d['s'].$name.$d['e'], $value, $str);
+            $str = str_replace($d['s'] . $name . $d['e'], $value, $str);
         }
 
         return $str;
+    }
+
+    /**
+     * @param CmsPage $page
+     */
+    public function breadcrumb($page)
+    {
+        $items = [];
+        while ($page != null) {
+            if (!$page->getRoute()->isDynamic()) {
+                $items[] = [
+                    'title' => $page->getTitle(),
+                    'link'  => $this->router->generate($page->getRoute()->getName())
+                ];
+
+            }
+            /** @var CmsPage $page */
+            $page = $page->getParent();
+        }
+
+        return array_reverse($items);
     }
 }
