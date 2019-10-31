@@ -1,17 +1,79 @@
 <!-- Twitter Card data -->
-<meta name="twitter:card" content="{{ cms_render_seo_smo_value(object, 'twitterCard') }}">
-<meta name="twitter:site" content="{{ cms_render_seo_smo_value(object, 'twitterSite') }}">
-<meta name="twitter:title" content="{{ cms_render_seo_smo_value(object, 'twitterTitle') }}">
-<meta name="twitter:description" content="{{ cms_render_seo_smo_value(object, 'twitterDescription') }}">
-<meta name="twitter:creator" content="{{ cms_render_seo_smo_value(object, 'twitterCreator') }}">
-{#Twitter Summary card images must be at least 120x120px #}
-<meta name="twitter:image" content="{{ cms_render_seo_smo_value(object, 'twitterImage') }}">
+{% if object is defined and cms_render_seo_smo_value(object, 'twitterCard') is not empty %}
+    <meta name="twitter:card" content="{{ cms_render_seo_smo_value(object, 'twitterCard') }}">
+{% else %}
+    <meta name="twitter:card" content="{{ cms_render_seo_smo_value(page, 'twitterCard') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'twitterSite') is not empty %}
+    <meta name="twitter:site" content="{{ cms_render_seo_smo_value(object, 'twitterSite') }}">
+{% else %}
+    <meta name="twitter:site" content="{{ cms_render_seo_smo_value(page, 'twitterSite') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'twitterTitle') is not empty %}
+    <meta name="twitter:title" content="{{ cms_render_seo_smo_value(object, 'twitterTitle') }}">
+{% else %}
+    <meta name="twitter:title" content="{{ cms_render_seo_smo_value(page, 'twitterTitle') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'twitterDescription') is not empty %}
+    <meta name="twitter:description" content="{{ cms_render_seo_smo_value(object, 'twitterDescription') }}">
+{% else %}
+    <meta name="twitter:description" content="{{ cms_render_seo_smo_value(page, 'twitterDescription') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'twitterCreator') is not empty %}
+    <meta name="twitter:creator" content="{{ cms_render_seo_smo_value(object, 'twitterCreator') }}">
+{% else %}
+    <meta name="twitter:creator" content="{{ cms_render_seo_smo_value(page, 'twitterCreator') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'twitterImage') is not empty %}
+    <meta name="twitter:image" content="{{ cms_render_seo_smo_value(object, 'twitterImage') }}">
+{% else %}
+    <meta name="twitter:image" content="{{ cms_render_seo_smo_value(page, 'twitterImage') }}">
+{% endif %}
 
 <!-- Open Graph data -->
-<meta property="og:title" content="{{ cms_render_seo_smo_value(object, 'fbTitle') }}" />
-<meta property="og:type" content="{{ cms_render_seo_smo_value(object, 'fbType') }}" />
-<meta property="og:url" content="{{ cms_render_seo_smo_value(object, 'fbUrl') }}" />
-<meta property="og:image" content="{{ cms_render_seo_smo_value(object, 'fbImage') }}" />
-<meta property="og:description" content="{{ cms_render_seo_smo_value(object, 'fbDescription') }}" />
-<meta property="og:site_name" content="{{ cms_render_seo_smo_value(object, 'fbSiteName') }}" />
-<meta property="fb:admins" content="{{ cms_render_seo_smo_value(object, 'fbAdmins') }}" />
+{% if object is defined and cms_render_seo_smo_value(object, 'fbTitle') is not empty %}
+    <meta name="og:title" content="{{ cms_render_seo_smo_value(object, 'fbTitle') }}">
+{% else %}
+    <meta name="og:title" content="{{ cms_render_seo_smo_value(page, 'fbTitle') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'fbType') is not empty %}
+    <meta name="og:type" content="{{ cms_render_seo_smo_value(object, 'fbType') }}">
+{% else %}
+    <meta name="og:type" content="{{ cms_render_seo_smo_value(page, 'fbType') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'fbUrl') is not empty %}
+    <meta name="og:url" content="{{ cms_render_seo_smo_value(object, 'fbUrl') }}">
+{% else %}
+    <meta name="og:url" content="{{ cms_render_seo_smo_value(page, 'fbUrl') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'fbImage') is not empty %}
+    <meta name="og:image" content="{{ cms_render_seo_smo_value(object, 'fbImage') }}">
+{% else %}
+    <meta name="og:image" content="{{ cms_render_seo_smo_value(page, 'fbImage') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'fbDescription') is not empty %}
+    <meta name="og:description" content="{{ cms_render_seo_smo_value(object, 'fbDescription') }}">
+{% else %}
+    <meta name="og:description" content="{{ cms_render_seo_smo_value(page, 'fbDescription') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'fbSiteName') is not empty %}
+    <meta name="og:site_name" content="{{ cms_render_seo_smo_value(object, 'fbSiteName') }}">
+{% else %}
+    <meta name="og:site_name" content="{{ cms_render_seo_smo_value(page, 'fbSiteName') }}">
+{% endif %}
+
+{% if object is defined and cms_render_seo_smo_value(object, 'fbAdmins') is not empty %}
+    <meta name="fb:admins" content="{{ cms_render_seo_smo_value(object, 'fbAdmins') }}">
+{% else %}
+    <meta name="fb:admins" content="{{ cms_render_seo_smo_value(page, 'fbAdmins') }}">
+{% endif %}
