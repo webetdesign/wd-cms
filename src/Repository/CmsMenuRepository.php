@@ -53,7 +53,8 @@ class CmsMenuRepository extends NestedTreeRepository
             ->addSelect('c')
             ->where('m.code = :code')
             ->setParameter('code', $code)
-            ->setMaxResults(1);
+//            ->setMaxResults(1)
+        ;
         return $qb->getQuery()->getOneOrNullResult();
     }
 
@@ -66,7 +67,8 @@ class CmsMenuRepository extends NestedTreeRepository
             ->andWhere('m.root = :root')
             ->setParameter('code', $code)
             ->setParameter('root', $root)
-            ->setMaxResults(1);
+//            ->setMaxResults(1)
+        ;
         return $qb->getQuery()->getOneOrNullResult();
     }
 

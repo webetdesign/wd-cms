@@ -11,7 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsMenuRepository")
- * @ORM\Table(name="cms__menu")
+ * @ORM\Table(name="cms__menu", uniqueConstraints={@ORM\UniqueConstraint(name="code_idx", columns={"code"})})
  * @Gedmo\Tree(type="nested")
  */
 class CmsMenu
@@ -32,7 +32,8 @@ class CmsMenu
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * 
+     * @ORM\Column(type="string", length=200, nullable=true)
      *
      */
     private $code;

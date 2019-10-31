@@ -298,21 +298,22 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
         ]);
 
-        $collector->addAssociation(CmsSite::class, 'mapManyToOne', [
+        $collector->addAssociation(CmsSite::class, 'mapOneToOne', [
             'fieldName'     => 'menu',
             'targetEntity'  => $config['admin']['configuration']['entity']['menu'],
             'cascade'       => [
                 'persist',
                 'remove'
             ],
-            'mappedBy'      => null,
-            'inversedBy'    => 'site',
             'joinColumns'   => [
                 [
                     'name'                 => 'menu_id',
                     'referencedColumnName' => 'id',
+                    'onDelete'             => 'SET NULL'
                 ],
             ],
+            'mappedBy'      => null,
+            'inversedBy'    => 'site',
             'orphanRemoval' => false,
         ]);
     }
@@ -383,7 +384,7 @@ class WebEtDesignCmsExtension extends Extension
             ],
         ]);
 
-        $collector->addAssociation(CmsMenu::class, 'mapOneToMany', [
+        $collector->addAssociation(CmsMenu::class, 'mapOneToOne', [
             'fieldName'     => 'site',
             'targetEntity'  => $config['admin']['configuration']['entity']['site'],
             'cascade'       => [
