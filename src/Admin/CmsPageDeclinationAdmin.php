@@ -29,6 +29,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
     protected $em;
     protected $pageConfig;
+    protected $globalVarsEnable;
 
     protected $parentAssociationMapping = 'page';
     protected $datagridValues           = [
@@ -37,10 +38,12 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         '_sort_by'    => 'position',
     ];
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $pageConfig)
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $pageConfig, $globalVarsDefinition)
     {
         $this->em         = $em;
         $this->pageConfig = $pageConfig;
+        $this->globalVarsEnable = $globalVarsDefinition['enable'];
+
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -137,7 +140,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         //region SEO
         $formMapper->tab('SEO');// The tab call is optional
-        $this->addGlobalVarsHelp($formMapper, $object->getPage());
+        $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable);
         $formMapper
             ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
             ->add('seo_title')
@@ -152,7 +155,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         //region Contenus
         $formMapper->tab('Contenus');
-        $this->addGlobalVarsHelp($formMapper, $object->getPage());
+        $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable);
         $formMapper
             ->with('', ['box_class' => ''])
             ->add(
