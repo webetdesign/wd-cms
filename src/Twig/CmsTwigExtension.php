@@ -313,16 +313,12 @@ class CmsTwigExtension extends AbstractExtension
 
         $value = null;
         if ($object instanceof CmsPage && $this->declination && ($declination = $this->getDeclination($object))) {
-            if (method_exists($declination, $method)) {
-                $value = call_user_func_array([$declination, $method], []);
-            } else {
-                trigger_error('Call to undefined method ' . get_class($declination) . '::' . $method . '()', E_USER_ERROR);
-            }
+            $this->getSeoSmoValue($declination, $method);
         } else {
-            if (method_exists($object, $method)) {
-                $value = call_user_func_array([$object, $method], []);
+            if ($object instanceof CmsPage) {
+                $value = $this->getSeoSmoValueFallbackParentPage($object, $method);
             } else {
-                trigger_error('Call to undefined method ' . get_class($object) . '::' . $method . '()', E_USER_ERROR);
+                $this->getSeoSmoValue($object, $method);
             }
         }
 
@@ -333,6 +329,24 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         return $value;
+    }
+
+    private function getSeoSmoValueFallbackParentPage(CmsPage $object, $method)
+    {
+        $value = $this->getSeoSmoValue($object, $method);
+        if (empty($value) && $object->getParent() !== null) {
+            return $this->getSeoSmoValueFallbackParentPage($object->getParent(), $method);
+        }
+        return $value;
+    }
+
+    private function getSeoSmoValue($object, $method)
+    {
+        if (method_exists($object, $method)) {
+            return call_user_func_array([$object, $method], []);
+        } else {
+            trigger_error('Call to undefined method ' . get_class($object) . '::' . $method . '()', E_USER_ERROR);
+        }
     }
 
     public function replaceVars($str)
