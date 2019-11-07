@@ -14,8 +14,8 @@ web_et_design_cms:
       action: index
       template: faq.html.twig
       contents:
-        - { label: 'title', type: 'TEXT' }
-        - { label: 'content', type: 'WYSYWYG' }     
+        - { code: 'title', type: 'TEXT' }
+        - { code: 'content', type: 'WYSYWYG' }     
 ```
 
 If your route needs settings, you can define it here too. In the example below we define the page parameter with these requirements and default value. The path will be automatically generated with the parameters: `page_name/{page}` in our case
@@ -29,8 +29,8 @@ web_et_design_cms:
       action: index
       template: exemple.html.twig
       contents:
-        - { label: 'title', type: 'TEXT' }
-        - { label: 'content', type: 'WYSYWYG' }
+        - { code: 'title', type: 'TEXT' }
+        - { code: 'content', type: 'WYSYWYG' }
         - { code: 'tech_name', label: 'fancy_name', type: 'TEXT' }
       params:
         page: 

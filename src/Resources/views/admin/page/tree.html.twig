@@ -17,13 +17,15 @@ file that was distributed with this source code.
                     {% if page.parent %}<i class="fa fa-caret-right"></i>{% endif %}
                     <i class="fa page-tree__item__is-hybrid fa-{% if page.isHybrid %}gears{% else %}code{% endif %}"></i>
                     <a class="page-tree__item__edit" href="{{ admin.generateObjectUrl('edit', page) }}">{{ page.title }}</a>
-                    <i class="text-muted">{% if page.root.site.locale is not empty and not page.root.site.hostMultilingual %}/{{ page.root.site.locale }}{% endif %}{{ page.route.path }}</i>
+                    {% if page.route != null %}
+                        <i class="text-muted">{% if page.root.site.locale is not empty and not page.root.site.hostMultilingual %}/{{ page.root.site.locale }}{% endif %}{{ page.route.path }}</i>
+                    {% endif %}
                     <a class="label label-default pull-right" href="{{ admin.generateObjectUrl('edit', page) }}">Editer <i class="fa fa-pencil"></i></a>
                     <span class="label label-{% if page.isActive %}success{% else %}danger{% endif %} pull-right">Active</span>
                     {% if page.declinations.count > 0 %}
                         <span class="label label-primary pull-right">{{ page.declinations.count }} {{ page.declinations.count > 1 ? 'Déclinaisons' : "Déclinaison" }}</span>
                     {% endif %}
-                    {% if app.user.hasRole('ROLE_ADMIN_CMS') %}
+                    {% if app.user.hasRole('ROLE_ADMIN_CMS') and page.route is not null %}
                         <span><code class="pull-right">{{ page.route.name }}</code></span>
                     {% endif %}
                 </div>

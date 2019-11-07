@@ -27,6 +27,7 @@ use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
+use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
@@ -44,6 +45,7 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected $datagridValues = [];
     protected $globalVarsEnable;
+    protected $pageProvider;
 
     public function __construct(
         string $code,
@@ -53,13 +55,15 @@ class CmsPageAdmin extends AbstractAdmin
         $multisite,
         $multilingual,
         $declination,
-        $globalVarsDefinition
+        $globalVarsDefinition,
+        TemplateProvider $pageProvider
     ) {
         $this->multisite        = $multisite;
         $this->multilingual     = $multilingual;
         $this->declination      = $declination;
         $this->em               = $em;
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
+        $this->pageProvider     = $pageProvider;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -180,6 +184,8 @@ class CmsPageAdmin extends AbstractAdmin
             $root = $object->getRoot();
         }
 
+        $site = $root ? $root->getSite() : $parent->getRoot()->getSite();
+
         $admin->setFormTheme(array_merge($admin->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
 
 
@@ -193,8 +199,20 @@ class CmsPageAdmin extends AbstractAdmin
             ->with('', ['box_class' => '']);
 
         $formMapper
-            ->add('title', null, ['label' => 'Title'])
-            ->add('template', PageTemplateType::class, ['label' => 'Modèle de page',])
+            ->add('title', null, ['label' => 'Title']);
+        if (empty($site->getTemplateFilter())) {
+            $formMapper
+                ->add('template', PageTemplateType::class, [
+                    'label' => 'Modèle de page',
+                ]);
+        } else {
+            $formMapper
+                ->add('template', PageTemplateType::class, [
+                    'label'   => 'Modèle de page',
+                    'choices' => $this->pageProvider->getTemplateList($site->getTemplateFilter())
+                ]);
+        }
+        $formMapper
             ->end(); // End form group
 
         $formMapper
@@ -315,40 +333,42 @@ class CmsPageAdmin extends AbstractAdmin
                 ->end();
             //endregion
 
-            //region Route
-            $formMapper->tab('Route')
-                ->with('', ['box_class' => ''])
-                ->add('route.name', null, ['label' => 'Route name (technique)'])
-                ->add('route.path', null, ['label' => 'Chemin', 'attr' => ['class' => 'cms_route_path_input']])
-                ->add(
-                    'route.methods',
-                    ChoiceType::class,
-                    [
-                        'label'    => 'Méthodes',
-                        'choices'  => [
-                            Request::METHOD_GET    => Request::METHOD_GET,
-                            Request::METHOD_POST   => Request::METHOD_POST,
-                            Request::METHOD_DELETE => Request::METHOD_DELETE,
-                            Request::METHOD_PUT    => Request::METHOD_PUT,
-                            Request::METHOD_PATCH  => Request::METHOD_PATCH,
-                        ],
-                        'multiple' => true,
-                    ]
-                )
-                ->add('route.controller', null, ['label' => 'Controller (technique)'])
-                ->add('route.defaults', HiddenType::class, [
-                    'attr' => [
-                        'class' => 'cms_route_default_input'
-                    ]
-                ])
-                ->add('route.requirements', HiddenType::class, [
-                    'attr' => [
-                        'class' => 'cms_route_requirements_input'
-                    ]
-                ])
-                ->end()
-                ->end();
-            //endregion
+            if ($object->getRoute() != null) {
+                //region Route
+                $formMapper->tab('Route')
+                    ->with('', ['box_class' => ''])
+                    ->add('route.name', null, ['label' => 'Route name (technique)'])
+                    ->add('route.path', null, ['label' => 'Chemin', 'attr' => ['class' => 'cms_route_path_input']])
+                    ->add(
+                        'route.methods',
+                        ChoiceType::class,
+                        [
+                            'label'    => 'Méthodes',
+                            'choices'  => [
+                                Request::METHOD_GET    => Request::METHOD_GET,
+                                Request::METHOD_POST   => Request::METHOD_POST,
+                                Request::METHOD_DELETE => Request::METHOD_DELETE,
+                                Request::METHOD_PUT    => Request::METHOD_PUT,
+                                Request::METHOD_PATCH  => Request::METHOD_PATCH,
+                            ],
+                            'multiple' => true,
+                        ]
+                    )
+                    ->add('route.controller', null, ['label' => 'Controller (technique)'])
+                    ->add('route.defaults', HiddenType::class, [
+                        'attr' => [
+                            'class' => 'cms_route_default_input'
+                        ]
+                    ])
+                    ->add('route.requirements', HiddenType::class, [
+                        'attr' => [
+                            'class' => 'cms_route_requirements_input'
+                        ]
+                    ])
+                    ->end()
+                    ->end();
+                //endregion
+            }
 
             //region Sécurité
             $formMapper->tab('Sécurité')

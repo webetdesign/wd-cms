@@ -112,8 +112,8 @@ web_et_design_cms:
           entity: App\Entity\Product\Brand
           property: slug
       contents:
-        - { label: 'title', type: 'TEXT' }
-        - { code: 'title_middle',label: 'title_middle', type: 'TEXT' }
-        - { label: 'content', type: 'WYSYWYG' }
+        - { code: 'title', type: 'TEXT' }
+        - { code: 'title_middle', label: 'title_middle', type: 'TEXT' }
+        - { code: 'content', type: 'WYSYWYG' }
       entityVars: App\Entity\Product\Brand
 ```

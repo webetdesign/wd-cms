@@ -19,16 +19,27 @@ class TemplateProvider
     }
 
     /**
+     * @param null $filter
      * @return array
      *
      * List of available templates for choice type
      */
-    public function getTemplateList()
+    public function getTemplateList($filter = null)
     {
         $list = [];
 
         foreach ($this->config as $key => $template) {
-            $list[$template['label']] = $key;
+            if ($filter) {
+                if (preg_match('/'.$filter.'/', $key)) {
+                    $list[$template['label']] = $key;
+                }
+                if (preg_match('/common/', $key)) {
+                    $list[$template['label']] = $key;
+                }
+            } else {
+                $list[$template['label']] = $key;
+            }
+
         }
 
         return $list;

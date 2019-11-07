@@ -238,7 +238,10 @@ class CmsPage
 
     public function isHybrid()
     {
-        return !empty($this->getRoute()->getController());
+        if ($this->getRoute()) {
+            return !empty($this->getRoute()->getController());
+        }
+        return false;
     }
 
     public function getId(): ?int

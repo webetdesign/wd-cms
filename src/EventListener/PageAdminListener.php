@@ -50,9 +50,10 @@ class PageAdminListener
         // hydrate content
         foreach ($config['contents'] as $content) {
             $CmsContent = new CmsContent();
-            $CmsContent->setCode($content['code'] ?? $content['label']);
-            $CmsContent->setLabel($content['label']);
+            $CmsContent->setCode($content['code']);
+            $CmsContent->setLabel($content['code'] ?? $content['label']);
             $CmsContent->setType($content['type']);
+            $CmsContent->setHelp($content['help'] ?? null);
             $page->addContent($CmsContent);
         }
     }
@@ -68,6 +69,55 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
+        if ($config['disableRoute']) {
+            return;
+        }
+
+        $this->createRoute($config, $page);
+
+        $this->warmUpRouteCache();
+    }
+
+    // clear cache routing on update
+    public function postUpdate(LifecycleEventArgs $event)
+    {
+        $page = $event->getObject();
+
+        if (!$page instanceof CmsPage) {
+            return;
+        }
+
+        $config = $this->provider->getConfigurationFor($page->getTemplate());
+
+        if (!$config['disableRoute'] && $page->getRoute() === null) {
+            $this->createRoute($config, $page);
+        }
+
+        if ($config['disableRoute'] && $page->getRoute() !== null) {
+            $route = $page->getRoute();
+            $page->setRoute(null);
+            $this->em->remove($route);
+        }
+
+        $this->warmUpRouteCache();
+    }
+
+    // remove cache routing file and warmup cache
+    protected function warmUpRouteCache()
+    {
+        $cacheDir = $this->kernel->getCacheDir();
+
+        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
+            $className = $this->router->getOption($option);
+            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
+            $this->fs->remove($cacheFile);
+        }
+
+        $this->router->warmUp($cacheDir);
+    }
+
+    protected function createRoute($config, $page)
+    {
         $paramString  = '';
         $defaults     = [];
         $requirements = [];
@@ -97,33 +147,6 @@ class PageAdminListener
         // persist route
         $this->em->persist($CmsRoute);
         $this->em->flush();
-
-        $this->warmUpRouteCache();
     }
 
-    // clear cache routing on update
-    public function postUpdate(LifecycleEventArgs $event)
-    {
-        $page = $event->getObject();
-
-        if (!$page instanceof CmsPage) {
-            return;
-        }
-
-        $this->warmUpRouteCache();
-    }
-
-    // remove cache routing file and warmup cache
-    protected function warmUpRouteCache()
-    {
-        $cacheDir = $this->kernel->getCacheDir();
-
-        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
-            $className = $this->router->getOption($option);
-            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
-            $this->fs->remove($cacheFile);
-        }
-
-        $this->router->warmUp($cacheDir);
-    }
 }

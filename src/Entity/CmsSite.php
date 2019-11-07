@@ -80,6 +80,12 @@ class CmsSite
      */
     private $menu;
 
+    /**
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $templateFilter;
+
     public function __construct() {}
 
     /**
@@ -238,6 +244,24 @@ class CmsSite
     public function setPage($page): void
     {
         $this->page = $page;
+    }
+
+    /**
+     * @param mixed $templateFilter
+     * @return CmsSite
+     */
+    public function setTemplateFilter($templateFilter)
+    {
+        $this->templateFilter = $templateFilter;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTemplateFilter()
+    {
+        return $this->templateFilter;
     }
 
 

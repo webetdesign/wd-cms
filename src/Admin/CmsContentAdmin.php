@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Container;
+use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -86,6 +87,8 @@ final class CmsContentAdmin extends AbstractAdmin
         $roleAdmin = $this->canManageContent();
         $admin = $this;
 
+        $subject = $formMapper->getAdmin()->getSubject();
+
         $formMapper->add('active', null, [
             'label' => 'Actif',
         ]);
@@ -111,11 +114,12 @@ final class CmsContentAdmin extends AbstractAdmin
             );
         }
 
-        if ($formMapper->getAdmin()->getSubject() && $formMapper->getAdmin()->getSubject()->getId()) {
+        if ($subject && $subject->getId()) {
 
-            switch ($formMapper->getAdmin()->getSubject()->getType()) {
+            switch ($subject->getType()) {
                 case CmsContentTypeEnum::TEXT:
                     $formMapper->add('value', TextType::class, ['required' => false]);
+                    $this->addHelp($formMapper, $subject, 'value');
                     break;
 
                 case CmsContentTypeEnum::SLIDER:
@@ -135,6 +139,7 @@ final class CmsContentAdmin extends AbstractAdmin
                             'edit'   => 'inline',
                         ]
                     );
+                    $this->addHelp($formMapper, $subject, 'sliders');
                     break;
 
                 case CmsContentTypeEnum::IMAGE:
@@ -153,6 +158,7 @@ final class CmsContentAdmin extends AbstractAdmin
                             ],
                         ]
                     );
+                    $this->addHelp($formMapper, $subject, 'media');
                     break;
 
                 case CmsContentTypeEnum::MEDIA:
@@ -170,6 +176,7 @@ final class CmsContentAdmin extends AbstractAdmin
                             ],
                         ]
                     );
+                    $this->addHelp($formMapper, $subject, 'media');
                     break;
 
                 case CmsContentTypeEnum::WYSYWYG:
@@ -183,6 +190,7 @@ final class CmsContentAdmin extends AbstractAdmin
                             'auto_initialize'  => false,
                         ]
                     );
+                    $this->addHelp($formMapper, $subject, 'value');
                     break;
 
                 case CmsContentTypeEnum::TEXTAREA:
@@ -194,6 +202,7 @@ final class CmsContentAdmin extends AbstractAdmin
                             'auto_initialize' => false,
                         ]
                     );
+                    $this->addHelp($formMapper, $subject, 'value');
                     break;
 
                 case CmsContentTypeEnum::SHARED_BLOCK:
@@ -214,6 +223,7 @@ final class CmsContentAdmin extends AbstractAdmin
                             return $value !== null ? $value->getId() : null;
                         }
                     ));
+                    $this->addHelp($formMapper, $subject, 'value');
 
                     break;
                 case CmsContentTypeEnum::SHARED_BLOCK_COLLECTION:
@@ -235,13 +245,14 @@ final class CmsContentAdmin extends AbstractAdmin
                     $formMapper->add('parent_heritance', null, [
                         'label' => 'Héritage',
                     ]);
+                    $this->addHelp($formMapper, $subject, 'parent_heritance');
 
                     break;
 
             }
 
             foreach ($this->customContents as $content => $configuration) {
-                if ($formMapper->getAdmin()->getSubject()->getType() === $content) {
+                if ($subject->getType() === $content) {
                     /** @var AbstractCustomContent $contentService */
                     $contentService = $this->container->get($configuration['service']);
                     $formMapper->add(
@@ -296,5 +307,12 @@ final class CmsContentAdmin extends AbstractAdmin
         }
 
         return array_merge(CmsContentTypeEnum::getChoices(), $customs);
+    }
+
+    protected function addHelp(FormMapper $formMapper, $subject, $field)
+    {
+        if (!empty($subject->getHelp())) {
+            $formMapper->addHelp($field, $subject->getHelp());
+        }
     }
 }

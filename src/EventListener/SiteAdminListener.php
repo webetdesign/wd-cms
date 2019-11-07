@@ -117,7 +117,7 @@ class SiteAdminListener
     private function createPage(EntityManager $em, CmsSite $site)
     {
         $page = new CmsPage();
-        $page->setTemplate('home');
+        $page->setTemplate(!empty($site->getTemplateFilter()) ? $site->getTemplateFilter() . '_home' : 'home');
         $page->setTitle('Homepage');
         $page->rootPage = true;
 

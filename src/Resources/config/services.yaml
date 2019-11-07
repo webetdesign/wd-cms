@@ -244,7 +244,7 @@ services:
 
   cms.admin.cms_site:
     class: '%wd_cms.admin.config.class.site%'
-    arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%', '%wd_cms.cms.multilingual%']
+    arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%', '%wd_cms.cms%']
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Site}
     public: true
@@ -267,6 +267,7 @@ services:
       - '%wd_cms.cms.multilingual%'
       - '%wd_cms.cms.declination%'
       - '%wd_cms.vars%'
+      - '@cms.page_provider'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
     calls:

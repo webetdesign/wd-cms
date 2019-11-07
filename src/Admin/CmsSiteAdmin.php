@@ -16,13 +16,15 @@ use Knp\Menu\ItemInterface as MenuItemInterface;
 final class CmsSiteAdmin extends AbstractAdmin
 {
     protected $isMultilingual;
+    protected $isMultisite;
 
     /**
      * @inheritDoc
      */
-    public function __construct(string $code, string $class, string $baseControllerName, $isMultilingual)
+    public function __construct(string $code, string $class, string $baseControllerName, $cmsConfig)
     {
-        $this->isMultilingual = $isMultilingual;
+        $this->isMultisite = $cmsConfig['multisite'];
+        $this->isMultilingual = $cmsConfig['multilingual'];
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -69,6 +71,10 @@ final class CmsSiteAdmin extends AbstractAdmin
             ->add('host')
             ->add('default')
             ->addHelp('default', "Site associé par défaut lorsque l'on crée une page");
+        if ($this->isMultisite) {
+            $formMapper->add('templateFilter')
+                ->addHelp('templateFilter', "Technique");
+        }
         if ($this->isMultilingual) {
             $formMapper
                 ->add('locale')

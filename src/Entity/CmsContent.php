@@ -90,6 +90,12 @@ class CmsContent
 
     private $declination;
 
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $help;
+
     public function __toString()
     {
         return $this->label;
@@ -344,5 +350,23 @@ class CmsContent
     public function getDeclination()
     {
         return $this->declination;
+    }
+
+    /**
+     * @param string $help
+     * @return CmsContent
+     */
+    public function setHelp(?string $help): CmsContent
+    {
+        $this->help = $help;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHelp(): ?string
+    {
+        return $this->help;
     }
 }
