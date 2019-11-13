@@ -39,10 +39,10 @@ final class CmsContentAdmin extends AbstractAdmin
         string $media_class,
         Container $container
     ) {
-        $this->em = $em;
+        $this->em             = $em;
         $this->customContents = $contentTypeOption;
-        $this->media_class = $media_class;
-        $this->container = $container;
+        $this->media_class    = $media_class;
+        $this->container      = $container;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -85,7 +85,7 @@ final class CmsContentAdmin extends AbstractAdmin
         $formMapper->getFormBuilder()->setMethod('patch');
 
         $roleAdmin = $this->canManageContent();
-        $admin = $this;
+        $admin     = $this;
 
         $subject = $formMapper->getAdmin()->getSubject();
 
@@ -269,6 +269,10 @@ final class CmsContentAdmin extends AbstractAdmin
 
                 }
             }
+
+        }
+        if ($roleAdmin) {
+            $formMapper->add('position');
         }
     }
 

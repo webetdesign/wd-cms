@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use Sonata\MediaBundle\Model\MediaInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 
 
 /**
@@ -52,15 +54,28 @@ class CmsContent
 
     /**
      * @var null|CmsPage
+     * @Gedmo\SortableGroup()
      */
     private $page;
 
     /**
+     * @var integer
+     * @ORM\Column(type="integer", nullable=true)
+     * @Gedmo\SortablePosition()
+     */
+    private $position;
+
+    /**
      * @var null|CmsSharedBlock
+     * @Gedmo\SortableGroup()
+     * Mapping Relation in WebEtDesignCmsExtension
      */
     private $sharedBlockParent;
 
-    /** @var ArrayCollection */
+    /**
+     * @var ArrayCollection
+     * Mapping Relation in WebEtDesignCmsExtension
+     */
     private $sharedBlockList;
 
     /**
@@ -88,6 +103,10 @@ class CmsContent
      */
     private $sliders;
 
+    /**
+     * Mapping Relation in WebEtDesignCmsExtension
+     * @Gedmo\SortableGroup()
+     */
     private $declination;
 
     /**
@@ -368,5 +387,23 @@ class CmsContent
     public function getHelp(): ?string
     {
         return $this->help;
+    }
+
+    /**
+     * @param int $position
+     * @return CmsContent
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPosition()
+    {
+        return $this->position;
     }
 }

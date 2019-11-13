@@ -135,6 +135,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
                     [
                         'edit'   => 'inline',
                         'inline' => 'table',
+                        'sortable' => 'position',
                     ]
                 )
                 ->end()

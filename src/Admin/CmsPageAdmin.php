@@ -327,6 +327,7 @@ class CmsPageAdmin extends AbstractAdmin
                     [
                         'edit'   => 'inline',
                         'inline' => 'table',
+                        'sortable' => 'position',
                     ]
                 )
                 ->end()
