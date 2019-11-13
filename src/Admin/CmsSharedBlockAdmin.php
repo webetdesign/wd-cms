@@ -2,23 +2,32 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\BlockTemplateType;
+use Knp\Menu\ItemInterface as MenuItemInterface;
 
 final class CmsSharedBlockAdmin extends AbstractAdmin
 {
     protected $templateType;
+    protected $isMultisite;
+    protected $em;
 
-    public function __construct(string $code, string $class, string $baseControllerName)
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManagerInterface $em, $cmsConfiguration)
     {
 //        $this->templateType = $templateType;
+        $this->em = $em;
+        $this->isMultisite = $cmsConfiguration['multisite'];
         parent::__construct($code, $class, $baseControllerName);
     }
 
@@ -30,6 +39,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             ->add('code')
             ->add('label')
             ->add('active')
+            ->add('site')
             ->add('public');
     }
 
@@ -49,6 +59,41 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
                     'delete' => [],
                 ],
             ]);
+    }
+
+    protected function configureRoutes(RouteCollection $collection)
+    {
+        $collection
+            ->add('createRootNode', 'initRoot')
+            ->add('move', 'move');
+
+        $default = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+        if ($default != null) {
+            $collection->add('list', 'list/{id}', ['id' => $default->getId()], ['id' => '\d*']);
+        }
+
+    }
+
+    protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
+    {
+        $admin   = $this->isChild() ? $this->getParent() : $this;
+        $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
+
+        $id = $this->getRequest()->get('id');
+
+        if (!$childAdmin && in_array($action, ['list'])) {
+            $sites = $this->em->getRepository(CmsSite::class)->findAll();
+            if (sizeof($sites) > 1) {
+                foreach ($sites as $site) {
+                    $active = $site->getId() == $id;
+                    dump($active);
+                    $menu->addChild(
+                        $site->getLabel(),
+                        ['uri' => $admin->generateUrl('list', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
+                    );
+                }
+            }
+        }
     }
 
     protected function configureFormFields(FormMapper $formMapper): void

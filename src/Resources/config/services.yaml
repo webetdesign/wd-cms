@@ -318,8 +318,13 @@ services:
       - ~
       - WebEtDesign\CmsBundle\Entity\CmsSharedBlock
       - WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.cms%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Block partagé }
+    calls:
+      - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
+
     public: true
 
   cms.admin.cms_content_has_shared_block:
