@@ -157,6 +157,11 @@ class CmsPage
 
     public $rootPage = false;
 
+    /**
+     * Set at true tu disable the creation of contents in listener, used in page import context
+     * @var bool
+     */
+    public $dontImportContent = false;
 
     public function getChildrenRight()
     {

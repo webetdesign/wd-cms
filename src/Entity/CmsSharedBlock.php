@@ -59,6 +59,9 @@ class CmsSharedBlock
      */
     private $template;
 
+
+    private $site;
+
     /**
      * @inheritDoc
      */
@@ -214,6 +217,24 @@ class CmsSharedBlock
     public function getContentList()
     {
         return $this->contentList;
+    }
+
+    /**
+     * @param mixed $site
+     * @return CmsSharedBlock
+     */
+    public function setSite($site)
+    {
+        $this->site = $site;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSite()
+    {
+        return $this->site;
     }
 
 }

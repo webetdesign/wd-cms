@@ -42,19 +42,21 @@ class PageAdminListener
         }
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
-        if(isset($config['association'])) {
+        if (isset($config['association'])) {
             $page->setClassAssociation($config['association']['class']);
             $page->setQueryAssociation($config['association']['queryMethod']);
         }
 
-        // hydrate content
-        foreach ($config['contents'] as $content) {
-            $CmsContent = new CmsContent();
-            $CmsContent->setCode($content['code']);
-            $CmsContent->setLabel($content['code'] ?? $content['label']);
-            $CmsContent->setType($content['type']);
-            $CmsContent->setHelp($content['help'] ?? null);
-            $page->addContent($CmsContent);
+        if (!$page->dontImportContent) {
+            // hydrate content
+            foreach ($config['contents'] as $content) {
+                $CmsContent = new CmsContent();
+                $CmsContent->setCode($content['code']);
+                $CmsContent->setLabel($content['code'] ?? $content['label']);
+                $CmsContent->setType($content['type']);
+                $CmsContent->setHelp($content['help'] ?? null);
+                $page->addContent($CmsContent);
+            }
         }
     }
 
@@ -69,7 +71,7 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
-        if ($config['disableRoute']) {
+        if ($config['disableRoute'] || $page->getRoute() != null) {
             return;
         }
 

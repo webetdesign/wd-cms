@@ -80,6 +80,8 @@ class CmsSite
      */
     private $menu;
 
+    private $sharedBlocks;
+
     /**
      *
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -264,5 +266,45 @@ class CmsSite
         return $this->templateFilter;
     }
 
+    /**
+     * @param mixed $sharedBlocks
+     * @return CmsSite
+     */
+    public function setSharedBlocks($sharedBlocks)
+    {
+        $this->sharedBlocks = $sharedBlocks;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSharedBlocks()
+    {
+        return $this->sharedBlocks;
+    }
+
+    public function addSharedBlock($sharedBlock): self
+    {
+        if (!$this->sharedBlocks->contains($sharedBlock)) {
+            $this->sharedBlocks[] = $sharedBlock;
+            $sharedBlock->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSharedBlock($sharedBlock): self
+    {
+        if ($this->sharedBlocks->contains($sharedBlock)) {
+            $this->sharedBlocks->removeElement($sharedBlock);
+            // set the owning side to null (unless already changed)
+            if ($sharedBlock->getPage() === $this) {
+                $sharedBlock->setPage(null);
+            }
+        }
+
+        return $this;
+    }
 
 }

@@ -316,6 +316,18 @@ class WebEtDesignCmsExtension extends Extension
             'inversedBy'    => 'site',
             'orphanRemoval' => false,
         ]);
+
+        $collector->addAssociation(CmsSite::class, 'mapOneToMany', [
+            'fieldName'     => 'sharedBlocks',
+            'targetEntity'  => $config['admin']['configuration']['entity']['shared_block'],
+            'cascade'       => [
+                "remove",
+                "persist"
+            ],
+            'mappedBy'      => 'site',
+            'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
     }
 
     protected function addCmsMenuMapping(DoctrineCollector $collector, $config)
@@ -492,6 +504,23 @@ class WebEtDesignCmsExtension extends Extension
             ],
             'mappedBy'      => 'sharedBlock',
             'inversedBy'    => null,
+            'orphanRemoval' => false,
+        ]);
+
+        $collector->addAssociation(CmsSharedBlock::class, 'mapManyToOne', [
+            'fieldName'     => 'site',
+            'targetEntity'  => $config['admin']['configuration']['entity']['site'],
+            'cascade'       => [
+            ],
+            'inversedBy'    => 'sharedBlocks',
+            'mappedBy'      => null,
+            'joinColumns'   => [
+                [
+                    'name'                 => 'site_id',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'SET NULL'
+                ],
+            ],
             'orphanRemoval' => false,
         ]);
     }
