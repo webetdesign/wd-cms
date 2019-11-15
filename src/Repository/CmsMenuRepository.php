@@ -49,8 +49,8 @@ class CmsMenuRepository extends NestedTreeRepository
     public function getByCode($code)
     {
         $qb = $this->createQueryBuilder('m')
-            ->leftJoin('m.children', 'c')
-            ->addSelect('c')
+            ->leftJoin('m.site', 's')
+            ->addSelect('s')
             ->where('m.code = :code')
             ->setParameter('code', $code)
 //            ->setMaxResults(1)
@@ -85,6 +85,31 @@ class CmsMenuRepository extends NestedTreeRepository
         $qb = $this->createQueryBuilder('m')
             ->where('m.code LIKE :code')
             ->setParameter('code', '%root%');
+        return $qb->getQuery()->getResult();
+    }
+
+    public function flatNodes(CmsMenu $menu)
+    {
+        $qb = $this->createQueryBuilder('n');
+        $qb->where('n.lft > :left')
+            ->addSelect('p')
+            ->addSelect('r')
+            ->addSelect('c')
+            ->addSelect('s2')
+            ->addSelect('s3')
+            ->leftJoin('n.page', 'p')
+            ->leftJoin('p.route', 'r')
+            ->leftJoin('n.children', 'c')
+            ->leftJoin('p.site', 's2')
+            ->leftJoin('n.site', 's3')
+            ->andHaving('n.rgt < :right')
+            ->andWhere('n.root = :root')
+            ->setParameter('left', $menu->getLft())
+            ->setParameter('right', $menu->getRgt())
+            ->setParameter('root', $menu->getRoot())
+            ->orderBy('n.lft', 'ASC')
+        ;
+
         return $qb->getQuery()->getResult();
     }
 }
