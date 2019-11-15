@@ -40,9 +40,13 @@ class SiteAdminListener
             return;
         }
 
-        $this->createMenu($em, $site);
+        if ($site->initMenu) {
+            $this->createMenu($em, $site);
+        }
 
-        $this->createPage($em, $site);
+        if ($site->initPage) {
+            $this->createPage($em, $site);
+        }
     }
 
     public function postUpdate(LifecycleEventArgs $event)

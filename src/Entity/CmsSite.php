@@ -88,6 +88,9 @@ class CmsSite
      */
     private $templateFilter;
 
+    public $initPage = true;
+    public $initMenu = true;
+
     public function __construct() {}
 
     /**
