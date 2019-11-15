@@ -205,7 +205,7 @@ class CmsTwigExtension extends AbstractExtension
             return $result;
         }
 
-        return $this->globalVarsEnable ? $this->replaceVars($content->getValue()) : $content->getValue();
+        return $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
     }
 
     public function getSharedBlock($code)
@@ -325,7 +325,7 @@ class CmsTwigExtension extends AbstractExtension
         $value = !empty($value) ? $value : $default;
 
         if ($this->globalVarsEnable) {
-            $value = $this->replaceVars($value);
+            $value = $this->globalVars->replaceVars($value);
         }
 
         return $value;
@@ -347,19 +347,6 @@ class CmsTwigExtension extends AbstractExtension
         } else {
             trigger_error('Call to undefined method ' . get_class($object) . '::' . $method . '()', E_USER_ERROR);
         }
-    }
-
-    public function replaceVars($str)
-    {
-        $values = $this->globalVars->computeValues($this->globalVars);
-
-        $d = $this->globalVars->getDelimiters();
-
-        foreach ($values as $name => $value) {
-            $str = str_replace($d['s'] . $name . $d['e'], $value, $str);
-        }
-
-        return $str;
     }
 
     /**

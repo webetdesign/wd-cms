@@ -11,14 +11,16 @@ namespace WebEtDesign\CmsBundle\Services;
 use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
 
-abstract class AbstractCmsGlobalVars implements GlobalVarsInterface
+class AbstractCmsGlobalVars implements GlobalVarsInterface
 {
     /** @var GlobalVarsInterface */
     protected $object;
 
     protected $delimiter;
 
-    abstract public static function getAvailableVars(): array;
+    public static function getAvailableVars(): array {
+        return [];
+    }
 
     public function getMethod($object, $name)
     {
@@ -33,13 +35,13 @@ abstract class AbstractCmsGlobalVars implements GlobalVarsInterface
         return false;
     }
 
-    public function computeValues($service)
+    public function computeValues()
     {
-        $vars = $service::getAvailableVars();
+        $vars = $this::getAvailableVars();
         $values = [];
         foreach ($vars as $var) {
-            if ($method = $this->getMethod($service, $var)) {
-                $values[$var] = $service->$method();
+            if ($method = $this->getMethod($this, $var)) {
+                $values[$var] = $this->$method();
             }
         }
 
@@ -53,6 +55,19 @@ abstract class AbstractCmsGlobalVars implements GlobalVarsInterface
         }
 
         return $values;
+    }
+
+    public function replaceVars($str)
+    {
+        $values = $this->computeValues();
+
+        $d = $this->getDelimiters();
+
+        foreach ($values as $name => $value) {
+            $str = str_replace($d['s'] . $name . $d['e'], $value, $str);
+        }
+
+        return $str;
     }
 
     /**
