@@ -19,6 +19,8 @@ class CmsHelper
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
+    private $page;
+
     /**
      * @param EntityManagerInterface $em
      * @param TemplateProvider $provider
@@ -39,9 +41,10 @@ class CmsHelper
 
     public function getPage(Request $request)
     {
-        $route = $this->em->getRepository(CmsRoute::class)->findOneBy(['name' => $request->attributes->get('_route')]);
-
-        return $route ? $route->getPage() : null;
+        if ($this->page === null) {
+            $this->page = $this->em->getRepository(CmsPage::class)->findByRouteName($request->attributes->get('_route'));
+        }
+        return $this->page;
     }
 
     /**

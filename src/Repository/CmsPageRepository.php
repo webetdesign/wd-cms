@@ -2,9 +2,11 @@
 
 namespace WebEtDesign\CmsBundle\Repository;
 
-use WebEtDesign\CmsBundle\Entity\CmsPage;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
+use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use LogicException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use WebEtDesign\CmsBundle\Entity\CmsPage;
 
 /**
  * @method CmsPage|null find($id, $lockMode = null, $lockVersion = null)
@@ -12,11 +14,43 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method CmsPage[]    findAll()
  * @method CmsPage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CmsPageRepository extends ServiceEntityRepository
+class CmsPageRepository extends NestedTreeRepository
 {
-    public function __construct(RegistryInterface $registry)
+
+    public function __construct(RegistryInterface $registry) {
+        $manager = $registry->getManagerForClass(CmsPage::class);
+
+        if ($manager === null) {
+            throw new LogicException(sprintf(
+                'Could not find the entity manager for class "%s". Check your Doctrine configuration to make sure it is configured to load this entity’s metadata.',
+                CmsPage::class
+            ));
+        }
+
+        parent::__construct($manager, $manager->getClassMetadata(CmsPage::class));
+    }
+
+
+    /**
+     * @param $name
+     * @return CmsPage[]|Collection
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findByRouteName($name)
     {
-        parent::__construct($registry, CmsPage::class);
+        $qb = $this->createQueryBuilder('p');
+        $qb->leftJoin('p.route', 'r')
+            ->leftJoin('p.site', 's')
+            ->leftJoin('p.declinations', 'd')
+            ->addSelect('r', 's', 'd')
+            ->where('r.name = :name')
+            ->setParameter('name', $name)
+            ->setMaxResults(1)
+        ;
+
+
+        return $qb->getQuery()->getOneOrNullResult();
+
     }
 
     // /**

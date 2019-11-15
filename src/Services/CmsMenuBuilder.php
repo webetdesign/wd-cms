@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CmsMenuBuilder
 {
+    /** @var EntityManagerInterface  */
     private $em;
 
     private $factory;
@@ -88,6 +89,13 @@ class CmsMenuBuilder
         } else {
             $cmsMenu = $repo->getByCode($menuCode);
         }
+
+        /*
+         * Cette query recupère tous les enfants de chaque noeud
+         * afin de ne pas faire une requette à chaque appelle à la fonction getChildren()
+         */
+        $nodes = $repo->flatNodes($cmsMenu);
+
         $menu = $this->factory->createItem('root');
         $menu->setChildrenAttribute('class', $cmsMenu->getClasses());
         $this->buildNodes($menu, $cmsMenu->getChildren(), $parentActive);
@@ -157,7 +165,7 @@ class CmsMenuBuilder
                         break;
                 }
             }
-            if (sizeof($children) > 0) {
+            if (count($children) > 0) {
                 $this->buildNodes($childItem, $children, $parentActive);
             }
 
