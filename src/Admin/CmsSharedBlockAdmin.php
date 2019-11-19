@@ -25,8 +25,8 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
 
     public function __construct(string $code, string $class, string $baseControllerName, EntityManagerInterface $em, $cmsConfiguration)
     {
-//        $this->templateType = $templateType;
-        $this->em = $em;
+        //        $this->templateType = $templateType;
+        $this->em          = $em;
         $this->isMultisite = $cmsConfiguration['multisite'];
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -112,6 +112,14 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
             $formMapper->getFormBuilder()->setMethod('put');
+
+            $contentOptions = [
+                'edit'   => 'inline',
+                'inline' => 'table',
+            ];
+            if ($roleAdmin) {
+                $contentOptions['sortable'] = 'position';
+            }
             $formMapper
                 ->tab('Général')// The tab call is optional
                 ->with('', ['box_class' => ''])
@@ -132,15 +140,10 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
                             'delete' => $roleAdmin,
                         ],
                     ],
-                    [
-                        'edit'   => 'inline',
-                        'inline' => 'table',
-                        'sortable' => 'position',
-                    ]
+                    $contentOptions
                 )
                 ->end()
-                ->end()
-            ;
+                ->end();
 
         }
 

@@ -134,6 +134,7 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'page',
             'inversedBy'    => null,
             'orphanRemoval' => false,
+            'orderBy'       => ['position' => 'ASC']
         ]);
 
         $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
@@ -273,6 +274,7 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'declination',
             'inversedBy'    => null,
             'orphanRemoval' => false,
+            'orderBy'       => ['position' => 'ASC']
         ]);
     }
 
@@ -493,6 +495,7 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'sharedBlockParent',
             'inversedBy'    => null,
             'orphanRemoval' => false,
+            'orderBy'       => ['position' => 'ASC']
         ]);
 
         $collector->addAssociation(CmsSharedBlock::class, 'mapOneToMany', [
@@ -505,6 +508,7 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'sharedBlock',
             'inversedBy'    => null,
             'orphanRemoval' => false,
+            'orderBy'       => ['position' => 'ASC']
         ]);
 
         $collector->addAssociation(CmsSharedBlock::class, 'mapManyToOne', [

@@ -27,13 +27,13 @@ function buildTable ($el, params) {
     let defaults;
     let requirements;
 
-    if ($('.cms_route_default_input').val() === "[]"){
+    if ($('.cms_route_default_input').val() === "[]" || $('.cms_route_default_input').val() === ''){
         defaults = {}
     }else {
         defaults = JSON.parse($('.cms_route_default_input').val())
     }
 
-    if ($('.cms_route_requirements_input').val() === "[]"){
+    if ($('.cms_route_requirements_input').val() === "[]" || $('.cms_route_requirements_input').val() === ''){
         requirements = {}
     }else {
         requirements = JSON.parse($('.cms_route_requirements_input').val());

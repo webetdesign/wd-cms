@@ -156,6 +156,14 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         //region Contenus
         $formMapper->tab('Contenus');
         $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable);
+
+        $contentOptions = [
+            'edit'   => 'inline',
+            'inline' => 'table',
+        ];
+        if ($roleAdmin) {
+            $contentOptions['sortable'] = 'position';
+        }
         $formMapper
             ->with('', ['box_class' => ''])
             ->add(
@@ -169,11 +177,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
                         'delete' => $roleAdmin,
                     ],
                 ],
-                [
-                    'edit'   => 'inline',
-                    'inline' => 'table',
-                    'sortable' => 'position',
-                ]
+                $contentOptions
             )
             ->end()
             ->end();
