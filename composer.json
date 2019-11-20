@@ -44,7 +44,8 @@
         "symfony/twig-bundle": "^4.0",
         "symfony/validator": "^4.0",
         "twig/extensions": "^1.5",
-        "twig/twig": "^1.34 || ^2.0"
+        "twig/twig": "^1.34 || ^2.0",
+        "mediafigaro/google-analytics-api-symfony": "^1.22"
     },
     "require-dev": {
         "symfony/class-loader": "^4.0",
