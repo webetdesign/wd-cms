@@ -32,6 +32,24 @@ document.addEventListener('DOMContentLoaded', function(){
 
         renderWeekOverWeekChart(JSON.parse(weeks), week_colors);
     }
+
+    if (document.getElementById('year-container') != null){
+
+        var year_colors = {
+            0 : null,
+            1 : null
+        };
+
+        if ( document.getElementById("year_colors") != null){
+            year_colors = document.getElementById("year_colors").dataset.yearcolors;
+            year_colors = JSON.parse(year_colors);
+            document.getElementById("year_colors").remove();
+        }
+
+        var years = document.getElementById("data-userYear").dataset.values;
+
+        renderYearOverYearChart(JSON.parse(years), year_colors);
+    }
 }, false);
 
 function renderTopBrowsersChart(browsers, colors) {
@@ -75,7 +93,7 @@ function renderWeekOverWeekChart(data, colors) {
         labels : data.labels,
         datasets : [
             {
-                label: 'Last Week',
+                label: 'Semaine dernière',
                 borderColor : colors[0],
                 pointColor : colors[0],
                 backgroundColor: (colors[0]).substring(0,17) + ", 0.5)",
@@ -83,7 +101,7 @@ function renderWeekOverWeekChart(data, colors) {
                 data :  data.values.last_week
             },
             {
-                label: 'This Week',
+                label: 'Cette semaine',
                 borderColor : colors[1],
                 pointColor : colors[1],
                 backgroundColor: (colors[1]).substring(0,17) + ", 0.5)",
@@ -99,7 +117,37 @@ function renderWeekOverWeekChart(data, colors) {
         data: values,
         options: options
     });
-    generateLegend('week-legend', data.datasets);
+}
+
+/**
+ * Draw the a chart.js bar chart with data from the specified view that
+ * overlays session data for the current year over session data for the
+ * previous year, grouped by month.
+ */
+function renderYearOverYearChart(data, colors) {
+
+    var values = {
+        labels : data.labels,
+        datasets : [
+            {
+                label: 'Année dernière',
+                backgroundColor : colors[0],
+                data : data.values.last_year
+            },
+            {
+                label: 'Cette année',
+                backgroundColor : colors[1],
+                data : data.values.this_year
+            }
+        ]
+    };
+
+    var  options = {};
+    new Chart(makeCanvas('year-container'), {
+        type: 'bar',
+        data: values,
+        options: options
+    });
 }
 
 function makeCanvas(id) {
@@ -121,6 +169,6 @@ function generateLegend(id, items) {
         var color = item.color || item.fillColor;
         var label = item.label;
         return '<li><i style="background:' + color + '"></i>' +
-            escapeHtml(label) + '</li>';
+            label + '</li>';
     }).join('');
 }

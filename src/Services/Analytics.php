@@ -89,40 +89,15 @@ class Analytics
     public function getUserWeek(){
         $thisWeek = new Google_Service_AnalyticsReporting_DateRange();
         // this monday
-        $thisWeek->setStartDate(
-            date('Y-m-d',
-                strtotime('this week',
-                    time()
-                )
-            )
-        );
+        $thisWeek->setStartDate(date('Y-m-d', strtotime('this week')));
         // today
-        $thisWeek->setEndDate(
-            date('Y-m-d', time()
-            )
-        );
+        $thisWeek->setEndDate(date('Y-m-d'));
 
         $lastWeek = new Google_Service_AnalyticsReporting_DateRange();
         // last monday
-        $lastWeek->setStartDate(
-            date("Y-m-d",
-                strtotime(
-                    date('Y-m-d',
-                        strtotime('this week', time()
-                        )
-                    ) . "-1 week"
-                )
-            )
-        );
+        $lastWeek->setStartDate(date('Y-m-d', strtotime('last week')));
         //last sunday
-        $lastWeek->setEndDate(date("Y-m-d",
-            strtotime(
-                date('Y-m-d',
-                    strtotime('this week', time()
-                    )
-                ) . "-1 day"
-            )
-        ));
+        $lastWeek->setEndDate(date('Y-m-d', strtotime('sunday this week')));
 
         $metric = new Google_Service_AnalyticsReporting_Metric();
         $metric->setExpression("ga:users");
@@ -137,23 +112,8 @@ class Analytics
         $response_this_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisWeek]);
         $response_last_week = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastWeek]);
 
-        $previous = null;
-
-        // append 0 in values array if days are missing because API not return days without session
-        foreach ($response_last_week['labels'] as $key => $item) {
-            if ($previous && date('d-m-Y', strtotime($previous . " 1 day") ) != date('d-m-Y', strtotime($item))){
-
-                $diff = abs(strtotime($previous) - strtotime($item));
-                $years = floor($diff / (365*60*60*24));
-                $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
-                $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24)) - 1;
-
-                for ($i = 0; $i < $days; $i++){
-                    array_splice($response_last_week['values'], $key, 0, 0);
-                }
-            }
-            $previous = $item;
-        }
+        $response_this_week = $this->getDiffForWeek($response_this_week);
+        $response_last_week = $this->getDiffForWeek($response_last_week);
 
         $data = [
             "labels" => ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."],
@@ -167,6 +127,82 @@ class Analytics
 
     }
 
+    private function getDiffForWeek($array){
+        $previous = null;
+        // append 0 in values array if days are missing because API not return days without session
+        foreach ($array['labels'] as $key => $item) {
+            if ($previous && date('d-m-Y', strtotime($previous . " 1 day") ) != date('d-m-Y', strtotime($item))){
+
+                $diff = abs(strtotime($previous) - strtotime($item));
+                $years = floor($diff / (365*60*60*24));
+                $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+                $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24)) - 1;
+
+                for ($i = 0; $i < $days; $i++){
+                    array_splice($array['values'], $key, 0, 0);
+                }
+            }
+            $previous = $item;
+        }
+        return $array;
+    }
+
+    public function getUserYear(){
+        $thisYear = new Google_Service_AnalyticsReporting_DateRange();
+        // this monday
+        $thisYear->setStartDate(date('Y-m-d', strtotime('first day of january this year')));
+        // today
+        $thisYear->setEndDate(date('Y-m-d', time()));
+
+        $lastYear = new Google_Service_AnalyticsReporting_DateRange();
+        // last monday
+        $lastYear->setStartDate(date('Y-m-d', strtotime('first day of january last year')));
+        //last sunday
+        $lastYear->setEndDate(date('Y-m-d', strtotime('last day of december last year')));
+
+        $metric = new Google_Service_AnalyticsReporting_Metric();
+        $metric->setExpression("ga:users");
+        $metric->setAlias("sessions");
+
+        $dimension_1 = new Google_Service_AnalyticsReporting_Dimension();
+        $dimension_1->setName("ga:month");
+
+        $dimension_2 = new Google_Service_AnalyticsReporting_Dimension();
+        $dimension_2->setName("ga:nthMonth");
+
+        $response_this_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$thisYear]);
+        $response_last_year = $this->makeRequest([$metric], [$dimension_1, $dimension_2], [$lastYear]);
+
+        $response_this_year = $this->getDiffForYear($response_this_year);
+        $response_last_year = $this->getDiffForYear($response_last_year);
+
+        $data = [
+            "labels" => ['Jan.','Fev.','Mar.','Avr.','Mai.','Jui.', 'Juil.','Aou.','Sep.','Oct.','Nov.','Dec.'],
+            "values" => [
+                "last_year" => $response_last_year["values"],
+                "this_year" => $response_this_year["values"]
+            ]
+        ];
+
+        return $data;
+    }
+
+    private function getDiffForYear($array){
+        $previous = "00";
+
+        // append 0 in values array if days are missing because API not return days without session
+        foreach ($array['labels'] as $key => $item) {
+            if (intval($previous) + 1 != intval($item)){
+                $diff = intval($item) - intval($previous) - 1;
+                for ($i = 0; $i < $diff; $i++){
+                    array_splice($array['values'], $key, 0, 0);
+                }
+            }
+            $previous = $item;
+        }
+
+        return $array;
+    }
     private function makeRequest(array $metrics, array $dimensions, array $dates){
         // Create the ReportRequest object.
         $request = new Google_Service_AnalyticsReporting_ReportRequest();

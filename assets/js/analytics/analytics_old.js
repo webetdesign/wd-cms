@@ -26,17 +26,6 @@ gapi.analytics.ready(function() {
         viewSelector.on('viewChange', function(data) {
 
 
-            if ($('#week-container').length){
-
-                var week_colors = null;
-
-                if ( $("#week_colors").length){
-                    week_colors = $("#week_colors").data('week-colors');
-                    $("#week_colors").remove();
-                }
-
-                renderWeekOverWeekChart(data.ids, week_colors);
-            }
 
             if ($('#year-container').length){
 
