@@ -28,16 +28,7 @@ gapi.analytics.ready(function() {
 
 
 
-            if ($('#countries-container').length){
 
-                if ( $("#map_key_api").length){
-
-                    var map = $("#map_key_api").data('map-key');
-                    $("#map_key_api").remove();
-
-                    renderTopCountriesChart(data.ids, colors, map);
-                }
-            }
 
             if ($('#users-container').length){
 
@@ -54,53 +45,6 @@ gapi.analytics.ready(function() {
         });
     }
 
-
-    /**
-     * Draw the a chart.js doughnut chart with data from the specified view that
-     * compares sessions from mobile, desktop, and tablet over the past seven
-     * days.
-     */
-    function renderTopCountriesChart(ids, colors, map) {
-
-        google.charts.load('current', {
-            'packages':['geochart'],
-            'mapsApiKey': map
-        });
-
-        query({
-            'ids': ids,
-            'dimensions': 'ga:country',
-            'metrics': 'ga:users'
-        })
-        .then(function(response) {
-
-            var values = [];
-            values.push(['Country', 'Popularité']);
-
-            response.rows.forEach(function(row, i) {
-
-                values.push([
-                    row[0], parseInt(row[1])
-                ]);
-            });
-
-            google.charts.setOnLoadCallback(drawRegionsMap(values, colors[0]));
-
-        });
-    }
-
-    function drawRegionsMap(values, color) {
-        var data = google.visualization.arrayToDataTable(values);
-
-        var options = {
-            colors: [color],
-            keepAspectRatio: true,
-        };
-
-        var chart = new google.visualization.GeoChart(document.getElementById('countries-container'));
-
-        chart.draw(data, options);
-    }
 
     /*************************************************************************/
 

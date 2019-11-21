@@ -66,8 +66,14 @@ document.addEventListener('DOMContentLoaded', function(){
         var map = document.getElementById("map_key").dataset.mapkey;
         document.getElementById("map_key").remove();
         renderCountries(JSON.parse(countries), colors, map);
-
     }
+
+    if (document.getElementById("users-container") != null){
+        var users_color = document.getElementById("users_color").dataset.userscolor;
+        var users = document.getElementById("data-users").dataset.values;
+        renderUsers(JSON.parse(users), users_color, "users");
+    }
+
 }, false);
 
 function renderDoughnut(response, colors, name) {
@@ -179,6 +185,84 @@ function renderCountries(data, colors, mapKey){
 
 }
 
+function renderUsers(data, color){
+    var visits = data["values"];
+    var max = data["max"];
+
+    $.each(visits, function(i, row) {
+        var id = "row-" + i ;
+        $("#users-container").append('<div class="row " id="'+id+'">\n' +
+            '\n' +
+            '</div>'
+        )
+        $.each(row, function(j, value) {
+            var colorDiv = getColorUser(max, value, color);
+            $("#"+id).append('<div ' +
+                'class="col-xs-1 m-1 " ' +
+                'style="background-color: '+ colorDiv +'; height: 12px; border: 2px solid white" ' +
+                'rel=\'tooltip\' data-original-title=\'' +
+                '<span style=" color: #A6ACAF;">' + getDay(j) + ' ' + i + 'h' + '</span>' +
+                '<br>' +
+                '<span style="font-size: 1.6rem; color: white;">'+ value +'</span>' +
+                '<br>' +
+                '<span style=" color: #A6ACAF;">' + (value < 2 ? 'Utilisateur' : 'Utilisateurs') +'</span>' +
+                '\'' +
+                '>\n</div>'
+            );
+        })
+
+        // if (row[0][0] % 2 === 0){
+        //     $("#"+id).append('<div class="col-xs-1 m-1 text-center" style=" height: 10px; border: 1px solid inherit; color: #A6ACAF; left: -5px;  font-size: 1.3rem" >'+ (row[0][0]) + '</div>');
+        //
+        // }
+
+    })
+
+    $("#users-container").append('<div class="row" id="row-date">\n' +
+        '\n' +
+        '</div>'
+    )
+    for (var i = 0; i < 7; i++) {
+        $("#row-date").append('<div class="col-xs-1 m-1 text-center" style=" height: 10px; border: 1px solid inherit; left: -5px;  font-size: 1.2rem; color: #A6ACAF;" >'+ getDay(i)  + '</div>');
+    }
+
+    $("[rel=tooltip]").tooltip({html:true});
+}
+
+function getColorUser(max, value, color){
+    if (value === 0) return "#dfdfdf";
+    var prct = value / max;
+    return color.substring(0, 17) + ", " + (prct * 2) + ")";
+
+}
+
+function getDay(day) {
+    switch (day) {
+        case 0:
+        case 'Monday':
+            return 'lun.';
+        case 1:
+        case 'Tuesday':
+            return 'mar.';
+        case 2:
+        case 'Wednesday':
+            return 'mer.';
+        case 3:
+        case 'Thursday':
+            return 'jeu.';
+        case 4:
+        case 'Friday':
+            return 'ven.';
+        case 5:
+        case 'Saturday':
+            return 'sam.';
+        case 6:
+        case 'Sunday':
+            return 'dim.';
+        default:
+            return day;
+    }
+}
 function drawMap(values, color){
     var data = google.visualization.arrayToDataTable(values);
 
@@ -205,12 +289,3 @@ function makeCanvas(id) {
     return ctx;
 }
 
-function generateLegend(id, items) {
-    var legend = document.getElementById(id);
-    legend.innerHTML = items.map(function(item) {
-        var color = item.color || item.fillColor;
-        var label = item.label;
-        return '<li><i style="background:' + color + '"></i>' +
-            label + '</li>';
-    }).join('');
-}

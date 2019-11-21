@@ -54,6 +54,7 @@ class Base extends AbstractBlockService
             $row["name"] = $block;
             $blocks[] = $row;
         }
+
         return $this->renderPrivateResponse("@WebEtDesignCms/block/analytics/base.html.twig", [
             'map_key' => $settings['map_key'] ,
             'users_color' => $settings['users_color'],
