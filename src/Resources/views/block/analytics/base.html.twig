@@ -7,6 +7,8 @@
 
 {% endfor %}
 
+
+
 {% if colors is defined %}
     <div id="colors" style="display: none;" data-colors="{{ colors }}">
     </div>
@@ -19,5 +21,10 @@
 
 {% if year_colors is defined %}
     <div id="year_colors" style="display: none;" data-yearcolors="{{ year_colors }}">
+    </div>
+{% endif %}
+
+{% if map_key is defined %}
+    <div id="map_key" style="display: none;" data-mapkey="{{ map_key }}">
     </div>
 {% endif %}

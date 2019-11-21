@@ -50,34 +50,33 @@ class Analytics
     }
 
     /**
-     * Return Number or Users per Browser last 30 days
+     * @param string $metric_name
+     * @param string $dimension_name
+     * @param string $start
+     * @param string $end
+     * @return array
+     */
+    public function getBasicChart($metric_name, $dimension_name, $start, $end = "today"){
+        $dateRange = new Google_Service_AnalyticsReporting_DateRange();
+        $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
+        $dateRange->setEndDate(date('Y-m-d', strtotime($end)));
+
+        $metric = new Google_Service_AnalyticsReporting_Metric();
+        $metric->setExpression("ga:" . $metric_name);
+        $metric->setAlias(ucfirst($metric_name));
+
+        $dimension = new Google_Service_AnalyticsReporting_Dimension();
+        $dimension->setName("ga:" . $dimension_name);
+
+        return $this->makeRequest([$metric], [$dimension], [$dateRange]);
+    }
+
+    /**
+     * Return Number or Users per Browser
      * @return array
      */
     public function getBrowsers(){
-
-        $dateRange = new Google_Service_AnalyticsReporting_DateRange();
-        $dateRange->setStartDate("30daysAgo");
-        $dateRange->setEndDate("today");
-
-        $metric = new Google_Service_AnalyticsReporting_Metric();
-        $metric->setExpression("ga:users");
-        $metric->setAlias("users");
-
-        $dimension = new Google_Service_AnalyticsReporting_Dimension();
-        $dimension->setName("ga:browser");
-
-        // Create the ReportRequest object.
-        $request = new Google_Service_AnalyticsReporting_ReportRequest();
-        $request->setViewId($this->viewId);
-        $request->setMetrics(array($metric));
-        $request->setDimensions(array($dimension));
-        $request->setDateRanges([$dateRange]);
-
-        $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
-        $body->setReportRequests( array( $request) );
-        $response = $this->analytics->reports->batchGet( $body );
-
-        return $this->formatDataChart($response);
+        return $this->getBasicChart( "users", "browser", "30 days ago");
     }
 
     /**
@@ -127,6 +126,11 @@ class Analytics
 
     }
 
+    /**
+     * add 0 to values table if a day is not defined
+     * @param array $array
+     * @return array
+     */
     private function getDiffForWeek($array){
         $previous = null;
         // append 0 in values array if days are missing because API not return days without session
@@ -193,6 +197,11 @@ class Analytics
         return $data;
     }
 
+    /**
+     * add 0 to values table if a month is not defined
+     * @param array $array
+     * @return array
+     */
     private function getDiffForYear($array){
         $previous = "00";
 
@@ -211,28 +220,63 @@ class Analytics
     }
 
     /**
-     * Return source of users for this year
+     * Return number of users per source
      * @return array
      */
     public function getSources(){
-        $dateRange = new Google_Service_AnalyticsReporting_DateRange();
-        $dateRange->setStartDate(date('Y-m-d', strtotime('first day of january this year')));
-        $dateRange->setEndDate(date('Y-m-d', strtotime('today')));
 
-        $metric = new Google_Service_AnalyticsReporting_Metric();
-        $metric->setExpression("ga:users");
-        $metric->setAlias("users");
+        $data = $this->getBasicChart( "users", "channelGrouping", "first day of january this year");
 
-        $dimension = new Google_Service_AnalyticsReporting_Dimension();
-        $dimension->setName("ga:channelGrouping");
-
-        $data = $this->makeRequest([$metric], [$dimension], [$dateRange]);
-
-        foreach ($data["labels"] as $key =>$label) {
+        foreach ($data["labels"] as $key => $label) {
             if ($label == "(none)"){
                 $data["labels"][$key] = "Direct";
             }
         }
+        return $data;
+    }
+
+    /**
+     * Return of users per device
+     * @return array
+     */
+    public function getDevices(){
+
+        $data = $this->getBasicChart( "users", "deviceCategory", "first day of january this year");
+
+        foreach ($data["labels"] as $key =>$label) {
+            switch (strtolower($label)) {
+                case 'mobile':
+                    $data["labels"][$key] = "Mobile";
+                    break;
+                case 'desktop':
+                    $data["labels"][$key] = "Ordinateur";
+                    break;
+                case 'tablet':
+                    $data["labels"][$key] = "Tablette";
+                    break;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Return of users per country
+     * @return array
+     */
+    public function getCountries(){
+
+        $response = $this->getBasicChart( "users", "country", "first day of january this year");
+        $data = [];
+        $data[] = ['Country', 'Popularity'];
+
+        foreach ($response["labels"] as $key => $item) {
+            $data[] = [
+                $response["labels"][$key],
+                intval($response["values"][$key])
+            ];
+        }
+
         return $data;
     }
 
@@ -258,46 +302,14 @@ class Analytics
             "values" => []
         ];
 
-
         /** @var Google_Report $report */
         foreach ($response->getReports() as $report) {
             /** @var Google_Service_AnalyticsReporting_ReportRow $row */
             foreach ($report->getData()->getRows() as $row) {
                 array_push($data["values"], $row->getMetrics()[0]->getValues()[0]);
-                array_push($data["labels"], $row->getDimensions()[0]);
+                array_push($data["labels"], ucfirst($row->getDimensions()[0]));
             }
 
-        }
-        return $data;
-    }
-
-    /**
-     * @param Google_Response $response
-     * @return array
-     */
-    private function formatData(Google_Response $response)
-    {
-        $data = [];
-        $data_row = [];
-
-        /** @var Google_Report $report */
-        foreach ($response->getReports() as $report) {
-            /** @var Google_Service_AnalyticsReporting_ReportRow $row */
-            foreach ($report->getData()->getRows() as $row) {
-                $data_row[$row->getDimensions()[0]] = $row->getMetrics()[0]->getValues()[0];
-            }
-            $data[]["value"] = $data_row;
-            $data_row = [];
-
-            if ($report->getData()->getTotals()){
-                $data[]["total"] = $report->getData()->getTotals()[0]->getValues()[0];
-            }
-            if ($report->getData()->getMinimums()){
-                $data[]["min"] = $report->getData()->getMinimums()[0]->getValues()[0];
-            }
-            if ($report->getData()->getMaximums()){
-                $data[]["max"] = $report->getData()->getMaximums()[0]->getValues()[0];
-            }
         }
         return $data;
     }

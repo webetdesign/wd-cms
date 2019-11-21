@@ -1,5 +1,5 @@
 import Chart from "chart.js"
-
+import './gapi.js';
 
 document.addEventListener('DOMContentLoaded', function(){
     var colors = null;
@@ -55,6 +55,19 @@ document.addEventListener('DOMContentLoaded', function(){
         var sources = document.getElementById("data-sources").dataset.values;
         renderDoughnut(JSON.parse(sources), colors, "sources");
     }
+
+    if (document.getElementById("devices-container") != null){
+        var devices = document.getElementById("data-devices").dataset.values;
+        renderDoughnut(JSON.parse(devices), colors, "devices");
+    }
+
+    if (document.getElementById("countries-container") != null){
+        var countries = document.getElementById("data-countries").dataset.values;
+        var map = document.getElementById("map_key").dataset.mapkey;
+        document.getElementById("map_key").remove();
+        renderCountries(JSON.parse(countries), colors, map);
+
+    }
 }, false);
 
 function renderDoughnut(response, colors, name) {
@@ -84,7 +97,6 @@ function renderDoughnut(response, colors, name) {
         options: {}
     });
 
-    generateLegend(name + '-legend', data);
 }
 
 /**
@@ -153,6 +165,31 @@ function renderYearOverYearChart(data, colors) {
         data: values,
         options: options
     });
+}
+
+function renderCountries(data, colors, mapKey){
+    google.charts.load('current', {
+        'packages':['geochart'],
+        'mapsApiKey': mapKey,
+    });
+
+    setTimeout(function() {
+        google.charts.setOnLoadCallback(drawMap(data, colors[0]));
+    }, 2000)
+
+}
+
+function drawMap(values, color){
+    var data = google.visualization.arrayToDataTable(values);
+
+    var options = {
+        colors: [color],
+        keepAspectRatio: true,
+    };
+
+    var chart = new google.visualization.GeoChart(document.getElementById('countries-container'));
+
+    chart.draw(data, options);
 }
 
 function makeCanvas(id) {
