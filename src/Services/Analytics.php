@@ -224,21 +224,9 @@ class Analytics
         $metric->setAlias("users");
 
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
-        $dimension->setName("ga:medium");
+        $dimension->setName("ga:channelGrouping");
 
-        // Create the ReportRequest object.
-        $request = new Google_Service_AnalyticsReporting_ReportRequest();
-        $request->setViewId($this->viewId);
-        $request->setMetrics(array($metric));
-        $request->setDimensions(array($dimension));
-        $request->setDateRanges([$dateRange]);
-        $request->setPageSize(21);
-
-        $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
-        $body->setReportRequests( array( $request) );
-        $response = $this->analytics->reports->batchGet( $body );
-
-        $data = $this->formatDataChart($response);
+        $data = $this->makeRequest([$metric], [$dimension], [$dateRange]);
 
         foreach ($data["labels"] as $key =>$label) {
             if ($label == "(none)"){
