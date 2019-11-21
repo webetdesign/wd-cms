@@ -8,7 +8,6 @@
 
 namespace WebEtDesign\CmsBundle\DependencyInjection;
 
-
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Sonata\EasyExtendsBundle\Mapper\DoctrineCollector;
 use Symfony\Component\Config\Definition\Processor;
@@ -119,7 +118,6 @@ class WebEtDesignCmsExtension extends Extension
         $this->addCmsSharedBlockMapping($collector, $config);
         $this->addCmsContentMapping($collector, $config);
         $this->addAbstractCmsRouteMapping($collector, $config);
-
     }
 
     protected function addCmsPageMapping(DoctrineCollector $collector, $config)
@@ -134,7 +132,6 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'page',
             'inversedBy'    => null,
             'orphanRemoval' => false,
-            'orderBy'       => ['position' => 'ASC']
         ]);
 
         $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
@@ -234,15 +231,21 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
         ]);
 
-        $collector->addAssociation(CmsPage::class, 'mapOneToOne', [
+        $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
             'fieldName'     => 'site',
             'targetEntity'  => $config['admin']['configuration']['entity']['site'],
             'cascade'       => [],
-            'mappedBy'      => 'page',
-            'inversedBy'    => null,
+            'mappedBy'      => null,
+            'joinColumns'   => [
+                [
+                    'name'                 => 'site_id',
+                    'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
+                ],
+            ],
+            'inversedBy'    => 'pages',
             'orphanRemoval' => false,
         ]);
-
     }
 
     protected function addCmsPageDeclinationMapping(DoctrineCollector $collector, $config)
@@ -274,29 +277,20 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'declination',
             'inversedBy'    => null,
             'orphanRemoval' => false,
-            'orderBy'       => ['position' => 'ASC']
         ]);
     }
 
     protected function addCmsSiteMapping(DoctrineCollector $collector, $config)
     {
-
-        $collector->addAssociation(CmsSite::class, 'mapOneToOne', [
-            'fieldName'     => 'page',
+        $collector->addAssociation(CmsSite::class, 'mapOneToMany', [
+            'fieldName'     => 'pages',
             'targetEntity'  => $config['admin']['configuration']['entity']['page'],
             'cascade'       => [
                 'persist',
                 'remove'
             ],
-            'joinColumns'   => [
-                [
-                    'name'                 => 'page_id',
-                    'referencedColumnName' => 'id',
-                    'onDelete'             => 'SET NULL'
-                ],
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => 'site',
+            'mappedBy'      => 'site',
+            'inversedBy'    => null,
             'orphanRemoval' => false,
         ]);
 
@@ -495,7 +489,6 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'sharedBlockParent',
             'inversedBy'    => null,
             'orphanRemoval' => false,
-            'orderBy'       => ['position' => 'ASC']
         ]);
 
         $collector->addAssociation(CmsSharedBlock::class, 'mapOneToMany', [
@@ -508,7 +501,6 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'sharedBlock',
             'inversedBy'    => null,
             'orphanRemoval' => false,
-            'orderBy'       => ['position' => 'ASC']
         ]);
 
         $collector->addAssociation(CmsSharedBlock::class, 'mapManyToOne', [

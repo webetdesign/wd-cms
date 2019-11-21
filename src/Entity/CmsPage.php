@@ -11,10 +11,11 @@ use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
+// * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageRepository")
 
 /**
  * @Gedmo\Tree(type="nested")
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageRepository")
+ * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\NestedTreeRepository")
  * @ORM\Table(name="cms__page")
  */
 class CmsPage
@@ -22,7 +23,6 @@ class CmsPage
     use SeoAwareTrait;
     use SmoFacebookTrait;
     use SmoTwitterTrait;
-
 
     /**
      * @ORM\Id()
@@ -147,6 +147,8 @@ class CmsPage
 
     /**
      * Mapping Relation in WebEtDesignCmsExtension
+     *
+     * @var CmsPage[]|Collection
      */
     private $children;
 
@@ -164,7 +166,7 @@ class CmsPage
 
     public function getChildrenRight()
     {
-        $criteria = Criteria::create()->orderBy(['rgt'=>'ASC']);
+        $criteria = Criteria::create()->orderBy(['rgt' => 'ASC']);
 
         return $this->children->matching($criteria);
     }
@@ -220,10 +222,11 @@ class CmsPage
     /**
      * @inheritDoc
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->contents = new ArrayCollection();
         $this->setActive(false);
-        $this->roles = [];
+        $this->roles          = [];
         $this->crossSitePages = new ArrayCollection();
     }
 
@@ -232,7 +235,7 @@ class CmsPage
      */
     public function __toString()
     {
-        return (string) $this->getTitle();
+        return (string)$this->getTitle();
     }
 
     public function isRoot()
@@ -245,6 +248,7 @@ class CmsPage
         if ($this->getRoute()) {
             return !empty($this->getRoute()->getController());
         }
+
         return false;
     }
 
@@ -384,9 +388,9 @@ class CmsPage
     public function setRoles(?array $roles): CmsPage
     {
         $this->roles = $roles;
+
         return $this;
     }
-
 
     /**
      * @param ArrayCollection $crossSitePages
@@ -509,7 +513,6 @@ class CmsPage
     public function setSite($site): void
     {
         $this->site = $site;
-        $site->setPage($this);
     }
 
     /**
@@ -577,33 +580,33 @@ class CmsPage
     }
 
     /**
-     * @return mixed
+     * @return CmsPage|null
      */
-    public function getRoot()
+    public function getRoot(): ?CmsPage
     {
         return $this->root;
     }
 
     /**
-     * @param mixed $root
+     * @param CmsPage|null $root
      */
-    public function setRoot($root): void
+    public function setRoot(?CmsPage $root): void
     {
         $this->root = $root;
     }
 
     /**
-     * @return mixed
+     * @return CmsPage|null
      */
-    public function getParent()
+    public function getParent(): ?CmsPage
     {
         return $this->parent;
     }
 
     /**
-     * @param mixed $parent
+     * @param CmsPage|null $parent
      */
-    public function setParent($parent): void
+    public function setParent(?CmsPage $parent): void
     {
         $this->parent = $parent;
     }
@@ -616,12 +619,35 @@ class CmsPage
         return $this->children;
     }
 
-    /**
-     * @param mixed $children
-     */
-    public function setChildren($children): void
+//    /**
+//     * @param mixed $children
+//     */
+//    public function setChildren($children): void
+//    {
+//        $this->children = $children;
+//    }
+
+    public function addChild(CmsPage $page): self
     {
-        $this->children = $children;
+        if (!$this->children->contains($page)) {
+            $this->children[] = $page;
+            $page->setParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChild(CmsPage $page): self
+    {
+        if ($this->children->contains($page)) {
+            $this->children->removeElement($page);
+            // set the owning side to null (unless already changed)
+            if ($page->getParent() === $this) {
+                $page->setParent(null);
+            }
+        }
+
+        return $this;
     }
 
     /**

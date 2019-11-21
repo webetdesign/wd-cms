@@ -28,7 +28,6 @@ class CmsMigrationArboCommand extends Command
         parent::__construct($name);
     }
 
-
     protected function configure()
     {
         $this
@@ -38,13 +37,12 @@ class CmsMigrationArboCommand extends Command
         ;
     }
 
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
 
 //        $this->con = $this->getConnection($io);
-        $oSites = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->findAll();
+        $oSites   = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->findAll();
         $menuRepo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
         if (empty($oSites)) {
             $oMenus = $menuRepo->findAll();
@@ -69,7 +67,7 @@ class CmsMigrationArboCommand extends Command
             }
 
             /** @var CmsPage $root */
-            $root = $newSite->getPage();
+            $root = $newSite->getRoot();
 
             $pageRepo = $this->em->getRepository('WebEtDesignCmsBundle:CmsPage');
             $pages    = $pageRepo->findBy(['root' => null]);
@@ -81,11 +79,8 @@ class CmsMigrationArboCommand extends Command
                 $pageRepo->persistAsLastChildOf($page, $root);
             }
 
-
             $this->em->flush();
         }
-
-
 
         $io->success('Migration terminée');
     }

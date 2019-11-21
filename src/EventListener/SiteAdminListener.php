@@ -57,7 +57,6 @@ class SiteAdminListener
             return;
         }
 
-
         $this->warmUpRouteCache();
     }
 
@@ -115,7 +114,6 @@ class SiteAdminListener
         $em->persist($homepage);
 
         $site->setMenu($root);
-
     }
 
     private function createPage(EntityManager $em, CmsSite $site)
@@ -124,8 +122,8 @@ class SiteAdminListener
         $page->setTemplate(!empty($site->getTemplateFilter()) ? $site->getTemplateFilter() . '_home' : 'home');
         $page->setTitle('Homepage');
         $page->rootPage = true;
+        $site->addPage($page);
 
         $em->persist($page);
-        $site->setPage($page);
     }
 }

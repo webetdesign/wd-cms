@@ -10,6 +10,8 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Selectable;
 use Doctrine\ORM\PersistentCollection;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,54 +26,57 @@ class CmsSite
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     *
+     * @var int
      */
     private $id;
 
     /**
-     * @var string
      * @ORM\Column(type="string", length=255, nullable=false)
      *
+     * @var string
      */
     private $label;
 
     /**
-     * @var string
      * @ORM\Column(type="string", length=255, nullable=true)
      *
+     * @var string
      */
     private $locale;
 
     /**
-     * @var string
      * @ORM\Column(type="string", length=255, nullable=true)
      *
+     * @var string
      */
     private $host;
 
     /**
-     * @var boolean
      * @ORM\Column(type="boolean", options={"default" : 0})
      *
+     * @var boolean
      */
     private $hostMultilingual = false;
 
     /**
-     * @var boolean
      * @ORM\Column(name="`default`", type="boolean", options={"default" : 0})
      *
+     * @var boolean
      */
     private $default;
 
     /**
-     * @var CmsPage
      * Mapping Relation in WebEtDesignCmsExtension
+     *
+     * @var CmsPage[]|Collection|Selectable
      */
-    private $page;
+    private $pages;
 
     /**
-     * @var string
      * @ORM\Column(type="string", length=255, nullable=true)
      *
+     * @var string
      */
     private $flagIcon;
 
@@ -91,14 +96,17 @@ class CmsSite
     public $initPage = true;
     public $initMenu = true;
 
-    public function __construct() {}
+    public function __construct()
+    {
+        $this->pages = new ArrayCollection();
+    }
 
     /**
      * @inheritDoc
      */
     public function __toString()
     {
-        return (string) $this->getLabel() . (!empty($this->getLocale()) ? ' - ' . $this->getLocale() : '');
+        return (string)$this->getLabel() . (!empty($this->getLocale()) ? ' - ' . $this->getLocale() : '');
     }
 
     /**
@@ -156,6 +164,7 @@ class CmsSite
     public function setLabel(?string $label): CmsSite
     {
         $this->label = $label;
+
         return $this;
     }
 
@@ -173,6 +182,7 @@ class CmsSite
     public function setHostMultilingual(bool $hostMultilingual)
     {
         $this->hostMultilingual = $hostMultilingual;
+
         return $this;
     }
 
@@ -190,6 +200,7 @@ class CmsSite
     public function setDefault(bool $default)
     {
         $this->default = $default;
+
         return $this;
     }
 
@@ -233,22 +244,49 @@ class CmsSite
         $this->menu = $menu;
     }
 
-    public function getSlug(){
+    public function getSlug()
+    {
         $slugify = new Slugify();
+
         return $slugify->slugify($this->getLabel(), "_");
     }
 
-    public function getPage()
+    public function getPages()
     {
-        return $this->page;
+        return $this->pages;
     }
 
-    /**
-     * @param $page
-     */
-    public function setPage($page): void
+    public function getRoot(): ?CmsPage
     {
-        $this->page = $page;
+        $criteria = new Criteria();
+        $criteria->where(
+            Criteria::expr()->eq('lvl', 0)
+        );
+
+        return $this->pages->matching($criteria)->first();
+    }
+
+    public function addPage($page): self
+    {
+        if (!$this->pages->contains($page)) {
+            $this->pages[] = $page;
+            $page->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removePage($page): self
+    {
+        if ($this->pages->contains($page)) {
+            $this->pages->removeElement($page);
+            // set the owning side to null (unless already changed)
+            if ($page->getSite() === $this) {
+                $page->setSite(null);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -258,6 +296,7 @@ class CmsSite
     public function setTemplateFilter($templateFilter)
     {
         $this->templateFilter = $templateFilter;
+
         return $this;
     }
 
@@ -276,6 +315,7 @@ class CmsSite
     public function setSharedBlocks($sharedBlocks)
     {
         $this->sharedBlocks = $sharedBlocks;
+
         return $this;
     }
 

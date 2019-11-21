@@ -5,6 +5,8 @@ namespace WebEtDesign\CmsBundle\Admin;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 use phpDocumentor\Reflection\Types\Boolean;
 use Sonata\AdminBundle\Admin\AdminInterface;
@@ -57,7 +59,8 @@ class CmsPageAdmin extends AbstractAdmin
         $declination,
         $globalVarsDefinition,
         TemplateProvider $pageProvider
-    ) {
+    )
+    {
         $this->multisite        = $multisite;
         $this->multilingual     = $multilingual;
         $this->declination      = $declination;
@@ -75,9 +78,9 @@ class CmsPageAdmin extends AbstractAdmin
     {
         $buttons           = parent::getActionButtons($action, $object);
         $buttons['create'] = ['template' => '@WebEtDesignCms/admin/page/create_button.html.twig'];
+
         return $buttons;
     }
-
 
     protected function configureRoutes(RouteCollection $collection)
     {
@@ -128,7 +131,6 @@ class CmsPageAdmin extends AbstractAdmin
             );
         }
     }
-
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
@@ -187,7 +189,6 @@ class CmsPageAdmin extends AbstractAdmin
         $site = $root ? $root->getSite() : $parent->getRoot()->getSite();
 
         $admin->setFormTheme(array_merge($admin->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
-
 
         $container = $this->getConfigurationPool()->getContainer();
         /** @var EntityManagerInterface $em */
@@ -248,6 +249,7 @@ class CmsPageAdmin extends AbstractAdmin
                     $qb
                         ->addOrderBy('p.root', 'asc')
                         ->addOrderBy('p.lft', 'asc');
+
                     return $qb;
                 },
                 'choice_label'  => function ($object) {
@@ -273,7 +275,6 @@ class CmsPageAdmin extends AbstractAdmin
                 ->with('', ['box_class' => ''])
                 ->add('active');
 
-
             //region Association
             if ($object->getClassAssociation()) {
                 $entities = $em->getRepository($object->getClassAssociation())->{$object->getQueryAssociation()}();
@@ -289,7 +290,6 @@ class CmsPageAdmin extends AbstractAdmin
                 );
             }
             //endregion
-
 
             $formMapper->end();// End form group
             $formMapper->end();// End tab
@@ -311,14 +311,6 @@ class CmsPageAdmin extends AbstractAdmin
             //region Contenus
             $formMapper->tab('Contenus');
             $this->addGlobalVarsHelp($formMapper, $object, $this->globalVarsEnable);
-
-            $contentOptions = [
-                'edit'   => 'inline',
-                'inline' => 'table',
-            ];
-            if ($roleAdmin) {
-                $contentOptions['sortable'] = 'position';
-            }
             $formMapper
                 ->with('', ['box_class' => ''])
                 ->add(
@@ -332,7 +324,11 @@ class CmsPageAdmin extends AbstractAdmin
                             'delete' => $roleAdmin,
                         ],
                     ],
-                    $contentOptions
+                    [
+                        'edit'     => 'inline',
+                        'inline'   => 'table',
+                        'sortable' => 'position',
+                    ]
                 )
                 ->end()
                 ->end();
@@ -388,15 +384,12 @@ class CmsPageAdmin extends AbstractAdmin
                 ->end();
             //endregion
 
-
             if ($this->multilingual) {
                 //region MultiLingue
                 $formMapper->tab('MultiLingue')
                     ->with('', ['box_class' => '']);
 
                 if ($object->getRoot()->getSite()) {
-
-
                     $formMapper->add('crossSitePages', MultilingualType::class, [
                         'site'  => $object->getRoot()->getSite(),
                         'page'  => $object,
@@ -411,6 +404,7 @@ class CmsPageAdmin extends AbstractAdmin
                                     $tab[$item->getRoot()->getSite()->getId()] = $item;
                                 }
                             }
+
                             return $tab;
                         },
                         function ($value) {
@@ -423,7 +417,6 @@ class CmsPageAdmin extends AbstractAdmin
                 //endregion
             }
         }
-
     }
 
     protected function configureShowFields(ShowMapper $showMapper)
@@ -439,5 +432,49 @@ class CmsPageAdmin extends AbstractAdmin
         $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');
+    }
+
+    public function createQuery($context = 'list')
+    {
+        $qb = $this->em->createQueryBuilder();
+
+        $qb
+            ->select(['p', 'r'])
+            ->from('WebEtDesignCmsBundle:CmsPage', 'p')
+            ->leftJoin('p.route', 'r')
+            ->andWhere(
+                $qb->expr()->eq('p.site', $this->getRequest()->get('id'))
+            )->getQuery()->getResult();
+
+        $qb = $this->em->createQueryBuilder();
+
+        $qb
+            ->select(['PARTIAL p.{id}', 'd'])
+            ->from('WebEtDesignCmsBundle:CmsPage', 'p')
+            ->leftJoin('p.declinations', 'd')
+            ->andWhere(
+                $qb->expr()->eq('p.site', $this->getRequest()->get('id'))
+            )->getQuery()->getResult();
+
+        $qb = $this->em->createQueryBuilder();
+
+        $qb
+            ->select(['PARTIAL p.{id}', 'c'])
+            ->from('WebEtDesignCmsBundle:CmsPage', 'p')
+            ->leftJoin('p.children', 'c')
+            ->andWhere(
+                $qb->expr()->eq('p.site', $this->getRequest()->get('id'))
+            )->getQuery()->getResult();
+
+        /** @var QueryBuilder $query */
+        $query = parent::createQuery($context);
+        $alias = $query->getRootAlias();
+
+        $query
+            ->andWhere(
+                $query->expr()->eq($alias . '.lvl', 0)
+            );
+
+        return $query;
     }
 }

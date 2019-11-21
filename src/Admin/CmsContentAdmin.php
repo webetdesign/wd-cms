@@ -38,7 +38,8 @@ final class CmsContentAdmin extends AbstractAdmin
         $contentTypeOption,
         string $media_class,
         Container $container
-    ) {
+    )
+    {
         $this->em             = $em;
         $this->customContents = $contentTypeOption;
         $this->media_class    = $media_class;
@@ -114,8 +115,12 @@ final class CmsContentAdmin extends AbstractAdmin
             );
         }
 
-        if ($subject && $subject->getId()) {
+        $formMapper->add('parent_heritance', null, [
+            'label' => 'Héritage',
+        ]);
+        $this->addHelp($formMapper, $subject, 'parent_heritance');
 
+        if ($subject && $subject->getId()) {
             switch ($subject->getType()) {
                 case CmsContentTypeEnum::TEXT:
                     $formMapper->add('value', TextType::class, ['required' => false]);
@@ -246,9 +251,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         'label' => 'Héritage',
                     ]);
                     $this->addHelp($formMapper, $subject, 'parent_heritance');
-
                     break;
-
             }
 
             foreach ($this->customContents as $content => $configuration) {
@@ -266,10 +269,8 @@ final class CmsContentAdmin extends AbstractAdmin
                     }
 
                     $formMapper->getFormBuilder()->get('value')->addModelTransformer($contentService->getCallbackTransformer());
-
                 }
             }
-
         }
         if ($roleAdmin) {
             $formMapper->add('position');
