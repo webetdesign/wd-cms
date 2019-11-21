@@ -7,10 +7,9 @@ import './analytics/analytics.js';
 
 import 'moment/moment'
 
-
 //commenter car pete le style de l'admin
-// import '../sass/analytics/index.scss';
-import '../sass/analytics/admin.scss';
+import '../sass/analytics/index.scss';
+// import '../sass/analytics/admin.scss';
 
 
 

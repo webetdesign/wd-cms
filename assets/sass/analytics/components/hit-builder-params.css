@@ -1,8 +1,0 @@
-.HitBuilderParams {
-  transition: opacity .2s var(--quantum-timing);
-}
-
-.is-editing .HitBuilderParams {
-  opacity: .4;
-  pointer-events: none;
-}

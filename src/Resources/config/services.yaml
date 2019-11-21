@@ -367,7 +367,7 @@ services:
     arguments:
       - ~
       - '@templating'
-
+      - '@analytics_api.service'
     tags:
       - { name: sonata.block }
 
@@ -399,3 +399,19 @@ services:
       - '@doctrine.orm.entity_manager'
       - '%wd_cms.admin.content.user%'
       - true
+
+  # ===============================================
+  # GOOGLE ANALYTICS
+  # ===============================================
+
+  analytics_api.api:
+    class: MediaFigaro\GoogleAnalyticsApi\Service\GoogleAnalyticsService
+    arguments: ["%google_analytics_api.google_analytics_json_key%"]
+    public: true
+
+  analytics_api.service:
+    public: true
+    class: WebEtDesign\CmsBundle\Services\Analytics
+    arguments:
+      - '@analytics_api.api'
+      - '%env(resolve:GOOGLE_ANALYTICS_VIEW_ID)%'
