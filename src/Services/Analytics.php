@@ -73,10 +73,11 @@ class Analytics
 
     /**
      * Return Number or Users per Browser
+     * @param string $start
      * @return array
      */
-    public function getBrowsers(){
-        return $this->getBasicChart( "users", "browser", "30 days ago");
+    public function getBrowsers($start = "30 days ago"){
+        return $this->getBasicChart( "users", "browser", $start);
     }
 
     /**
@@ -221,11 +222,12 @@ class Analytics
 
     /**
      * Return number of users per source
+     * @param string $start
      * @return array
      */
-    public function getSources(){
+    public function getSources($start = "first day of january this year"){
 
-        $data = $this->getBasicChart( "users", "channelGrouping", "first day of january this year");
+        $data = $this->getBasicChart( "users", "channelGrouping", $start);
 
         foreach ($data["labels"] as $key => $label) {
             if ($label == "(none)"){
@@ -237,11 +239,12 @@ class Analytics
 
     /**
      * Return of users per device
+     * @param string $start
      * @return array
      */
-    public function getDevices(){
+    public function getDevices($start = "30 days ago"){
 
-        $data = $this->getBasicChart( "users", "deviceCategory", "first day of january this year");
+        $data = $this->getBasicChart( "users", "deviceCategory", $start);
 
         foreach ($data["labels"] as $key =>$label) {
             switch (strtolower($label)) {
@@ -262,11 +265,12 @@ class Analytics
 
     /**
      * Return of users per country
+     * @param string $start
      * @return array
      */
-    public function getCountries(){
+    public function getCountries($start = "first day of january this year"){
 
-        $response = $this->getBasicChart( "users", "country", "first day of january this year");
+        $response = $this->getBasicChart( "users", "country", $start);
         $data = [];
         $data[] = ['Country', 'Popularity'];
 
@@ -280,9 +284,10 @@ class Analytics
         return $data;
     }
 
-    public function getUsers(){
+    public function getUsers($start = "30 days ago"){
+
         $dateRange = new Google_Service_AnalyticsReporting_DateRange();
-        $dateRange->setStartDate(date('Y-m-d', strtotime("30 days ago")));
+        $dateRange->setStartDate(date('Y-m-d', strtotime($start)));
         $dateRange->setEndDate(date('Y-m-d', strtotime("today")));
 
         $metric = new Google_Service_AnalyticsReporting_Metric();

@@ -46,12 +46,16 @@ class Base extends AbstractBlockService
 
         $blocks = [];
 
+
         foreach ($settings["blocks"] as $block) {
-            $method = "get" . ucfirst($block);
+            $block_name = array_key_first($block);
+            $start = sizeof($block[$block_name]) == 2 ? $block[$block_name][1] : null;
+            $method = "get" . ucfirst($block_name);
             $row = [];
-            $row["template"] = "@WebEtDesignCms/block/analytics/" . $block . ".html.twig";
-            $row["data"] = $this->analyticsService->$method();
-            $row["name"] = $block;
+            $row["template"] = "@WebEtDesignCms/block/analytics/" . $block_name . ".html.twig";
+            $start ? $row["data"] = $this->analyticsService->$method($start) : $row["data"] = $this->analyticsService->$method();
+            $row["name"] = $block_name;
+            $row["size"] = $block[$block_name] ? $block[$block_name][0] : null;
             $blocks[] = $row;
         }
 

@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function(){
     if ( document.getElementById("colors")){
         colors = document.getElementById("colors").dataset.colors;
         colors = JSON.parse(colors);
-        document.getElementById("colors").remove();
     }
 
     if (document.getElementById("browsers-container") != null){
@@ -105,11 +104,6 @@ function renderDoughnut(response, colors, name) {
 
 }
 
-/**
- * Draw the a chart.js line chart with data from the specified view that
- * overlays session data for the current week over session data for the
- * previous week.
- */
 function renderWeekOverWeekChart(data, colors) {
 
     var values = {
@@ -142,11 +136,6 @@ function renderWeekOverWeekChart(data, colors) {
     });
 }
 
-/**
- * Draw the a chart.js bar chart with data from the specified view that
- * overlays session data for the current year over session data for the
- * previous year, grouped by month.
- */
 function renderYearOverYearChart(data, colors) {
 
     var values = {
@@ -211,11 +200,6 @@ function renderUsers(data, color){
             );
         })
 
-        // if (row[0][0] % 2 === 0){
-        //     $("#"+id).append('<div class="col-xs-1 m-1 text-center" style=" height: 10px; border: 1px solid inherit; color: #A6ACAF; left: -5px;  font-size: 1.3rem" >'+ (row[0][0]) + '</div>');
-        //
-        // }
-
     })
 
     $("#users-container").append('<div class="row" id="row-date">\n' +
@@ -263,6 +247,7 @@ function getDay(day) {
             return day;
     }
 }
+
 function drawMap(values, color){
     var data = google.visualization.arrayToDataTable(values);
 

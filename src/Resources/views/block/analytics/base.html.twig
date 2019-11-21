@@ -1,5 +1,5 @@
 {% for block in blocks %}
-    <div class="{{ block.size | default('col-md-6') }}">
+    <div id="block-{{ block.name }}" class="{{ block.size | default('col-md-6') }}" >
         {% include block.template with block.data %}
     </div>
     <div id="data-{{ block.name }}" style="display: none;" data-values="{{ block.data | json_encode }}">
