@@ -213,6 +213,10 @@ class CmsContent
 
     public function getParentContent(): ?CmsContent
     {
+        if (!$this->getPage()) {
+            return null;
+        }
+
         return $this->getPage()->getParent() ? $this->getPage()->getParent()->getContent($this->code) : null;
     }
 

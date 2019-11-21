@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "php": "^7.0",
+        "php": "^7.1",
         "doctrine/common": "^2.7",
         "mailjet/mailjet-apiv3-php": "^1.4",
         "doctrine/doctrine-bundle": "^1.10",
