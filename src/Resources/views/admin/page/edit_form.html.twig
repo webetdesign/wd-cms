@@ -1,4 +1,5 @@
 {% extends '@SonataAdmin/CRUD/base_edit_form.html.twig' %}
+
 {% if action == 'create' %}
     {% set options = {
         'id': objectId|default(admin.id(object)),
@@ -15,4 +16,31 @@
         'subclass': app.request.get('subclass')
     } %}
 {% endif %}
+
 {% block sonata_form_action_url %}{{ admin.generateUrl(action, options) }}{% endblock %}
+
+{% block form %}
+    {{ parent() }}
+
+    <script type="application/javascript">
+    function setParentInheritance ($el) {
+      var $row = $el.parents('tr');
+      var $target = $row.find('td[class*="value"]')
+        .children();
+
+      if ($el.is(':checked')) {
+        $target.hide();
+      } else {
+        $target.show();
+      }
+    }
+
+    $('[name*="parent_heritance"]')
+      .on('change', function() {
+        setParentInheritance($(this));
+      })
+      .each(function(k, el) {
+        setParentInheritance($(el));
+      });
+    </script>
+{% endblock %}

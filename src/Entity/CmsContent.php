@@ -9,8 +9,6 @@ use Sonata\MediaBundle\Model\MediaInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-
-
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsContentRepository")
  * @ORM\Table(name="cms__content")
@@ -138,6 +136,7 @@ class CmsContent
             case $this->getSharedBlockList() !== null && $this->getSharedBlockList()->count() > 0:
                 return true;
         }
+
         return false;
     }
 
@@ -184,7 +183,13 @@ class CmsContent
 
     public function getValue(): ?string
     {
-        return $this->value;
+        $value = $this->value;
+        if ($this->getParentHeritance()) {
+            $content = $this->getParentContent();
+            $value   = $content ? $content->getValue() : null;
+        }
+
+        return $value;
     }
 
     public function setValue(?string $value): self
@@ -204,6 +209,11 @@ class CmsContent
         $this->page = $page;
 
         return $this;
+    }
+
+    public function getParentContent(): ?CmsContent
+    {
+        return $this->getPage()->getParent() ? $this->getPage()->getParent()->getContent($this->code) : null;
     }
 
     public function getSharedBlockParent(): ?CmsSharedBlock
@@ -327,6 +337,7 @@ class CmsContent
     public function setSharedBlockList($sharedBlockList)
     {
         $this->sharedBlockList = $sharedBlockList;
+
         return $this;
     }
 
@@ -360,6 +371,7 @@ class CmsContent
     public function setDeclination($declination)
     {
         $this->declination = $declination;
+
         return $this;
     }
 
@@ -378,6 +390,7 @@ class CmsContent
     public function setHelp(?string $help): CmsContent
     {
         $this->help = $help;
+
         return $this;
     }
 
@@ -396,6 +409,7 @@ class CmsContent
     public function setPosition($position)
     {
         $this->position = $position;
+
         return $this;
     }
 

@@ -293,6 +293,17 @@ class CmsPage
         return $this->contents;
     }
 
+    public function getContent($code): ?CmsContent
+    {
+        $criteria = new Criteria();
+        $criteria
+            ->where(
+                Criteria::expr()->eq('code', $code)
+            );
+
+        return $this->contents->matching($criteria)->first() ?: null;
+    }
+
     /**
      * @param ArrayCollection $contents
      */
@@ -618,14 +629,6 @@ class CmsPage
     {
         return $this->children;
     }
-
-//    /**
-//     * @param mixed $children
-//     */
-//    public function setChildren($children): void
-//    {
-//        $this->children = $children;
-//    }
 
     public function addChild(CmsPage $page): self
     {
