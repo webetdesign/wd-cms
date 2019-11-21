@@ -147,6 +147,12 @@ class Analytics
         return $array;
     }
 
+    /**
+     * Return the number of users each month for periods :
+     *      [january -> today] this year
+     *      [january -> december] last year
+     * @return array
+     */
     public function getUserYear(){
         $thisYear = new Google_Service_AnalyticsReporting_DateRange();
         // this monday
@@ -203,6 +209,45 @@ class Analytics
 
         return $array;
     }
+
+    /**
+     * Return source of users for this year
+     * @return array
+     */
+    public function getSources(){
+        $dateRange = new Google_Service_AnalyticsReporting_DateRange();
+        $dateRange->setStartDate(date('Y-m-d', strtotime('first day of january this year')));
+        $dateRange->setEndDate(date('Y-m-d', strtotime('today')));
+
+        $metric = new Google_Service_AnalyticsReporting_Metric();
+        $metric->setExpression("ga:users");
+        $metric->setAlias("users");
+
+        $dimension = new Google_Service_AnalyticsReporting_Dimension();
+        $dimension->setName("ga:medium");
+
+        // Create the ReportRequest object.
+        $request = new Google_Service_AnalyticsReporting_ReportRequest();
+        $request->setViewId($this->viewId);
+        $request->setMetrics(array($metric));
+        $request->setDimensions(array($dimension));
+        $request->setDateRanges([$dateRange]);
+        $request->setPageSize(21);
+
+        $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
+        $body->setReportRequests( array( $request) );
+        $response = $this->analytics->reports->batchGet( $body );
+
+        $data = $this->formatDataChart($response);
+
+        foreach ($data["labels"] as $key =>$label) {
+            if ($label == "(none)"){
+                $data["labels"][$key] = "Direct";
+            }
+        }
+        return $data;
+    }
+
     private function makeRequest(array $metrics, array $dimensions, array $dates){
         // Create the ReportRequest object.
         $request = new Google_Service_AnalyticsReporting_ReportRequest();

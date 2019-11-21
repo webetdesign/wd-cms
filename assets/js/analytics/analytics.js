@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     if (document.getElementById("browsers-container") != null){
         var browsers = document.getElementById("data-browsers").dataset.values;
-        renderTopBrowsersChart(JSON.parse(browsers), colors);
+        renderDoughnut(JSON.parse(browsers), colors, "browsers");
     }
 
     if (document.getElementById('week-container') != null){
@@ -50,17 +50,22 @@ document.addEventListener('DOMContentLoaded', function(){
 
         renderYearOverYearChart(JSON.parse(years), year_colors);
     }
+
+    if (document.getElementById("sources-container") != null){
+        var sources = document.getElementById("data-sources").dataset.values;
+        renderDoughnut(JSON.parse(sources), colors, "sources");
+    }
 }, false);
 
-function renderTopBrowsersChart(browsers, colors) {
+function renderDoughnut(response, colors, name) {
     var data = [];
     var colors_chart = [];
     var values = [];
     var labels = [];
 
-    for (let i = 0; i < browsers.labels.length; i++) {
-        values.push(browsers.values[i]);
-        labels.push(browsers.labels[i]);
+    for (let i = 0; i < response.labels.length; i++) {
+        values.push(response.values[i]);
+        labels.push(response.labels[i]);
         colors_chart.push(colors[i]);
     }
 
@@ -73,13 +78,13 @@ function renderTopBrowsersChart(browsers, colors) {
     data['labels'] =  labels;
 
 
-    var chart = new Chart(makeCanvas('browsers-container'), {
+    var chart = new Chart(makeCanvas(name + '-container'), {
         type: 'doughnut',
         data: data,
         options: {}
     });
 
-    generateLegend('browsers-legend', data);
+    generateLegend(name + '-legend', data);
 }
 
 /**
