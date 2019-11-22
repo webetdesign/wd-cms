@@ -1,33 +1,5 @@
-## Analytics : 
+## Configure API : 
 
-You can make different analytics blocks :
-
-   - **browsers** : to display browsers used last week
-   - **countries** : to display a map with the location of users
-   - **devices** : to display devices used last week
-   - **source** :  to display where users are coming from
-   - **users** : to display when the users are coming
-   - **userWeek** : to display the difference in the number of visitors between this week and the previous
-   - **userYear** : to display the difference in the number of visitors between this year and the previous
-
-    dashboard:
-        blocks:
-            -  class: col-12
-               position: top
-               roles: [ROLE_ADMIN]
-               type:     cms.admin.analytics
-               settings:
-                   analytics:
-                       - devices: ["col-md-4", "2 months ago"]
-                   colors: ["rgb(195, 236, 255)","rgb(160, 225, 255)", "rgb(114, 210, 255)", "rgb(063, 194, 255)", "rgb(000, 150, 220)", "rgb(000, 150, 174)"]
-                   week_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
-                   year_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
-                   users_color: 'rgb(000, 123, 255)'
-                   map_color: '#0077ae'
-                   map_key: "your_key"
-
-###Configuration API
-        
    1°  You need a json file to access the API. Follow [this documentation](https://developers.google.com/analytics/devguides/reporting/core/v4/quickstart/service-php)
    
    2 ° When you have your json file. Save it in var dir of the project.
@@ -54,6 +26,34 @@ You can make different analytics blocks :
             -> Administration
             -> Gestion des Utilisateurs
             -> +
+            
+## Data :            
+You can make different analytics blocks :
+
+   - **browsers** : to display browsers used last week
+   - **countries** : to display a map with the location of users
+   - **devices** : to display devices used last week
+   - **source** :  to display where users are coming from
+   - **users** : to display when the users are coming
+   - **userWeek** : to display the difference in the number of visitors between this week and the previous
+   - **userYear** : to display the difference in the number of visitors between this year and the previous
+
+    dashboard:
+        blocks:
+            -  class: col-12
+               position: top
+               roles: [ROLE_ADMIN]
+               type:     cms.admin.analytics
+               settings:
+                   analytics:
+                       - devices: ["col-md-4", "2 months ago"]
+                   colors: ["rgb(195, 236, 255)","rgb(160, 225, 255)", "rgb(114, 210, 255)", "rgb(063, 194, 255)", "rgb(000, 150, 220)", "rgb(000, 150, 174)"]
+                   week_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
+                   year_colors: ["rgb(160, 225, 255)", "rgb(000, 150, 220)"]
+                   users_color: 'rgb(000, 123, 255)'
+                   map_color: '#0077ae'
+                   map_key: "your_key"
+
    
 ###Configuration of a block
 
