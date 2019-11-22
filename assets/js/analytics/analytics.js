@@ -63,8 +63,9 @@ document.addEventListener('DOMContentLoaded', function(){
     if (document.getElementById("countries-container") != null){
         var countries = document.getElementById("data-countries").dataset.values;
         var map = document.getElementById("map_key").dataset.mapkey;
+        var map_color = document.getElementById("map_color").dataset.mapcolor;
         document.getElementById("map_key").remove();
-        renderCountries(JSON.parse(countries), colors, map);
+        renderCountries(JSON.parse(countries), map_color    , map);
     }
 
     if (document.getElementById("users-container") != null){
@@ -162,14 +163,14 @@ function renderYearOverYearChart(data, colors) {
     });
 }
 
-function renderCountries(data, colors, mapKey){
+function renderCountries(data, color, mapKey){
     google.charts.load('current', {
         'packages':['geochart'],
         'mapsApiKey': mapKey,
     });
 
     setTimeout(function() {
-        google.charts.setOnLoadCallback(drawMap(data, colors[0]));
+        google.charts.setOnLoadCallback(drawMap(data, color));
     }, 2000)
 
 }

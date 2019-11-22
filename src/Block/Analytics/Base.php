@@ -46,8 +46,9 @@ class Base extends AbstractBlockService
 
         $blocks = [];
 
+        $this->analyticsService->maxPage = sizeof($settings['colors']);
 
-        foreach ($settings["blocks"] as $block) {
+        foreach ($settings["analytics"] as $block) {
             $block_name = array_key_first($block);
             $start = sizeof($block[$block_name]) == 2 ? $block[$block_name][1] : null;
             $method = "get" . ucfirst($block_name);
@@ -61,6 +62,7 @@ class Base extends AbstractBlockService
 
         return $this->renderPrivateResponse("@WebEtDesignCms/block/analytics/base.html.twig", [
             'map_key' => $settings['map_key'] ,
+            'map_color' => $settings['map_color'],
             'users_color' => $settings['users_color'],
             'week_colors' => json_encode($settings['week_colors']),
             'year_colors' => json_encode($settings['year_colors']),
@@ -81,11 +83,12 @@ class Base extends AbstractBlockService
     {
         $resolver->setDefaults([
             'map_key' => null,
+            'map_color' => "#0077ae",
             'users_color' => 'rgb(179, 000, 000)',
             'week_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
             'year_colors' => ['rgb(255, 077, 077)', 'rgb(230, 000, 000)'],
             'colors' => ['rgb(255, 102, 102)','rgb(255, 051, 051)','rgb(230, 000, 000)','rgb(179, 000, 000)','rgb(128, 000, 000)'],
-            "blocks" => []
+            "analytics" => []
 
         ]);
 
@@ -93,8 +96,9 @@ class Base extends AbstractBlockService
         $resolver->setAllowedTypes('week_colors', ['array', 'null']);
         $resolver->setAllowedTypes('year_colors', ['array', 'null']);
         $resolver->setAllowedTypes('users_color', ['string', 'null']);
+        $resolver->setAllowedTypes('map_color', ['string', 'null']);
         $resolver->setAllowedTypes('colors', ['array', 'null']);
-        $resolver->setAllowedTypes('blocks', ['array', 'null']);
+        $resolver->setAllowedTypes('analytics', ['array', 'null']);
 
 
     }

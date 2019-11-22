@@ -34,19 +34,25 @@ class Analytics
      * @var Google_Client
      */
     private $client;
+    /**
+     * @var int
+     */
+    public $maxPage;
 
     /**
      * Analytics constructor.
      * @param GoogleAnalyticsService $analyticsService
      * @param $viewId
+     * @param int $maxPage
      */
-    public function __construct(GoogleAnalyticsService $analyticsService, $viewId)
+    public function __construct(GoogleAnalyticsService $analyticsService, $viewId, int $maxPage = 10)
     {
         $this->analyticsService = $analyticsService;
         $this->viewId = $viewId;
         $this->client = $analyticsService->getClient();
         $this->analytics = new Google_Service_AnalyticsReporting($this->client);
 
+        $this->maxPage = $maxPage;
     }
 
     /**
@@ -68,7 +74,7 @@ class Analytics
         $dimension = new Google_Service_AnalyticsReporting_Dimension();
         $dimension->setName("ga:" . $dimension_name);
 
-        return $this->makeRequest([$metric], [$dimension], [$dateRange]);
+        return $this->makeRequest([$metric], [$dimension], [$dateRange], "formatDataChart",$this->maxPage);
     }
 
     /**
@@ -309,13 +315,17 @@ class Analytics
 
     }
 
-    private function makeRequest(array $metrics, array $dimensions, array $dates, $method = "formatDataChart"){
+    private function makeRequest(array $metrics, array $dimensions, array $dates, $method = "formatDataChart", $max = null){
         // Create the ReportRequest object.
         $request = new Google_Service_AnalyticsReporting_ReportRequest();
         $request->setViewId($this->viewId);
         $request->setMetrics($metrics);
         $request->setDimensions($dimensions);
         $request->setDateRanges($dates);
+
+        if ($max){
+            $request->setPageSize($max);
+        }
 
         $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
         $body->setReportRequests( array( $request) );

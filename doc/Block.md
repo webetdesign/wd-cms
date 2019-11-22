@@ -17,12 +17,15 @@ You can make different analytics blocks :
 ###Configuration
    **General**
    ----------
-    class:    col-12
-              position: top
-              roles: [ROLE_ADMIN]
-              type:     cms.admin.analytics
-              settings:
-                template: "@WebEtDesignCms/block/analytics/<block_name>.html.twig"
+    -
+        class:    col-12
+        position: top
+        roles: [ROLE_ADMIN]
+        type:     cms.admin.analytics
+        settings:
+            blocks:
+                - devices: ["col-md-4", "2 months ago"]
+            colors: ["#FA5882","#DF013A", "#B40431", "#3B0B17"]
                 
    
    The colors must be in rgb format :
