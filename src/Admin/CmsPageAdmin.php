@@ -84,12 +84,8 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected function configureRoutes(RouteCollection $collection)
     {
-        $default = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-
         $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
-        if ($default != null) {
-            $collection->add('tree', 'tree/{id}', ['id' => $default->getId()], ['id' => '\d*']);
-        }
+        $collection->add('tree', 'tree/{id}', ['id' => null], ['id' => '\d*']);
         $collection->add('create', 'create/{parent}', ['parent' => null], ['parent' => '\d*']);
 
         parent::configureRoutes($collection);
@@ -436,36 +432,6 @@ class CmsPageAdmin extends AbstractAdmin
 
     public function createQuery($context = 'list')
     {
-        $qb = $this->em->createQueryBuilder();
-
-        $qb
-            ->select(['p', 'r'])
-            ->from('WebEtDesignCmsBundle:CmsPage', 'p')
-            ->leftJoin('p.route', 'r')
-            ->andWhere(
-                $qb->expr()->eq('p.site', $this->getRequest()->get('id'))
-            )->getQuery()->getResult();
-
-        $qb = $this->em->createQueryBuilder();
-
-        $qb
-            ->select(['PARTIAL p.{id}', 'd'])
-            ->from('WebEtDesignCmsBundle:CmsPage', 'p')
-            ->leftJoin('p.declinations', 'd')
-            ->andWhere(
-                $qb->expr()->eq('p.site', $this->getRequest()->get('id'))
-            )->getQuery()->getResult();
-
-        $qb = $this->em->createQueryBuilder();
-
-        $qb
-            ->select(['PARTIAL p.{id}', 'c'])
-            ->from('WebEtDesignCmsBundle:CmsPage', 'p')
-            ->leftJoin('p.children', 'c')
-            ->andWhere(
-                $qb->expr()->eq('p.site', $this->getRequest()->get('id'))
-            )->getQuery()->getResult();
-
         /** @var QueryBuilder $query */
         $query = parent::createQuery($context);
         $alias = $query->getRootAlias();

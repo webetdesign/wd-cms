@@ -14,7 +14,6 @@ use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 
-
 class CmsMenuAdminController extends CRUDController
 {
     public function createRootNodeAction()
@@ -55,18 +54,22 @@ class CmsMenuAdminController extends CRUDController
         $this->moveItems($source);
 
         return new JsonResponse(['status' => 'ok']);
-
     }
 
     public function listAction($id = null)
     {
+        if ($id === null) {
+            $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+            if (!$defaultSite) {
+                $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+
+                return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+            }
+
+            $id = $defaultSite->getId();
+        }
 
         $request = $this->getRequest();
-
-        if ($this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault() == null) {
-            $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
-            return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
-        }
 
         $this->admin->checkAccess('list');
 
@@ -81,7 +84,7 @@ class CmsMenuAdminController extends CRUDController
 
         $datagrid = $this->admin->getDatagrid();
         if ($id) {
-            $datagrid->setValue('site',null, $id);
+            $datagrid->setValue('site', null, $id);
         }
         $formView = $datagrid->getForm()->createView();
 
@@ -97,7 +100,7 @@ class CmsMenuAdminController extends CRUDController
         $menuRepo = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu');
 
         $rootNodes = $menuRepo->findRoot();
-        $sites = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->findSitesMenu();
+        $sites     = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->findSitesMenu();
 
         return $this->renderWithExtraParams($template, [
             'action'         => 'list',
@@ -111,9 +114,7 @@ class CmsMenuAdminController extends CRUDController
                 $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
                 $this->admin->getExportFormats(),
         ], null);
-
     }
-
 
     /**
      * @inheritDoc
@@ -226,6 +227,7 @@ class CmsMenuAdminController extends CRUDController
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplate($templateKey);
+
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
@@ -350,6 +352,7 @@ class CmsMenuAdminController extends CRUDController
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplate($templateKey);
+
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
@@ -476,7 +479,5 @@ class CmsMenuAdminController extends CRUDController
 
         $twig->getRuntime(FormRenderer::class)->setTheme($formView, $theme);
     }
-
-
 
 }

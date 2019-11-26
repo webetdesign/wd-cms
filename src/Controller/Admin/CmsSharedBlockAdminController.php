@@ -12,15 +12,20 @@ final class CmsSharedBlockAdminController extends CRUDController
 
     public function listAction($id = null)
     {
-        $request = $this->getRequest();
+        if ($id === null) {
+            $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+            if (!$defaultSite) {
+                $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
-        if ($this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault() == null) {
-            $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
-            return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+            }
+
+            $id = $defaultSite->getId();
         }
 
         $this->admin->checkAccess('list');
 
+        $request     = $this->getRequest();
         $preResponse = $this->preList($request);
         if (null !== $preResponse) {
             return $preResponse;
@@ -32,7 +37,7 @@ final class CmsSharedBlockAdminController extends CRUDController
 
         $datagrid = $this->admin->getDatagrid();
         if ($id) {
-            $datagrid->setValue('site',null, $id);
+            $datagrid->setValue('site', null, $id);
         }
         $formView = $datagrid->getForm()->createView();
 
@@ -41,13 +46,14 @@ final class CmsSharedBlockAdminController extends CRUDController
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplate('list');
+
         // $template = $this->templateRegistry->getTemplate('list');
 
         return $this->renderWithExtraParams($template, [
-            'action' => 'list',
-            'form' => $formView,
-            'datagrid' => $datagrid,
-            'csrf_token' => $this->getCsrfToken('sonata.batch'),
+            'action'         => 'list',
+            'form'           => $formView,
+            'datagrid'       => $datagrid,
+            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
             'export_formats' => $this->has('sonata.admin.admin_exporter') ?
                 $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
                 $this->admin->getExportFormats(),

@@ -31,7 +31,6 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         parent::__construct($code, $class, $baseControllerName);
     }
 
-
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
@@ -67,11 +66,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             ->add('createRootNode', 'initRoot')
             ->add('move', 'move');
 
-        $default = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-        if ($default != null) {
-            $collection->add('list', 'list/{id}', ['id' => $default->getId()], ['id' => '\d*']);
-        }
-
+        $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
     }
 
     protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
@@ -144,9 +139,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
                 )
                 ->end()
                 ->end();
-
         }
-
     }
 
     protected function configureShowFields(ShowMapper $showMapper): void

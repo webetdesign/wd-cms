@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Menu\Renderer\TwigRenderer;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\LockException;
@@ -74,22 +75,65 @@ class CmsPageAdminController extends CRUDController
         $request->request->set('site', $request->attributes->get('id'));
     }
 
-    public function treeAction($id)
+    public function treeAction($id = null)
     {
+        /** @var EntityManagerInterface $em */
+        $em = $this->getDoctrine();
+        if ($id === null) {
+            $defaultSite = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+            if (!$defaultSite) {
+                $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+
+                return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+            }
+
+            $id = $defaultSite->getId();
+        }
 
         $datagrid = $this->admin->getDatagrid();
 
         if ($id) {
-            $datagrid->setValue('site',null, $id);
+            $datagrid->setValue('site', null, $id);
+
+            $rp = $em->getRepository('WebEtDesignCmsBundle:CmsPage');
+            $qb = $rp->createQueryBuilder('p');
+
+            $qb
+                ->select(['p', 'r'])
+                ->leftJoin('p.route', 'r')
+                ->andWhere(
+                    $qb->expr()->eq('p.site', $id)
+                )
+                ->getQuery()->getResult();
+
+            $qb = $rp->createQueryBuilder('p');
+
+            $qb
+                ->select(['PARTIAL p.{id}', 'd'])
+                ->leftJoin('p.declinations', 'd')
+                ->andWhere(
+                    $qb->expr()->eq('p.site', $id)
+                )
+                ->getQuery()->getResult();
+
+            $qb = $rp->createQueryBuilder('p');
+
+            $qb
+                ->select(['PARTIAL p.{id}', 'c'])
+                ->leftJoin('p.children', 'c')
+                ->andWhere(
+                    $qb->expr()->eq('p.site', $id)
+                )
+                ->getQuery()->getResult();
         }
 
         $formView = $datagrid->getForm()->createView();
 
         return $this->renderWithExtraParams('@WebEtDesignCms/admin/page/tree.html.twig', [
-            'action'         => 'tree',
-            'form'           => $formView,
-            'datagrid'       => $datagrid,
-            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
+            'action'     => 'tree',
+            'form'       => $formView,
+            'datagrid'   => $datagrid,
+            'csrf_token' => $this->getCsrfToken('sonata.batch'),
 //            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
 //                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
 //                $this->admin->getExportFormats(),
@@ -105,6 +149,7 @@ class CmsPageAdminController extends CRUDController
 
         if ($this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault() == null) {
             $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+
             return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
         }
 
@@ -126,7 +171,7 @@ class CmsPageAdminController extends CRUDController
         $datagrid = $this->admin->getDatagrid();
 
         if ($id) {
-            $datagrid->setValue('site',null, $id);
+            $datagrid->setValue('site', null, $id);
         }
 
         $formView = $datagrid->getForm()->createView();
@@ -137,6 +182,7 @@ class CmsPageAdminController extends CRUDController
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplate('list');
+
         // $template = $this->templateRegistry->getTemplate('list');
 
         return $this->renderWithExtraParams($template, [
@@ -196,7 +242,6 @@ class CmsPageAdminController extends CRUDController
             $em = $this->getDoctrine()->getManager();
             $em->persist($refPage);
         }
-
 
         $preResponse = $this->preCreate($request, $newObject);
         if (null !== $preResponse) {
@@ -280,9 +325,9 @@ class CmsPageAdminController extends CRUDController
         $twig = $this->get('twig');
         $twig->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFormTheme());
 
-
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplate($templateKey);
+
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
@@ -406,8 +451,8 @@ class CmsPageAdminController extends CRUDController
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplate($templateKey);
-        // $template = $this->templateRegistry->getTemplate($templateKey);
 
+        // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
             'action'   => 'edit',
@@ -424,6 +469,7 @@ class CmsPageAdminController extends CRUDController
     {
         if ($object->isRoot()) {
             $this->addFlash('error', "Vous ne pouvez supprimer la page d'accueil");
+
             return $this->redirect($this->admin->generateUrl('tree', ['id' => $object->getSite()->getId()]));
         }
 

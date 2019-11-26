@@ -26,7 +26,6 @@ use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 
-
 final class CmsMenuAdmin extends AbstractAdmin
 {
     protected $pageProvider;
@@ -39,18 +38,13 @@ final class CmsMenuAdmin extends AbstractAdmin
         parent::__construct($code, $class, $baseControllerName);
     }
 
-
     protected function configureRoutes(RouteCollection $collection)
     {
         $collection
             ->add('createRootNode', 'initRoot')
             ->add('move', 'move');
 
-        $default = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-        if ($default != null) {
-            $collection->add('list', 'list/{id}', ['id' => $default->getId()], ['id' => '\d*']);
-        }
-
+        $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
     }
 
     protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
@@ -117,7 +111,6 @@ final class CmsMenuAdmin extends AbstractAdmin
         $subject   = $formMapper->getAdmin()->getSubject();
         $roleAdmin = $this->canManageContent();
 
-
         $formMapper
             ->with('Configuration')
             ->add('name', null, [
@@ -152,7 +145,6 @@ final class CmsMenuAdmin extends AbstractAdmin
                 if ($route->isDynamic()) {
                     $this->getRouteParamsField($formMapper, $subject, $route);
                 }
-
             }
 
             $formMapper
@@ -167,7 +159,6 @@ final class CmsMenuAdmin extends AbstractAdmin
         $formMapper->end();
 
         if ($subject && $subject->getId() != null) {
-
             $formMapper
                 ->with('Configuration avancé')
                 ->add('classes', null, [
@@ -184,7 +175,6 @@ final class CmsMenuAdmin extends AbstractAdmin
                 ])
                 ->add('role')
                 ->end();
-
         }
 
         if ($roleAdmin) {
@@ -230,7 +220,6 @@ final class CmsMenuAdmin extends AbstractAdmin
                 }
             ));
         }
-
     }
 
     protected function configureShowFields(ShowMapper $showMapper)
@@ -262,6 +251,7 @@ final class CmsMenuAdmin extends AbstractAdmin
                 'class'        => $param['entity'],
                 'choice_value' => function ($entity = null) use ($param) {
                     $getter = 'get' . ucfirst($param['property']);
+
                     return $entity ? $entity->$getter() : '';
                 },
             ] : [];
@@ -283,6 +273,7 @@ final class CmsMenuAdmin extends AbstractAdmin
                         }
                     }
                 }
+
                 return $values;
             },
             function ($values) use ($config) {
@@ -293,6 +284,7 @@ final class CmsMenuAdmin extends AbstractAdmin
                         $values[$name] = $value->$getter();
                     }
                 }
+
                 return json_encode($values);
             }
         ));
