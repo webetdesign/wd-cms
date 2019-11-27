@@ -3,7 +3,7 @@
 namespace WebEtDesign\CmsBundle\Repository;
 
 use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Entity\CmsMenu;
+use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -74,7 +74,7 @@ class CmsContentRepository extends ServiceEntityRepository
         $qb
             ->select('m.id AS mid, IDENTITY(m.parent) AS parent_id, m.lvl, m.lft, p.id AS pid, c.id AS cid, c.type, c.code, c.parent_heritance')
             ->leftJoin('c.page', 'p')
-            ->leftJoin(CmsMenu::class, 'm', 'WITH', 'm.page = p')
+            ->leftJoin(CmsMenuItem::class, 'm', 'WITH', 'm.page = p')
             ->where('c.code LIKE :code')
             ->andWhere('c.type LIKE :type')
             ->orderBy('m.lft', 'ASC')

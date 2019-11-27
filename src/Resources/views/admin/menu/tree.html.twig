@@ -1,0 +1,141 @@
+{#
+
+This file is part of the Sonata package.
+
+(c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+
+#}
+{% import _self as tree %}
+{% macro menus(items, admin, rootPages) %}
+    <ul{% if rootPages %} class="page-tree"{% endif %}>
+        {% for item in items %}
+            {% if item.linkType == constant('WebEtDesign\\CmsBundle\\Entity\\CmsMenuLinkTypeEnum::CMS_PAGE') %}
+                {% set icon = 'file-text-o' %}
+                {% if item.page and item.page.route and not item.page.route.isDynamic %}
+                    {% set path = cms_path(item.page.route.name, [], true) %}
+                {% else %}
+                    {% set path = null %}
+                {% endif %}
+            {% elseif item.linkType == constant('WebEtDesign\\CmsBundle\\Entity\\CmsMenuLinkTypeEnum::ROUTENAME') %}
+                {% set icon = 'code' %}
+                {% set path = path(item.linkValue) %}
+            {% elseif item.linkType == constant('WebEtDesign\\CmsBundle\\Entity\\CmsMenuLinkTypeEnum::URL') %}
+                {% set icon = 'link' %}
+                {% set path = 'http://' ~ item.linkValue %}
+            {% elseif item.linkType == constant('WebEtDesign\\CmsBundle\\Entity\\CmsMenuLinkTypeEnum::PATH') %}
+                {% set icon = 'terminal' %}
+                {% set path = item.linkValue %}
+            {% else %}
+                {% set icon = 'chain-broken' %}
+                {% set path = null %}
+            {% endif %}
+
+            <li>
+                <div class="page-tree__item">
+                    {% if item.lvl > 1 %}<i class="fa fa-caret-right"></i>{% endif %}
+                    <i class="fa page-tree__item__is-hybrid fa-{{ icon }}"></i>
+                    <a class="page-tree__item__edit" href="{{ admin.generateUrl('cms.admin.cms_menu_item.edit', {id: item.menu.id, childId: item.id}) }}">{{ item.name }} </a>
+                    {#                    {% if path %}#}
+                    {#                        <i class="text-muted">{{ path }}</i>#}
+                    {#                    {% endif %}#}
+                    {% if path is not empty %}
+                        <a class="label label-default pull-right" data-toggle="tooltip" title="Ouvir le lien" href="{{ path }}"><i class="fa fa-share"></i></a>
+                    {% endif %}
+                    <a class="label label-default pull-right" data-toggle="tooltip" title="Editer" href="{{ admin.generateUrl('cms.admin.cms_menu_item.edit', {id: item.menu.id, childId: item.id}) }}"><i class="fa fa-pencil"></i></a>
+                    {% if item.menu.type != constant('WebEtDesign\\CmsBundle\\Entity\\CmsMenuTypeEnum::PAGE_ARBO') %}
+                        <a class="label label-default pull-right" data-toggle="tooltip" title="Ajouter" href="{{ admin.generateUrl('cms.admin.cms_menu_item.create', {id: item.menu.id, target: item.id}) }}"><i class="fa fa-plus"></i></a>
+                        <a class="label label-default pull-right treeMoveAction" data-toggle="tooltip" title="Déplacer" href="{{ admin.generateUrl('cms.admin.cms_menu_item.move', {id: item.menu.id, itemId: item.id }) }}"><i class="fa fa-arrows"></i></a>
+                    {% endif %}
+                    <span class="label label-{% if item.isVisible %}success{% else %}danger{% endif %} pull-right">{{ item.visibleString }}</span>
+                    {#                    {% if app.user.hasRole('ROLE_ADMIN_CMS') and item.route is not null %}#}
+                    {#                        <span><code class="pull-right">{{ item.route.name }}</code></span>#}
+                    {#                    {% endif %}#}
+                </div>
+                {% import _self as macro %}
+                {% if item.children|length %}
+                    {{ macro.menus(item.childrenRight, admin, false) }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% extends base_template %}
+
+{%- block actions -%}
+    {% include '@SonataAdmin/CRUD/action_buttons.html.twig' %}
+{%- endblock -%}
+
+{%- block tab_menu -%}
+    {{ knp_menu_render(admin.sidemenu(action), {
+        'currentClass': 'active',
+        'template': get_global_template('tab_menu_template')
+    }, 'twig') }}
+{%- endblock -%}
+
+{% block title %}
+    {{ admin.isChild and admin.parent.subject ? 'title_edit'|trans({'%name%': admin.parent.toString(admin.parent.subject)|truncate(15) }, 'SonataAdminBundle') : '' }}
+{% endblock %}
+
+{% block navbar_title %}
+    {{ admin.isChild and admin.parent.subject ? 'title_edit'|trans({'%name%': admin.parent.toString(admin.parent.subject)|truncate(100) }, 'SonataAdminBundle') : '' }}
+{% endblock %}
+
+{% block list_table %}
+    <div class="col-xs-12 col-md-12">
+        {% set _tab = app.request.query.get('_tab') %}
+
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs" role="tablist">
+                {% for menu in admin.datagrid.results %}
+                    <li class="menu_tab{% if _tab is empty and loop.first or _tab == 'tab_' ~ menu.code %} active {% endif %}"
+                        data-add-link="{{ admin.generateUrl('cms.admin.cms_menu_item.create', {id: menu.id}) }}"
+                        data-edit-link="{{ admin.generateObjectUrl('edit', menu) }}"
+                        data-type="{{ menu.type }}"
+                        data-id="{{ menu.id }}" data-root="{{ menu.children is not empty ? menu.children[0].id }}">
+
+                        <a href="#tab_{{ menu.code }}" class="changer-tab" aria-controls="tab_{{ menu.code }}" data-toggle="tab" style="display: inline-block">
+                            <i class="fa fa-exclamation-circle has-errors hide" aria-hidden="true"></i> {{ menu.label }} {% if app.user.hasRole('ROLE_ADMIN_CMS') %} <code>{{ menu.code }}</code> {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content">
+                {% for menu in admin.datagrid.results %}
+                    <div class="tab-pane fade {% if _tab is empty and loop.first or _tab == 'tab_' ~ menu.code %}active in{% endif %}" id="tab_{{ menu.code }}">
+                        <div class="box-body container-fluid">
+                            {% if menu.children is not empty %}
+                                {{ tree.menus(menu.children[0].children, admin, true) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% include '@WebEtDesignCms/admin/nestedTreeMoveAction/moveModal.html.twig' %}
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector('#addItemBtn').addEventListener('click', function (e) {
+          e.preventDefault()
+          var active = document.querySelector('.menu_tab.active');
+          if (active.dataset.type === '{{ constant('WebEtDesign\\CmsBundle\\Entity\\CmsMenuTypeEnum::PAGE_ARBO') }}') {
+            alert("Vous ne pouvez pas ajouter d'élément dans ce menu, utilisez l'arboréssence de page.")
+            return;
+          }
+          var link = active.dataset.addLink
+          location.href = link
+        })
+        document.querySelector('#editMenuBtn').addEventListener('click', function (e) {
+          e.preventDefault()
+          var active = document.querySelector('.menu_tab.active');
+          var link = active.dataset.editLink
+          location.href = link
+        })
+      })
+    </script>
+{% endblock %}

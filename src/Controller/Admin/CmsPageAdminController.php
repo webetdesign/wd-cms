@@ -7,72 +7,60 @@ use Knp\Menu\Renderer\TwigRenderer;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\LockException;
 use Sonata\AdminBundle\Exception\ModelManagerException;
-use Symfony\Bridge\Twig\AppVariable;
-use Symfony\Bridge\Twig\Command\DebugCommand;
-use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Form\MoveForm;
 
 class CmsPageAdminController extends CRUDController
 {
-    /**
-     * @inheritDoc
-     */
-    protected function redirectTo($object)
-    {
-        $request = $this->getRequest();
-
-        $url = false;
-
-        if (null !== $request->get('btn_update_and_list')) {
-            return $this->redirectToTree();
-        }
-        if (null !== $request->get('btn_create_and_list')) {
-            return $this->redirectToTree();
-        }
-
-        if (null !== $request->get('btn_create_and_create')) {
-            $params = [];
-            if ($this->admin->hasActiveSubClass()) {
-                $params['subclass'] = $request->get('subclass');
-            }
-            $url = $this->admin->generateUrl('create', $params);
-        }
-
-        if ('DELETE' === $this->getRestMethod()) {
-            return $this->redirectToTree();
-        }
-
-        if (!$url) {
-            foreach (['edit', 'show'] as $route) {
-                if ($this->admin->hasRoute($route) && $this->admin->hasAccess($route, $object)) {
-                    $url = $this->admin->generateObjectUrl($route, $object);
-
-                    break;
-                }
-            }
-        }
-
-        if (!$url) {
-            return $this->redirectToTree();
-        } else {
-            if (sizeof($request->query->all()) > 0) {
-                $url .= '?' . http_build_query($request->query->all());
-            }
-        }
-
-        return new RedirectResponse($url);
-    }
-
     protected function preList(Request $request)
     {
         $request->request->set('site', $request->attributes->get('id'));
+    }
+
+    public function moveAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $object = $em->getRepository(CmsPage::class)->find($id);
+
+        $form = $this->createForm(MoveForm::class, $object, [
+            'data_class' => CmsPage::class,
+            'object'     => $object,
+            'action'     => $this->admin->generateObjectUrl('move', $object)
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var CmsPage $object */
+            $object = $form->getData();
+
+            $this->moveItems($object);
+
+            return $this->redirect($this->admin->generateUrl('tree', [
+                'id' => $object->getRoot()->getSite()->getId(),
+            ]));
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse([
+                'label'        => $object->getTitle(),
+                'modalContent' => $this->renderView('@WebEtDesignCms/admin/nestedTreeMoveAction/moveForm.html.twig', [
+                    'admin'  => $this->admin,
+                    'form'   => $form->createView(),
+                    'object' => $object
+                ])
+            ]);
+        }
+
+        return $this->renderWithExtraParams('@WebEtDesignCms/admin/nestedTreeMoveAction/move.html.twig', [
+            'form'   => $form->createView(),
+            'object' => $object
+        ]);
     }
 
     public function treeAction($id = null)
@@ -134,9 +122,9 @@ class CmsPageAdminController extends CRUDController
             'form'       => $formView,
             'datagrid'   => $datagrid,
             'csrf_token' => $this->getCsrfToken('sonata.batch'),
-//            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
-//                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
-//                $this->admin->getExportFormats(),
+            //            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
+            //                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
+            //                $this->admin->getExportFormats(),
         ], null);
     }
 
@@ -199,8 +187,15 @@ class CmsPageAdminController extends CRUDController
     /**
      * @inheritDoc
      */
-    public function createAction($root = null, $id = null)
+    public function createAction($id = null)
     {
+        /** @var EntityManagerInterface $em */
+        $em = $this->getDoctrine();
+        if ($id === null) {
+            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+        } else {
+            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
+        }
         $request = $this->getRequest();
         // the key used to lookup the template
         $templateKey = 'edit';
@@ -223,6 +218,7 @@ class CmsPageAdminController extends CRUDController
 
         /** @var CmsPage $newObject */
         $newObject = $this->admin->getNewInstance();
+        $newObject->setSite($site);
 
         if ($request->query->has('siteId')) {
             $site = $this->getDoctrine()->getRepository($this->getParameter('wd_cms.admin.config.entity.site'))->find($request->query->get('siteId'));
@@ -512,6 +508,55 @@ class CmsPageAdminController extends CRUDController
         }
 
         $this->getDoctrine()->getManager()->flush();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function redirectTo($object)
+    {
+        $request = $this->getRequest();
+
+        $url = false;
+
+        if (null !== $request->get('btn_update_and_list')) {
+            return $this->redirectToTree();
+        }
+        if (null !== $request->get('btn_create_and_list')) {
+            return $this->redirectToTree();
+        }
+
+        if (null !== $request->get('btn_create_and_create')) {
+            $params = [];
+            if ($this->admin->hasActiveSubClass()) {
+                $params['subclass'] = $request->get('subclass');
+            }
+            $url = $this->admin->generateUrl('create', $params);
+        }
+
+        if ('DELETE' === $this->getRestMethod()) {
+            return $this->redirectToTree();
+        }
+
+        if (!$url) {
+            foreach (['edit', 'show'] as $route) {
+                if ($this->admin->hasRoute($route) && $this->admin->hasAccess($route, $object)) {
+                    $url = $this->admin->generateObjectUrl($route, $object);
+
+                    break;
+                }
+            }
+        }
+
+        if (!$url) {
+            return $this->redirectToTree();
+        } else {
+            if (sizeof($request->query->all()) > 0) {
+                $url .= '?' . http_build_query($request->query->all());
+            }
+        }
+
+        return new RedirectResponse($url);
     }
 
     public function redirectToTree()

@@ -2,13 +2,15 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
+use App\Entity\User;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\Form\Type\ImmutableArrayType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use WebEtDesign\CmsBundle\Entity\CmsMenu;
+use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use Doctrine\ORM\EntityRepository;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
@@ -38,13 +40,54 @@ final class CmsMenuAdmin extends AbstractAdmin
         parent::__construct($code, $class, $baseControllerName);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function configureActionButtons($action, $object = null)
+    {
+        $list = parent::configureActionButtons($action, $object);
+
+        if (\in_array($action, ['tree'], true)
+            && $this->getChild('cms.admin.cms_menu_item')->hasRoute('create')
+        ) {
+            $list['addItem'] = [
+                'template' => '@WebEtDesignCms/admin/menu/actionButtons/button_create_item.html.twig',
+            ];
+        }
+
+        if (\in_array($action, ['tree'], true)
+            && $this->getChild('cms.admin.cms_menu_item')->hasRoute('create')
+        ) {
+            $list['editMenu'] = [
+                'template' => '@WebEtDesignCms/admin/menu/actionButtons/button_edit_menu.html.twig',
+            ];
+        }
+
+        if (\in_array($action, ['tree'], true)
+            && $this->hasRoute('generateFromPage') && $this->canManageContent()
+        ) {
+            $list['generateFromPage'] = [
+                'template' => "@WebEtDesignCms/admin/menu/actionButtons/button_create_form_arbo.html.twig",
+            ];
+        }
+
+
+        return $list;
+
+    }
+
+
     protected function configureRoutes(RouteCollection $collection)
     {
         $collection
             ->add('createRootNode', 'initRoot')
-            ->add('move', 'move');
+            ->add('move', 'move/{id}');
 
         $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
+        $collection->add('tree', 'tree/{id}', ['id' => null], ['id' => '\d*']);
+        $collection->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
+        $collection->add('generateFromPage', 'generateFromPage/{id}', ['id' => null], ['id' => '\d*']);
+
     }
 
     protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
@@ -54,35 +97,25 @@ final class CmsMenuAdmin extends AbstractAdmin
 
         $id = $this->getRequest()->get('id');
 
-        if (!$childAdmin && in_array($action, ['list'])) {
+        if (!$childAdmin && in_array($action, ['list', 'tree'])) {
             $sites = $this->em->getRepository(CmsSite::class)->findAll();
             if (sizeof($sites) > 1) {
                 foreach ($sites as $site) {
                     $active = $site->getId() == $this->request->attributes->get('id');
                     $menu->addChild(
                         $site->getLabel(),
-                        ['uri' => $admin->generateUrl('list', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
+                        ['uri' => $admin->generateUrl('tree', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
                     );
                 }
             }
         }
     }
 
-    //    public function createQuery($context = 'list')
-    //    {
-    //        $proxyQuery = parent::createQuery('list');
-    //        $proxyQuery->addOrderBy($proxyQuery->getRootAlias() . '.root', 'ASC');
-    //        $proxyQuery->addOrderBy($proxyQuery->getRootAlias() . '.lft', 'ASC');
-    //
-    //        return $proxyQuery;
-    //    }
-
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
         $datagridMapper
             ->add('id')
-            ->add('name')
-            ->add('lvl')
+            ->add('label')
             ->add('site');
     }
 
@@ -107,129 +140,25 @@ final class CmsMenuAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $formMapper)
     {
-        /** @var CmsMenu $subject */
-        $subject   = $formMapper->getAdmin()->getSubject();
-        $roleAdmin = $this->canManageContent();
 
         $formMapper
             ->with('Configuration')
-            ->add('name', null, [
+            ->add('label', null, [
                 'label' => 'Nom',
             ])
-            ->add('code', HiddenType::class);
-        if ($subject && $subject->getMoveTarget() && $subject->getMoveTarget()->getLvl() == 0) {
-            $formMapper->remove('code');
-            $formMapper
-                ->add('code', null, [
-                    'label'    => 'Code',
-                    'required' => true,
-                ]);
-        }
-        if ($subject && $subject->getId() != null && $subject->getLvl() > 1) {
-            $formMapper
-                ->add('linkType', ChoiceType::class, [
-                    'choices'  => CmsMenuLinkTypeEnum::getChoices(),
-                    'label'    => 'Type de lien',
-                    'required' => false,
-                ])
-                ->addHelp('page', 'help page')
-                ->add('page', null, [
-                    'sonata_help' => 'Si le type de lien utilisé est Page cms',
-                    'required'    => false,
-                    'label'       => 'Page cms',
-                ]);
-
-            if ($subject && $subject->getId() != null && $subject->getPage() != null) {
-                /** @var CmsRoute $route */
-                $route = $subject->getPage()->getRoute();
-                if ($route->isDynamic()) {
-                    $this->getRouteParamsField($formMapper, $subject, $route);
-                }
-            }
-
-            $formMapper
-                ->add('linkValue', null, [
-                    'sonata_help' => 'Valeur pour les autres types de liens',
-                    'required'    => false,
-                    'label'       => 'Valeur du lien',
-                ]);
-        }
+            ->add('code');
 
         // end configuration
         $formMapper->end();
 
-        if ($subject && $subject->getId() != null) {
-            $formMapper
-                ->with('Configuration avancé')
-                ->add('classes', null, [
-                    'label'    => 'Classes',
-                    'required' => false,
-                ])
-                ->add('connected', ChoiceType::class, [
-                    'choices' => [
-                        'Tout les temps'             => '',
-                        'uniquement si connecté'     => 'ONLY_LOGIN',
-                        'uniquement si non connecté' => 'ONLY_LOGOUT'
-                    ],
-                    'label'   => 'Visible',
-                ])
-                ->add('role')
-                ->end();
-        }
 
-        if ($roleAdmin) {
-            $formMapper
-                ->with('Déplacer')
-                ->add('moveMode', ChoiceType::class, [
-                    'choices'  => [
-                        'Déplacer comme premier enfant de'        => 'persistAsFirstChildOf',
-                        'Déplacer en tant que dernier enfant de'  => 'persistAsLastChildOf',
-                        'Déplacer en tant que prochain frère de'  => 'persistAsNextSiblingOf',
-                        'Déplacer en tant que frère antérieur de' => 'persistAsPrevSiblingOf',
-                    ],
-                    'label'    => false,
-                    'required' => false,
-                ])
-                ->add('moveTarget', EntityType::class, [
-                    'class'         => CmsMenu::class,
-                    'query_builder' => function (EntityRepository $er) {
-                        return $er->createQueryBuilder('m')
-                            ->addOrderBy('m.root', 'asc')
-                            ->addOrderBy('m.lft', 'asc');
-                    },
-                    'choice_label'  => function ($menu) {
-                        return str_repeat('--', $menu->getLvl()) . ' ' . $menu->getName();
-                    },
-                    'label'         => false,
-                    'required'      => false,
-                ])
-                ->end();
-        } else {
-            $formMapper
-                ->with('Configuration')
-                ->add('moveMode', HiddenType::class)
-                ->add('moveTarget', HiddenType::class)
-                ->end();
-
-            $formMapper->getFormBuilder()->get('moveTarget')->addModelTransformer(new CallbackTransformer(
-                function ($value) {
-                    return $value !== null ? $value->getId() : null;
-                },
-                function ($value) {
-                    return $this->em->getRepository(CmsMenu::class)->find((int)$value);
-                }
-            ));
-        }
     }
 
     protected function configureShowFields(ShowMapper $showMapper)
     {
         $showMapper
             ->add('id')
-            ->add('name')
-            ->add('lft')
-            ->add('lvl')
-            ->add('rgt');
+            ->add('name');
     }
 
     protected function canManageContent()
@@ -240,53 +169,45 @@ final class CmsMenuAdmin extends AbstractAdmin
         return $user->hasRole('ROLE_ADMIN_CMS');
     }
 
-    protected function getRouteParamsField(FormMapper $formMapper, $subject, $route)
+    public function createQuery($context = 'list')
     {
-        $config = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
-        $keys   = [];
-        foreach ($route->getParams() as $name) {
-            $param  = $config['params'][$name] ?? null;
-            $type   = !empty($param['entity']) ? EntityType::class : TextType::class;
-            $opts   = !empty($param['entity']) ? [
-                'class'        => $param['entity'],
-                'choice_value' => function ($entity = null) use ($param) {
-                    $getter = 'get' . ucfirst($param['property']);
+        //        $qb = $this->em->createQueryBuilder();
+        //
+        //        $qb
+        //            ->select(['m', 's'])
+        //            ->from('CmsMenuItem', 'm')
+        //            ->leftJoin('m.site', 's')
+        //            ->andWhere(
+        //                $qb->expr()->eq('m.site', $this->getRequest()->get('id'))
+        //            )
+        //            ->getQuery()->getResult();
+        //
+        //        $qb = $this->em->createQueryBuilder();
+        //
+        //        $qb
+        //            ->select(['PARTIAL m.{id}', 'p', 'r'])
+        //            ->from('CmsMenuItem', 'm')
+        //            ->leftJoin('m.page', 'p')
+        //            ->leftJoin('p.route', 'r')
+        //            ->andWhere(
+        //                $qb->expr()->eq('m.site', $this->getRequest()->get('id'))
+        //            )
+        //            ->getQuery()->getResult();
+        //
+        //        $qb = $this->em->createQueryBuilder();
+        //
+        //        $qb
+        //            ->select(['PARTIAL m.{id}', 'c'])
+        //            ->from('CmsMenuItem', 'm')
+        //            ->leftJoin('m.children', 'c')
+        //            ->andWhere(
+        //                $qb->expr()->eq('m.site', $this->getRequest()->get('id'))
+        //            )
+        //            ->getQuery()->getResult();
 
-                    return $entity ? $entity->$getter() : '';
-                },
-            ] : [];
-            $keys[] = [$name, $type, $opts];
-        }
-        $formMapper->add('params', ImmutableArrayType::class, [
-            'keys'  => $keys,
-            'label' => false
-        ]);
-        $formMapper->getFormBuilder()->get('params')->addModelTransformer(new CallbackTransformer(
-            function ($values) use ($config) {
-                if ($values != null) {
-                    $values = json_decode($values, true);
-                    foreach ($values as $name => $value) {
-                        $param = $config['params'][$name] ?? null;
-                        if ($param) {
-                            $object        = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
-                            $values[$name] = $object;
-                        }
-                    }
-                }
-
-                return $values;
-            },
-            function ($values) use ($config) {
-                foreach ($values as $name => $value) {
-                    $param = $config['params'][$name] ?? null;
-                    if ($param) {
-                        $getter        = 'get' . ucfirst($param['property']);
-                        $values[$name] = $value->$getter();
-                    }
-                }
-
-                return json_encode($values);
-            }
-        ));
+        /** @var QueryBuilder $query */
+        $query = parent::createQuery($context);
+        return $query;
     }
+
 }

@@ -5,20 +5,18 @@ namespace WebEtDesign\CmsBundle\Admin;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Knp\Menu\ItemInterface as MenuItemInterface;
-use phpDocumentor\Reflection\Types\Boolean;
 use Sonata\AdminBundle\Admin\AdminInterface;
-use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use WebEtDesign\CmsBundle\Entity\CmsMenu;
+use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
+use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Form\MultilingualType;
 use WebEtDesign\CmsBundle\Form\PageTemplateType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
@@ -59,8 +57,7 @@ class CmsPageAdmin extends AbstractAdmin
         $declination,
         $globalVarsDefinition,
         TemplateProvider $pageProvider
-    )
-    {
+    ) {
         $this->multisite        = $multisite;
         $this->multilingual     = $multilingual;
         $this->declination      = $declination;
@@ -84,9 +81,11 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected function configureRoutes(RouteCollection $collection)
     {
+        $collection->add('move', 'move/{id}');
+        $collection->add('test', 'test');
         $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
         $collection->add('tree', 'tree/{id}', ['id' => null], ['id' => '\d*']);
-        $collection->add('create', 'create/{parent}', ['parent' => null], ['parent' => '\d*']);
+        $collection->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
 
         parent::configureRoutes($collection);
     }
@@ -182,9 +181,12 @@ class CmsPageAdmin extends AbstractAdmin
             $root = $object->getRoot();
         }
 
-        $site = $root ? $root->getSite() : $parent->getRoot()->getSite();
+        $site = $object->getSite();
 
-        $admin->setFormTheme(array_merge($admin->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
+        $admin->setFormTheme(array_merge($admin->getFormTheme(), [
+            '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
+            '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig'
+        ]));
 
         $container = $this->getConfigurationPool()->getContainer();
         /** @var EntityManagerInterface $em */
@@ -210,54 +212,26 @@ class CmsPageAdmin extends AbstractAdmin
                 ]);
         }
         $formMapper
-            ->end(); // End form group
-
-        $formMapper
-            ->with('Déplacer')
-            ->add('moveMode', ChoiceType::class, [
-                'choices'  => [
-                    'Déplacer comme premier enfant de'        => 'persistAsFirstChildOf',
-                    'Déplacer en tant que dernier enfant de'  => 'persistAsLastChildOf',
-                    'Déplacer en tant que prochain frère de'  => 'persistAsNextSiblingOf',
-                    'Déplacer en tant que frère antérieur de' => 'persistAsPrevSiblingOf',
+            ->add('site', EntityType::class, [
+                'class' => CmsSite::class,
+                'data'  => $site,
+                'attr'  => [
+                    'style' => 'display: none '
                 ],
-                'label'    => false,
-                'required' => false,
-                'data'     => isset($parent) && $parent ? 'persistAsLastChildOf' : null
-            ])
-            ->add('moveTarget', EntityType::class, [
-                'class'         => CmsPage::class,
-                'query_builder' => function (EntityRepository $er) use ($parent, $root, $object) {
-                    if ($parent) {
-                        $root = $parent->getRoot();
-                    }
-                    $qb = $er->createQueryBuilder('p');
-                    if ($root) {
-                        $qb
-                            ->andWhere('p.root = :root')
-                            ->setParameter('root', $root);
-                    }
-                    if ($object and $object->getId() != null) {
-                        $qb
-                            ->andWhere('p <> :object')
-                            ->setParameter('object', $object);
-                    }
-                    $qb
-                        ->addOrderBy('p.root', 'asc')
-                        ->addOrderBy('p.lft', 'asc');
+                'label' => false,
+            ]);
 
-                    return $qb;
-                },
-                'choice_label'  => function ($object) {
-                    return str_repeat('--', $object->getLvl()) . ' ' . $object->getTitle();
-                },
-                'label'         => false,
-                'required'      => false,
-                'data'          => $parent ?? null,
-            ])
-            ->end();
+        if ($object->getId() === null) {
+            $formMapper
+                ->add('position', MoveForm::class, [
+                    'data_class' => null,
+                    'entity'     => CmsPage::class,
+                    'object'     => $object
+                ]);
+        }
 
         $formMapper
+            ->end() // End form group
             ->end()// End tab
         ;
         //endregion

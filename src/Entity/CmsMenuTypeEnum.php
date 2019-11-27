@@ -11,19 +11,17 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 class CmsMenuTypeEnum
 {
-    const ROOT      = 'ROOT';
-    const MENU      = 'MENU';
-    const MENU_ITEM = 'MENU_ITEM';
+    const DEFAULT   = 'DEFAULT';
+    const PAGE_ARBO = 'PAGE_ARBO';
 
     /** @var array user friendly named type */
     protected static $typeName = [
-        self::ROOT      => 'ROOT',
-        self::MENU      => 'MENU',
-        self::MENU_ITEM => 'MENU_ITEM',
+        self::DEFAULT   => 'DEFAULT',
+        self::PAGE_ARBO => 'PAGE_ARBO',
     ];
 
     /**
-     * @param  string $typeShortName
+     * @param string $typeShortName
      * @return string
      */
     public static function getName($typeShortName)
@@ -42,8 +40,7 @@ class CmsMenuTypeEnum
     {
         return [
             self::ROOT,
-            self::MENU,
-            self::MENU_ITEM,
+            self::PAGE_ARBO,
         ];
     }
 

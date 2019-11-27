@@ -5,6 +5,8 @@ namespace WebEtDesign\CmsBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
+use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
+use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
@@ -40,13 +42,14 @@ class SiteAdminListener
             return;
         }
 
+        if ($site->initPage) {
+            $this->createPage($em, $site);
+        }
+
         if ($site->initMenu) {
             $this->createMenu($em, $site);
         }
 
-        if ($site->initPage) {
-            $this->createPage($em, $site);
-        }
     }
 
     public function postUpdate(LifecycleEventArgs $event)
@@ -92,28 +95,26 @@ class SiteAdminListener
      */
     private function createMenu(EntityManager $em, CmsSite $site)
     {
-        $root = new CmsMenu();
-        $root->setCode("root_" . $site->getSlug());
-        $root->setName('root');
+        $menu = new CmsMenu();
+        $menu->setLabel('Menu principale')
+            ->setCode('main_menu')
+            ->setSite($site)
+            ->setType(CmsMenuTypeEnum::DEFAULT);
 
+        $site->addMenu($menu);
+
+        $root = new CmsMenuItem();
+        $root->setName('root '. $site->getLabel() . ' ' . $menu->getLabel());
+        $root->setRoot($root);
+        $root->setMenu($menu);
         $em->persist($root);
 
-        $root->setRoot($root);
-
-        $main_menu = new CmsMenu();
-        $main_menu->setCode("main_menu");
-        $main_menu->setname("Main menu");
-        $main_menu->setParent($root);
-
-        $em->persist($main_menu);
-
-        $homepage = new CmsMenu();
+        $homepage = new CmsMenuItem();
         $homepage->setName("Homepage");
-        $homepage->setParent($main_menu);
-
+        $homepage->setParent($root);
+        $homepage->setMenu($menu);
         $em->persist($homepage);
 
-        $site->setMenu($root);
     }
 
     private function createPage(EntityManager $em, CmsSite $site)

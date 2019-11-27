@@ -5,7 +5,7 @@ namespace WebEtDesign\CmsBundle\Services;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Menu\MenuItem;
 use Symfony\Component\Routing\RouterInterface;
-use WebEtDesign\CmsBundle\Entity\CmsMenu;
+use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use Doctrine\ORM\EntityManager;
 use Knp\Menu\FactoryInterface;
@@ -34,7 +34,7 @@ class CmsMenuAdminBuilder
     public function __construct(FactoryInterface $factory, EntityManagerInterface $entityManager, RouterInterface $router)
     {
         $this->em      = $entityManager;
-        $this->repo    = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
+        $this->repo    = $this->em->getRepository('CmsMenuItem');
         $this->router  = $router;
         $this->factory = $factory;
     }
@@ -42,7 +42,7 @@ class CmsMenuAdminBuilder
     public function cmsAdminMenu(array $options)
     {
         $rootItem = $options['item'];
-        $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
+        $repo = $this->em->getRepository('CmsMenuItem');
         $this->admin = $options['admin'] ?? null;
 
         /** @var MenuItem $menu */
@@ -59,7 +59,7 @@ class CmsMenuAdminBuilder
 
     public function buildNodes(ItemInterface $menu, $items)
     {
-        /** @var CmsMenu $child */
+        /** @var CmsMenuItem $child */
         foreach ($items as $child) {
             $children = $this->repo->getChildren($child, true);
 

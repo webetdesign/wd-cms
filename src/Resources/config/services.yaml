@@ -91,10 +91,12 @@ services:
       - '@filesystem'
       - '@kernel'
       - '%wd_cms.admin.config.entity.route%'
+      - '%wd_cms.cms%'
     tags:
       - { name: doctrine.event_listener, event: prePersist }
       - { name: doctrine.event_listener, event: postPersist }
       - { name: doctrine.event_listener, event: postUpdate }
+      - { name: doctrine.event_listener, event: preRemove }
 
   cms.admin.cms_page_declination_listener:
     class: WebEtDesign\CmsBundle\EventListener\PageDeclinationAdminListener
@@ -114,6 +116,11 @@ services:
       - { name: doctrine.event_listener, event: prePersist }
       - { name: doctrine.event_listener, event: postPersist }
       - { name: doctrine.event_listener, event: postUpdate }
+
+  cms.admin.cms_menu_listener:
+    class: 'WebEtDesign\CmsBundle\EventListener\MenuAdminListener'
+    tags:
+      - { name: doctrine.event_listener, event: postPersist }
 
 
   cms.admin.cms_shared_block_listener:
@@ -310,14 +317,30 @@ services:
 
   cms.admin.cms_menu:
     class: '%wd_cms.admin.config.class.menu%'
-    arguments: [~, '%wd_cms.admin.config.entity.menu%', '%wd_cms.admin.config.controller.menu%', '@doctrine.orm.default_entity_manager', '@cms.page_provider']
+    arguments: [~, WebEtDesign\CmsBundle\Entity\CmsMenu, '%wd_cms.admin.config.controller.menu%', '@doctrine.orm.default_entity_manager', '@cms.page_provider']
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Menu }
     calls:
       - [setTranslationDomain, ['cms']]
-      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
-      - [setTemplate, ['edit', '@@WebEtDesignCms/menu/edit.html.twig']]
+#      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
+      - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/menu/actionButtons/button_create.html.twig']]
+      - [addChild, ['@cms.admin.cms_menu_item', 'menu']]
     public: true
+
+  cms.admin.cms_menu_item:
+    class: WebEtDesign\CmsBundle\Admin\CmsMenuItemAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsMenuItem
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuItemAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '@cms.page_provider'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false }
+    calls:
+      - [setTemplate, ['edit', '@@WebEtDesignCms/admin/menuItem/edit.html.twig']]
+    public: true
+
 
   cms.admin.cms_shared_block:
     class: WebEtDesign\CmsBundle\Admin\CmsSharedBlockAdmin

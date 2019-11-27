@@ -1,0 +1,8 @@
+{%- block radio_widget -%}
+    <div class="nested_move_item">
+        <input type="radio" data-sonata-icheck="false" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+        <label for="{{ id }}" data-label-text="{{ value |trans({}, 'wd_cms') }}">
+            <img class="move-mode-img" src="{{ asset('bundles/webetdesigncms/img/NesteMoveIcons/'~value~'.png') }}" alt="">
+        </label>
+    </div>
+{%- endblock radio_widget -%}

@@ -7,6 +7,7 @@ use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use LogicException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 /**
  * @method CmsPage|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,7 +18,8 @@ use WebEtDesign\CmsBundle\Entity\CmsPage;
 class CmsPageRepository extends NestedTreeRepository
 {
 
-    public function __construct(RegistryInterface $registry) {
+    public function __construct(RegistryInterface $registry)
+    {
         $manager = $registry->getManagerForClass(CmsPage::class);
 
         if ($manager === null) {
@@ -45,12 +47,21 @@ class CmsPageRepository extends NestedTreeRepository
             ->addSelect('r', 's', 'd')
             ->where('r.name = :name')
             ->setParameter('name', $name)
-            ->setMaxResults(1)
-        ;
+            ->setMaxResults(1);
 
 
         return $qb->getQuery()->getOneOrNullResult();
 
+    }
+
+    public function getPagesBySite(CmsSite $site)
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->where('p.site = :site')
+            ->setParameter('site', $site)
+            ->orderBy('p.lft', 'ASC');
+
+        return $qb->getQuery()->getResult();
     }
 
     // /**

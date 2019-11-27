@@ -43,7 +43,7 @@ class CmsMigrationArboCommand extends Command
 
 //        $this->con = $this->getConnection($io);
         $oSites   = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->findAll();
-        $menuRepo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu');
+        $menuRepo = $this->em->getRepository('CmsMenuItem');
         if (empty($oSites)) {
             $oMenus = $menuRepo->findAll();
             if (!empty($oMenus)) {
@@ -67,7 +67,7 @@ class CmsMigrationArboCommand extends Command
             }
 
             /** @var CmsPage $root */
-            $root = $newSite->getRoot();
+            $root = $newSite->getRootPage();
 
             $pageRepo = $this->em->getRepository('WebEtDesignCmsBundle:CmsPage');
             $pages    = $pageRepo->findBy(['root' => null]);

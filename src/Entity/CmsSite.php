@@ -81,9 +81,10 @@ class CmsSite
     private $flagIcon;
 
     /**
-     * @var mixed $menu
+     * @var CmsPage[]|Collection|Selectable
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenu", mappedBy="site", cascade={"persist", "remove"})
      */
-    private $menu;
+    private $menus;
 
     private $sharedBlocks;
 
@@ -99,6 +100,7 @@ class CmsSite
     public function __construct()
     {
         $this->pages = new ArrayCollection();
+        $this->menus = new ArrayCollection();
     }
 
     /**
@@ -228,20 +230,37 @@ class CmsSite
         $this->flagIcon = $flagIcon;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMenu()
+    public function getMenuArbo()
     {
-        return $this->menu;
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('type', CmsMenuTypeEnum::PAGE_ARBO));
+
+        $menus = $this->menus->matching($criteria);
+
+        return $menus[0] ?? null;
     }
 
-    /**
-     * @param mixed $menu
-     */
-    public function setMenu($menu): void
+    public function addMenu($menu): self
     {
-        $this->menu = $menu;
+        if (!$this->menus->contains($menu)) {
+            $this->menus[] = $menu;
+            $menu->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenu($menu): self
+    {
+        if ($this->menus->contains($menu)) {
+            $this->menus->removeElement($menu);
+            // set the owning side to null (unless already changed)
+            if ($menu->getSite() === $this) {
+                $menu->setSite(null);
+            }
+        }
+
+        return $this;
     }
 
     public function getSlug()
@@ -256,7 +275,7 @@ class CmsSite
         return $this->pages;
     }
 
-    public function getRoot(): ?CmsPage
+    public function getRootPage(): ?CmsPage
     {
         $criteria = new Criteria();
         $criteria->where(

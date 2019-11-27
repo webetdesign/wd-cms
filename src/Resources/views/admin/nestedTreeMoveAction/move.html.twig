@@ -1,0 +1,37 @@
+{% extends base_template %}
+
+{% block title %}
+    {# NEXT_MAJOR: remove default filter #}
+    {% if objectId|default(admin.id(object)) is not null %}
+        Déplacer {{ admin.toString(object)|truncate(15) }}
+    {% endif %}
+{% endblock %}
+
+{% block navbar_title %}
+    {# NEXT_MAJOR: remove default filter #}
+    {% if objectId|default(admin.id(object)) is not null %}
+        Déplacer "{{ admin.toString(object)|truncate(100) }}"
+    {% endif %}
+{% endblock %}
+
+{%- block actions -%}
+{%- endblock -%}
+
+{%- block tab_menu -%}
+{%- endblock -%}
+
+{% block form %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary">
+                        <div class="box-body">
+                            {% include '@WebEtDesignCms/admin/nestedTreeMoveAction/moveForm.html.twig' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

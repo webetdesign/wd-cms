@@ -30,6 +30,8 @@
 //}
 
 @import "tree";
+@import "nested_move_radio";
+@import "login";
 
 @mixin btnNoStyle() {
     background : none;
@@ -39,6 +41,12 @@
     font       : inherit;
     cursor     : pointer;
     outline    : inherit;
+}
+
+.cms-menu-item__btn-hide_child{
+    &.minimalized{
+        transform: rotate(180deg);
+    }
 }
 
 .cmsMenuAdmin {

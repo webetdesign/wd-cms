@@ -2,141 +2,69 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Selectable;
+use Doctrine\ORM\PersistentCollection;
+use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsMenuRepository")
- * @ORM\Table(name="cms__menu", uniqueConstraints={@ORM\UniqueConstraint(name="code_idx", columns={"code", "tree_root"})})
- * @Gedmo\Tree(type="nested")
+ * @ORM\Table(name="cms__menu", uniqueConstraints={@ORM\UniqueConstraint(name="code_idx", columns={"code", "site_id"})})
  */
 class CmsMenu
 {
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     *
+     * @var int
      */
     private $id;
 
     /**
-     * @var string
      * @ORM\Column(type="string", length=255, nullable=false)
      *
+     * @var string
      */
-    private $name;
+    private $label;
 
     /**
-     * @var string
-     * 
-     * @ORM\Column(type="string", length=128, nullable=true)
+     * @ORM\Column(type="string", length=128, nullable=false)
      *
+     * @var string
      */
     private $code;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
      * @var string
-     * @ORM\Column(type="string", length=255, nullable=true, name="link_type")
-     *
      */
-    private $linkType;
+    private $type;
 
     /**
-     *
-     */
-    private $page;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true, name="link_value")
-     *
-     */
-    private $linkValue;
-
-    /**
-     * @var int
-     * @Gedmo\TreeLevel
-     * @ORM\Column(type="integer", nullable=false)
-     *
-     */
-    private $lvl;
-
-    /**
-     * @var int
-     * @Gedmo\TreeLeft
-     * @ORM\Column(type="integer", nullable=false)
-     *
-     */
-    private $lft;
-
-    /**
-     * @var int
-     * @Gedmo\TreeRight
-     * @ORM\Column(type="integer", nullable=false)
-     *
-     */
-    private $rgt;
-
-    /**
-     * @Gedmo\TreeRoot
-     */
-    private $root;
-
-    /**
-     * @Gedmo\TreeParent
-     */
-    private $parent;
-
-    /**
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="menu", cascade={"persist", "remove"})
+     * @var CmsMenuItem[]|Collection|Selectable
      */
     private $children;
 
     /**
-     * @var null|String
+     * @var CmsSite
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="menus")
+     * @ORM\JoinColumn(name="site_id", referencedColumnName="id")
      */
-    private $moveMode;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     *
-     */
-    private $classes;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private $connected;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     *
-     */
-    private $role;
-
-    /**
-     * @var null|CmsMenu
-     */
-    private $moveTarget;
-
-
     private $site;
 
-    /**
-     * @var null|string
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $params;
+    public $initRoot = true;
+
 
     public function __construct()
     {
-        $this->children = new ArrayCollection();
+        $this->type = CmsMenuTypeEnum::DEFAULT;
     }
 
     /**
@@ -144,100 +72,69 @@ class CmsMenu
      */
     public function __toString()
     {
-        return (string) $this->getName();
+        return (string)$this->getLabel();
     }
 
-
-    public function getId(): ?int
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getLft(): ?int
+    /**
+     * @param int $id
+     */
+    public function setId(?int $id): void
     {
-        return $this->lft;
+        $this->id = $id;
     }
 
-    public function setLft(int $lft): self
+    /**
+     * @param string|null $label
+     * @return CmsMenu
+     */
+    public function setLabel(?string $label): CmsMenu
     {
-        $this->lft = $lft;
-
-        return $this;
-    }
-
-    public function getLvl(): ?int
-    {
-        return $this->lvl;
-    }
-
-    public function setLvl(int $lvl): self
-    {
-        $this->lvl = $lvl;
-
-        return $this;
-    }
-
-    public function getRgt(): ?int
-    {
-        return $this->rgt;
-    }
-
-    public function setRgt(int $rgt): self
-    {
-        $this->rgt = $rgt;
-
-        return $this;
-    }
-
-    public function getRoot(): ?self
-    {
-        return $this->root;
-    }
-
-    public function setRoot(?self $root): self
-    {
-        $this->root = $root;
-
-        return $this;
-    }
-
-    public function getParent(): ?self
-    {
-        return $this->parent;
-    }
-
-    public function setParent(?self $parent): self
-    {
-        $this->parent = $parent;
+        $this->label = $label;
 
         return $this;
     }
 
     /**
-     * @return Collection|CmsMenu[]
+     * @return string|null
      */
-    public function getChildren(): Collection
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
+    /**
+     * @return Collection|Selectable|CmsMenuItem[]
+     */
+    public function getChildren()
     {
         return $this->children;
     }
 
-    public function addChild(CmsMenu $child): self
+    public function addChildren($children): self
     {
-        if (!$this->children->contains($child)) {
-            $this->children[] = $child;
-            $child->setParent($this);
+        if (!$this->children->contains($children)) {
+            $this->children[] = $children;
+            $children->setSite($this);
         }
 
         return $this;
     }
 
-    public function removeChild(CmsMenu $child): self
+    public function removeChildren($children): self
     {
-        if ($this->children->contains($child)) {
-            $this->children->removeElement($child);
+        if ($this->children->contains($children)) {
+            $this->children->removeElement($children);
             // set the owning side to null (unless already changed)
-            if ($child->getParent() === $this) {
-                $child->setParent(null);
+            if ($children->getPage() === $this) {
+                $children->setPage(null);
             }
         }
 
@@ -245,23 +142,17 @@ class CmsMenu
     }
 
     /**
-     * @return null|string
+     * @param string $code
+     * @return CmsMenu
      */
-    public function getName(): ?string
+    public function setCode(string $code): CmsMenu
     {
-        return $this->name;
+        $this->code = $code;
+        return $this;
     }
 
     /**
-     * @param null|string $name
-     */
-    public function setName(?string $name): void
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return null|string
+     * @return string
      */
     public function getCode(): ?string
     {
@@ -269,185 +160,39 @@ class CmsMenu
     }
 
     /**
-     * @param null|string $code
-     */
-    public function setCode($code): void
-    {
-        $this->code = $code;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPage()
-    {
-        return $this->page;
-    }
-
-    /**
-     * @param mixed $page
-     */
-    public function setPage($page): void
-    {
-        $this->page = $page;
-    }
-
-    /**
-     * @return null|String
-     */
-    public function getMoveMode(): ?String
-    {
-        return $this->moveMode;
-    }
-
-    /**
-     * @param null|String $moveMode
-     */
-    public function setMoveMode(?String $moveMode): void
-    {
-        $this->moveMode = $moveMode;
-    }
-
-    /**
-     * @return CmsMenu|null
-     */
-    public function getMoveTarget(): ?CmsMenu
-    {
-        return $this->moveTarget;
-    }
-
-    /**
-     * @param CmsMenu|null $moveTarget
-     */
-    public function setMoveTarget(?CmsMenu $moveTarget): void
-    {
-        $this->moveTarget = $moveTarget;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getLinkValue(): ?string
-    {
-        return $this->linkValue;
-    }
-
-    /**
-     * @param null|string $linkValue
-     */
-    public function setLinkValue(?string $linkValue): void
-    {
-        $this->linkValue = $linkValue;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLinkType(): ?string
-    {
-        return $this->linkType;
-    }
-
-    /**
-     * @param string $linkType
-     */
-    public function setLinkType(?string $linkType): void
-    {
-        $this->linkType = $linkType;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClasses(): ?string
-    {
-        return $this->classes;
-    }
-
-    /**
-     * @param string $classes
+     * @param string $type
      * @return CmsMenu
      */
-    public function setClasses(?string $classes): CmsMenu
+    public function setType(string $type): CmsMenu
     {
-        $this->classes = $classes;
+        $this->type = $type;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getConnected(): ?string
+    public function getType(): string
     {
-        return $this->connected;
+        return $this->type;
     }
 
     /**
-     * @param string $connected
+     * @param CmsSite $site
      * @return CmsMenu
      */
-    public function setConnected(?string $connected): CmsMenu
+    public function setSite(CmsSite $site): CmsMenu
     {
-        $this->connected = $connected;
+        $this->site = $site;
         return $this;
     }
 
     /**
-     * @return array
+     * @return CmsSite
      */
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    /**
-     * @param string $roles
-     * @return CmsMenu
-     */
-    public function setRole(?string $role): CmsMenu
-    {
-        $this->role = $role;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSite()
+    public function getSite(): CmsSite
     {
         return $this->site;
     }
-
-    /**
-     * @param mixed $site
-     */
-    public function setSite($site): void
-    {
-        $this->site = $site;
-    }
-
-    public function getSlug(){
-        $slugify = new Slugify();
-        return $slugify->slugify($this->getName(), "_");
-    }
-
-    /**
-     * @param string|null $params
-     * @return CmsMenu
-     */
-    public function setParams(?string $params): CmsMenu
-    {
-        $this->params = $params;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getParams(): ?string
-    {
-        return $this->params;
-    }
-
 
 }

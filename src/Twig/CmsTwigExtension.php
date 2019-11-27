@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
+use Twig\TwigTest;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
@@ -72,6 +73,13 @@ class CmsTwigExtension extends AbstractExtension
         }
     }
 
+    public function getTests()
+    {
+        return [
+            new TwigTest('instanceOf', [$this, 'isInstanceOf'])
+        ];
+    }
+
 
     public function getFilters(): array
     {
@@ -94,8 +102,12 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'], ['is_safe' => ['html']]),
             new TwigFunction('cms_render_seo_smo_value', [$this, 'renderSeoSmo']),
             new TwigFunction('cms_breadcrumb', [$this, 'breadcrumb']),
-            new TwigFunction('test', [$this, 'test']),
         ];
+    }
+
+    public function isInstanceOf($object, $class)
+    {
+        return $object instanceof $class;
     }
 
     private function getDeclination($page)
@@ -276,10 +288,10 @@ class CmsTwigExtension extends AbstractExtension
         return $content->getSliders();
     }
 
-    public function cmsPath($route, $params = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
+    public function cmsPath($route, $params = [], $absoluteUrl = false)
     {
         try {
-            return $this->router->generate($route, $params, $referenceType);
+            return $this->router->generate($route, $params, $absoluteUrl ? UrlGenerator::ABSOLUTE_URL : UrlGenerator::ABSOLUTE_PATH);
         } catch (RouteNotFoundException $e) {
             return '#404(route:' . $route . ')';
         }

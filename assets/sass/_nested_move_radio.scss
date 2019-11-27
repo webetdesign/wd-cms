@@ -1,0 +1,20 @@
+/********************************************************************\
+   nested_move_radio
+\********************************************************************/
+
+.nested_move_item {
+    display: inline-block;
+    label {
+        border: solid 2px white;
+        border-radius: 3px;
+        //border: solid 1px #3C8DBC;
+    }
+
+    input{
+        display: none;
+    }
+
+    input:checked + label {
+        border-color: #3C8DBC;
+    }
+}

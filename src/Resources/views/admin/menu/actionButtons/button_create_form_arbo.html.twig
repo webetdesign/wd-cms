@@ -1,0 +1,20 @@
+{#
+
+This file is part of the Sonata package.
+
+(c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+
+#}
+
+{% if admin.hasRoute('generateFromPage') and app.user.hasRole('ROLE_ADMIN_CMS') %}
+    {% set _tab = app.request.query.get('_tab') %}
+    <li>
+        <a class="sonata-action-element" href="{{ admin.generateUrl('generateFromPage', {id: app.request.get('id')}) }}">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            Générer un menu depuis l'arborescence de page
+        </a>
+    </li>
+{% endif %}

@@ -2,6 +2,7 @@ require('../sass/app.scss')
 import $ from "jquery"
 import "./cms_route_params"
 import "./menu_admin"
+import "./tree"
 
 import './analytics/analytics.js';
 

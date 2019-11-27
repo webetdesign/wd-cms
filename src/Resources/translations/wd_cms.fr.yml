@@ -1,1 +1,5 @@
 title_wd: Votre gestionnaire de site sur mesure
+persistAsFirstChildOf: 'Déplacer en premier, dessous :'
+persistAsLastChildOf: 'Déplacer en dernier, dessous :'
+persistAsNextSiblingOf: 'Déplacer après :'
+persistAsPrevSiblingOf: 'Déplacer avant :'

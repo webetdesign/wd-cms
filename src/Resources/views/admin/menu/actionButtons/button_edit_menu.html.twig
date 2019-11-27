@@ -1,0 +1,19 @@
+{#
+
+This file is part of the Sonata package.
+
+(c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+
+#}
+
+{% if admin.child('cms.admin.cms_menu_item').hasRoute('create') and app.user.hasRole('ROLE_ADMIN_CMS')%}
+    <li>
+        <a class="sonata-action-element" id="editMenuBtn" href="#">
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+            Editer le menu selectoné
+        </a>
+    </li>
+{% endif %}

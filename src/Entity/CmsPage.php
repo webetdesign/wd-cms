@@ -162,6 +162,20 @@ class CmsPage
      */
     public $dontImportContent = false;
 
+    public function setPosition($values)
+    {
+        $this->setMoveMode($values['moveMode']);
+        $this->setMoveTarget($values['moveTarget']);
+    }
+
+    public function getPosition()
+    {
+        return [
+            'moveMode' => $this->getMoveMode(),
+            'moveTarget' => $this->getMoveTarget()
+        ];
+    }
+
     public function getChildrenRight()
     {
         $criteria = Criteria::create()->orderBy(['rgt' => 'ASC']);

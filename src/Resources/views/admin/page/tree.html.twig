@@ -16,11 +16,14 @@ file that was distributed with this source code.
                 <div class="page-tree__item">
                     {% if page.parent %}<i class="fa fa-caret-right"></i>{% endif %}
                     <i class="fa page-tree__item__is-hybrid fa-{% if page.isHybrid %}gears{% else %}code{% endif %}"></i>
+                    {% if page.lvl != 0 %}
+                        <a class="label label-default pull-right treeMoveAction" data-toggle="tooltip" title="Déplacer" href="{{ admin.generateObjectUrl('move', page) }}"><i class="fa fa-arrows"></i></a>
+                    {% endif %}
                     <a class="page-tree__item__edit" href="{{ admin.generateObjectUrl('edit', page) }}">{{ page.title }}</a>
                     {% if page.route != null %}
                         <i class="text-muted">{% if page.root.site.locale is not empty and not page.root.site.hostMultilingual %}/{{ page.root.site.locale }}{% endif %}{{ page.route.path }}</i>
                     {% endif %}
-                    <a class="label label-default pull-right" href="{{ admin.generateObjectUrl('edit', page) }}">Editer <i class="fa fa-pencil"></i></a>
+                    <a class="label label-default pull-right" data-toggle="tooltip" title="Editer" href="{{ admin.generateObjectUrl('edit', page) }}"><i class="fa fa-pencil"></i></a>
                     <span class="label label-{% if page.isActive %}success{% else %}danger{% endif %} pull-right">Active</span>
                     {% if page.declinations.count > 0 %}
                         <span class="label label-primary pull-right">{{ page.declinations.count }} {{ page.declinations.count > 1 ? 'Déclinaisons' : "Déclinaison" }}</span>
@@ -74,4 +77,5 @@ file that was distributed with this source code.
             </div>
         </div>
     </div>
+    {% include '@WebEtDesignCms/admin/nestedTreeMoveAction/moveModal.html.twig'%}
 {% endblock %}

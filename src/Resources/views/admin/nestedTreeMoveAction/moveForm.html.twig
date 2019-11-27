@@ -1,0 +1,42 @@
+{{ form_start(form) }}
+<div class="sonata-ba-collapsed-fields">
+    <div class="form-group">
+        {% form_theme form.moveMode '@WebEtDesignCms/form/cms_nested_move_radio.html.twig' %}
+        <div class="sonata-ba-field sonata-ba-field-standard-natural">
+            {% for item in form.moveMode %}
+                {{ form_widget(item) }}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="{{ form.moveTarget.vars.id }}">{{ form.moveMode.vars.value | trans({}, 'wd_cms') }}</label>
+        <div class="sonata-ba-field sonata-ba-field-standard-natural">
+            {{ form_widget(form.moveTarget) }}
+        </div>
+    </div>
+</div>
+<div class="sonata-ba-form-actions form-actions">
+    <button type="submit" class="btn btn-success" name="btn_update_and_edit"><i class="fa fa-save" aria-hidden="true"></i> Mettre à jour</button>
+    {% if form.vars.value is instanceOf('WebEtDesign\\CmsBundle\\Entity\\CmsMenuItem') %}
+        <a href="{{ admin.parent.generateUrl('tree', {id: form.vars.value.menu.site.id, _tab: 'tab_' ~ form.vars.value.menu.code}) }}" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Annuler</a>
+    {% else %}
+        <a href="{{ admin.generateUrl('tree', {id: form.vars.value.root.site.id }) }}" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Annuler</a>
+    {% endif %}
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var items = document.querySelectorAll('.nested_move_item')
+    items.forEach(function (item) {
+      item.addEventListener('click', function () {
+        document.querySelector('label[for="{{ form.moveTarget.vars.id }}"]').innerText = item.querySelector('label').dataset.labelText
+      })
+    })
+
+    var targetSelect = document.querySelector('#{{ form.moveTarget.vars.id }}')
+    targetSelect.addEventListener('onchange', function () {
+      console.log(this.value)
+    })
+
+  })
+</script>
+{{ form_end(form) }}
