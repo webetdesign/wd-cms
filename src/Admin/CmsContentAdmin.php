@@ -316,7 +316,7 @@ final class CmsContentAdmin extends AbstractAdmin
 
     protected function addHelp(FormMapper $formMapper, $subject, $field)
     {
-        if (!empty($subject->getHelp())) {
+        if ($subject && !empty($subject->getHelp())) {
             $formMapper->addHelp($field, $subject->getHelp());
         }
     }
