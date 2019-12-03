@@ -33,6 +33,7 @@ class ExtraLoader implements LoaderInterface
         try {
             $con = $this->em->getConnection();
             $con->connect();
+            $cmsRoutes = $this->em->getRepository(CmsRoute::class)->findAll();
         } catch (Exception $exception) {
             return new RouteCollection();
         }
@@ -42,9 +43,7 @@ class ExtraLoader implements LoaderInterface
         }
 
         $routes = new RouteCollection();
-
-        $cmsRoutes = $this->em->getRepository(CmsRoute::class)->findAll();
-
+        
         /** @var CmsRoute $cmsRoute */
         foreach ($cmsRoutes as $cmsRoute) {
             if ($cmsRoute->getPage() == null || $cmsRoute->getPage()->getRoot() == null) {
