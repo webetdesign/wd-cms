@@ -52,7 +52,8 @@ class CmsMenuBuilder
         TokenStorageInterface $storage,
         AuthorizationCheckerInterface $authorizationChecker,
         RequestStack $requestStack
-    ) {
+    )
+    {
         $this->em                   = $entityManager;
         $this->router               = $router;
         $this->factory              = $factory;
@@ -96,7 +97,11 @@ class CmsMenuBuilder
     public function buildNodes(ItemInterface $menu, $items, $parentActive, $activeClass)
     {
         /** @var User $user */
-        $user = $this->storage->getToken()->getUser();
+        if ($this->storage->setToken() != null) {
+            $user = $this->storage->getToken()->getUser();
+        } else {
+            $user = null;
+        }
 
         /** @var CmsMenuItem $child */
         foreach ($items as $child) {
@@ -168,7 +173,6 @@ class CmsMenuBuilder
 
     public function isActive(CmsMenuItem $item)
     {
-
         $request         = $this->requestStack->getCurrentRequest();
         $activeRouteName = $request->get('_route');
         if (!$item->getPage()->getRoute()) {
