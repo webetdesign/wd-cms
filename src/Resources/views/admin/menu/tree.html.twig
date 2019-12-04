@@ -121,19 +121,19 @@ file that was distributed with this source code.
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         document.querySelector('#addItemBtn').addEventListener('click', function (e) {
-          e.preventDefault()
+          e.preventDefault();
           var active = document.querySelector('.menu_tab.active');
           if (active.dataset.type === '{{ constant('WebEtDesign\\CmsBundle\\Entity\\CmsMenuTypeEnum::PAGE_ARBO') }}') {
-            alert("Vous ne pouvez pas ajouter d'élément dans ce menu, utilisez l'arboréssence de page.")
+            alert("Vous ne pouvez pas ajouter d'élément dans ce menu, utilisez l'arboréssence de page.");
             return;
           }
-          var link = active.dataset.addLink
-          location.href = link
-        })
+          var link = active.dataset.addLink;
+          location.href = link;
+        });
         document.querySelector('#editMenuBtn').addEventListener('click', function (e) {
-          e.preventDefault()
+          e.preventDefault();
           var active = document.querySelector('.menu_tab.active');
-          var link = active.dataset.editLink
+          var link = active.dataset.editLink;
           location.href = link
         })
       })

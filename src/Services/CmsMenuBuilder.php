@@ -105,6 +105,9 @@ class CmsMenuBuilder
 
         /** @var CmsMenuItem $child */
         foreach ($items as $child) {
+            if (!$child->isVisible()) {
+                continue;
+            }
             if ($child->getRole() && !$this->authorizationChecker->isGranted($child->getRole())) {
                 continue;
             }

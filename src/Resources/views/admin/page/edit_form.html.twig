@@ -2,7 +2,7 @@
 
 {% if action == 'create' %}
     {% set options = {
-        'id': objectId|default(admin.id(object)),
+        'id': object.site.id,
         'uniqid': admin.uniqid,
         'subclass': app.request.get('subclass'),
         'parent': app.request.attributes.get('parent'),
@@ -17,7 +17,7 @@
     } %}
 {% endif %}
 
-{% block sonata_form_action_url %}{{ admin.generateUrl(action, options) }}{% endblock %}
+{%- block sonata_form_action_url -%}{{ admin.generateUrl(action, options) }}{%- endblock -%}
 
 {% block form %}
     {{ parent() }}

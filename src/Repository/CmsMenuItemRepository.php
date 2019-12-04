@@ -122,6 +122,7 @@ class CmsMenuItemRepository extends NestedTreeRepository
             ->setParameter('site', $site)
             ->setParameter('type', CmsMenuTypeEnum::PAGE_ARBO);
 
+
         return $qb->getQuery()->getOneOrNullResult();
     }
 }

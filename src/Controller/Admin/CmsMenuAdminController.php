@@ -77,8 +77,8 @@ class CmsMenuAdminController extends CRUDController
         $menu = $em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy(['site' => $site, 'type' => CmsMenuTypeEnum::PAGE_ARBO]);
 
         if ($menu) {
-            dump('xx');
-            die();
+            $this->addFlash('warning', 'Un menu de type arborescence existe déjà pour ce site, vous ne pouvez pas en créer d\'autres');
+            $this->redirectToList();
         } else {
             $menu = new CmsMenu();
             $menu->setLabel($site->getLabel());

@@ -13,6 +13,8 @@ use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
@@ -173,15 +175,10 @@ class CmsPageAdmin extends AbstractAdmin
         $admin     = $this;
         /** @var CmsPage $object */
         $object = $this->getSubject();
-        $parent = null;
-        $root   = null;
-        if ($this->request->attributes->get('parent') != null) {
-            $parent = $this->em->getRepository(CmsPage::class)->find($this->request->attributes->get('parent'));
-        } else {
-            $root = $object->getRoot();
-        }
 
         $site = $object->getSite();
+
+        $formMapper->getFormBuilder()->setAction($this->generateUrl('create', ['id' => $site->getId()]));
 
         $admin->setFormTheme(array_merge($admin->getFormTheme(), [
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
@@ -216,7 +213,7 @@ class CmsPageAdmin extends AbstractAdmin
                 'class' => CmsSite::class,
                 'data'  => $site,
                 'attr'  => [
-                    'style' => 'display: none '
+//                    'style' => 'display: none '
                 ],
                 'label' => false,
             ]);

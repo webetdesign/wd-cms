@@ -193,6 +193,8 @@ class CmsPageAdminController extends CRUDController
      */
     public function createAction($id = null)
     {
+        $request = $this->getRequest();
+
         /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine();
         if ($id === null) {
@@ -200,7 +202,6 @@ class CmsPageAdminController extends CRUDController
         } else {
             $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
         }
-        $request = $this->getRequest();
         // the key used to lookup the template
         $templateKey = 'edit';
 
