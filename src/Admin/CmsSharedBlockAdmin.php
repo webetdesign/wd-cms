@@ -64,7 +64,8 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     {
         $collection
             ->add('createRootNode', 'initRoot')
-            ->add('move', 'move');
+            ->add('move', 'move')
+            ->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
 
         $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
     }
@@ -94,10 +95,19 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $formMapper): void
     {
         $roleAdmin = $this->canManageContent();
+        $object    = $this->getSubject();
+        if ($this->isCurrentRoute('create') && $this->getRequest()->get('id') !== null) {
+            $site = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($this->getRequest()->get('id'));
+            $object->setSite($site);
+        }
 
         $formMapper
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => ''])
+            ->add('site', null, [
+                'attr'  => ['style' => 'display:none;'],
+                'label' => false
+            ])
             ->add('code', $this->isCurrentRoute('edit') && $roleAdmin ? TextType::class : HiddenType::class, [])
             ->add('label')
             ->add('template', BlockTemplateType::class, ['label' => 'Modèle de block partagé'])
@@ -153,5 +163,84 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function configureActionButtons($action, $object = null)
+    {
+        $list = [];
+
+        if (\in_array($action, ['tree'], true)
+            && $this->hasAccess('create')
+            && $this->hasRoute('create')
+        ) {
+            $list['create'] = [
+                // NEXT_MAJOR: Remove this line and use commented line below it instead
+                'template' => $this->getTemplate('button_create'),
+                //                'template' => $this->getTemplateRegistry()->getTemplate('button_create'),
+            ];
+        }
+
+        if (\in_array($action, ['show', 'delete', 'acl', 'history'], true)
+            && $this->canAccessObject('edit', $object)
+            && $this->hasRoute('edit')
+        ) {
+            $list['edit'] = [
+                // NEXT_MAJOR: Remove this line and use commented line below it instead
+                'template' => $this->getTemplate('button_edit'),
+                //'template' => $this->getTemplateRegistry()->getTemplate('button_edit'),
+            ];
+        }
+
+        if (\in_array($action, ['show', 'edit', 'acl'], true)
+            && $this->canAccessObject('history', $object)
+            && $this->hasRoute('history')
+        ) {
+            $list['history'] = [
+                // NEXT_MAJOR: Remove this line and use commented line below it instead
+                'template' => $this->getTemplate('button_history'),
+                // 'template' => $this->getTemplateRegistry()->getTemplate('button_history'),
+            ];
+        }
+
+        if (\in_array($action, ['edit', 'history'], true)
+            && $this->isAclEnabled()
+            && $this->canAccessObject('acl', $object)
+            && $this->hasRoute('acl')
+        ) {
+            $list['acl'] = [
+                // NEXT_MAJOR: Remove this line and use commented line below it instead
+                'template' => $this->getTemplate('button_acl'),
+                // 'template' => $this->getTemplateRegistry()->getTemplate('button_acl'),
+            ];
+        }
+
+        if (\in_array($action, ['edit', 'history', 'acl'], true)
+            && $this->canAccessObject('show', $object)
+            && \count($this->getShow()) > 0
+            && $this->hasRoute('show')
+        ) {
+            $list['show'] = [
+                // NEXT_MAJOR: Remove this line and use commented line below it instead
+                'template' => $this->getTemplate('button_show'),
+                // 'template' => $this->getTemplateRegistry()->getTemplate('button_show'),
+            ];
+        }
+
+        if (\in_array($action, ['show', 'edit', 'delete', 'acl', 'batch'], true)
+            && $this->hasAccess('list')
+            && $this->hasRoute('list')
+        ) {
+            $list['list'] = [
+                // NEXT_MAJOR: Remove this line and use commented line below it instead
+                'template' => $this->getTemplate('button_list'),
+                // 'template' => $this->getTemplateRegistry()->getTemplate('button_list'),
+            ];
+        }
+
+        return $list;
     }
 }

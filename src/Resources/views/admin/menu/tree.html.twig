@@ -42,7 +42,7 @@ file that was distributed with this source code.
                     {#                        <i class="text-muted">{{ path }}</i>#}
                     {#                    {% endif %}#}
                     {% if path is not empty %}
-                        <a class="label label-default pull-right" data-toggle="tooltip" title="Ouvir le lien" href="{{ path }}"><i class="fa fa-share"></i></a>
+                        <a class="label label-default pull-right" data-toggle="tooltip" title="Ouvir le lien" target="_blank" href="{{ path }}"><i class="fa fa-share"></i></a>
                     {% endif %}
                     <a class="label label-default pull-right" data-toggle="tooltip" title="Editer" href="{{ admin.generateUrl('cms.admin.cms_menu_item.edit', {id: item.menu.id, childId: item.id}) }}"><i class="fa fa-pencil"></i></a>
                     {% if item.menu.type != constant('WebEtDesign\\CmsBundle\\Entity\\CmsMenuTypeEnum::PAGE_ARBO') %}

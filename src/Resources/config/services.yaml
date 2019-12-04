@@ -354,6 +354,7 @@ services:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Block partagé }
     calls:
       - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
+      - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/sharedBlock/actionButtons/button_create.html.twig']]
 
     public: true
 

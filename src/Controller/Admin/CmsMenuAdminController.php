@@ -195,6 +195,7 @@ class CmsMenuAdminController extends CRUDController
             }
 
             $id = $defaultSite->getId();
+            $request->attributes->set('id', $id);
         }
 
         return $this->redirect($this->admin->generateUrl('tree', ['id' => $id]));

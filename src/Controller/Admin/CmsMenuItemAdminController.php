@@ -22,6 +22,8 @@ final class CmsMenuItemAdminController extends CRUDController
 
         $object = $em->getRepository(CmsMenuItem::class)->find($itemId);
 
+        $object->setMoveTarget($object->getRoot());
+
         $form = $this->createForm(MoveForm::class, $object, [
             'data_class' => CmsMenuItem::class,
             'object'     => $object,
@@ -90,6 +92,9 @@ final class CmsMenuItemAdminController extends CRUDController
             $target = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenuItem')->find($request->query->get('target'));
             $newObject->setMoveTarget($target);
             $newObject->setMoveMode('persistAsLastChildOf');
+        } else {
+            $menu = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu')->find($request->get('id'));
+            $newObject->setMoveTarget($menu->getRoot());
         }
 
         $this->admin->setSubject($newObject);

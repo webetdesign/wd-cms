@@ -3,18 +3,36 @@
 \********************************************************************/
 
 .nested_move_item {
-    display: inline-block;
+    display : inline-block;
+
     label {
-        border: solid 2px white;
-        border-radius: 3px;
+        border        : solid 2px white;
+        border-radius : 3px;
         //border: solid 1px #3C8DBC;
+        position      : relative;
     }
 
-    input{
-        display: none;
-    }
+    input {
+        display : none;
 
-    input:checked + label {
-        border-color: #3C8DBC;
+        &:checked + label {
+            border-color : #3C8DBC;
+        }
+
+        &:disabled + label:before {
+            content          : "\f05e";
+            display          : flex;
+            justify-content  : space-around;
+            align-items      : center;
+            font-size        : 50px;
+            font-family      : FontAwesome;
+            width            : 100%;
+            height           : 100%;
+            position         : absolute;
+            color            : #ffffff;
+            background-color : rgba(0, 0, 0, 0.28);
+            border-color     : rgba(0, 0, 0, 0.28);
+            border-radius    : 3px;
+        }
     }
 }

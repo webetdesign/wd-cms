@@ -113,11 +113,26 @@
   display: inline-block; }
   .nested_move_item label {
     border: solid 2px white;
-    border-radius: 3px; }
+    border-radius: 3px;
+    position: relative; }
   .nested_move_item input {
     display: none; }
-  .nested_move_item input:checked + label {
-    border-color: #3C8DBC; }
+    .nested_move_item input:checked + label {
+      border-color: #3C8DBC; }
+    .nested_move_item input:disabled + label:before {
+      content: "\F05E";
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 50px;
+      font-family: FontAwesome;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      color: #ffffff;
+      background-color: rgba(0, 0, 0, 0.28);
+      border-color: rgba(0, 0, 0, 0.28);
+      border-radius: 3px; }
 
 /********************************************************************\
   _login.scss

@@ -110,6 +110,16 @@ class CmsMenu
         return $this->label;
     }
 
+    public function getRoot()
+    {
+        $criteria = new Criteria();
+        $criteria->where(
+            Criteria::expr()->eq('lvl', 0)
+        );
+
+        return $this->children->matching($criteria)->first();
+    }
+
     /**
      * @return Collection|Selectable|CmsMenuItem[]
      */

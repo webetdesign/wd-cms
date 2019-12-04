@@ -2,7 +2,7 @@
     <div class="nested_move_item">
         <input type="radio" data-sonata-icheck="false" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
         <label for="{{ id }}" data-label-text="{{ value |trans({}, 'wd_cms') }}">
-            <img class="move-mode-img" src="{{ asset('bundles/webetdesigncms/img/NesteMoveIcons/'~value~'.png') }}" alt="">
+            <img class="move-mode-img" src="{{ asset('bundles/webetdesigncms/img/NesteMoveIcons/'~value~'.png') }}" alt="" style="cursor: pointer">
         </label>
     </div>
 {%- endblock radio_widget -%}
@@ -10,13 +10,13 @@
 {% block wd_cms_move_form_widget %}
     <div class="sonata-ba-collapsed-fields">
         <div class="form-group">
-{#            {% form_theme form.moveMode '@WebEtDesignCms/form/cms_nested_move_radio.html.twig' %}#}
             <div class="sonata-ba-field sonata-ba-field-standard-natural">
                 {% for item in form.moveMode %}
                     {{ form_widget(item) }}
                 {% endfor %}
             </div>
         </div>
+        {% dump(form.moveMode.vars.full_name) %}
         <div class="form-group">
             <label for="{{ form.moveTarget.vars.id }}">{{ form.moveMode.vars.value | trans({}, 'wd_cms') }}</label>
             <div class="sonata-ba-field sonata-ba-field-standard-natural">
@@ -25,13 +25,50 @@
         </div>
     </div>
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        var items = document.querySelectorAll('.nested_move_item')
+      function toggleRadio (opt) {
+        if (opt) {
+          if (opt.dataset.hasOwnProperty('root')) {
+            var radios = document.querySelectorAll('input[type="radio"][name="{{ form.moveMode.vars.full_name }}"][data-disallow-root]');
+            radios.forEach(function (radio) {
+              radio.setAttribute('disabled', 'disabled');
+              if (radio.checked) {
+                radio.checked = false;
+                document.querySelector('input[type="radio"][name="{{ form.moveMode.vars.full_name }}"][data-allow-root]').checked = true;
+              }
+            });
+          } else {
+            var radios = document.querySelectorAll('input[type="radio"][name="{{ form.moveMode.vars.full_name }}"][data-disallow-root]');
+            radios.forEach(function (radio) {
+              radio.removeAttribute('disabled')
+            });
+          }
+        }
+      }
+
+      function listener () {
+        var items = document.querySelectorAll('.nested_move_item');
         items.forEach(function (item) {
           item.addEventListener('click', function () {
-            document.querySelector('label[for="{{ form.moveTarget.vars.id }}"]').innerText = item.querySelector('label').dataset.labelText
+            var radio = item.querySelector('input[type="radio"');
+            if (!radio.attributes.hasOwnProperty('disabled')) {
+              document.querySelector('label[for="{{ form.moveTarget.vars.id }}"]').innerText = item.querySelector('label').dataset.labelText
+            }
           })
-        })
-      })
+        });
+
+        var select = document.querySelector('#{{ form.moveTarget.vars.id }}');
+        var opt = select.querySelector('option[selected="selected"]');
+        toggleRadio(opt);
+
+        $('#{{ form.moveTarget.vars.id }}').on('change', function (e) {
+          var opt = select.querySelector('option[value="' + e.val + '"]');
+          toggleRadio(opt);
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        listener()
+      });
+      listener();
     </script>
 {% endblock wd_cms_move_form_widget %}

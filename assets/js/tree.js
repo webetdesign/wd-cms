@@ -2,8 +2,8 @@ import axios from 'axios';
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 document.addEventListener("DOMContentLoaded",function(){
-  const items = document.querySelectorAll('.treeMoveAction')
-  const modal = document.querySelector('#tree_move_modal')
+  const items = document.querySelectorAll('.treeMoveAction');
+  const modal = document.querySelector('#tree_move_modal');
 
   items.forEach(item => {
     item.addEventListener('click', e => {
@@ -11,11 +11,13 @@ document.addEventListener("DOMContentLoaded",function(){
 
       axios.get(item.href)
         .then(response => {
-          console.log(response.data.modalContent)
           modal.querySelector('.modal-title').innerText = 'Déplacé ' + response.data.label;
           modal.querySelector('.modal-body').innerHTML = response.data.modalContent;
 
-          Admin.setup_select2(modal)
+          let script = modal.querySelector('.modal-body').querySelector('script');
+          eval(script.innerText);
+
+          Admin.setup_select2(modal);
 
           $(modal).modal('show');
         })
@@ -24,4 +26,4 @@ document.addEventListener("DOMContentLoaded",function(){
     })
   })
 
-})
+});

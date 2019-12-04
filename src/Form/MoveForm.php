@@ -24,16 +24,22 @@ class MoveForm extends AbstractType
 
         $builder
             ->add('moveMode', ChoiceType::class, [
-                'choices'  => [
+                'choices'     => [
                     'Déplacer en premier, dessous :' => 'persistAsFirstChildOf',
                     'Déplacer en dernier, dessous :' => 'persistAsLastChildOf',
                     'Déplacer après :'               => 'persistAsNextSiblingOf',
                     'Déplacer avant :'               => 'persistAsPrevSiblingOf',
                 ],
-                'expanded' => true,
-                'label'    => false,
-                'required' => true,
-                'data'     => 'persistAsFirstChildOf'
+                'choice_attr' => function ($choice, $key, $value) {
+                    return [
+                        'data-disallow-root' => in_array($choice, ['persistAsNextSiblingOf', 'persistAsPrevSiblingOf']),
+                        'data-allow-root' => in_array($choice, ['persistAsFirstChildOf', 'persistAsLastChildOf'])
+                    ];
+                },
+                'expanded'    => true,
+                'label'       => false,
+                'required'    => true,
+                'data'        => 'persistAsFirstChildOf'
             ])
             ->add('moveTarget', EntityType::class, [
                 'class'         => $options['data_class'] !== null ? $options['data_class'] : $options['entity'],
@@ -67,12 +73,11 @@ class MoveForm extends AbstractType
                     }
                     return str_repeat('—', $lvl) . ' ' . $object->__toString();
                 },
-                'choice_attr' => function($choice, $key, $value) {
-                    // adds a class like attending_yes, attending_no, etc
+                'choice_attr'   => function ($choice, $key, $value) {
                     return ['data-root' => $choice->isRoot()];
                 },
                 'label'         => false,
-                'required'      => false,
+                'required'      => true,
             ]);
 
     }

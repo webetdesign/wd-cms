@@ -28,6 +28,8 @@ class CmsPageAdminController extends CRUDController
 
         $object = $em->getRepository(CmsPage::class)->find($id);
 
+        $object->setMoveTarget($object->getRoot());
+
         $form = $this->createForm(MoveForm::class, $object, [
             'data_class' => CmsPage::class,
             'object'     => $object,
@@ -65,6 +67,7 @@ class CmsPageAdminController extends CRUDController
 
     public function treeAction($id = null)
     {
+        $request = $this->getRequest();
         /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine();
         if ($id === null) {
@@ -76,6 +79,7 @@ class CmsPageAdminController extends CRUDController
             }
 
             $id = $defaultSite->getId();
+            $request->attributes->set('id', $id);
         }
 
         $datagrid = $this->admin->getDatagrid();
@@ -219,6 +223,8 @@ class CmsPageAdminController extends CRUDController
         /** @var CmsPage $newObject */
         $newObject = $this->admin->getNewInstance();
         $newObject->setSite($site);
+
+        $newObject->setMoveTarget($site->getRootPage());
 
         if ($request->query->has('siteId')) {
             $site = $this->getDoctrine()->getRepository($this->getParameter('wd_cms.admin.config.entity.site'))->find($request->query->get('siteId'));

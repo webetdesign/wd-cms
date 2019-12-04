@@ -12,6 +12,7 @@ final class CmsSharedBlockAdminController extends CRUDController
 
     public function listAction($id = null)
     {
+        $request = $this->getRequest();
         if ($id === null) {
             $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
             if (!$defaultSite) {
@@ -21,6 +22,7 @@ final class CmsSharedBlockAdminController extends CRUDController
             }
 
             $id = $defaultSite->getId();
+            $request->attributes->set('id', $id);
         }
 
         $this->admin->checkAccess('list');
