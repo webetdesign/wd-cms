@@ -195,13 +195,13 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                 ])
                 ->add('connected', ChoiceType::class, [
                     'choices' => [
-                        'Tout les temps'                                 => '',
+                        'Tout le temps'                                 => '',
                         "uniquement si l'utilisateur est connecté"       => 'ONLY_LOGIN',
                         "uniquement si l'utilisateur n'est pas connecté" => 'ONLY_LOGOUT'
                     ],
                     'label'   => 'Visible',
                 ])
-                ->addHelp('connected', "Permet de dynamiser le menu si l'utilisateur et connecté ou non")
+                ->addHelp('connected', "Permet de dynamiser le menu si l'utilisateur est connecté ou non")
                 ->add('role');
 
             $formMapper
