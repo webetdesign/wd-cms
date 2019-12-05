@@ -81,9 +81,6 @@ class CmsRouteParamsType extends AbstractType
                 ];
             }
 
-            if ($name == 'id') {
-                dump($opts);
-            }
             $builder->add($name, $type, $opts);
         }
     }
