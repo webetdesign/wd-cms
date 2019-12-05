@@ -21,6 +21,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
+use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
@@ -97,8 +98,10 @@ final class CmsMenuItemAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $formMapper): void
     {
         $this->setFormTheme(array_merge($this->getFormTheme(), [
-            '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig'
+            '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
+            '@WebEtDesignCms/form/cms_route_params.html.twig',
         ]));
+
 
         /** @var CmsMenuItem $object */
         $object = $this->getSubject();
@@ -207,36 +210,6 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             // fin tab Avancé
 
         }
-
-        //        if ($object && $object->getId() != null) {
-        //            $formMapper
-        //                ->with('Configuration avancé')
-        //                ->add('classes', null, [
-        //                    'label'    => 'Classes',
-        //                    'required' => false,
-        //                ])
-        //                ->add('connected', ChoiceType::class, [
-        //                    'choices' => [
-        //                        'Tout les temps'             => '',
-        //                        'uniquement si connecté'     => 'ONLY_LOGIN',
-        //                        'uniquement si non connecté' => 'ONLY_LOGOUT'
-        //                    ],
-        //                    'label'   => 'Visible',
-        //                ])
-        //                ->add('role')
-        //                ->end();
-        //        }
-
-        //        if ($object->getId() != null) {
-        //            $formMapper
-        //                ->add('linkType')
-        //                ->add('linkValue')
-        //                ->add('isVisible')
-        //                ->add('classes')
-        //                ->add('connected')
-        //                ->add('role')
-        //                ->add('params');
-        //        }
     }
 
     protected function configureShowFields(ShowMapper $showMapper): void
@@ -259,23 +232,11 @@ final class CmsMenuItemAdmin extends AbstractAdmin
     protected function getRouteParamsField(FormMapper $formMapper, $subject, $route)
     {
         $config = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
-        $keys   = [];
-        foreach ($route->getParams() as $name) {
-            $param  = $config['params'][$name] ?? null;
-            $type   = !empty($param['entity']) ? EntityType::class : TextType::class;
-            $opts   = !empty($param['entity']) ? [
-                'class'        => $param['entity'],
-                'choice_value' => function ($entity = null) use ($param) {
-                    $getter = 'get' . ucfirst($param['property']);
-
-                    return $entity ? $entity->$getter() : '';
-                },
-            ] : [];
-            $keys[] = [$name, $type, $opts];
-        }
-        $formMapper->add('params', ImmutableArrayType::class, [
-            'keys'  => $keys,
-            'label' => false
+        $formMapper->add('params', CmsRouteParamsType::class, [
+            'config' => $config,
+            'route'  => $route,
+            'object' => $subject,
+            'label'  => 'Paramtre de l\'url de la page : ' . $route->getPath() . ' '
         ]);
         $formMapper->getFormBuilder()->get('params')->addModelTransformer(new CallbackTransformer(
             function ($values) use ($config) {
@@ -296,8 +257,10 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                 foreach ($values as $name => $value) {
                     $param = $config['params'][$name] ?? null;
                     if ($param) {
-                        $getter        = 'get' . ucfirst($param['property']);
-                        $values[$name] = $value->$getter();
+                        $getter = 'get' . ucfirst($param['property']);
+                        if (method_exists($value, $getter)) {
+                            $values[$name] = $value->$getter();
+                        }
                     }
                 }
 

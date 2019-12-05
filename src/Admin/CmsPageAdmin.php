@@ -213,7 +213,7 @@ class CmsPageAdmin extends AbstractAdmin
                 'class' => CmsSite::class,
                 'data'  => $site,
                 'attr'  => [
-//                    'style' => 'display: none '
+                    'style' => 'display: none '
                 ],
                 'label' => false,
             ]);

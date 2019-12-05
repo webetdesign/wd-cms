@@ -1,0 +1,29 @@
+{% block cms_route_params_widget %}
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="150px">Paramètre</th>
+            <th>Valeur</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in form.children %}
+            <tr>
+                <td>{{ form_label(item) }}</td>
+                <td>
+                    <div class="form-group {% if item.vars.errors.count > 0 %}has-error{% endif %}">
+                        <div class="sonata-ba-field sonata-ba-field-standard-natural {% if item.vars.errors.count > 0 %}sonata-ba-field-error{% endif %}">
+                            {{ form_widget(item) }}
+                            {% if item.vars.errors.count > 0 %}
+                                <div class="help-block sonata-ba-field-error-messages">
+                                    {{ form_errors(item) }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock cms_route_params_widget %}

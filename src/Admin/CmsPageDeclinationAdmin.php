@@ -17,6 +17,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
+use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
@@ -40,8 +41,8 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
     public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $pageConfig, $globalVarsDefinition)
     {
-        $this->em         = $em;
-        $this->pageConfig = $pageConfig;
+        $this->em               = $em;
+        $this->pageConfig       = $pageConfig;
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
 
 
@@ -75,10 +76,14 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $formMapper): void
     {
         $roleAdmin = $this->canManageContent();
-        $this->setFormTheme(array_merge($this->getFormTheme(), ['@WebEtDesignCms/form/cms_global_vars_type.html.twig']));
+        $this->setFormTheme(array_merge($this->getFormTheme(), [
+            '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
+            '@WebEtDesignCms/form/cms_route_params.html.twig',
+        ]));
 
         /** @var CmsPageDeclination $object */
         $object = $this->getSubject();
+        $route  = $object->getPage()->getRoute();
         $config = $this->pageConfig[$object->getPage()->getTemplate()];
 
         //region Général
@@ -89,22 +94,11 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         $formMapper
             ->add('title', null, ['label' => 'Title']);
 
-        $keys = [];
-        foreach ($object->getPage()->getRoute()->getParams() as $name) {
-            $param  = $config['params'][$name] ?? null;
-            $type   = !empty($param['entity']) ? EntityType::class : TextType::class;
-            $opts   = !empty($param['entity']) ? [
-                'class'        => $param['entity'],
-                'choice_value' => function ($entity = null) use ($param) {
-                    $getter = 'get' . ucfirst($param['property']);
-                    return $entity ? $entity->$getter() : '';
-                },
-            ] : [];
-            $keys[] = [$name, $type, $opts];
-        }
-        $formMapper->add('params', ImmutableArrayType::class, [
-            'keys'  => $keys,
-            'label' => false
+        $formMapper->add('params', CmsRouteParamsType::class, [
+            'config' => $config,
+            'route'  => $route,
+            'object' => $object,
+            'label'  => 'Paramtre de l\'url de la page : ' . $route->getPath() . ' '
         ]);
 
         $formMapper->getFormBuilder()->get('params')->addModelTransformer(new CallbackTransformer(

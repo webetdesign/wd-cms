@@ -33,6 +33,12 @@ services:
     tags:
       - { name: form.type }
 
+  WebEtDesign\CmsBundle\Form\CmsRouteParamsType:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+    tags:
+      - { name: form.type }
+
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
