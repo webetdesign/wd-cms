@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method CmsContent|null find($id, $lockMode = null, $lockVersion = null)
@@ -119,6 +120,36 @@ class CmsContentRepository extends ServiceEntityRepository
         }
 
         return false;
+    }
+
+    public function findByParentInOutCodes($parent, $codes, $criteria = 'IN')
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        if($parent instanceof CmsPage) {
+            $qb->andWhere('c.page = :page')
+                ->setParameter('page', $parent);
+        }
+
+        if($parent instanceof CmsPageDeclination) {
+            $qb->andWhere('c.declination = :declination')
+                ->setParameter('declination', $parent);
+        }
+
+        if($parent instanceof CmsSharedBlock) {
+            $qb->andWhere('c.sharedBlock = :sharedBlock')
+                ->setParameter('sharedBlock', $parent);
+        }
+
+        if ($criteria === 'IN') {
+            $qb->andWhere($qb->expr()->in('c.code', $codes));
+        }
+
+        if ($criteria === 'OUT') {
+            $qb->andWhere($qb->expr()->notIn('c.code', $codes));
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     // /**

@@ -83,6 +83,14 @@ services:
     tags:
       - { name: 'console.command', command: 'cms:gen-contents-position' }
 
+  WebEtDesign\CmsBundle\Command\CmsResetContentCommand:
+    arguments:
+      - ~
+      - '@doctrine.orm.default_entity_manager'
+      - '@cms.page_provider'
+    tags:
+      - { name: 'console.command', command: 'cms:reset-content' }
+
 
   # ===============================================
   # LISTENER
