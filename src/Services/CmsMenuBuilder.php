@@ -150,7 +150,7 @@ class CmsMenuBuilder
                         }
                         break;
                     case CmsMenuLinkTypeEnum::ROUTENAME:
-                        if (!empty($child->getLinkValue())) {
+                        if (!empty($child->getLinkValue() && (null === $this->router->getRouteCollection()->get($child->getLinkValue())) ? false : true)) {
                             $childItem->setUri($this->router->generate($child->getLinkValue()));
                         }
                         break;

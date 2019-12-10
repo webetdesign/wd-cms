@@ -102,6 +102,7 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'], ['is_safe' => ['html']]),
             new TwigFunction('cms_render_seo_smo_value', [$this, 'renderSeoSmo']),
             new TwigFunction('cms_breadcrumb', [$this, 'breadcrumb']),
+            new TwigFunction('route_exist', [$this, 'routeExist']),
         ];
     }
 
@@ -381,4 +382,10 @@ class CmsTwigExtension extends AbstractExtension
 
         return array_reverse($items);
     }
+
+    public function routeExist($path)
+    {
+        return (null === $this->router->getRouteCollection()->get($path)) ? false : true;
+    }
+
 }
