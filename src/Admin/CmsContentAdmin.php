@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Sonata\CoreBundle\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
@@ -38,8 +39,7 @@ final class CmsContentAdmin extends AbstractAdmin
         $contentTypeOption,
         string $media_class,
         Container $container
-    )
-    {
+    ) {
         $this->em             = $em;
         $this->customContents = $contentTypeOption;
         $this->media_class    = $media_class;
@@ -251,6 +251,20 @@ final class CmsContentAdmin extends AbstractAdmin
                         'label' => 'Héritage',
                     ]);
                     $this->addHelp($formMapper, $subject, 'parent_heritance');
+                    break;
+                case CmsContentTypeEnum::CHECKBOX:
+                    $formMapper->add('value', CheckboxType::class, ['required' => false, 'label' => false]);
+
+                    $formMapper->getFormBuilder()->get('value')->addModelTransformer(new CallbackTransformer(
+                        function ($value) {
+                            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                        },
+                        function ($value) {
+                            return $value;
+                        }
+                    ));
+
+                    $this->addHelp($formMapper, $subject, 'value');
                     break;
             }
 

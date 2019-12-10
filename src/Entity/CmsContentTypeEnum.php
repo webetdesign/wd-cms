@@ -20,6 +20,7 @@ class CmsContentTypeEnum
     const HIGHLIGHT               = 'HIGHLIGHT';
     const SHARED_BLOCK            = 'SHARED_BLOCK';
     const SHARED_BLOCK_COLLECTION = 'SHARED_BLOCK_COLLECTION';
+    const CHECKBOX                = "CHECKBOX";
 
     /** @var array user friendly named type */
     protected static $typeName = [
@@ -32,10 +33,11 @@ class CmsContentTypeEnum
         self::HIGHLIGHT               => 'Highlight',
         self::SHARED_BLOCK            => 'Shared block',
         self::SHARED_BLOCK_COLLECTION => 'Shared block list',
+        self::CHECKBOX                => 'CheckBox',
     ];
 
     /**
-     * @param  string $typeShortName
+     * @param string $typeShortName
      * @return string
      */
     public static function getName($typeShortName)
@@ -62,6 +64,7 @@ class CmsContentTypeEnum
             self::HIGHLIGHT,
             self::SHARED_BLOCK,
             self::SHARED_BLOCK_COLLECTION,
+            self::CHECKBOX,
         ];
     }
 
