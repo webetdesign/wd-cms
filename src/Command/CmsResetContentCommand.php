@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
@@ -142,17 +143,32 @@ class CmsResetContentCommand extends Command
             $config = $this->pageProvider->getConfigurationFor($page->getTemplate());
         } catch (Exception $e) {
             $this->io->error($e->getMessage());
-            return 0;
+            return false;
         }
 
+        $this->processContent($page, $config);
+
+        if (count($page->getDeclinations()) > 0) {
+            /** @var CmsPageDeclination $declination */
+            foreach ($page->getDeclinations() as $declination) {
+                $this->io->title('Reset declination ' . $declination->getTitle());
+                $this->processContent($declination, $config);
+            }
+        }
+
+        return true;
+    }
+
+    public function processContent($object, $config)
+    {
         $contentConf = [];
         foreach ($config['contents'] as $content) {
             $contentConf[$content['code']] = $content;
         }
         $codes = array_keys($contentConf);
 
-        $ins  = $this->contentRp->findByParentInOutCodes($page, $codes, 'IN');
-        $outs = $this->contentRp->findByParentInOutCodes($page, $codes, 'OUT');
+        $ins  = $this->contentRp->findByParentInOutCodes($object, $codes, 'IN');
+        $outs = $this->contentRp->findByParentInOutCodes($object, $codes, 'OUT');
 
         foreach ($outs as $out) {
             $this->em->remove($out);
@@ -185,7 +201,12 @@ class CmsResetContentCommand extends Command
             $content->setPosition(array_search($code, $codes));
             $content->setCode($code);
             $content->setType($conf['type']);
-            $content->setPage($page);
+            if ($object instanceof CmsPage) {
+                $content->setPage($object);
+            }
+            if ($object instanceof CmsPageDeclination) {
+                $content->setDeclination($object);
+            }
             if (isset($conf['label'])) {
                 $content->setLabel($conf['label']);
             }
@@ -197,5 +218,6 @@ class CmsResetContentCommand extends Command
         }
 
         $this->em->flush();
+        return true;
     }
 }

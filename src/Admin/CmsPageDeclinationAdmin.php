@@ -155,9 +155,9 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             'edit'   => 'inline',
             'inline' => 'table',
         ];
-        if ($roleAdmin) {
-            $contentOptions['sortable'] = 'position';
-        }
+//        if ($roleAdmin) {
+//            $contentOptions['sortable'] = 'position';
+//        }
         $formMapper
             ->with('', ['box_class' => ''])
             ->add(

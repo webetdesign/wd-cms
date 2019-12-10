@@ -122,9 +122,9 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
                 'edit'   => 'inline',
                 'inline' => 'table',
             ];
-            if ($roleAdmin) {
-                $contentOptions['sortable'] = 'position';
-            }
+//            if ($roleAdmin) {
+//                $contentOptions['sortable'] = 'position';
+//            }
             $formMapper
                 ->tab('Général')// The tab call is optional
                 ->with('', ['box_class' => ''])

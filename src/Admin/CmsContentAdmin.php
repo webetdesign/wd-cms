@@ -286,9 +286,9 @@ final class CmsContentAdmin extends AbstractAdmin
                 }
             }
         }
-        if ($roleAdmin) {
-            $formMapper->add('position');
-        }
+//        if ($roleAdmin) {
+//            $formMapper->add('position');
+//        }
     }
 
     protected function configureShowFields(ShowMapper $showMapper)
