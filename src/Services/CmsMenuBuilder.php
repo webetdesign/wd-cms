@@ -96,8 +96,9 @@ class CmsMenuBuilder
 
     public function buildNodes(ItemInterface $menu, $items, $parentActive, $activeClass)
     {
+
         /** @var User $user */
-        if ($this->storage->setToken() != null) {
+        if ($this->storage->getToken() != null) {
             $user = $this->storage->getToken()->getUser();
         } else {
             $user = null;
