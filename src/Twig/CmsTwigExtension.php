@@ -142,6 +142,7 @@ class CmsTwigExtension extends AbstractExtension
                     CmsContentTypeEnum::SHARED_BLOCK_COLLECTION,
                     CmsContentTypeEnum::MEDIA,
                     CmsContentTypeEnum::IMAGE,
+                    CmsContentTypeEnum::CHECKBOX,
                 ], array_keys($this->customContents))
             );
 
@@ -216,6 +217,10 @@ class CmsTwigExtension extends AbstractExtension
                 $result .= $this->renderSharedBlock($item->getSharedBlock());
             }
             return $result;
+        }
+
+        if ($content->getType() === CmsContentTypeEnum::CHECKBOX) {
+            return filter_var($content->getValue(), FILTER_VALIDATE_BOOLEAN);
         }
 
         return $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
