@@ -46,7 +46,8 @@ class CmsPage
      *
      * @var ArrayCollection|PersistentCollection
      *
-     * Mapping Relation in WebEtDesignCmsExtension.php
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="page", cascade={"persist", "remove"})
+     * @ORM\OrderBy({"position" = "ASC"})
      */
     private $contents;
 

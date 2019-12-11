@@ -121,17 +121,20 @@ class WebEtDesignCmsExtension extends Extension
 
     protected function addCmsPageMapping(DoctrineCollector $collector, $config)
     {
-        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
-            'fieldName'     => 'contents',
-            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
-            'cascade'       => [
-                "remove",
-                "persist"
-            ],
-            'mappedBy'      => 'page',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
+//        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
+//            'fieldName'     => 'contents',
+//            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+//            'cascade'       => [
+//                "remove",
+//                "persist"
+//            ],
+//            'mappedBy'      => 'page',
+//            'inversedBy'    => null,
+//            'orphanRemoval' => false,
+//            'orderBy'       => [
+//                "position" => "ASC"
+//            ]
+//        ]);
 
         $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
             'fieldName'     => 'declinations',

@@ -6,6 +6,7 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Exception;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -195,7 +196,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                 ])
                 ->add('connected', ChoiceType::class, [
                     'choices' => [
-                        'Tout le temps'                                 => '',
+                        'Tout le temps'                                  => '',
                         "uniquement si l'utilisateur est connecté"       => 'ONLY_LOGIN',
                         "uniquement si l'utilisateur n'est pas connecté" => 'ONLY_LOGOUT'
                     ],
@@ -231,41 +232,48 @@ final class CmsMenuItemAdmin extends AbstractAdmin
 
     protected function getRouteParamsField(FormMapper $formMapper, $subject, $route)
     {
-        $config = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
-        $formMapper->add('params', CmsRouteParamsType::class, [
-            'config' => $config,
-            'route'  => $route,
-            'object' => $subject,
-            'label'  => 'Paramtre de l\'url de la page : ' . $route->getPath() . ' '
-        ]);
-        $formMapper->getFormBuilder()->get('params')->addModelTransformer(new CallbackTransformer(
-            function ($values) use ($config) {
-                if ($values != null) {
-                    $values = json_decode($values, true);
+        try {
+            $config = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
+        } catch (Exception $e) {
+            $config = null;
+        }
+
+        if ($config) {
+            $formMapper->add('params', CmsRouteParamsType::class, [
+                'config' => $config,
+                'route'  => $route,
+                'object' => $subject,
+                'label'  => 'Paramtre de l\'url de la page : ' . $route->getPath() . ' '
+            ]);
+            $formMapper->getFormBuilder()->get('params')->addModelTransformer(new CallbackTransformer(
+                function ($values) use ($config) {
+                    if ($values != null) {
+                        $values = json_decode($values, true);
+                        foreach ($values as $name => $value) {
+                            $param = $config['params'][$name] ?? null;
+                            if ($param && isset($param['entity']) && isset($param['property'])) {
+                                $object        = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
+                                $values[$name] = $object;
+                            }
+                        }
+                    }
+
+                    return $values;
+                },
+                function ($values) use ($config) {
                     foreach ($values as $name => $value) {
                         $param = $config['params'][$name] ?? null;
-                        if ($param) {
-                            $object        = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
-                            $values[$name] = $object;
+                        if ($param && isset($param['property'])) {
+                            $getter = 'get' . ucfirst($param['property']);
+                            if (method_exists($value, $getter)) {
+                                $values[$name] = $value->$getter();
+                            }
                         }
                     }
-                }
 
-                return $values;
-            },
-            function ($values) use ($config) {
-                foreach ($values as $name => $value) {
-                    $param = $config['params'][$name] ?? null;
-                    if ($param) {
-                        $getter = 'get' . ucfirst($param['property']);
-                        if (method_exists($value, $getter)) {
-                            $values[$name] = $value->$getter();
-                        }
-                    }
+                    return json_encode($values);
                 }
-
-                return json_encode($values);
-            }
-        ));
+            ));
+        }
     }
 }

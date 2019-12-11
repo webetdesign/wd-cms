@@ -187,10 +187,12 @@ class CmsResetContentCommand extends Command
             if (isset($conf['help'])) {
                 $in->setHelp($conf['help']);
             }
+
             if ($in->getType() !== $conf['type']) {
                 $in->setValue(null);
                 $in->setMedia(null);
                 $in->setSharedBlockList(null);
+                $in->setType($conf['type']);
             }
             $this->em->persist($in);
         }

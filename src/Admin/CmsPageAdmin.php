@@ -26,7 +26,7 @@ use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\CoreBundle\Form\Type\CollectionType;
+use Sonata\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
@@ -282,7 +282,7 @@ class CmsPageAdmin extends AbstractAdmin
                 ->with('', ['box_class' => ''])
                 ->add(
                     'contents',
-                    CollectionType::class,
+                    \Sonata\Form\Type\CollectionType::class,
                     [
                         'label'        => false,
                         'by_reference' => false,
