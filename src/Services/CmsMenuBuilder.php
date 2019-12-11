@@ -4,6 +4,8 @@ namespace WebEtDesign\CmsBundle\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\User;
+use HttpInvalidParamException;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -139,7 +141,9 @@ class CmsMenuBuilder
                             if ($route) {
                                 if ($route->isDynamic()) {
                                     $params   = json_decode($child->getParams(), true) ?: [];
-                                    $childItem->setUri($this->router->generate($route->getName(), $params));
+                                    try {
+                                        $childItem->setUri($this->router->generate($route->getName(), $params));
+                                    } catch (InvalidParameterException $exception) {}
                                 } else {
                                     $childItem->setUri($this->router->generate($route->getName()));
                                 }
