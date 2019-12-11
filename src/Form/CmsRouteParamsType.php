@@ -7,9 +7,11 @@ namespace WebEtDesign\CmsBundle\Form;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 
@@ -60,7 +62,7 @@ class CmsRouteParamsType extends AbstractType
 
             if (isset($defaults[$name])) {
                 if (empty($param['entity'])) {
-                    $opts['empty_data'] = $defaults[$name];
+                    $opts['empty_data']          = $defaults[$name];
                     $opts['attr']['placeholder'] = $defaults[$name];
                 } else {
                     $opts['choice_attr'] = function ($choice, $key, $value) use ($defaults, $name) {
@@ -79,10 +81,46 @@ class CmsRouteParamsType extends AbstractType
                         'match'   => true,
                     ])
                 ];
+
+                if (!preg_match('/' . $requirements[$name] . '/', '')) {
+                    $opts['constraints'] = [
+                        new NotBlank()
+                    ];
+                }
             }
 
             $builder->add($name, $type, $opts);
         }
+
+        $builder->addModelTransformer(new CallbackTransformer(
+            function ($values) use ($config) {
+                if ($values != null) {
+                    $values = json_decode($values, true);
+                    foreach ($values as $name => $value) {
+                        $param = $config['params'][$name] ?? null;
+                        if ($param && isset($param['entity']) && isset($param['property'])) {
+                            $object        = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
+                            $values[$name] = $object;
+                        }
+                    }
+                }
+
+                return $values;
+            },
+            function ($values) use ($config) {
+                foreach ($values as $name => $value) {
+                    $param = $config['params'][$name] ?? null;
+                    if ($param && isset($param['property'])) {
+                        $getter = 'get' . ucfirst($param['property']);
+                        if (method_exists($value, $getter)) {
+                            $values[$name] = $value->$getter();
+                        }
+                    }
+                }
+
+                return json_encode($values);
+            }
+        ));
     }
 
     /**

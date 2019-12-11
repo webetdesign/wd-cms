@@ -138,12 +138,8 @@ class CmsMenuBuilder
                             $route = $child->getPage()->getRoute();
                             if ($route) {
                                 if ($route->isDynamic()) {
-                                    $params   = json_decode($child->getParams(), true);
-                                    $pagePath = $route->getPath();
-                                    $path     = preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($params) {
-                                        return $params[$matches[1]];
-                                    }, $pagePath);
-                                    $childItem->setUri($path);
+                                    $params   = json_decode($child->getParams(), true) ?: [];
+                                    $childItem->setUri($this->router->generate($route->getName(), $params));
                                 } else {
                                     $childItem->setUri($this->router->generate($route->getName()));
                                 }
