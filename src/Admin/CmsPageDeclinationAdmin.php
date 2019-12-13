@@ -83,6 +83,9 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         /** @var CmsPageDeclination $object */
         $object = $this->getSubject();
+        if (!$object) { //For Batch action delete
+            return;
+        }
         $route  = $object->getPage()->getRoute();
         $config = $this->pageConfig[$object->getPage()->getTemplate()];
 
@@ -100,32 +103,6 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             'object' => $object,
             'label'  => 'Paramtre de l\'url de la page : ' . $route->getPath() . ' '
         ]);
-
-        $formMapper->getFormBuilder()->get('params')->addModelTransformer(new CallbackTransformer(
-            function ($values) use ($config) {
-                if ($values != null) {
-                    $values = json_decode($values, true);
-                    foreach ($values as $name => $value) {
-                        $param = $config['params'][$name] ?? null;
-                        if ($param) {
-                            $object        = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
-                            $values[$name] = $object;
-                        }
-                    }
-                }
-                return $values;
-            },
-            function ($values) use ($config) {
-                foreach ($values as $name => $value) {
-                    $param = $config['params'][$name] ?? null;
-                    if ($param) {
-                        $getter        = 'get' . ucfirst($param['property']);
-                        $values[$name] = $value->$getter();
-                    }
-                }
-                return json_encode($values);
-            }
-        ));
 
         $formMapper
             ->end()// End form group

@@ -117,7 +117,7 @@ services:
     arguments:
       - '@doctrine.orm.entity_manager'
     tags:
-      - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: prePersist }
+      - { name: doctrine.event_listener, event: prePersist }
 
   cms.admin.cms_site_listener:
     class: '%cms.admin.cms_site_listener.class%'

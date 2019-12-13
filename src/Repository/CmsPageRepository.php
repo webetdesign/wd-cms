@@ -46,8 +46,7 @@ class CmsPageRepository extends NestedTreeRepository
             ->leftJoin('p.declinations', 'd')
             ->addSelect('r', 's', 'd')
             ->where('r.name = :name')
-            ->setParameter('name', $name)
-            ->setMaxResults(1);
+            ->setParameter('name', $name);
 
 
         return $qb->getQuery()->getOneOrNullResult();
