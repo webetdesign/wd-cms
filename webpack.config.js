@@ -1,11 +1,12 @@
-const ExtractTextWebpackPlugin = require("extract-text-webpack-plugin");
+const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 const webpack = require('webpack');
-const path = require('path')
+const path = require('path');
+require('dotenv').load();
 const ENV = process.env.APP_ENV;
-const isTest = ENV === 'test'
+const isTest = ENV === 'test';
 const isProd = ENV === 'prod';
 
-function setDevTool () {
+function setDevTool() {
   if (isTest) {
     return 'inline-source-map';
   } else if (isProd) {
@@ -28,21 +29,21 @@ const config = {
         test: /\.js$/,
         use: 'babel-loader',
         exclude: [
-          /node_modules/
-        ]
+          /node_modules/,
+        ],
       },
       {
         test: /\.(sass|scss)$/,
         use: ExtractTextWebpackPlugin.extract({
           fallback: 'style-loader',
           use: ['css-loader', 'sass-loader'],
-        })
-      }
-    ]
+        }),
+      },
+    ],
   },
   plugins: [
-    new ExtractTextWebpackPlugin("cms_admin.css")
-  ]
+    new ExtractTextWebpackPlugin('cms_admin.css'),
+  ],
 };
 
 module.exports = config;

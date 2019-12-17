@@ -1,30 +1,22 @@
-require('../sass/app.scss')
-import $ from "jquery"
-import "./cms_route_params"
-import "./menu_admin"
-import "./tree"
+require('../sass/app.scss');
 
-import './analytics/analytics.js';
+import $ from 'jquery';
+import 'moment/moment';
 
-import 'moment/moment'
+import './cms_route_params';
+import './menu_admin';
+import './tree';
 
-
-//commenter car pete le style de l'admin
-// import '../sass/analytics/index.scss';
-import '../sass/analytics/admin.scss';
-
-
-
-$(document).ready(function () {
-// show active tab on reload
-//   if (location.hash !== '' && location.hash.substring(1, 5) == 'tab_') {
-//     var currentTabNumber = location.hash.substring(5);
-//     var adminUniqid = '{{ admin.uniqid }}';
-//
-//     $('a[href="#tab_' + adminUniqid + '_' + currentTabNumber + '"]').tab('show');
-//   }
-//
-  function modifyURLQuery (url, param) {
+$(document).ready(function() {
+  // show active tab on reload
+  //   if (location.hash !== '' && location.hash.substring(1, 5) == 'tab_') {
+  //     var currentTabNumber = location.hash.substring(5);
+  //     var adminUniqid = '{{ admin.uniqid }}';
+  //
+  //     $('a[href="#tab_' + adminUniqid + '_' + currentTabNumber + '"]').tab('show');
+  //   }
+  //
+  function modifyURLQuery(url, param) {
     var value = {};
 
     var query = String(url).split('?');
@@ -58,29 +50,35 @@ $(document).ready(function () {
     }
   }
 
-  $('a[data-toggle="tab"]').on('click', function (e) {
+  $('a[data-toggle="tab"]').on('click', function(e) {
     var tabName = $(e.target).attr('href').substring(1);
 
-    var form = $('form:not([class])')
-    var action = modifyURLQuery(form.attr('action'), {_tab: tabName})
-    form.attr('action', action)
+    var form = $('form:not([class])');
+    var action = modifyURLQuery(form.attr('action'), { _tab: tabName });
+    form.attr('action', action);
 
   });
 
-  function getParameterByName (name, url) {
-    if (!url) url = window.location.href;
+  function getParameterByName(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
     name = name.replace(/[\[\]]/g, '\\$&');
     var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
       results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
+    if (!results) {
+      return null;
+    }
+    if (!results[2]) {
+      return '';
+    }
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
   }
 
-  var tabName = getParameterByName('_tab', location.href)
+  var tabName = getParameterByName('_tab', location.href);
   if (tabName) {
-    var form = $('form:not([class])')
-    var action = modifyURLQuery(form.attr('action'), {_tab: tabName})
-    form.attr('action', action)
+    var form = $('form:not([class])');
+    var action = modifyURLQuery(form.attr('action'), { _tab: tabName });
+    form.attr('action', action);
   }
 });

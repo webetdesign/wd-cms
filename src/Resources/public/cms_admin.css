@@ -185,9 +185,6 @@
   text-align: left;
   padding-left: 0; }
 
-.cms-menu-item__btn-hide_child.minimalized {
-  transform: rotate(180deg); }
-
 .cmsMenuAdmin .box {
   overflow: hidden; }
 
@@ -201,7 +198,7 @@
   background: none;
   color: inherit;
   border: none;
-  padding: 0px;
+  padding: 0;
   font: inherit;
   cursor: pointer;
   outline: inherit;
@@ -224,7 +221,7 @@
 .cmsMenuAdmin li {
   line-height: 2em;
   position: relative;
-  padding: 0px 0px 0px 15px; }
+  padding: 0 0 0 15px; }
   .cmsMenuAdmin li > div {
     display: flex;
     justify-content: space-between;
@@ -233,7 +230,7 @@
       background: none;
       color: inherit;
       border: none;
-      padding: 0px;
+      padding: 0;
       font: inherit;
       cursor: pointer;
       outline: inherit;
@@ -274,6 +271,8 @@
     .cms-menu-item__drop-item-ondrag {
       height: 40px;
       background-color: #dedede; }
+  .cms-menu-item__btn-hide_child.minimalized {
+    transform: rotate(180deg); }
 
 .spinbox {
   height: 120px; }
@@ -302,6 +301,7 @@
 
 .logo img {
   max-width: 100%; }
+
 .shadow-sm {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important; }
 
@@ -345,3 +345,5 @@
 .ml-auto,
 .mx-auto {
   margin-left: auto !important; }
+
+/*# sourceMappingURL=cms_admin.css.map*/
