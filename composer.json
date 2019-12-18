@@ -47,7 +47,6 @@
         "twig/twig": "^1.34 || ^2.0"
     },
     "require-dev": {
-        "symfony/class-loader": "^4.0",
         "symfony/filesystem": "^4.0",
         "symfony/phpunit-bridge": "^4.0",
         "symfony/yaml": "^4.0"
