@@ -131,10 +131,20 @@ services:
       - { name: doctrine.event_listener, event: postPersist }
       - { name: doctrine.event_listener, event: postUpdate }
 
+  cms.admin.cms_route_listener:
+    class: WebEtDesign\CmsBundle\EventListener\RouteAdminListener
+    arguments:
+      - '@router'
+      - '@filesystem'
+      - '@kernel'
+    tags:
+      - { name: doctrine.event_listener, event: postUpdate }
+
   cms.admin.cms_menu_listener:
     class: 'WebEtDesign\CmsBundle\EventListener\MenuAdminListener'
     tags:
       - { name: doctrine.event_listener, event: postPersist }
+
 
 
   cms.admin.cms_shared_block_listener:
