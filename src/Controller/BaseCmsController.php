@@ -71,9 +71,9 @@ class BaseCmsController extends AbstractController
         }
 
         $extension = $this->getExtension();
-        $template  = $extension && $extension !== 'html' ? $extension . '/' . $page->getTemplate() : $page->getTemplate();
+        $rootDir   = $extension && $extension !== 'html' ? $extension . '/' : '';
 
-        return $this->render($this->provider->getTemplate($template), array_merge($params, $baseParams));
+        return $this->render($rootDir . $this->provider->getTemplate($page->getTemplate()), array_merge($params, $baseParams));
     }
 
     /**
@@ -107,7 +107,7 @@ class BaseCmsController extends AbstractController
         $request      = $requestStack->getCurrentRequest();
         $path         = $request->getRequestUri();
 
-        preg_match('\.([a-z]+)[$|?]', $path, $extension);
+        preg_match('/\.([a-z]+)[$|?]/', $path, $extension);
 
         return isset($extension[1]) ? $extension[1] : null;
     }
