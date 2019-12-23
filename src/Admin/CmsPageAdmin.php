@@ -4,18 +4,15 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
+use Sonata\Form\Type\CollectionType;
 use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\MoveForm;
@@ -26,7 +23,6 @@ use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
@@ -269,6 +265,7 @@ class CmsPageAdmin extends AbstractAdmin
                 ->add('seo_title')
                 ->add('seo_description')
                 ->add('seo_keywords')
+                ->add('seo_breadcrumb')
                 ->end();
             $this->addFormFieldSmoFacebook($formMapper);
             $this->addFormFieldSmoTwitter($formMapper);
@@ -282,7 +279,7 @@ class CmsPageAdmin extends AbstractAdmin
                 ->with('', ['box_class' => ''])
                 ->add(
                     'contents',
-                    \Sonata\Form\Type\CollectionType::class,
+                    CollectionType::class,
                     [
                         'label'        => false,
                         'by_reference' => false,

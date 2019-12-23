@@ -397,28 +397,6 @@ services:
     public: true
 
   # ===============================================
-  # DASHBOARD BLOCKS
-  # ===============================================
-
-  cms.admin.analytics:
-    class: WebEtDesign\CmsBundle\Block\Analytics\Base
-    arguments:
-      - ~
-      - '@templating'
-
-    tags:
-      - { name: sonata.block }
-
-  cms.admin.mailJet:
-    class: WebEtDesign\CmsBundle\Block\MailJet\Base
-    arguments:
-      - ~
-      - '@templating'
-
-    tags:
-      - { name: sonata.block }
-
-  # ===============================================
   # CMS CUSTOM CONTENTS
   # ===============================================
 

@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
@@ -25,7 +26,7 @@ class BaseCmsController extends AbstractController
 
     /** @var AbstractCmsGlobalVars */
     private $globalVars;
-    
+
     private $cmsConfig;
 
     public function setVarsObject(GlobalVarsInterface $object)
@@ -59,25 +60,32 @@ class BaseCmsController extends AbstractController
         $this->provider = $provider;
     }
 
-
     protected function defaultRender(array $params)
     {
         /** @var CmsPage $page */
-        $page = $this->getPage();
+        $page       = $this->getPage();
         $baseParams = ['page' => $page];
-      
+
         if ($this->getCmsConfig()['declination']) {
             $baseParams['declination'] = $this->getDeclination($page);
         }
 
-        return $this->render($this->provider->getTemplate($page->getTemplate()), array_merge($params, $baseParams));
+        $extension = $this->getExtension();
+        $template  = $extension && $extension !== 'html' ? $extension . '/' . $page->getTemplate() : $page->getTemplate();
+
+        return $this->render($this->provider->getTemplate($template), array_merge($params, $baseParams));
     }
 
+    /**
+     * @param CmsPage $page
+     * @return CmsPageDeclination|null
+     */
     private function getDeclination($page)
     {
+        /** @var RequestStack $requestStack */
         $requestStack = $this->get('request_stack');
-        $request = $requestStack->getCurrentRequest();
-        $path = $request->getRequestUri();
+        $request      = $requestStack->getCurrentRequest();
+        $path         = $request->getRequestUri();
 
         /** @var CmsPageDeclination $declination */
         foreach ($page->getDeclinations() as $declination) {
@@ -85,7 +93,23 @@ class BaseCmsController extends AbstractController
                 return $declination;
             }
         }
+
         return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getExtension()
+    {
+        /** @var RequestStack $requestStack */
+        $requestStack = $this->get('request_stack');
+        $request      = $requestStack->getCurrentRequest();
+        $path         = $request->getRequestUri();
+
+        preg_match('\.([a-z]+)[$|?]', $path, $extension);
+
+        return isset($extension[1]) ? $extension[1] : null;
     }
 
     /**
@@ -103,6 +127,7 @@ class BaseCmsController extends AbstractController
     public function setGranted(bool $granted): BaseCmsController
     {
         $this->granted = $granted;
+
         return $this;
     }
 
@@ -113,6 +138,7 @@ class BaseCmsController extends AbstractController
     public function setPage(?CmsPage $page): BaseCmsController
     {
         $this->page = $page;
+
         return $this;
     }
 
@@ -126,11 +152,12 @@ class BaseCmsController extends AbstractController
 
     /**
      * @param mixed $locale
-     * @return CmsController
+     * @return self
      */
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -157,6 +184,7 @@ class BaseCmsController extends AbstractController
     public function setCmsConfig($cmsConfig)
     {
         $this->cmsConfig = $cmsConfig;
+
         return $this;
     }
 }
