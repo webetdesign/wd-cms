@@ -79,7 +79,7 @@ class ExtraLoader implements LoaderInterface
                 }
             }
 
-            if ($this->parameterBag->get('wd_cms.cms.extension')) {
+            if ($this->parameterBag->get('wd_cms.cms.page_extension')) {
                 if ($pattern !== '/' && strpos($pattern, '.{extension}') === false) {
                     $pattern               .= '.{extension}';
                     $defaults['extension'] = '';
