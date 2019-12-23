@@ -107,7 +107,7 @@ class BaseCmsController extends AbstractController
         $request      = $requestStack->getCurrentRequest();
         $path         = $request->getRequestUri();
 
-        preg_match('/\.([a-z]+)[$|?]/', $path, $extension);
+        preg_match('/\.([a-z]+)($|\?)/', $path, $extension);
 
         return isset($extension[1]) ? $extension[1] : null;
     }

@@ -48,6 +48,7 @@ class WebEtDesignCmsExtension extends Extension
         $container->setParameter('wd_cms.cms.multisite', $config['cms']['multilingual'] || $config['cms']['multisite'] ? true : false);
         $container->setParameter('wd_cms.cms.multilingual', $config['cms']['multilingual']);
         $container->setParameter('wd_cms.cms.declination', $config['cms']['declination']);
+        $container->setParameter('wd_cms.cms.page_extension', $config['cms']['page_extension']);
         $container->setParameter('wd_cms.templates', $config['pages']);
         $container->setParameter('wd_cms.shared_block', $config['sharedBlock']);
         $container->setParameter('wd_cms.custom_contents', $config['customContents']);

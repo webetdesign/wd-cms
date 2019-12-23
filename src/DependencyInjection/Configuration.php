@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('multisite')->defaultValue(false)->end()
                         ->scalarNode('multilingual')->defaultValue(false)->end()
                         ->scalarNode('declination')->defaultValue(false)->end()
+                        ->scalarNode('page_extension')->defaultValue(false)->end()
                         ->scalarNode('menuByPage')->defaultValue(false)->end()
                         ->arrayNode('vars')->addDefaultsIfNotSet()
                             ->children()

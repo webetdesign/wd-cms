@@ -4,13 +4,13 @@ namespace WebEtDesign\CmsBundle\Routing;
 
 use Exception;
 use PDOException;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 class ExtraLoader implements LoaderInterface
 {
@@ -18,15 +18,18 @@ class ExtraLoader implements LoaderInterface
 
     protected $em = null;
 
+    protected $parameterBag = null;
+
     /**
      * ExtraLoader constructor.
      * @param EntityManager $entityManager
+     * @param ContainerBagInterface $parameterBag
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, ContainerBagInterface $parameterBag)
     {
-        $this->em = $entityManager;
+        $this->em           = $entityManager;
+        $this->parameterBag = $parameterBag;
     }
-
 
     public function load($resource, $type = null)
     {
@@ -62,9 +65,11 @@ class ExtraLoader implements LoaderInterface
                 '_controller' => !$cmsRoute->getPage()->isActive() ? 'WebEtDesign\CmsBundle\Controller\CmsController::pageDisabled' :
                     $cmsRoute->getController() ?? 'WebEtDesign\CmsBundle\Controller\CmsController::index',
             ];
+
             if ($cmsRoute->getDefaults()) {
                 $defaults = array_merge($defaults, json_decode($cmsRoute->getDefaults(), true));
             }
+
             if ($cmsRoute->getRequirements()) {
                 $requirements = json_decode($cmsRoute->getRequirements(), true);
                 foreach ($requirements as $key => $requirement) {
@@ -73,6 +78,14 @@ class ExtraLoader implements LoaderInterface
                     }
                 }
             }
+
+            if ($this->parameterBag->get('wd_cms.cms.extension')) {
+                if ($pattern !== '/' && strpos($pattern, '.{extension}') === false) {
+                    $pattern               .= '.{extension}';
+                    $defaults['extension'] = '';
+                }
+            }
+
             $route = new Route($pattern, $defaults, $requirements ?? []);
             if (!empty($host)) {
                 $route->setHost($host);
