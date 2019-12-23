@@ -42,7 +42,7 @@ services:
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
-    arguments: ['@doctrine.orm.entity_manager']
+    arguments: ['@doctrine.orm.entity_manager', '@parameter_bag']
     tags:
       - { name: routing.loader }
 
