@@ -86,6 +86,10 @@ class BaseCmsController extends AbstractController
         $requestStack = $this->get('request_stack');
         $request      = $requestStack->getCurrentRequest();
         $path         = $request->getRequestUri();
+        $path         = preg_replace('(\?.*)', '', $path);
+        if ($this->getCmsConfig()['page_extension']) {
+            $path = preg_replace('/\.([a-z]+)$/', '', $path);
+        }
 
         /** @var CmsPageDeclination $declination */
         foreach ($page->getDeclinations() as $declination) {

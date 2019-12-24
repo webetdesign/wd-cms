@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Twig;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
@@ -32,6 +33,7 @@ class CmsTwigExtension extends AbstractExtension
     protected $globalVars;
     protected $globalVarsEnable;
     protected $pageProvider;
+    protected $pageExtension;
     private   $sharedBlockProvider;
     private   $twig;
     private   $container;
@@ -48,24 +50,26 @@ class CmsTwigExtension extends AbstractExtension
     public function __construct(
         EntityManagerInterface $entityManager,
         RouterInterface $router,
-        $customContents,
         Container $container,
         Environment $twig,
         TemplateProvider $pageProvider,
         TemplateProvider $templateProvider,
         RequestStack $requestStack,
-        $declination,
-        $globalVarsDefinition
-    ) {
+        ParameterBagInterface $parameterBag
+    )
+    {
         $this->em                  = $entityManager;
         $this->router              = $router;
-        $this->customContents      = $customContents;
         $this->container           = $container;
         $this->twig                = $twig;
         $this->pageProvider        = $pageProvider;
         $this->sharedBlockProvider = $templateProvider;
         $this->requestStack        = $requestStack;
-        $this->declination         = $declination;
+
+        $this->pageExtension  = $parameterBag->get('wd_cms.cms.page_extension');
+        $this->declination    = $parameterBag->get('wd_cms.cms.declination');
+        $this->customContents = $parameterBag->get('wd_cms.custom_contents');
+        $globalVarsDefinition = $parameterBag->get('wd_cms.vars');
 
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
         if ($globalVarsDefinition['enable']) {
@@ -79,7 +83,6 @@ class CmsTwigExtension extends AbstractExtension
             new TwigTest('instanceOf', [$this, 'isInstanceOf'])
         ];
     }
-
 
     public function getFilters(): array
     {
@@ -113,8 +116,10 @@ class CmsTwigExtension extends AbstractExtension
 
     private function getDeclination($page)
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $path    = $request->getRequestUri();
+        $request          = $this->requestStack->getCurrentRequest();
+        $path             = $request->getRequestUri();
+        $path             = preg_replace('(\?.*)', '', $path);
+        $withoutExtension = $this->pageExtension ? preg_replace('/\.([a-z]+)$/', '', $path) : false;
 
         /** @var CmsPageDeclination $declination */
         foreach ($page->getDeclinations() as $declination) {
@@ -198,6 +203,7 @@ class CmsTwigExtension extends AbstractExtension
 
         if (in_array($content->getType(), array_keys($this->customContents))) {
             $contentService = $this->container->get($this->customContents[$content->getType()]['service']);
+
             return $contentService->render($content);
         }
 
@@ -216,6 +222,7 @@ class CmsTwigExtension extends AbstractExtension
             foreach ($content->getSharedBlockList() as $item) {
                 $result .= $this->renderSharedBlock($item->getSharedBlock());
             }
+
             return $result;
         }
 
@@ -355,6 +362,7 @@ class CmsTwigExtension extends AbstractExtension
         if (empty($value) && $object->getParent() !== null) {
             return $this->getSeoSmoValueFallbackParentPage($object->getParent(), $method);
         }
+
         return $value;
     }
 
@@ -379,7 +387,6 @@ class CmsTwigExtension extends AbstractExtension
                     'title' => $page->getTitle(),
                     'link'  => $this->router->generate($page->getRoute()->getName())
                 ];
-
             }
             /** @var CmsPage $page */
             $page = $page->getParent();

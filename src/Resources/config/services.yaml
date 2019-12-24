@@ -179,14 +179,12 @@ services:
     arguments:
       - '@doctrine.orm.entity_manager'
       - '@router'
-      - '%wd_cms.custom_contents%'
       - '@service_container'
       - '@twig'
       - '@cms.page_provider'
       - '@cms.block_provider'
       - '@request_stack'
-      - '%wd_cms.cms.declination%'
-      - '%wd_cms.vars%'
+      - '@parameter_bag'
     tags:
       - { name: twig.extension }
     public: true
