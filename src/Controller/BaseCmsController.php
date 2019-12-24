@@ -83,17 +83,15 @@ class BaseCmsController extends AbstractController
     private function getDeclination($page)
     {
         /** @var RequestStack $requestStack */
-        $requestStack = $this->get('request_stack');
-        $request      = $requestStack->getCurrentRequest();
-        $path         = $request->getRequestUri();
-        $path         = preg_replace('(\?.*)', '', $path);
-        if ($this->getCmsConfig()['page_extension']) {
-            $path = preg_replace('/\.([a-z]+)$/', '', $path);
-        }
+        $requestStack     = $this->get('request_stack');
+        $request          = $requestStack->getCurrentRequest();
+        $path             = $request->getRequestUri();
+        $path             = preg_replace('(\?.*)', '', $path);
+        $withoutExtension = $this->getCmsConfig()['page_extension'] ? preg_replace('/\.([a-z]+)$/', '', $path) : false;
 
         /** @var CmsPageDeclination $declination */
         foreach ($page->getDeclinations() as $declination) {
-            if ($declination->getPath() == $path) {
+            if ($declination->getPath() == $path || $declination->getPath() === $withoutExtension) {
                 return $declination;
             }
         }
