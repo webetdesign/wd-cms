@@ -2,13 +2,18 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
+use App\Utils\ArrayUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Exception;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Doctrine\ORM\EntityManager;
 use Sonata\AdminBundle\Event\PersistenceEvent;
@@ -26,16 +31,32 @@ class PageAdminListener
     protected $kernel;
     protected $routeClass;
     protected $configCms;
+    protected $configCustomContent;
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
-    public function __construct(TemplateProvider $provider, EntityManager $em, Router $router, Filesystem $fs, KernelInterface $kernel, $routeClass, $configCms)
-    {
-        $this->provider   = $provider;
-        $this->em         = $em;
-        $this->router     = $router;
-        $this->fs         = $fs;
-        $this->kernel     = $kernel;
-        $this->routeClass = $routeClass;
-        $this->configCms  = $configCms;
+    public function __construct(
+        TemplateProvider $provider,
+        EntityManager $em,
+        Router $router,
+        Filesystem $fs,
+        KernelInterface $kernel,
+        $routeClass,
+        $configCms,
+        $configCustomContent,
+        ContainerInterface $container
+    ) {
+        $this->provider            = $provider;
+        $this->em                  = $em;
+        $this->router              = $router;
+        $this->fs                  = $fs;
+        $this->kernel              = $kernel;
+        $this->routeClass          = $routeClass;
+        $this->configCms           = $configCms;
+        $this->configCustomContent = $configCustomContent;
+        $this->container           = $container;
     }
 
     // create page form template configuration
@@ -134,6 +155,52 @@ class PageAdminListener
         if ($menuItem) {
             $em->remove($menuItem);
         }
+
+    }
+
+    public function postLoad(LifecycleEventArgs $event)
+    {
+        $page = $event->getObject();
+
+        if (!$page instanceof CmsPage) {
+            return;
+        }
+
+
+        $str = '';
+
+        /** @var CmsContent $content */
+        foreach ($page->getContents() as $content) {
+            if (in_array($content->getType(), [
+                CmsContentTypeEnum::TEXT,
+                CmsContentTypeEnum::TEXTAREA,
+                CmsContentTypeEnum::WYSYWYG,
+            ])) {
+                $str .= $content->getValue() . ' ';
+            } elseif (in_array($content->getType(), array_keys($this->configCustomContent))) {
+                $contentService = $this->container->get($this->configCustomContent[$content->getType()]['service']);
+
+                if (method_exists($contentService, 'getIndexableData')) {
+                    $str .= $contentService->getIndexableData($content) . " ";
+                }
+            } elseif ($content->getType() === CmsContentTypeEnum::SHARED_BLOCK_COLLECTION) {
+                $blocks = $content->getSharedBlockList();
+
+                foreach ($blocks as $relation) {
+                    /** @var CmsSharedBlock $block */
+                    $block = $relation->getSharedBlock();
+                    $str .= $block->indexedContent;
+                }
+            } elseif ($content->getType() === CmsContentTypeEnum::SHARED_BLOCK) {
+                if ($content->getValue() !== null) {
+                    $block = $this->em->getRepository(CmsSharedBlock::class)->find($content->getValue());
+                    $str .= $block->indexedContent;
+                }
+            }
+        }
+
+
+        $page->indexedContent = $str;
 
     }
 

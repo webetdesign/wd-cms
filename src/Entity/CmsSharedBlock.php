@@ -62,6 +62,8 @@ class CmsSharedBlock
 
     private $site;
 
+    public $indexedContent = null;
+
     /**
      * @inheritDoc
      */

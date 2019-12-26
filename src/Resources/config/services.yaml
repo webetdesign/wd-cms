@@ -106,11 +106,14 @@ services:
       - '@kernel'
       - '%wd_cms.admin.config.entity.route%'
       - '%wd_cms.cms%'
+      - '%wd_cms.custom_contents%'
+      - '@service_container'
     tags:
       - { name: doctrine.event_listener, event: prePersist }
       - { name: doctrine.event_listener, event: postPersist }
       - { name: doctrine.event_listener, event: postUpdate }
       - { name: doctrine.event_listener, event: preRemove }
+      - { name: doctrine.event_listener, event: postLoad }
 
   cms.admin.cms_page_declination_listener:
     class: WebEtDesign\CmsBundle\EventListener\PageDeclinationAdminListener
@@ -158,6 +161,15 @@ services:
       - '%wd_cms.admin.config.entity.route%'
     tags:
       - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildSharedBlock }
+
+  cms.shared_bloc_listner:
+    class: WebEtDesign\CmsBundle\EventListener\SharedBlockListener
+    arguments:
+      - '%wd_cms.custom_contents%'
+      - '@service_container'
+    tags:
+      - { name: doctrine.event_listener, event: postLoad }
+
 
   cms.controller.listener:
     class: WebEtDesign\CmsBundle\EventListener\CmsControllerListener

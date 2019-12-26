@@ -163,6 +163,8 @@ class CmsPage
      */
     public $dontImportContent = false;
 
+    public $indexedContent = null;
+
     public function setPosition($values)
     {
         $this->setMoveMode($values['moveMode']);
