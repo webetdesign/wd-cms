@@ -45,14 +45,14 @@ class ExtraLoader implements LoaderInterface
             throw new \RuntimeException('Do not add the "extra" loader twice');
         }
 
-        $routes = new RouteCollection();
+        $routes = [];
 
         /** @var CmsRoute $cmsRoute */
         foreach ($cmsRoutes as $cmsRoute) {
             if ($cmsRoute->getPage() == null || $cmsRoute->getPage()->getRoot() == null) {
                 continue;
             }
-//            /** @var CmsSite $cmsSite */
+            //            /** @var CmsSite $cmsSite */
             $cmsSite = $cmsRoute->getPage()->getRoot()->getSite();
             if ($cmsSite) {
                 $langPrefix = !empty($cmsSite->getLocale()) && !$cmsSite->isHostMultilingual() ? '/' . $cmsSite->getLocale() : null;
@@ -92,10 +92,26 @@ class ExtraLoader implements LoaderInterface
             }
             $route->setMethods($cmsRoute->getMethods());
 
-            $routes->add($cmsRoute->getName(), $route);
+            preg_match_all('/\{(\w+)\}/', $cmsRoute->getPath(), $matches);
+            $routes [] = [
+                'nbParams' => count($matches[1]),
+                'name'     => $cmsRoute->getName(),
+                'route'    => $route
+            ];
         }
 
-        return $routes;
+        uasort($routes, function ($a, $b) {
+            if ($a['nbParams'] == $b['nbParams']) {
+                return 0;
+            }
+            return $a['nbParams'] < $b['nbParams'] ? -1 : 1;
+        });
+
+        $routeCollection = new RouteCollection();
+        foreach ($routes as $route) {
+            $routeCollection->add($route['name'], $route['route']);
+        }
+        return $routeCollection;
     }
 
     public function supports($resource, $type = null)
