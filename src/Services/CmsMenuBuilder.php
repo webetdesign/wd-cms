@@ -54,8 +54,7 @@ class CmsMenuBuilder
         TokenStorageInterface $storage,
         AuthorizationCheckerInterface $authorizationChecker,
         RequestStack $requestStack
-    )
-    {
+    ) {
         $this->em                   = $entityManager;
         $this->router               = $router;
         $this->factory              = $factory;
@@ -70,6 +69,7 @@ class CmsMenuBuilder
         $code         = $options['code'];
         $parentActive = $options['parentActive'] ?? false;
         $activeClass  = $options['activeClass'] ?? 'active';
+        $mainClass    = $options['classes'] ?? false;
 
         $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
         if ($page) {
@@ -89,7 +89,9 @@ class CmsMenuBuilder
         $nodes = $repo->flatNodes($menu);
 
         $root = $this->factory->createItem('root');
-        //        $menu->setChildrenAttribute('class', $cmsMenu->getClasses());
+        if ($mainClass) {
+            $root->setChildrenAttribute('class', $mainClass);
+        }
         $children = isset($menu->getChildren()[0]) ? $menu->getChildren()[0]->getChildren() : [];
         $this->buildNodes($root, $children, $parentActive, $activeClass);
 
@@ -140,10 +142,11 @@ class CmsMenuBuilder
                             $route = $child->getPage()->getRoute();
                             if ($route) {
                                 if ($route->isDynamic()) {
-                                    $params   = json_decode($child->getParams(), true) ?: [];
+                                    $params = json_decode($child->getParams(), true) ?: [];
                                     try {
                                         $childItem->setUri($this->router->generate($route->getName(), $params));
-                                    } catch (InvalidParameterException $exception) {}
+                                    } catch (InvalidParameterException $exception) {
+                                    }
                                 } else {
                                     $childItem->setUri($this->router->generate($route->getName()));
                                 }

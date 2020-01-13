@@ -45,7 +45,7 @@ class CmsControllerListener
         }
     }
 
-    public function onKernelController(ControllerEvent $event)
+    public function onKernelController($event)
     {
         $controller = $event->getController();
         if (is_array($controller)) {
