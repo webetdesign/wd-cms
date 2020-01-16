@@ -142,7 +142,7 @@ class CmsPage
     /**
      * @Gedmo\TreeParent
      * @ORM\ManyToOne(targetEntity="CmsPage", inversedBy="children")
-     * @ORM\JoinColumn(name="parent", referencedColumnName="id")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      */
     private $parent;
 
