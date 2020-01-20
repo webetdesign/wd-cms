@@ -10,7 +10,7 @@ use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 
 class MenuAdminListener
 {
-    public function postPersist(LifecycleEventArgs $event)
+    public function postPersist($event)
     {
         $menu = $event->getEntity();
 
