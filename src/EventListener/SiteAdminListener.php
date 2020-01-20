@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
-use Doctrine\ORM\Event\;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
