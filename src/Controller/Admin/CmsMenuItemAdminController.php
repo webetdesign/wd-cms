@@ -190,6 +190,37 @@ final class CmsMenuItemAdminController extends CRUDController
         ], null);
     }
 
+    public function preEdit(Request $request, $object)
+    {
+        $em = $this->getDoctrine();
+        $rp = $em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
+        $qb = $rp->createQueryBuilder('mi');
+
+        $qb
+            ->select(['mi', 'm'])
+            ->leftJoin('mi.menu', 'm')
+            ->getQuery()->getResult();
+
+
+        $qb = $rp->createQueryBuilder('mi');
+
+        $qb
+            ->select(['mi', 'c'])
+            ->leftJoin('mi.children', 'c')
+            ->getQuery()->getResult();
+
+
+        $qb = $rp->createQueryBuilder('mi');
+
+        $qb
+            ->select(['mi', 'p', 'r', 'c', 'sbl'])
+            ->leftJoin('mi.page', 'p')
+            ->leftJoin('p.route', 'r')
+            ->leftJoin('p.contents', 'c')
+            ->leftJoin('c.sharedBlockList', 'sbl')
+            ->getQuery()->getResult();
+    }
+
     /**
      * @inheritDoc
      */

@@ -108,6 +108,12 @@ class CmsPage
     private $declinations;
 
     /**
+     * @var Collection|null
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="page")
+     */
+    private $menuItems;
+
+    /**
      * @var CmsSite
      *
      * Mapping Relation in WebEtDesignCmsExtension
@@ -629,6 +635,19 @@ class CmsPage
         return $this->parent;
     }
 
+    public function getParentAtLvl($lvl)
+    {
+        if ($this->getLvl() < $lvl) {
+            return null;
+        }
+
+        if ($this->getLvl() === $lvl) {
+            return $this;
+        } else {
+            return $this->getParent()->getParentAtLvl($lvl);
+        }
+    }
+
     /**
      * @param CmsPage|null $parent
      */
@@ -683,4 +702,44 @@ class CmsPage
     {
         $this->lft = $lft;
     }
+
+    /**
+     * @return null|Collection
+     */
+    public function getMenuItems()
+    {
+        return $this->menuItems;
+    }
+
+    /**
+     * @param ArrayCollection $menuItems
+     */
+    public function setMenuItems(ArrayCollection $menuItems): void
+    {
+        $this->menuItems = $menuItems;
+    }
+
+    public function addMenuItem(CmsMenuItem $menuItem): self
+    {
+        if (!$this->menuItems->contains($menuItem)) {
+            $this->menuItems[] = $menuItem;
+            $menuItem->setPage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenuItem(CmsMenuItem $menuItem): self
+    {
+        if ($this->menuItems->contains($menuItem)) {
+            $this->menuItems->removeElement($menuItem);
+            // set the owning side to null (unless already changed)
+            if ($menuItem->getPage() === $this) {
+                $menuItem->setPage(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

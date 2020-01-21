@@ -49,7 +49,7 @@ class CmsMenuItem
 
     /**
      * @var CmsPage|null
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage")
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="menuItems")
      * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $page;
@@ -147,6 +147,12 @@ class CmsMenuItem
      * @ORM\JoinColumn(name="menu_id", referencedColumnName="id")
      */
     private $menu;
+
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean")
+     */
+    private $blank = 0;
 
     public function __construct()
     {
@@ -530,6 +536,24 @@ class CmsMenuItem
     public function getMenu(): ?CmsMenu
     {
         return $this->menu;
+    }
+
+    /**
+     * @param bool $blank
+     * @return CmsMenuItem
+     */
+    public function setBlank(bool $blank): CmsMenuItem
+    {
+        $this->blank = $blank;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBlank(): bool
+    {
+        return $this->blank;
     }
 
 

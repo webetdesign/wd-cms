@@ -172,6 +172,9 @@ class CmsMenuBuilder
             }
 
             $childItem->setAttribute('class', $childItemClass);
+            if ($child->isBlank()) {
+                $childItem->setLinkAttribute('target', '_blank');
+            }
         }
     }
 
