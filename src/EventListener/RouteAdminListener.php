@@ -38,7 +38,7 @@ class RouteAdminListener
         $this->kernel    = $kernel;
     }
 
-    public function postUpdate(LifecycleEventArgs $event)
+    public function postUpdate($event)
     {
         $route = $event->getObject();
 

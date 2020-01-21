@@ -140,20 +140,21 @@ class CmsPage
 
     /**
      * @Gedmo\TreeRoot
-     * Mapping Relation in WebEtDesignCmsExtension
+     * @ORM\ManyToOne(targetEntity="CmsPage")
+     * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
      */
     private $root;
 
     /**
      * @Gedmo\TreeParent
-     * Mapping Relation in WebEtDesignCmsExtension
+     * @ORM\ManyToOne(targetEntity="CmsPage", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      */
     private $parent;
 
     /**
-     * Mapping Relation in WebEtDesignCmsExtension
-     *
      * @var CmsPage[]|Collection
+     * @ORM\OneToMany(targetEntity="CmsPage", mappedBy="parent")
      */
     private $children;
 

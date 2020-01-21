@@ -16,7 +16,7 @@ class PageDeclinationAdminListener
         $this->em = $em;
     }
 
-    public function prePersist(LifecycleEventArgs $event)
+    public function prePersist($event)
     {
         /** @var CmsPageDeclination $declination */
         $declination = $event->getObject();

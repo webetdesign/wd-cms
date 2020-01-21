@@ -25,7 +25,7 @@ class BaseCmsController extends AbstractController
     protected $provider;
 
     /** @var AbstractCmsGlobalVars */
-    private $globalVars;
+    protected $globalVars;
 
     private $cmsConfig;
 
