@@ -284,6 +284,18 @@
   .cms-menu-item__btn-hide_child.minimalized {
     transform: rotate(180deg); }
 
+.small-box > .crud-name {
+  text-align: center;
+  text-decoration: none;
+  padding-top: 15px;
+  padding-bottom: 10px; }
+
+.crud-name > p {
+  margin-bottom: 0; }
+
+.small-box-crud {
+  color: white !important; }
+
 .spinbox {
   height: 120px; }
   .spinbox .spinner {
