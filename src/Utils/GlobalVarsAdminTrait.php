@@ -10,7 +10,7 @@ trait GlobalVarsAdminTrait
     {
         if ($show) {
             $formMapper
-                ->with('Variable disponible dans les champs :', ['box_class' => 'box box-primary', 'class' => $side ? 'col-xs-2' : 'col-xs-12'])
+                ->with('Variable disponible dans les champs :', ['box_class' => 'box box-primary', 'class' => $side ? 'col-xs-3' : 'col-xs-12'])
                 ->add(uniqid(), GlobalVarsType::class, ['mapped' => false, "page" => $page, 'label' => false])
                 ->end();
         }

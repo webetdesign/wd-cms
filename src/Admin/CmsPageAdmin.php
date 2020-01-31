@@ -280,22 +280,6 @@ class CmsPageAdmin extends AbstractAdmin
             $formMapper->tab('Contenus');
             $formMapper
                 ->with('', ['box_class' => 'header_none', 'class' => $this->globalVarsEnable ? 'col-xs-10' : 'col-xs-12'])
-                //                ->add(
-                //                    'contents',
-                //                    CollectionType::class,
-                //                    [
-                //                        'label'        => false,
-                //                        'by_reference' => false,
-                //                        'btn_add'      => $roleAdmin ? 'Ajouter' : false,
-                //                        'type_options' => [
-                //                            'delete' => $roleAdmin,
-                //                        ],
-                //                    ],
-                //                    [
-                //                        'edit'     => 'inline',
-                //                        'inline'   => 'table',
-                //                    ]
-                //                )
                 ->add('contents', CmsContentsType::class, [
                     'label'        => false,
                     'by_reference' => false,

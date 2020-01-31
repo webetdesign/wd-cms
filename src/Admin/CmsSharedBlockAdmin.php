@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\BlockTemplateType;
 use Knp\Menu\ItemInterface as MenuItemInterface;
+use WebEtDesign\CmsBundle\Form\CmsContentsType;
 
 final class CmsSharedBlockAdmin extends AbstractAdmin
 {
@@ -94,8 +95,15 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $formMapper): void
     {
+        $admin     = $this;
         $roleAdmin = $this->canManageContent();
         $object    = $this->getSubject();
+
+        $admin->setFormTheme(array_merge($admin->getFormTheme(), [
+            '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
+            '@WebEtDesignCms/form/cms_contents_type.html.twig',
+        ]));
+
         if ($this->isCurrentRoute('create') && $this->getRequest()->get('id') !== null) {
             $site = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($this->getRequest()->get('id'));
             $object->setSite($site);
@@ -118,37 +126,26 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
             $formMapper->getFormBuilder()->setMethod('put');
 
-            $contentOptions = [
-                'edit'   => 'inline',
-                'inline' => 'table',
-            ];
-//            if ($roleAdmin) {
-//                $contentOptions['sortable'] = 'position';
-//            }
             $formMapper
                 ->tab('Général')// The tab call is optional
                 ->with('', ['box_class' => ''])
                 ->add('active')
                 ->add('public')
                 ->end()
-                ->end()
-                ->tab('Contenus')
-                ->with('', ['box_class' => ''])
-                ->add(
-                    'contents',
-                    CollectionType::class,
-                    [
-                        'label'        => false,
-                        'by_reference' => false,
-                        'btn_add'      => $roleAdmin ? 'Ajouter' : false,
-                        'type_options' => [
-                            'delete' => $roleAdmin,
-                        ],
-                    ],
-                    $contentOptions
-                )
-                ->end()
                 ->end();
+            //region Contenus
+            $formMapper->tab('Contenus');
+            $formMapper
+                ->with('', ['box_class' => 'header_none', 'class' => 'col-xs-12'])
+                ->add('contents', CmsContentsType::class, [
+                    'label'        => false,
+                    'by_reference' => false,
+                    'role_admin'   => $roleAdmin,
+                ])
+                ->end();
+            $formMapper
+                ->end();
+            //endregion
         }
     }
 

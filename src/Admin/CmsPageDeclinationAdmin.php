@@ -17,6 +17,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
+use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
@@ -79,6 +80,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         $this->setFormTheme(array_merge($this->getFormTheme(), [
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_route_params.html.twig',
+            '@WebEtDesignCms/form/cms_contents_type.html.twig',
         ]));
 
         /** @var CmsPageDeclination $object */
@@ -101,7 +103,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             'config' => $config,
             'route'  => $route,
             'object' => $object,
-            'label'  => 'Paramtre de l\'url de la page : ' . $route->getPath() . ' '
+            'label'  => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
         ]);
 
         $formMapper
@@ -126,31 +128,16 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         //region Contenus
         $formMapper->tab('Contenus');
-        $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable);
-
-        $contentOptions = [
-            'edit'   => 'inline',
-            'inline' => 'table',
-        ];
-//        if ($roleAdmin) {
-//            $contentOptions['sortable'] = 'position';
-//        }
         $formMapper
-            ->with('', ['box_class' => ''])
-            ->add(
-                'contents',
-                CollectionType::class,
-                [
-                    'label'        => false,
-                    'by_reference' => false,
-                    'btn_add'      => $roleAdmin ? 'Ajouter' : false,
-                    'type_options' => [
-                        'delete' => $roleAdmin,
-                    ],
-                ],
-                $contentOptions
-            )
-            ->end()
+            ->with('', ['box_class' => 'header_none', 'class' => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'])
+            ->add('contents', CmsContentsType::class, [
+                'label'        => false,
+                'by_reference' => false,
+                'role_admin'   => $roleAdmin,
+            ])
+            ->end();
+        $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable, true);
+        $formMapper
             ->end();
         //endregion
     }
