@@ -161,6 +161,16 @@ class CmsMenuItem
         return (string) $this->getName();
     }
 
+    public function getPath()
+    {
+        $params = json_decode($this->getParams(), true);
+        $pagePath = $this->getPage()->getRoute()->getPath();
+        $path     = preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($params) {
+            return $params[$matches[1]] ?? '';
+        }, $pagePath);
+        return $path;
+    }
+
     public function isRoot()
     {
         return $this->getId() == $this->getRoot()->getId();

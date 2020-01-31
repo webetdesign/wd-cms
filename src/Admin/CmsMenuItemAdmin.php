@@ -246,7 +246,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                 'config' => $config,
                 'route'  => $route,
                 'object' => $subject,
-                'label'  => 'Paramtre de l\'url de la page : ' . $route->getPath() . ' '
+                'label'  => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $subject->getPath() . ' )'
             ]);
         }
     }

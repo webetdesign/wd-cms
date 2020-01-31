@@ -1,0 +1,47 @@
+{% block cms_contents_widget %}
+    <div class="panel-group" id="contents_collapse" role="tablist" aria-multiselectable="true">
+        {% for item in form.children %}
+            <div class="panel">
+                <div class="panel-heading" role="tab" id="heading_{{ loop.index }}">
+                    <div class="align-left">
+                        <div class="enable">
+                            {{ form_widget(item.active) }}
+                        </div>
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#contents_collapse" href="#collapse_{{ loop.index }}" aria-expanded="true" aria-controls="collapse_{{ loop.index }}">
+                                {{ item.label.vars.value }}
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="align-right">
+                        {% if role_admin %}
+                            <div class="info">
+                                {{ choice_label(item.type.vars.choices, item.type.vars.value) }}
+                                <code>{{ item.code.vars.value }}</code>
+                            </div>
+                        {% endif %}
+                        <div class="inherit">
+                            {{ form_widget(item.parent_heritance) }}
+                        </div>
+                        <div class="btn_arrow">
+                            <button type="button" class="class btn btn-default btn-sm collapsed" data-toggle="collapse" data-parent="#contents_collapse" data-target="#collapse_{{ loop.index }}" aria-expanded="true" aria-controls="collapse_{{ loop.index }}">
+                                <i class="glyphicon glyphicon-menu-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="collapse_{{ loop.index }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading_{{ loop.index }}">
+                    <div class="panel-body">
+                        {{ form_widget(item.value) }}
+                        <div style="display: none">
+                            {{ form_widget(item.label) }}
+                            {{ form_widget(item.code) }}
+                            {{ form_widget(item.type) }}
+                            {{ form_widget(item.parent_heritance) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
