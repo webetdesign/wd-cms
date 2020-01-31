@@ -191,49 +191,6 @@ class WebEtDesignCmsExtension extends Extension
             'orphanRemoval' => false,
         ]);
 
-        //nested set
-        $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
-            'fieldName'     => 'root',
-            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
-            'cascade'       => [],
-            'joinColumns'   => [
-                [
-                    'name'                 => 'tree_root',
-                    'referencedColumnName' => 'id',
-                    'onDelete'             => 'CASCADE'
-                ],
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
-            'fieldName'     => 'parent',
-            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
-            'cascade'       => [],
-            'joinColumns'   => [
-                [
-                    'name'                 => 'parent_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'mappedBy'      => null,
-            'inversedBy'    => 'children',
-            'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
-            'fieldName'     => 'children',
-            'targetEntity'  => $config['admin']['configuration']['entity']['page'],
-            'cascade'       => [
-                'remove'
-            ],
-            'mappedBy'      => 'parent',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-        ]);
-
         $collector->addAssociation(CmsPage::class, 'mapManyToOne', [
             'fieldName'     => 'site',
             'targetEntity'  => $config['admin']['configuration']['entity']['site'],

@@ -291,7 +291,7 @@ class CmsPageAdmin extends AbstractAdmin
                 ->end();
             //endregion
 
-            if ($object->getRoute() != null) {
+            if ($object->getRoute() != null && $roleAdmin) {
                 //region Route
                 $formMapper->tab('Route')
                     ->with('', ['box_class' => ''])

@@ -47,9 +47,14 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     {
         unset($this->listModes['mosaic']);
 
+        if ($this->canManageContent()){
+            $listMapper
+                ->add('id')
+                ->add('code')
+            ;
+        }
+
         $listMapper
-            ->add('id')
-            ->add('code')
             ->add('label')
             ->add('active')
             ->add('public')
@@ -59,6 +64,8 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
                     'delete' => [],
                 ],
             ]);
+
+
     }
 
     protected function configureRoutes(RouteCollection $collection)
@@ -122,6 +129,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             ->end()// End form group
             ->end()// End tab
         ;
+
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
             $formMapper->getFormBuilder()->setMethod('put');

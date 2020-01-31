@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
@@ -32,7 +31,7 @@ class SiteAdminListener
         $this->siteClass = $siteClass;
     }
 
-    public function prePersist(LifecycleEventArgs $event)
+    public function prePersist($event)
     {
         $em = $event->getEntityManager();
         /** @var CmsSite $site */
@@ -49,10 +48,9 @@ class SiteAdminListener
         if ($site->initMenu) {
             $this->createMenu($em, $site);
         }
-
     }
 
-    public function postUpdate(LifecycleEventArgs $event)
+    public function postUpdate($event)
     {
         $site = $event->getObject();
 
@@ -63,7 +61,7 @@ class SiteAdminListener
         $this->warmUpRouteCache();
     }
 
-    public function postPersist(LifecycleEventArgs $event)
+    public function postPersist($event)
     {
         $site = $event->getObject();
 
@@ -104,7 +102,7 @@ class SiteAdminListener
         $site->addMenu($menu);
 
         $root = new CmsMenuItem();
-        $root->setName('root '. $site->getLabel() . ' ' . $menu->getLabel());
+        $root->setName('root ' . $site->getLabel() . ' ' . $menu->getLabel());
         $root->setRoot($root);
         $root->setMenu($menu);
         $em->persist($root);
@@ -114,7 +112,6 @@ class SiteAdminListener
         $homepage->setParent($root);
         $homepage->setMenu($menu);
         $em->persist($homepage);
-
     }
 
     private function createPage(EntityManager $em, CmsSite $site)

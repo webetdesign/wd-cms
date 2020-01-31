@@ -163,9 +163,11 @@ class CmsMenuAdminController extends CRUDController
             $qb = $rp->createQueryBuilder('mi');
 
             $qb
-                ->select(['mi', 'p', 'r'])
+                ->select(['mi', 'p', 'r', 'c', 'sbl'])
                 ->leftJoin('mi.page', 'p')
                 ->leftJoin('p.route', 'r')
+                ->leftJoin('p.contents', 'c')
+                ->leftJoin('c.sharedBlockList', 'sbl')
                 ->getQuery()->getResult();
         }
 

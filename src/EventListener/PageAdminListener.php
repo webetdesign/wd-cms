@@ -60,7 +60,7 @@ class PageAdminListener
     }
 
     // create page form template configuration
-    public function prePersist(LifecycleEventArgs $event)
+    public function prePersist($event)
     {
         $page = $event->getObject();
 
@@ -88,7 +88,7 @@ class PageAdminListener
     }
 
     // create route from template configuration
-    public function postPersist(LifecycleEventArgs $event)
+    public function postPersist($event)
     {
         $page = $event->getObject();
 
@@ -113,7 +113,7 @@ class PageAdminListener
     }
 
     // clear cache routing on update
-    public function postUpdate(LifecycleEventArgs $event)
+    public function postUpdate($event)
     {
         $page = $event->getObject();
 
@@ -140,7 +140,7 @@ class PageAdminListener
         $this->warmUpRouteCache();
     }
 
-    public function preRemove(LifecycleEventArgs $event)
+    public function preRemove($event)
     {
         $page = $event->getObject();
 
@@ -158,7 +158,7 @@ class PageAdminListener
 
     }
 
-    public function postLoad(LifecycleEventArgs $event)
+    public function postLoad($event)
     {
         $page = $event->getObject();
 

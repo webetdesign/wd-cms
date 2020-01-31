@@ -192,6 +192,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                 ->with('', ['box_class' => '']);
 
             $formMapper
+                ->add('blank', null, ['label' => 'Nouvelle fenetre'])
                 ->add('classes', null, [
                     'label'    => 'Classes',
                     'required' => false,
