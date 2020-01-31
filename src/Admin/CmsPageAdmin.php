@@ -279,7 +279,7 @@ class CmsPageAdmin extends AbstractAdmin
             //region Contenus
             $formMapper->tab('Contenus');
             $formMapper
-                ->with('', ['box_class' => 'header_none', 'class' => $this->globalVarsEnable ? 'col-xs-10' : 'col-xs-12'])
+                ->with('', ['box_class' => 'header_none', 'class' => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'])
                 ->add('contents', CmsContentsType::class, [
                     'label'        => false,
                     'by_reference' => false,
