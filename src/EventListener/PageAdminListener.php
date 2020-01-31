@@ -158,52 +158,6 @@ class PageAdminListener
 
     }
 
-    public function postLoad($event)
-    {
-        $page = $event->getObject();
-
-        if (!$page instanceof CmsPage) {
-            return;
-        }
-
-
-        $str = '';
-
-        /** @var CmsContent $content */
-        foreach ($page->getContents() as $content) {
-            if (in_array($content->getType(), [
-                CmsContentTypeEnum::TEXT,
-                CmsContentTypeEnum::TEXTAREA,
-                CmsContentTypeEnum::WYSYWYG,
-            ])) {
-                $str .= $content->getValue() . ' ';
-            } elseif (in_array($content->getType(), array_keys($this->configCustomContent))) {
-                $contentService = $this->container->get($this->configCustomContent[$content->getType()]['service']);
-
-                if (method_exists($contentService, 'getIndexableData')) {
-                    $str .= $contentService->getIndexableData($content) . " ";
-                }
-            } elseif ($content->getType() === CmsContentTypeEnum::SHARED_BLOCK_COLLECTION) {
-                $blocks = $content->getSharedBlockList();
-
-                foreach ($blocks as $relation) {
-                    /** @var CmsSharedBlock $block */
-                    $block = $relation->getSharedBlock();
-                    $str .= $block->indexedContent;
-                }
-            } elseif ($content->getType() === CmsContentTypeEnum::SHARED_BLOCK) {
-                if ($content->getValue() !== null) {
-                    $block = $this->em->getRepository(CmsSharedBlock::class)->find($content->getValue());
-                    $str .= $block->indexedContent;
-                }
-            }
-        }
-
-
-        $page->indexedContent = $str;
-
-    }
-
     protected function moveMenuItem(EntityManager $em, CmsPage $page)
     {
         if ($page->getLvl() === 0) {
