@@ -49,7 +49,7 @@ class ExtraLoader implements LoaderInterface
 
         /** @var CmsRoute $cmsRoute */
         foreach ($cmsRoutes as $cmsRoute) {
-            if ($cmsRoute->getPage() == null || $cmsRoute->getPage()->getRoot() == null) {
+            if ($cmsRoute->getPage() == null || $cmsRoute->getPage()->getRoot() == null || !$cmsRoute->getPage()->getActive()) {
                 continue;
             }
             //            /** @var CmsSite $cmsSite */
