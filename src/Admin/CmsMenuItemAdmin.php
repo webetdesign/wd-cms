@@ -23,6 +23,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
+use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
@@ -150,6 +151,16 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                     $formMapper->add('page', null, [
                         'required' => false,
                         'label'    => 'Page',
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('p')
+                                ->orderBy('p.lft', 'ASC');
+                        },
+                        'choice_label' => function (CmsPage $page) {
+                            return str_repeat('—', $page->getLvl()) . ' ' . $page->getTitle();
+                        },
+                        'group_by' => function($choice, $key, $value) {
+                            return $choice->getSite()->getLabel();
+                        },
                     ]);
 
                     if ($object->getPage() != null) {

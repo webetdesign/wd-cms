@@ -32,7 +32,9 @@
                 </div>
                 <div id="collapse_{{ loop.index }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading_{{ loop.index }}">
                     <div class="panel-body">
-                        {{ form_widget(item.value) }}
+                        {% if item.value is defined %}
+                            {{ form_widget(item.value) }}
+                        {% endif %}
                         <div style="display: none">
                             {{ form_widget(item.label) }}
                             {{ form_widget(item.code) }}
