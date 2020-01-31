@@ -1,0 +1,16 @@
+services:
+  cms.custom_content.user:
+    public: true
+    class: WebEtDesign\CmsBundle\Services\EntityContent
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '%wd_cms.admin.content.user%'
+      - false
+
+  cms.custom_content.users:
+    public: true
+    class: WebEtDesign\CmsBundle\Services\EntityContent
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '%wd_cms.admin.content.user%'
+      - true

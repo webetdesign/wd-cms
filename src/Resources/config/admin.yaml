@@ -1,0 +1,128 @@
+services:
+  cms.admin.cms_site:
+    class: '%wd_cms.admin.config.class.site%'
+    arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%', '%wd_cms.cms%']
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Site}
+    public: true
+
+  cms.admin.cms_route:
+    class: '%wd_cms.admin.config.class.route%'
+    arguments: [~, '%wd_cms.admin.config.entity.route%', '%wd_cms.admin.config.controller.route%']
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Route, show_in_dashboard: false }
+    public: true
+
+  cms.admin.cms_page:
+    class: '%wd_cms.admin.config.class.page%'
+    arguments:
+      - ~
+      - '%wd_cms.admin.config.entity.page%'
+      - '%wd_cms.admin.config.controller.page%'
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.cms.multisite%'
+      - '%wd_cms.cms.multilingual%'
+      - '%wd_cms.cms.declination%'
+      - '%wd_cms.vars%'
+      - '@cms.page_provider'
+      - '%wd_cms.custom_contents_form_themes%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
+    calls:
+      - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
+      - [addChild, ['@cms.admin.cms_page_declination']]
+    public: true
+
+  cms.admin.cms_content:
+    class: '%wd_cms.admin.config.class.content%'
+    #        arguments: [~, '%wd_cms.admin.config.entity.content%', '%wd_cms.admin.config.controller.content%']
+    arguments:
+      - ~
+      - '%wd_cms.admin.config.entity.content%'
+      - '%wd_cms.admin.config.controller.content%'
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.custom_contents%'
+      - '%wd_cms.admin.content.media%'
+      - '@service_container'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Content, show_in_dashboard: false }
+    public: true
+
+  cms.admin.cms_content_slider:
+    class: '%wd_cms.admin.config.class.content_slider%'
+    arguments:
+      - ~
+      - '%wd_cms.admin.config.entity.content_slider%'
+      - '%wd_cms.admin.config.controller.content_slider%'
+      - '%wd_cms.admin.content.media%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: ContentSlider, show_in_dashboard: false }
+    public: true
+
+  cms.admin.cms_menu:
+    class: '%wd_cms.admin.config.class.menu%'
+    arguments: [~, WebEtDesign\CmsBundle\Entity\CmsMenu, '%wd_cms.admin.config.controller.menu%', '@doctrine.orm.default_entity_manager', '@cms.page_provider']
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Menu }
+    calls:
+      - [setTranslationDomain, ['cms']]
+      #      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
+      - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/menu/actionButtons/button_create.html.twig']]
+      - [addChild, ['@cms.admin.cms_menu_item', 'menu']]
+    public: true
+
+  cms.admin.cms_menu_item:
+    class: WebEtDesign\CmsBundle\Admin\CmsMenuItemAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsMenuItem
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuItemAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '@cms.page_provider'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false }
+    calls:
+      - [setTemplate, ['edit', '@@WebEtDesignCms/admin/menuItem/edit.html.twig']]
+    public: true
+
+
+  cms.admin.cms_shared_block:
+    class: WebEtDesign\CmsBundle\Admin\CmsSharedBlockAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsSharedBlock
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.cms%'
+      - '%wd_cms.custom_contents_form_themes%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Block partagé }
+    calls:
+      - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
+      - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/sharedBlock/actionButtons/button_create.html.twig']]
+
+    public: true
+
+  cms.admin.cms_content_has_shared_block:
+    class: WebEtDesign\CmsBundle\Admin\CmsContentHasSharedBlockAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock
+      - ~
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: content has sharedBlock, show_in_dashboard: false }
+    public: true
+
+  cms.admin.cms_page_declination:
+    class: WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsPageDeclination
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsPageDeclinationAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.templates%'
+      - '%wd_cms.vars%'
+      - '%wd_cms.custom_contents_form_themes%'
+    tags:
+      - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
+    public: true

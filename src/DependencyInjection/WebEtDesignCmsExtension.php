@@ -40,6 +40,12 @@ class WebEtDesignCmsExtension extends Extension
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
+        $loader->load('admin.yaml');
+        $loader->load('command.yaml');
+        $loader->load('customContent.yaml');
+        $loader->load('listener.yaml');
+        $loader->load('menu.yaml');
+        $loader->load('provider.yaml');
 
         $this->registerDoctrineMapping($config);
 

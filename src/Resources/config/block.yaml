@@ -1,0 +1,9 @@
+services:
+  cms.admin.crud_button:
+    class: WebEtDesign\CmsBundle\Block\CRUDButtonBlock
+    arguments:
+      - ~
+      - '@templating'
+      - '@sonata.admin.pool'
+    tags:
+      - { name: sonata.block }

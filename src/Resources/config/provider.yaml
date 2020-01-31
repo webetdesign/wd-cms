@@ -1,0 +1,32 @@
+services:
+  cms.media.provider.svg:
+    class: WebEtDesign\CmsBundle\Provider\SvgProvider
+    tags:
+      - { name: sonata.media.provider }
+    arguments:
+      - "cms.media.provider.svg"
+      - "@sonata.media.filesystem.local"
+      - "@sonata.media.cdn.server"
+      - "@sonata.media.generator.default"
+      - "@sonata.media.thumbnail.format"
+      - ['svg']
+      - ['image/svg+xml']
+
+    calls:
+      - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/SVG/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/SVG/view_svg.html.twig' }]]
+
+  cms.media.provider.video:
+    class: WebEtDesign\CmsBundle\Provider\VideoProvider
+    tags:
+      - { name: sonata.media.provider }
+    arguments:
+      - "cms.media.provider.video"
+      - "@sonata.media.filesystem.local"
+      - "@sonata.media.cdn.server"
+      - "@sonata.media.generator.default"
+      - "@sonata.media.thumbnail.format"
+      - ['mp4','ogg','webm']
+      - ['video/mp4','video/ogg','video/webm']
+
+    calls:
+      - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/Video/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/Video/view_video.html.twig' }]]
