@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Twig;
 
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
@@ -106,6 +107,7 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_render_seo_smo_value', [$this, 'renderSeoSmo']),
             new TwigFunction('cms_breadcrumb', [$this, 'breadcrumb']),
             new TwigFunction('route_exist', [$this, 'routeExist']),
+            new TwigFunction('choice_label', [$this, 'choiceLabel']),
         ];
     }
 
@@ -398,6 +400,17 @@ class CmsTwigExtension extends AbstractExtension
     public function routeExist($path)
     {
         return (null === $this->router->getRouteCollection()->get($path)) ? false : true;
+    }
+
+    public function choiceLabel($choices, $value)
+    {
+        /** @var ChoiceView $choice */
+        foreach ($choices as $choice) {
+            if ($choice->value == $value) {
+                return $choice->label;
+            }
+        }
+        return null;
     }
 
 }

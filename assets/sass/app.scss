@@ -99,3 +99,9 @@
 .mx-auto {
     margin-left: auto !important;
 }
+
+.header_none {
+    .box-header {
+        display: none;
+    }
+}

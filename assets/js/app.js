@@ -6,6 +6,7 @@ import 'moment/moment';
 import './cms_route_params';
 import './menu_admin';
 import './tree';
+import './contents';
 
 $(document).ready(function() {
   // show active tab on reload

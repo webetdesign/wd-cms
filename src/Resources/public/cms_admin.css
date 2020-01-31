@@ -346,4 +346,40 @@
 .mx-auto {
   margin-left: auto !important; }
 
-/*# sourceMappingURL=cms_admin.css.map*/
+.header_none .box-header {
+  display: none; }
+#contents_collapse:first-child {
+  border-top: 1px solid #dfdfdf; }
+
+#contents_collapse .panel {
+  border-radius: 0;
+  margin: 0;
+  border-top: none;
+  border-color: #dfdfdf; }
+  #contents_collapse .panel-heading {
+    border-radius: 0;
+    display: flex;
+    justify-content: space-between; }
+    #contents_collapse .panel-heading .align-left {
+      display: flex;
+      width: 45%;
+      justify-content: flex-start; }
+    #contents_collapse .panel-heading .align-right {
+      display: flex;
+      width: 45%;
+      justify-content: flex-end; }
+    #contents_collapse .panel-heading .enable {
+      width: 80px; }
+    #contents_collapse .panel-heading .inherit {
+      width: 150px; }
+    #contents_collapse .panel-heading .info {
+      align-self: center;
+      margin-right: 15px;
+      padding-right: 10px;
+      border-right: 1px solid #dddddd; }
+    #contents_collapse .panel-heading .btn_arrow {
+      align-self: center; }
+      #contents_collapse .panel-heading .btn_arrow .collapsed i {
+        transform: rotate(180deg); }
+  #contents_collapse .panel-title {
+    align-self: center; }

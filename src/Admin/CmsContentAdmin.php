@@ -116,7 +116,7 @@ final class CmsContentAdmin extends AbstractAdmin
         }
 
         $formMapper->add('parent_heritance', null, [
-            'label' => 'Héritage',
+            'label' => 'Contenu hérité',
         ]);
         $this->addHelp($formMapper, $subject, 'parent_heritance');
 

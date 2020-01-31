@@ -13,8 +13,11 @@ use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
+use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Form\MultilingualType;
 use WebEtDesign\CmsBundle\Form\PageTemplateType;
@@ -178,7 +181,8 @@ class CmsPageAdmin extends AbstractAdmin
 
         $admin->setFormTheme(array_merge($admin->getFormTheme(), [
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
-            '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig'
+            '@WebEtDesignCms/form/cms_contents_type.html.twig',
+            '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
         ]));
 
         $container = $this->getConfigurationPool()->getContainer();
@@ -274,26 +278,32 @@ class CmsPageAdmin extends AbstractAdmin
 
             //region Contenus
             $formMapper->tab('Contenus');
-            $this->addGlobalVarsHelp($formMapper, $object, $this->globalVarsEnable);
             $formMapper
-                ->with('', ['box_class' => ''])
-                ->add(
-                    'contents',
-                    CollectionType::class,
-                    [
-                        'label'        => false,
-                        'by_reference' => false,
-                        'btn_add'      => $roleAdmin ? 'Ajouter' : false,
-                        'type_options' => [
-                            'delete' => $roleAdmin,
-                        ],
-                    ],
-                    [
-                        'edit'     => 'inline',
-                        'inline'   => 'table',
-                    ]
-                )
-                ->end()
+                ->with('', ['box_class' => 'header_none', 'class' => $this->globalVarsEnable ? 'col-xs-10' : 'col-xs-12'])
+                //                ->add(
+                //                    'contents',
+                //                    CollectionType::class,
+                //                    [
+                //                        'label'        => false,
+                //                        'by_reference' => false,
+                //                        'btn_add'      => $roleAdmin ? 'Ajouter' : false,
+                //                        'type_options' => [
+                //                            'delete' => $roleAdmin,
+                //                        ],
+                //                    ],
+                //                    [
+                //                        'edit'     => 'inline',
+                //                        'inline'   => 'table',
+                //                    ]
+                //                )
+                ->add('contents', CmsContentsType::class, [
+                    'label'        => false,
+                    'by_reference' => false,
+                    'role_admin'   => $roleAdmin,
+                ])
+                ->end();
+            $this->addGlobalVarsHelp($formMapper, $object, $this->globalVarsEnable, true);
+            $formMapper
                 ->end();
             //endregion
 
