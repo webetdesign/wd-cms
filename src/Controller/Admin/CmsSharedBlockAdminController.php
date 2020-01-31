@@ -13,15 +13,21 @@ final class CmsSharedBlockAdminController extends CRUDController
     public function listAction($id = null)
     {
         $request = $this->getRequest();
+        $session = $request->getSession();
+
         if ($id === null) {
-            $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-            if (!$defaultSite) {
-                $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+            if($session->get('admin_current_site_id')) {
+                $id = $session->get('admin_current_site_id');
+            } else {
+                $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+                if (!$defaultSite) {
+                    $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
-                return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                    return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                }
+
+                $id = $defaultSite->getId();
             }
-
-            $id = $defaultSite->getId();
             $request->attributes->set('id', $id);
         }
 
@@ -39,6 +45,7 @@ final class CmsSharedBlockAdminController extends CRUDController
 
         $datagrid = $this->admin->getDatagrid();
         if ($id) {
+            $session->set('admin_current_site_id', $id);
             $datagrid->setValue('site', null, $id);
         }
         $formView = $datagrid->getForm()->createView();

@@ -68,23 +68,29 @@ class CmsPageAdminController extends CRUDController
     public function treeAction($id = null)
     {
         $request = $this->getRequest();
+        $session = $request->getSession();
         /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine();
         if ($id === null) {
-            $defaultSite = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-            if (!$defaultSite) {
-                $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+            if($session->get('admin_current_site_id')) {
+                $id = $session->get('admin_current_site_id');
+            } else {
+                $defaultSite = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+                if (!$defaultSite) {
+                    $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
-                return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                    return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                }
+
+                $id = $defaultSite->getId();
             }
-
-            $id = $defaultSite->getId();
             $request->attributes->set('id', $id);
         }
 
         $datagrid = $this->admin->getDatagrid();
 
         if ($id) {
+            $session->set('admin_current_site_id', $id);
             $datagrid->setValue('site', null, $id);
 
             $rp = $em->getRepository('WebEtDesignCmsBundle:CmsPage');

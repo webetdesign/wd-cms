@@ -43,7 +43,7 @@ class CmsMenuAdminController extends CRUDController
 
             $this->moveItems($object);
 
-            return $this->redirect($this->admin->generateUrl('tree',[
+            return $this->redirect($this->admin->generateUrl('tree', [
                 'id'   => $object->getRoot()->getSite()->getId(),
                 '_tab' => 'tab_' . $object->getMenuCode()
             ]));
@@ -69,9 +69,9 @@ class CmsMenuAdminController extends CRUDController
         if ($id == null) {
             $site = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
         } else {
-            $site  = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
+            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
         }
-        $pages = $em->getRepository('WebEtDesignCmsBundle:CmsPage')->getPagesBySite($site);
+        $pages    = $em->getRepository('WebEtDesignCmsBundle:CmsPage')->getPagesBySite($site);
         $rootPage = $site->getRootPage();
 
         $menu = $em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy(['site' => $site, 'type' => CmsMenuTypeEnum::PAGE_ARBO]);
@@ -82,7 +82,7 @@ class CmsMenuAdminController extends CRUDController
         } else {
             $menu = new CmsMenu();
             $menu->setLabel($site->getLabel());
-            $menu->setCode((!empty($site->getTemplateFilter()) ? $site->getTemplateFilter() .'_' : "") . 'main_arbo' );
+            $menu->setCode((!empty($site->getTemplateFilter()) ? $site->getTemplateFilter() . '_' : "") . 'main_arbo');
             $menu->setType(CmsMenuTypeEnum::PAGE_ARBO);
             $menu->setSite($site);
             $menu->initRoot = false;
@@ -126,21 +126,30 @@ class CmsMenuAdminController extends CRUDController
 
     public function treeAction($id)
     {
-        $em = $this->getDoctrine();
+        $em       = $this->getDoctrine();
         $datagrid = $this->admin->getDatagrid();
+        $request  = $this->getRequest();
+        $session  = $request->getSession();
+
 
         if ($id === null) {
-            $defaultSite = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-            if (!$defaultSite) {
-                $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+            if ($session->get('admin_current_site_id')) {
+                $id = $session->get('admin_current_site_id');
+            } else {
+                $defaultSite = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+                if (!$defaultSite) {
+                    $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
-                return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                    return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                }
+
+                $id = $defaultSite->getId();
             }
-
-            $id = $defaultSite->getId();
+            $request->attributes->set('id', $id);
         }
 
         if ($id) {
+            $session->set('admin_current_site_id', $id);
             $datagrid->setValue('site', null, $id);
 
             $rp = $em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
@@ -187,16 +196,21 @@ class CmsMenuAdminController extends CRUDController
     public function listAction($id = null)
     {
         $request = $this->getRequest();
+        $session = $request->getSession();
 
         if ($id === null) {
-            $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-            if (!$defaultSite) {
-                $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+            if($session->get('admin_current_site_id')) {
+                $id = $session->get('admin_current_site_id');
+            } else {
+                $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+                if (!$defaultSite) {
+                    $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
-                return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                    return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                }
+
+                $id = $defaultSite->getId();
             }
-
-            $id = $defaultSite->getId();
             $request->attributes->set('id', $id);
         }
 
@@ -273,8 +287,8 @@ class CmsMenuAdminController extends CRUDController
                 '@SonataAdmin/CRUD/select_subclass.html.twig',
                 [
                     'base_template' => $this->getBaseTemplate(),
-                    'admin' => $this->admin,
-                    'action' => 'create',
+                    'admin'         => $this->admin,
+                    'action'        => 'create',
                 ],
                 null
             );
@@ -315,8 +329,8 @@ class CmsMenuAdminController extends CRUDController
 
                     if ($this->isXmlHttpRequest()) {
                         return $this->renderJson([
-                            'result' => 'ok',
-                            'objectId' => $this->admin->getNormalizedIdentifier($newObject),
+                            'result'     => 'ok',
+                            'objectId'   => $this->admin->getNormalizedIdentifier($newObject),
                             'objectName' => $this->escapeHtml($this->admin->toString($newObject)),
                         ], 200, []);
                     }
@@ -367,9 +381,9 @@ class CmsMenuAdminController extends CRUDController
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
-            'action' => 'create',
-            'form' => $formView,
-            'object' => $newObject,
+            'action'   => 'create',
+            'form'     => $formView,
+            'object'   => $newObject,
             'objectId' => null,
         ], null);
     }
