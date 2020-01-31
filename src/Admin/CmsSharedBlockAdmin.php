@@ -23,13 +23,15 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     protected $templateType;
     protected $isMultisite;
     protected $em;
+    private   $customFormThemes;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManagerInterface $em, $cmsConfiguration)
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManagerInterface $em, $cmsConfiguration, $customFormThemes)
     {
         //        $this->templateType = $templateType;
         $this->em          = $em;
         $this->isMultisite = $cmsConfiguration['multisite'];
         parent::__construct($code, $class, $baseControllerName);
+        $this->customFormThemes = $customFormThemes;
     }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
@@ -109,7 +111,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         $admin->setFormTheme(array_merge($admin->getFormTheme(), [
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
-        ]));
+        ], $this->customFormThemes));
 
         if ($this->isCurrentRoute('create') && $this->getRequest()->get('id') !== null) {
             $site = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($this->getRequest()->get('id'));

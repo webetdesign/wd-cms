@@ -39,8 +39,9 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         '_sort_order' => 'ASC',
         '_sort_by'    => 'position',
     ];
+    private   $customFormThemes;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $pageConfig, $globalVarsDefinition)
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $pageConfig, $globalVarsDefinition, $customFormThemes)
     {
         $this->em               = $em;
         $this->pageConfig       = $pageConfig;
@@ -48,6 +49,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
 
         parent::__construct($code, $class, $baseControllerName);
+        $this->customFormThemes = $customFormThemes;
     }
 
 
@@ -81,7 +83,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_route_params.html.twig',
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
-        ]));
+        ], $this->customFormThemes));
 
         /** @var CmsPageDeclination $object */
         $object = $this->getSubject();

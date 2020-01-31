@@ -325,6 +325,7 @@ services:
       - '%wd_cms.cms.declination%'
       - '%wd_cms.vars%'
       - '@cms.page_provider'
+      - '%wd_cms.custom_contents_form_themes%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
     calls:
@@ -393,6 +394,7 @@ services:
       - WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.cms%'
+      - '%wd_cms.custom_contents_form_themes%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Block partagé }
     calls:
@@ -420,7 +422,7 @@ services:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.templates%'
       - '%wd_cms.vars%'
-
+      - '%wd_cms.custom_contents_form_themes%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
     public: true

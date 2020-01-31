@@ -52,6 +52,7 @@ class WebEtDesignCmsExtension extends Extension
         $container->setParameter('wd_cms.templates', $config['pages']);
         $container->setParameter('wd_cms.shared_block', $config['sharedBlock']);
         $container->setParameter('wd_cms.custom_contents', $config['customContents']);
+        $container->setParameter('wd_cms.custom_contents_form_themes', $config['customContentsFormThemes']);
 
         $container->setParameter('wd_cms.vars', $config['cms']['vars']);
     }

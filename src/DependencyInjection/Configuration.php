@@ -45,7 +45,8 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
+            ->end();
+        $rootNode
             ->children()
                 ->arrayNode('admin')->addDefaultsIfNotSet()
                     ->children()
@@ -182,13 +183,17 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('customContents')
-                ->useAttributeAsKey('code')
+                    ->useAttributeAsKey('code')
                     ->arrayPrototype()
                         ->children()
                             ->scalarNode('name')->isRequired()->end()
                             ->scalarNode('service')->isRequired()->end()
+                            ->end()
                         ->end()
                     ->end()
+                ->arrayNode('customContentsFormThemes')
+                ->scalarPrototype()
+                ->defaultValue([])
                 ->end()
             ->end();
 

@@ -47,6 +47,7 @@ class CmsPageAdmin extends AbstractAdmin
     protected $datagridValues = [];
     protected $globalVarsEnable;
     protected $pageProvider;
+    protected $customFormThemes;
 
     public function __construct(
         string $code,
@@ -57,7 +58,8 @@ class CmsPageAdmin extends AbstractAdmin
         $multilingual,
         $declination,
         $globalVarsDefinition,
-        TemplateProvider $pageProvider
+        TemplateProvider $pageProvider,
+        $customFormThemes
     ) {
         $this->multisite        = $multisite;
         $this->multilingual     = $multilingual;
@@ -65,6 +67,7 @@ class CmsPageAdmin extends AbstractAdmin
         $this->em               = $em;
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
         $this->pageProvider     = $pageProvider;
+        $this->customFormThemes = $customFormThemes;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -183,7 +186,7 @@ class CmsPageAdmin extends AbstractAdmin
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
             '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
-        ]));
+        ], $this->customFormThemes));
 
         $container = $this->getConfigurationPool()->getContainer();
         /** @var EntityManagerInterface $em */
