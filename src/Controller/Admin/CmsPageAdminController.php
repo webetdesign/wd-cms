@@ -128,10 +128,11 @@ class CmsPageAdminController extends CRUDController
         $formView = $datagrid->getForm()->createView();
 
         return $this->renderWithExtraParams('@WebEtDesignCms/admin/page/tree.html.twig', [
-            'action'     => 'tree',
-            'form'       => $formView,
-            'datagrid'   => $datagrid,
-            'csrf_token' => $this->getCsrfToken('sonata.batch'),
+            'action'           => 'tree',
+            'declinationAdmin' => $this->get('cms.admin.cms_page_declination'),
+            'form'             => $formView,
+            'datagrid'         => $datagrid,
+            'csrf_token'       => $this->getCsrfToken('sonata.batch'),
             //            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
             //                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
             //                $this->admin->getExportFormats(),

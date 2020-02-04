@@ -9,12 +9,12 @@ file that was distributed with this source code.
 
 #}
 {% import _self as tree %}
-{% macro pages(pages, admin, rootPages) %}
+{% macro pages(pages, admin, declinationAdmin, rootPages) %}
     <ul{% if rootPages %} class="page-tree"{% endif %}>
         {% for page in pages %}
             <li>
-                <div class="page-tree__item">
-                    {% if page.parent %}<i class="fa fa-caret-right"></i>{% endif %}
+                <div class="page-tree__item is-toggled" data-id="{{ page.id }}">
+                    {% if page.children|length > 0  and page.parent %}<i class="fa fa-caret-right"></i>{% endif %}
                     <i class="fa page-tree__item__is-hybrid fa-{% if page.isHybrid %}gears{% else %}code{% endif %}"></i>
                     {% if page.lvl != 0 %}
                         <a class="label label-default pull-right treeMoveAction" data-toggle="tooltip" title="Déplacer" href="{{ admin.generateObjectUrl('move', page) }}"><i class="fa fa-arrows"></i></a>
@@ -26,15 +26,32 @@ file that was distributed with this source code.
                     <a class="label label-default pull-right" data-toggle="tooltip" title="Editer" href="{{ admin.generateObjectUrl('edit', page) }}"><i class="fa fa-pencil"></i></a>
                     <span class="label label-{% if page.isActive %}success{% else %}danger{% endif %} pull-right">Active</span>
                     {% if page.declinations.count > 0 %}
-                        <span class="label label-primary pull-right">{{ page.declinations.count }} {{ page.declinations.count > 1 ? 'Déclinaisons' : "Déclinaison" }}</span>
+                        <span class="label label-primary pull-right declination-toggle">voir {{ page.declinations.count > 1 ? "les "~page.declinations.count : "la" }}  {{ page.declinations.count > 1 ? 'déclinaisons' : "déclinaison" }}</span>
                     {% endif %}
                     {% if app.user.hasRole('ROLE_ADMIN_CMS') and page.route is not null %}
                         <span><code class="pull-right">{{ page.route.name }}</code></span>
                     {% endif %}
+                    {% if page.declinations.count > 0 %}
+                        <div class="declinations">
+                            <ul>
+                                {% for declination in page.declinations %}
+                                    <li>
+                                        <div>
+                                        <i class="fa fa-copy"></i>
+                                        <a class="page-tree__item__edit" href="{{ declinationAdmin.generateObjectUrl('edit', declination) }}">{{ declination.title }}</a>
+                                        {% if page.route != null %}
+                                            <i class="text-muted">{% if page.site.locale is not empty and not page.site.hostMultilingual %}/{{ page.site.locale }}{% endif %}{{ declination.path }}</i>
+                                        {% endif %}
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
                 {% import _self as macro %}
                 {% if page.children|length %}
-                    {{ macro.pages(page.childrenRight, admin, false) }}
+                    {{ macro.pages(page.childrenRight, admin, declinationAdmin, false) }}
                 {% endif %}
             </li>
         {% endfor %}
@@ -66,12 +83,12 @@ file that was distributed with this source code.
     <div class="col-xs-12 col-md-12">
 
         {# Add a margin if no pager to prevent dropdown cropping on window #}
-        <div class="box box-primary"{% if admin.datagrid.pager.lastPage == 1 %} style="margin-bottom: 100px;"{% endif %}>
+        <div class="pages-box box box-primary"{% if admin.datagrid.pager.lastPage == 1 %} style="margin-bottom: 100px;"{% endif %}>
             <div class="box-body{% if admin.datagrid.results|length > 0 %} table-responsive no-padding{% endif %}">
                 <div class="box-header"></div>
                 {% set pages = admin.datagrid.results %}
                 <div class="box-content">
-                    {{ tree.pages(pages, admin, true) }}
+                    {{ tree.pages(pages, admin, declinationAdmin, true) }}
                 </div>
 
             </div>
