@@ -57,7 +57,10 @@ let searchTree = function(){
 };
 
 let createSearchbar = () => {
-    document.querySelector('#treeSearch').addEventListener('input', _.debounce(()=>{searchTree()},300));
+    const sb = document.querySelector('#treeSearch');
+    if (sb !== null) {
+      sb.addEventListener('input', _.debounce(()=>{searchTree()},300));
+    }
 };
 
 document.addEventListener("DOMContentLoaded",function(){
