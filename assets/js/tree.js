@@ -22,7 +22,7 @@ let toggleSubItems = (item)=>{
 
 let searchTree = function(){
   document.querySelector('.js-search-result').innerHTML = '';
-  const input = document.querySelector('.content-header .sticky-wrapper .js-search-tree input');
+  const input = document.querySelector('#treeSearch');
   if (input.value.length > 2){
     document.querySelector('.pages-box').classList.add('hidden');
    const searchValue = input.value.toLowerCase();
@@ -56,14 +56,7 @@ let searchTree = function(){
 };
 
 let createSearchbar = () => {
-  const header = document.querySelector('.content-header .sticky-wrapper');
-  let searchDiv = document.createElement('div');
-  searchDiv.classList.add('js-search-tree');
-  searchDiv.innerHTML = '<div class="search-container"><input type="search" placeholder="Recherche"></div><div class="js-search-result hidden"></div>'
-  if(header){
-    header.append(searchDiv);
-    header.querySelector('.js-search-tree input').addEventListener('input', _.debounce(()=>{searchTree()},300));
-  }
+    document.querySelector('#treeSearch').addEventListener('input', _.debounce(()=>{searchTree()},300));
 };
 
 document.addEventListener("DOMContentLoaded",function(){
@@ -104,6 +97,8 @@ document.addEventListener("DOMContentLoaded",function(){
 
           $(modal).modal('show');
         })
+
+
     })
   })
   declinations.forEach( item => {
