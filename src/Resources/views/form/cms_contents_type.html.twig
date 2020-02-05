@@ -40,8 +40,12 @@
                         {% endif %}
                         <div style="display: none">
                             {{ form_widget(item.label) }}
-                            {{ form_widget(item.code) }}
-                            {{ form_widget(item.type) }}
+                            {% if item.code is defined %}
+                                {{ form_widget(item.code) }}
+                            {% endif %}
+                            {% if item.code is defined %}
+                                {{ form_widget(item.type) }}
+                            {% endif %}
                             {{ form_widget(item.parent_heritance) }}
                         </div>
                     </div>
