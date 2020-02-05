@@ -5,19 +5,20 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 let toggleSubItems = (item)=>{
   item.classList.toggle('is-toggled');
 
-  let closedItemStored = [];
-  const storageItems = JSON.parse(localStorage.getItem('adminMenuClosed'));
-  if(storageItems ){
-    closedItemStored = [].concat(storageItems);
+  let storageItems = JSON.parse(localStorage.getItem('adminMenuClosed'));
+  if(storageItems === null){
+    storageItems = [];
   }
   const id = item.getAttribute('data-id');
-  if (item.classList.contains('is-toggled')){
-    closedItemStored = closedItemStored.filter(item => item!== id);
-  }else{
-    closedItemStored.push(id)
+  if (!item.classList.contains('is-toggled')){
+    if (!storageItems.includes(id)) {
+      storageItems.push(id)
+    }
+  }else {
+    storageItems.splice( storageItems.indexOf(id), 1 );
   }
-  localStorage.setItem('adminMenuClosed', JSON.stringify(closedItemStored));
 
+  localStorage.setItem('adminMenuClosed', JSON.stringify(storageItems));
 };
 
 let searchTree = function(){
