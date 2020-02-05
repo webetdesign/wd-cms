@@ -35,6 +35,9 @@
                         {% if item.value is defined %}
                             {{ form_widget(item.value) }}
                         {% endif %}
+                        {% if item.media is defined %}
+                            {{ form_widget(item.media) }}
+                        {% endif %}
                         <div style="display: none">
                             {{ form_widget(item.label) }}
                             {{ form_widget(item.code) }}

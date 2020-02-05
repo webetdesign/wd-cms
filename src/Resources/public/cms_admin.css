@@ -124,21 +124,20 @@
   display: flex;
   width: 100%;
   padding: 0 30px;
-  align-items: center;
-}
+  align-items: center; }
   .js-search-tree .search-container input {
     border-radius: 3px;
     border: 1px solid #e7e7e7;
     height: 35px;
-    padding-left: 10px;
-  }
+    padding-left: 10px; }
 
-.js-search-result {
-  padding: 20px 15px;
-}
-.js-search-result .fa-caret-right{
-  display: none;
-}
+.js-search-tree .js-search-result {
+  width: 100%;
+  border-top-color: #3c8dbc;
+  margin-top: 30px;
+  background: #ffffff;
+  padding: 15px 15px 15px 15px; }
+
 /**
  * Toggleable tree
  */

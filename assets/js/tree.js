@@ -64,7 +64,10 @@ document.addEventListener("DOMContentLoaded",function(){
   const treeMove = document.querySelectorAll('.treeMoveAction');
   const declinations = document.querySelectorAll('.declination-toggle');
   const modal = document.querySelector('#tree_move_modal');
-  const storageItems = JSON.parse(localStorage.getItem('adminMenuClosed'));
+  let storageItems = JSON.parse(localStorage.getItem('adminMenuClosed'));
+  if (storageItems == null ) {
+    storageItems = [];
+  }
   createSearchbar();
   treeItems.forEach(item => {
     const id = item.getAttribute('data-id');
