@@ -38,8 +38,8 @@ file that was distributed with this source code.
             {% endif %}
 
             <li>
-                <div class="page-tree__item">
-                    {% if item.lvl > 1 %}<i class="fa fa-caret-right"></i>{% endif %}
+                <div class="page-tree__item is-menu">
+{#                    {% if item.lvl > 1 %}<i class="fa fa-caret-right"></i>{% endif %}#}
                     <i class="fa page-tree__item__is-hybrid fa-{{ icon }}"></i>
                     <a class="page-tree__item__edit" href="{{ admin.generateUrl('cms.admin.cms_menu_item.edit', {id: item.menu.id, childId: item.id}) }}">{{ item.name }} </a>
                     {#                    {% if path %}#}
@@ -58,9 +58,8 @@ file that was distributed with this source code.
                     {#                        <span><code class="pull-right">{{ item.route.name }}</code></span>#}
                     {#                    {% endif %}#}
                 </div>
-                {% import _self as macro %}
                 {% if item.children|length %}
-                    {{ macro.menus(item.childrenRight, admin, false) }}
+                    {{ _self.menus(item.childrenRight, admin, false) }}
                 {% endif %}
             </li>
         {% endfor %}

@@ -84,6 +84,11 @@
         overflow: hidden;
         transition: all .15s ease-in-out;
     }
+    &.is-menu {
+        &+ul{
+            max-height: 9000px;
+        }
+    }
     &.is-toggled{
         .fa-caret-right {
             -webkit-transform: rotate(90deg);

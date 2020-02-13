@@ -82,6 +82,9 @@
   overflow: hidden;
   transition: all .15s ease-in-out; }
 
+.page-tree__item.is-menu + ul {
+  max-height: 9000px; }
+
 .page-tree__item.is-toggled .fa-caret-right {
   -webkit-transform: rotate(90deg);
   -moz-transform: rotate(90deg);
