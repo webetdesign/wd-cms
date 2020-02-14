@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use Symfony\Component\Form\CallbackTransformer;
 use WebEtDesign\CmsBundle\Services\AbstractCustomContent;
+use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
@@ -30,6 +31,14 @@ final class CmsContentAdmin extends AbstractAdmin
     protected $media_class;
     protected $container;
     protected $cmsSharedBlockAdmin;
+    /**
+     * @var TemplateProvider
+     */
+    private $blockProvider;
+    /**
+     * @var TemplateProvider
+     */
+    private $pageProvider;
 
     public function __construct(
         string $code,
@@ -38,12 +47,16 @@ final class CmsContentAdmin extends AbstractAdmin
         EntityManager $em,
         $contentTypeOption,
         string $media_class,
-        Container $container
+        Container $container,
+        TemplateProvider $blockProvider,
+        TemplateProvider $pageProvider
     ) {
         $this->em             = $em;
         $this->customContents = $contentTypeOption;
         $this->media_class    = $media_class;
         $this->container      = $container;
+        $this->blockProvider  = $blockProvider;
+        $this->pageProvider   = $pageProvider;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -88,6 +101,7 @@ final class CmsContentAdmin extends AbstractAdmin
         $roleAdmin = $this->canManageContent();
         $admin     = $this;
 
+        /** @var CmsContent $subject */
         $subject = $formMapper->getAdmin()->getSubject();
 
         $formMapper->add('active', null, [
@@ -185,12 +199,23 @@ final class CmsContentAdmin extends AbstractAdmin
                     break;
 
                 case CmsContentTypeEnum::WYSYWYG:
+                    if ($subject->getPage()) {
+                        $configs = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
+                    } elseif ($subject->getSharedBlockParent()->getTemplate()) {
+                        $configs = $this->blockProvider->getConfigurationFor($subject->getSharedBlockParent()->getTemplate());
+                    }
+                    $contents = [];
+                    foreach ($configs['contents'] as $content) {
+                        $contents[$content['code']] = $content;
+                    }
+                    $options = $contents[$subject->getCode()]['options'] ?? [];
+
                     $formMapper->add(
                         'value',
                         SimpleFormatterType::class,
                         [
                             'format'           => 'richhtml',
-                            'ckeditor_context' => 'cms_page',
+                            'ckeditor_context' => $options['ckeditor_context'] ?? 'cms_page',
                             'required'         => false,
                             'auto_initialize'  => false,
                         ]
@@ -286,9 +311,9 @@ final class CmsContentAdmin extends AbstractAdmin
                 }
             }
         }
-//        if ($roleAdmin) {
-//            $formMapper->add('position');
-//        }
+        //        if ($roleAdmin) {
+        //            $formMapper->add('position');
+        //        }
     }
 
     protected function configureShowFields(ShowMapper $showMapper)
