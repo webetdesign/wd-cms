@@ -180,7 +180,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     {
         $list = [];
 
-        if (\in_array($action, ['tree'], true)
+        if (\in_array($action, ['tree', 'list'], true)
             && $this->hasAccess('create')
             && $this->hasRoute('create')
         ) {
