@@ -38,6 +38,9 @@
                         {% if item.media is defined %}
                             {{ form_widget(item.media) }}
                         {% endif %}
+                        {% if item.sharedBlockList is defined %}
+                            {{ form_widget(item.sharedBlockList) }}
+                        {% endif %}
                         <div style="display: none">
                             {{ form_widget(item.label) }}
                             {% if item.code is defined %}
