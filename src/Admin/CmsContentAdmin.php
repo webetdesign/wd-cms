@@ -134,6 +134,14 @@ final class CmsContentAdmin extends AbstractAdmin
         ]);
         $this->addHelp($formMapper, $subject, 'parent_heritance');
 
+        if ($subject->getPage()) {
+            $configs = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
+        } elseif ($subject->getDeclination() && $subject->getDeclination()->getPage()->getTemplate()) {
+            $configs = $this->pageProvider->getConfigurationFor($subject->getDeclination()->getPage()->getTemplate());
+        } elseif ($subject->getSharedBlockParent() && $subject->getSharedBlockParent()->getTemplate()) {
+            $configs = $this->blockProvider->getConfigurationFor($subject->getSharedBlockParent()->getTemplate());
+        }
+
         if ($subject && $subject->getId()) {
             switch ($subject->getType()) {
                 case CmsContentTypeEnum::TEXT:
@@ -199,11 +207,6 @@ final class CmsContentAdmin extends AbstractAdmin
                     break;
 
                 case CmsContentTypeEnum::WYSYWYG:
-                    if ($subject->getPage()) {
-                        $configs = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
-                    } elseif ($subject->getSharedBlockParent()->getTemplate()) {
-                        $configs = $this->blockProvider->getConfigurationFor($subject->getSharedBlockParent()->getTemplate());
-                    }
                     $contents = [];
                     foreach ($configs['contents'] as $content) {
                         $contents[$content['code']] = $content;
