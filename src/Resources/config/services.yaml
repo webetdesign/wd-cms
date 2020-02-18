@@ -12,7 +12,11 @@ services:
         template: '@WebEtDesignCms/collectors/template.html.twig'
         id:       'cms.collector'
     arguments:
-      ['@cms.helper', '@cms.page_provider']
+      - '@cms.helper'
+      - '@cms.page_provider'
+      - '@cms.admin.cms_page'
+      - '@cms.admin.cms_page_declination'
+      - '%wd_cms.cms%'
 
   WebEtDesign\CmsBundle\Form\PageTemplateType:
     arguments:
