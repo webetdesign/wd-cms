@@ -63,6 +63,15 @@ class CmsPageRepository extends NestedTreeRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findByTemplate($template)
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->where('p.template = :template')
+            ->setParameter('template', $template);
+
+        return $qb->getQuery()->getResult();
+    }
+
     // /**
     //  * @return CmsPage[] Returns an array of CmsPage objects
     //  */

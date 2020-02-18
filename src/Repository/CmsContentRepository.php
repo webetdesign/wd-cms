@@ -137,7 +137,7 @@ class CmsContentRepository extends ServiceEntityRepository
         }
 
         if($parent instanceof CmsSharedBlock) {
-            $qb->andWhere('c.sharedBlock = :sharedBlock')
+            $qb->andWhere('c.sharedBlockParent = :sharedBlock')
                 ->setParameter('sharedBlock', $parent);
         }
 

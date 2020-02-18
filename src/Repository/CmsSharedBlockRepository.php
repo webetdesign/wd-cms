@@ -30,6 +30,15 @@ class CmsSharedBlockRepository extends ServiceEntityRepository
         return sizeof($result);
     }
 
+    public function findByTemplate($template)
+    {
+        $qb = $this->createQueryBuilder('sb');
+        $qb->where('sb.template = :template')
+            ->setParameter('template', $template);
+
+        return $qb->getQuery()->getResult();
+    }
+
     // /**
     //  * @return CmsSharedBlock[] Returns an array of CmsSharedBlock objects
     //  */
