@@ -1,0 +1,62 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.data is defined and collector.data is not empty and collector.data is not null %}
+
+        {% set icon %}
+            {# this is the content displayed as a panel in the toolbar #}
+            <img src="{{ asset('bundles/webetdesigncms/img/logo-compact-2.svg') }}">
+            <span class="sf-toolbar-value">CMS</span>
+        {% endset %}
+
+        {% set text %}
+            {# this is the content displayed when hovering the mouse over
+               the toolbar panel #}
+            <div class="sf-toolbar-info-piece">
+                <b>Page</b>
+                <span>{{ collector.data.page }}</span>
+            </div>
+
+            {% if collector.data.type is not null %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Type</b>
+                    <span>{{ collector.data.type }}</span>
+                </div>
+            {% endif %}
+
+            <div class="sf-toolbar-info-piece">
+                <b>Page id </b>
+                <span>{{ collector.data.pageId }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Template</b>
+                <span>{{ collector.data.template }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Twig template</b>
+                <span>{{ collector.data.twigTemplate }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Action</b>
+                <span>
+                    <a target="_blank" href="{{ collector.data.editUrl }}">Edit Page</a>
+                    {% if collector.data.editDeclinationUrl is not null %}
+                        <a target="_blank" href="{{ collector.data.editDeclinationUrl }}">Edit Declination</a>
+                    {% endif %}
+                    {% if collector.data.addDeclinationUrl is not null %}
+                        <a target="_blank" href="{{ collector.data.addDeclinationUrl }}">Add Declination</a>
+                    {% endif %}
+                </span>
+            </div>
+
+
+        {% endset %}
+
+        {# the 'link' value set to 'false' means that this panel doesn't
+           show a section in the web profiler #}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
+    {% endif %}
+{% endblock %}

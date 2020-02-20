@@ -5,6 +5,19 @@ parameters:
   cms.admin.cms_site_entity_listener.class: WebEtDesign\CmsBundle\EventListener\CmsSiteListener
 
 services:
+  WebEtDesign\CmsBundle\Collectors\CmsCollector:
+    tags:
+      -
+        name:     data_collector
+        template: '@WebEtDesignCms/collectors/template.html.twig'
+        id:       'cms.collector'
+    arguments:
+      - '@cms.helper'
+      - '@cms.page_provider'
+      - '@cms.admin.cms_page'
+      - '@cms.admin.cms_page_declination'
+      - '%wd_cms.cms%'
+
   WebEtDesign\CmsBundle\Form\PageTemplateType:
     arguments:
       - '@cms.page_provider'
