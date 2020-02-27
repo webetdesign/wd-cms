@@ -135,6 +135,10 @@ class CmsMenuBuilder
                 switch ($child->getLinkType()) {
                     case CmsMenuLinkTypeEnum::CMS_PAGE:
                         if ($child->getPage()) {
+                            if (!$child->getPage()->isActive()) {
+                                $menu->removeChild($child->getName());
+                                continue 2;
+                            }
                             $childItem->setExtra('page', $child->getPage());
                             if ($this->isActive($child)) {
                                 $childItemClass .= $activeClass;
