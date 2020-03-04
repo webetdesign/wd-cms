@@ -51,6 +51,8 @@ class CmsContentRepository extends ServiceEntityRepository
                 ->setParameter('type', $type);
         }
 
+        $qb->setMaxResults(1);
+
         return $qb->getQuery()
             ->getOneOrNullResult();
     }
@@ -78,9 +80,11 @@ class CmsContentRepository extends ServiceEntityRepository
             ->setParameter('parent', $content->getPage()->getParent())
             ->andWhere('c.code = :code')
             ->setParameter('code', $content->getCode())
+            ->setMaxResults(1)
         ;
 
-        return $qb->getQuery()->getOneOrNullResult();
+        $res = $qb->getQuery()->getResult();
+        return $res ? $res[0] : null;
 
         // FIX Héritage page aaa
 //        $qb
