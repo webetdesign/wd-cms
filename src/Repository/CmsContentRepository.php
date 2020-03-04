@@ -72,29 +72,40 @@ class CmsContentRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c');
 
-        $qb
-            ->select('m.id AS mid, IDENTITY(m.parent) AS parent_id, m.lvl, m.lft, p.id AS pid, c.id AS cid, c.type, c.code, c.parent_heritance')
+        $qb->select('c')
             ->leftJoin('c.page', 'p')
-            ->leftJoin(CmsMenuItem::class, 'm', 'WITH', 'm.page = p')
-            ->where('c.code LIKE :code')
-            ->andWhere('c.type LIKE :type')
-            ->orderBy('m.lft', 'ASC')
-            ->setParameter('type', $content->getType())
-            ->setParameter('code', $content->getCode());
+            ->where('p = :parent')
+            ->setParameter('parent', $content->getPage()->getParent())
+            ->andWhere('c.code = :code')
+            ->setParameter('code', $content->getCode())
+        ;
 
-        $list = $qb->getQuery()->getResult();
+        return $qb->getQuery()->getOneOrNullResult();
 
-        $output_id = $this->search($list, $content->getPage()->getId());
-
-        if ($output_id) {
-            return $this->createQueryBuilder('c')
-                ->where('c.id = :id')
-                ->setParameter('id', $output_id)
-                ->getQuery()
-                ->getOneOrNullResult();
-        } else {
-            return $content;
-        }
+        // FIX Héritage page aaa
+//        $qb
+//            ->select('m.id AS mid, IDENTITY(m.parent) AS parent_id, m.lvl, m.lft, p.id AS pid, c.id AS cid, c.type, c.code, c.parent_heritance')
+//            ->leftJoin('c.page', 'p')
+//            ->leftJoin(CmsMenuItem::class, 'm', 'WITH', 'm.page = p')
+//            ->where('c.code LIKE :code')
+//            ->andWhere('c.type LIKE :type')
+//            ->orderBy('m.lft', 'ASC')
+//            ->setParameter('type', $content->getType())
+//            ->setParameter('code', $content->getCode());
+//
+//        $list = $qb->getQuery()->getResult();
+//
+//        $output_id = $this->search($list, $content->getPage()->getId());
+//
+//        if ($output_id) {
+//            return $this->createQueryBuilder('c')
+//                ->where('c.id = :id')
+//                ->setParameter('id', $output_id)
+//                ->getQuery()
+//                ->getOneOrNullResult();
+//        } else {
+//            return $content;
+//        }
     }
 
     private function search($list, $page_id)

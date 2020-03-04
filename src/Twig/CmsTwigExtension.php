@@ -199,7 +199,7 @@ class CmsTwigExtension extends AbstractExtension
             return null;
         }
 
-        if ($content->getParentHeritance()) {
+        while ($content->getParentHeritance() && $content->getPage()->getParent()){
             $content = $this->em->getRepository(CmsContent::class)->findParent($content);
         }
 
