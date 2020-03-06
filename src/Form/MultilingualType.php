@@ -46,7 +46,7 @@ class MultilingualType extends AbstractType
 
         /** @var CmsSite $s */
         foreach ($this->sites as $s) {
-            $root = $s->getPage();
+            $root = $s->getRootPage();
             $builder->add($s->getId(), EntityType::class, [
                 'required'      => false,
                 'label'         => $s->getLabel(),

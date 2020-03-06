@@ -19,7 +19,7 @@
                     {% if form.children[site.id].vars.value != null %}
                         <a href="{{ sonata_admin.admin.generateObjectUrl('edit', form.children[site.id].vars.data) }}" class="btn btn-primary" style="width: 100%"><i class="fa fa-pencil"></i>&nbsp;Modifier</a>
                     {% else %}
-                        <a href="{{ sonata_admin.admin.generateUrl('create', {parent: site.page.id, refId: currentPage.id }) }}" class="btn btn-primary" style="width: 100%"><i class="fa fa-plus-square"></i>&nbsp;Créer</a>
+                        <a href="{{ sonata_admin.admin.generateUrl('create', {id: site.id, refId: currentPage.id }) }}" class="btn btn-primary" style="width: 100%"><i class="fa fa-plus-square"></i>&nbsp;Créer</a>
                     {% endif %}
                 </td>
             </tr>
