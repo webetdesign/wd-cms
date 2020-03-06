@@ -125,7 +125,10 @@ class CmsTwigExtension extends AbstractExtension
 
         /** @var CmsPageDeclination $declination */
         foreach ($page->getDeclinations() as $declination) {
-            if ($declination->getPath() === $path || $declination->getPath() === $withoutExtension) {
+            if (
+                preg_match('/^' . preg_quote($declination->getPath(), '/') . '/', $path) ||
+                preg_match('/^' . preg_quote($declination->getPath(), '/') . '/', $withoutExtension)
+            ) {
                 return $declination;
                 break;
             }

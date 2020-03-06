@@ -75,17 +75,13 @@ class CmsRouteParamsType extends AbstractType
                 }
             }
             if (isset($requirements[$name]) && !empty($requirements[$name])) {
-                $opts['constraints'] = [
-                    new Regex([
-                        'pattern' => '/' . $requirements[$name] . '/',
-                        'match'   => true,
-                    ])
-                ];
+                $opts['constraints'][] = new Regex([
+                    'pattern' => '/' . $requirements[$name] . '/',
+                    'match'   => true,
+                ]);
 
                 if (!preg_match('/' . $requirements[$name] . '/', '')) {
-                    $opts['constraints'] = [
-                        new NotBlank()
-                    ];
+                    $opts['constraints'][] = new NotBlank();
                 }
             }
 

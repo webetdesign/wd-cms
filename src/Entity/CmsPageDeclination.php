@@ -83,7 +83,7 @@ class CmsPageDeclination
         $path     = preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($params) {
             return $params[$matches[1]] ?? '';
         }, $pagePath);
-        return $path;
+        return preg_replace('/\/*$/', '', $path);
     }
 
     public function getId(): ?int
