@@ -72,7 +72,8 @@ class CmsContent
 
     /**
      * @var ArrayCollection
-     * Mapping Relation in WebEtDesignCmsExtension
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock", mappedBy="content", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\OrderBy({"position" = "ASC"})
      */
     private $sharedBlockList;
 

@@ -276,41 +276,7 @@ class WebEtDesignCmsExtension extends Extension
 
     protected function addCmsContentHasSharedBlockMapping(DoctrineCollector $collector, $config)
     {
-        $collector->addAssociation(CmsContentHasSharedBlock::class, 'mapManyToOne', [
-            'fieldName'     => 'content',
-            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
-            'cascade'       => [
-                'remove',
-                'persist'
-            ],
-            'inversedBy'    => 'sharedBlockList',
-            'joinColumns'   => [
-                [
-                    'name'                 => 'content_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'orphanRemoval' => false,
-            'id'            => true
-        ]);
 
-        $collector->addAssociation(CmsContentHasSharedBlock::class, 'mapManyToOne', [
-            'fieldName'     => 'sharedBlock',
-            'targetEntity'  => $config['admin']['configuration']['entity']['shared_block'],
-            'cascade'       => [
-                'remove',
-                'persist'
-            ],
-            'inversedBy'    => 'contentList',
-            'joinColumns'   => [
-                [
-                    'name'                 => 'shared_block_id',
-                    'referencedColumnName' => 'id',
-                ],
-            ],
-            'orphanRemoval' => false,
-            'id'            => true
-        ]);
     }
 
     protected function addCmsContentSliderMapping(DoctrineCollector $collector, $config)
@@ -468,21 +434,6 @@ class WebEtDesignCmsExtension extends Extension
             'mappedBy'      => 'content',
             'inversedBy'    => null,
             'orphanRemoval' => false,
-        ]);
-
-        $collector->addAssociation(CmsContent::class, 'mapOneToMany', [
-            'fieldName'     => 'sharedBlockList',
-            'targetEntity'  => $config['admin']['configuration']['entity']['cms_content_has_shared_block'],
-            'cascade'       => [
-                "remove",
-                "persist"
-            ],
-            'mappedBy'      => 'content',
-            'inversedBy'    => null,
-            'orphanRemoval' => false,
-            'orderBy'       => [
-                "position" => "ASC"
-            ]
         ]);
     }
 
