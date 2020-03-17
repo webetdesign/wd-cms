@@ -228,7 +228,6 @@ class CmsTwigExtension extends AbstractExtension
                 $result .= $this->renderSharedBlock($item->getSharedBlock());
             }
 
-                dump($result);
             return $result;
         }
 
