@@ -2,6 +2,8 @@
 
 namespace WebEtDesign\CmsBundle\Repository;
 
+use Doctrine\ORM\NonUniqueResultException;
+use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -83,8 +85,11 @@ class CmsContentRepository extends ServiceEntityRepository
             ->setMaxResults(1)
         ;
 
-        $res = $qb->getQuery()->getResult();
-        return $res ? $res[0] : null;
+        try {
+            return $qb->getQuery()->getOneOrNullResult();
+        } catch (NonUniqueResultException $e) {
+            return null;
+        }
 
         // FIX Héritage page aaa
 //        $qb

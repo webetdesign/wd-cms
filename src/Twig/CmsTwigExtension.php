@@ -194,16 +194,16 @@ class CmsTwigExtension extends AbstractExtension
             $content = $this->getContent($object, $content_code);
         }
 
-        if (!$content) {
+        if (!$content || !$content->isActive()) {
             return null;
         }
 
-        if (!$content->isActive()) {
-            return null;
-        }
-
-        while ($content->getParentHeritance() && $content->getPage()->getParent()){
+        while ($content !== null && $content->getParentHeritance() && $content->getPage()->getParent()){
             $content = $this->em->getRepository(CmsContent::class)->findParent($content);
+        }
+
+        if (!$content || !$content->isActive()) {
+            return null;
         }
 
         if (in_array($content->getType(), array_keys($this->customContents))) {
