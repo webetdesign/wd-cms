@@ -2,6 +2,8 @@
 
 namespace WebEtDesign\CmsBundle\Twig;
 
+use App\Entity\Product\Category;
+use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -325,12 +327,30 @@ class CmsTwigExtension extends AbstractExtension
         foreach ($page->getCrossSitePages() as $p) {
             preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
             $routeParams = [];
+            $paramsConfig  = $this->pageProvider->getConfigurationFor($page->getTemplate())['params'];
             foreach ($params[1] as $param) {
-                $routeParams[$param] = $request->get($param);
+                if (isset($paramsConfig[$param]) && $paramsConfig[$param]['entity'] !== null &&
+                    is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class) ) {
+                    $repoMethod = 'findOneBy'.ucfirst($paramsConfig[$param]['property']);
+                    /** @var Category $object */
+                    $object = $this->em->getRepository($paramsConfig[$param]['entity'])
+                        ->$repoMethod($request->get($param), $page->getSite()->getLocale());
+                    $object->setCurrentLocale($p->getSite()->getLocale());
+                    $getProperty = 'get'.ucfirst($paramsConfig[$param]['property']);
+                    $routeParams[$param] = $object->$getProperty();
+                } else {
+                    $routeParams[$param] = $request->get($param);
+                }
+            }
+
+            try {
+                $path = $this->router->generate($p->getRoute()->getName(), $routeParams);
+            } catch (RouteNotFoundException $e) {
+                continue;
             }
 
             $pages[] = [
-                'path' => $this->router->generate($p->getRoute()->getName(), $routeParams),
+                'path' => $path,
                 'code' => $p->getSite()->getLocale(),
                 'icon' => $p->getSite()->getFlagIcon(),
             ];

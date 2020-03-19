@@ -234,10 +234,10 @@ class CmsPageAdminController extends CRUDController
 
         $newObject->setMoveTarget($site->getRootPage());
 
-        if ($request->query->has('siteId')) {
-            $site = $this->getDoctrine()->getRepository($this->getParameter('wd_cms.admin.config.entity.site'))->find($request->query->get('siteId'));
+        if ($request->query->has('refId')) {
             /** @var CmsPage $refPage */
-            $refPage = $this->getDoctrine()->getRepository($this->getParameter('wd_cms.admin.config.entity.page'))->find($request->query->get('refId'));
+            $refPage = $this->getDoctrine()->getRepository(CmsPage::class)
+                ->find($request->query->get('refId'));
 
             $newObject->setSite($site);
             $newObject->addCrossSitePage($refPage);
