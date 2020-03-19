@@ -49,6 +49,7 @@ services:
   WebEtDesign\CmsBundle\Form\CmsRouteParamsType:
     arguments:
       - '@doctrine.orm.entity_manager'
+      - '%wd_cms.cms%'
     tags:
       - { name: form.type }
 
