@@ -9,6 +9,7 @@ class CmsMenuLinkTypeEnum
     const ROUTENAME = 'ROUTENAME';
     const URL       = 'URL';
     const PATH      = 'PATH';
+    const SERVICE   = 'SERVICE';
 
     /** @var array user friendly named type */
     protected static $typeName = [
@@ -16,10 +17,11 @@ class CmsMenuLinkTypeEnum
         self::ROUTENAME => 'Route name',
         self::URL       => 'Url',
         self::PATH      => 'Static path',
+        self::SERVICE   => 'Service',
     ];
 
     /**
-     * @param  string $typeShortName
+     * @param string $typeShortName
      * @return string
      */
     public static function getName($typeShortName)
@@ -41,6 +43,7 @@ class CmsMenuLinkTypeEnum
             self::ROUTENAME,
             self::URL,
             self::PATH,
+            self::SERVICE
         ];
     }
 

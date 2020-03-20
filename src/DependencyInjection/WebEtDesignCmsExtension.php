@@ -61,6 +61,8 @@ class WebEtDesignCmsExtension extends Extension
         $container->setParameter('wd_cms.custom_contents_form_themes', $config['customContentsFormThemes']);
 
         $container->setParameter('wd_cms.vars', $config['cms']['vars']);
+
+        $container->setParameter('wd_cms.menu', $config['menu']);
     }
 
     /**

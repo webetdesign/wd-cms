@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Services;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\User;
 use HttpInvalidParamException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -37,6 +38,11 @@ class CmsMenuBuilder
 
     /** @var RequestStack */
     private $requestStack;
+    private $configMenu;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
 
     /**
      * CmsMenuBuilder constructor.
@@ -46,6 +52,7 @@ class CmsMenuBuilder
      * @param TokenStorageInterface $storage
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param RequestStack $requestStack
+     * @param $configMenu
      */
     public function __construct(
         FactoryInterface $factory,
@@ -53,7 +60,9 @@ class CmsMenuBuilder
         RouterInterface $router,
         TokenStorageInterface $storage,
         AuthorizationCheckerInterface $authorizationChecker,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        ContainerInterface $container,
+        $configMenu
     ) {
         $this->em                   = $entityManager;
         $this->router               = $router;
@@ -61,6 +70,8 @@ class CmsMenuBuilder
         $this->storage              = $storage;
         $this->authorizationChecker = $authorizationChecker;
         $this->requestStack         = $requestStack;
+        $this->configMenu           = $configMenu;
+        $this->container            = $container;
     }
 
     public function cmsMenu(array $options)
@@ -73,7 +84,11 @@ class CmsMenuBuilder
 
         $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
         if ($page) {
-            $menu = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy(['code' => $code, 'site' => $page->getSite()]);
+            $locale = $page->getSite()->getLocale();
+            $menu = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy([
+                'code' => $code,
+                'site' => $page->getSite()
+            ]);
         } else {
             $menu = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy(['code' => $code]);
         }
@@ -93,12 +108,12 @@ class CmsMenuBuilder
             $root->setChildrenAttribute('class', $mainClass);
         }
         $children = isset($menu->getChildren()[0]) ? $menu->getChildren()[0]->getChildren() : [];
-        $this->buildNodes($root, $children, $parentActive, $activeClass);
+        $this->buildNodes($root, $children, $parentActive, $activeClass, $locale ?? null);
 
         return $root;
     }
 
-    public function buildNodes(ItemInterface $menu, $items, $parentActive, $activeClass)
+    public function buildNodes(ItemInterface $menu, $items, $parentActive, $activeClass, $locale)
     {
 
         /** @var User $user */
@@ -148,7 +163,8 @@ class CmsMenuBuilder
                                 if ($route->isDynamic()) {
                                     $params = json_decode($child->getParams(), true) ?: [];
                                     try {
-                                        $childItem->setUri($this->router->generate($route->getName(), $params));
+                                        $childItem->setUri($this->router->generate($route->getName(),
+                                            $params));
                                     } catch (InvalidParameterException $exception) {
                                     }
                                 } else {
@@ -172,10 +188,17 @@ class CmsMenuBuilder
                     case CmsMenuLinkTypeEnum::PATH:
                         $childItem->setUri($child->getLinkValue());
                         break;
+                    case CmsMenuLinkTypeEnum::SERVICE:
+                        if (isset($this->configMenu[$child->getLinkValue()])) {
+                            $service = $this->container->get($this->configMenu[$child->getLinkValue()]['service']);
+                            $service->build($childItem, $locale);
+                        }
+                        break;
+
                 }
             }
             if (count($children) > 0) {
-                $this->buildNodes($childItem, $children, $parentActive, $activeClass);
+                $this->buildNodes($childItem, $children, $parentActive, $activeClass, $locale);
             }
 
             $childItem->setAttribute('class', $childItemClass);

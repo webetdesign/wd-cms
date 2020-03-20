@@ -50,7 +50,7 @@ services:
             - "template_of_custom_menu.html.twig"
             - "@knp_menu.matcher"
         tags:
-            # The alias is what is used to retrieve the menu
+            # The alias is used to retrieve the menu
             - { name: knp_menu.renderer, alias: 'name_of_your_renderer' }
 ```
 
