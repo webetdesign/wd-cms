@@ -28,6 +28,9 @@ use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
+/**
+ * @property mixed configCms
+ */
 class CmsTwigExtension extends AbstractExtension
 {
     protected $declination;
@@ -72,6 +75,7 @@ class CmsTwigExtension extends AbstractExtension
         $this->declination    = $parameterBag->get('wd_cms.cms.declination');
         $this->customContents = $parameterBag->get('wd_cms.custom_contents');
         $globalVarsDefinition = $parameterBag->get('wd_cms.vars');
+        $this->configCms      = $parameterBag->get('wd_cms.cms');
 
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
         if ($globalVarsDefinition['enable']) {
@@ -311,10 +315,14 @@ class CmsTwigExtension extends AbstractExtension
         return $content->getSliders();
     }
 
-    public function cmsPath($route, $params = [], $absoluteUrl = false)
+    public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
     {
+        if ($this->configCms['multilingual'] && $page !== null) {
+            $prefix = $page->getSite()->getLocale() . '_';
+        }
+
         try {
-            return $this->router->generate($route, $params,
+            return $this->router->generate(($prefix ?? null) . $route, $params,
                 $absoluteUrl ? UrlGenerator::ABSOLUTE_URL : UrlGenerator::ABSOLUTE_PATH);
         } catch (RouteNotFoundException $e) {
             return '#404(route:' . $route . ')';
@@ -326,17 +334,17 @@ class CmsTwigExtension extends AbstractExtension
         $pages = [];
         foreach ($page->getCrossSitePages() as $p) {
             preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
-            $routeParams = [];
-            $paramsConfig  = $this->pageProvider->getConfigurationFor($page->getTemplate())['params'];
+            $routeParams  = [];
+            $paramsConfig = $this->pageProvider->getConfigurationFor($page->getTemplate())['params'];
             foreach ($params[1] as $param) {
                 if (isset($paramsConfig[$param]) && $paramsConfig[$param]['entity'] !== null &&
-                    is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class) ) {
-                    $repoMethod = 'findOneBy'.ucfirst($paramsConfig[$param]['property']);
+                    is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class)) {
+                    $repoMethod = 'findOneBy' . ucfirst($paramsConfig[$param]['property']);
                     /** @var Category $object */
                     $object = $this->em->getRepository($paramsConfig[$param]['entity'])
                         ->$repoMethod($request->get($param), $page->getSite()->getLocale());
                     $object->setCurrentLocale($p->getSite()->getLocale());
-                    $getProperty = 'get'.ucfirst($paramsConfig[$param]['property']);
+                    $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
                     $routeParams[$param] = $object->$getProperty();
                 } else {
                     $routeParams[$param] = $request->get($param);
@@ -357,7 +365,7 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         return $this->twig->render('@WebEtDesignCms/block/cms_locale_switch.html.twig', [
-            'page' => $page,
+            'page'  => $page,
             'pages' => $pages
         ]);
     }
