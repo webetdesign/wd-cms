@@ -60,33 +60,19 @@ class PasswordStrengthValidator extends ConstraintValidator
 
             return;
         }
-
-        dump($this->tips);
-
-
+        
         if ($constraint->unicodeEquality) {
             $passwordStrength = $this->calculateStrengthUnicode($password, $constraint->minStrength);
-            dump("uni");
-
-            dump($this->tips);
-
         } else {
             $passwordStrength = $this->calculateStrength($password, $constraint->minStrength);
-            dump("not uni");
-
-            dump($this->tips);
-
         }
 
         if ($passLength > 12) {
-            dump("+");
             ++$passwordStrength;
         } else {
             $this->tips[] = 'length';
         }
-
-        dump($this->tips);
-
+        
         // There is no decrease of strength on weak combinations.
         // Detecting this is tricky and requires a deep understanding of the syntax.
 
