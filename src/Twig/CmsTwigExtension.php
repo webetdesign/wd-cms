@@ -377,11 +377,14 @@ class CmsTwigExtension extends AbstractExtension
         $value = null;
         if ($object instanceof CmsPage && $this->declination && ($declination = $this->getDeclination($object))) {
             $value = $this->getSeoSmoValue($declination, $method);
+            if(empty($value)){
+                $value = $this->getSeoSmoValueFallbackParentPage($object, $method);
+            }
         } else {
             if ($object instanceof CmsPage) {
                 $value = $this->getSeoSmoValueFallbackParentPage($object, $method);
             } else {
-                $this->getSeoSmoValue($object, $method);
+                $value = $this->getSeoSmoValue($object, $method);
             }
         }
 
