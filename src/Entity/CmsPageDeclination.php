@@ -194,4 +194,13 @@ class CmsPageDeclination
         return $this->params;
     }
 
+    public function getSeoTitle(): ?string
+    {
+        if ($this->seo_title === null) {
+            return '';
+        }
+
+        return $this->seo_title;
+    }
+
 }
