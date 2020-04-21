@@ -124,7 +124,7 @@ class CmsTwigExtension extends AbstractExtension
         return $object instanceof $class;
     }
 
-    private function getDeclination($page)
+    private function getDeclination(CmsPage $page)
     {
         $request          = $this->requestStack->getCurrentRequest();
         $path             = $request->getRequestUri();
@@ -133,9 +133,14 @@ class CmsTwigExtension extends AbstractExtension
 
         /** @var CmsPageDeclination $declination */
         foreach ($page->getDeclinations() as $declination) {
+            $dPath = $declination->getPath();
+            if ($this->configCms['multilingual'] && !empty( $page->getSite()->getLocale() )) {
+                $dPath = '/' . $page->getSite()->getLocale() . $dPath;
+            }
+
             if (
-                preg_match('/^' . preg_quote($declination->getPath(), '/') . '/', $path) ||
-                preg_match('/^' . preg_quote($declination->getPath(), '/') . '/', $withoutExtension)
+                preg_match('/^' . preg_quote($dPath, '/') . '/', $path) ||
+                preg_match('/^' . preg_quote($dPath, '/') . '/', $withoutExtension)
             ) {
                 return $declination;
                 break;

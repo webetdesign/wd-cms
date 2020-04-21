@@ -100,11 +100,11 @@ class CmsRouteParamsType extends AbstractType
                             if ($this->cmsConfig['multilingual'] == true && is_subclass_of($param['entity'], TranslatableInterface::class)) {
                                 $method = 'findOneBy'.ucfirst($param['property']);
                                 $locale = $object->getPage()->getSite()->getLocale();
-                                $object = $this->em->getRepository($param['entity'])->$method($value, $locale);
+                                $entity = $this->em->getRepository($param['entity'])->$method($value, $locale);
                             } else {
-                                $object = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
+                                $entity = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
                             }
-                            $values[$name] = $object ?? null;
+                            $values[$name] = $entity ?? null;
                         }
                     }
                 }
