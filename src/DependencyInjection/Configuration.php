@@ -43,6 +43,12 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        ->arrayNode('themes')
+                            ->useAttributeAsKey('name')
+                            ->arrayPrototype()
+                            ->children()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end();

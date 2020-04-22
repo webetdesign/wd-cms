@@ -158,6 +158,12 @@ class CmsPage
      */
     private $children;
 
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $theme;
+
     private $moveMode;
 
     private $moveTarget;
@@ -741,6 +747,28 @@ class CmsPage
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $theme
+     * @return CmsPage
+     */
+    public function setTheme(string $theme): CmsPage
+    {
+        $this->theme = $theme;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTheme(): string
+    {
+        if ($this->theme !== null) {
+            return $this->theme;
+        } else {
+            return $this->getSite()->getTheme();
+        }
     }
 
 }

@@ -94,6 +94,12 @@ class CmsSite
      */
     private $templateFilter;
 
+    /**
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $theme;
+
     public $initPage = true;
     public $initMenu = true;
 
@@ -367,6 +373,24 @@ class CmsSite
         }
 
         return $this;
+    }
+
+    /**
+     * @param mixed $theme
+     * @return CmsSite
+     */
+    public function setTheme($theme)
+    {
+        $this->theme = $theme;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTheme()
+    {
+        return $this->theme;
     }
 
 }
