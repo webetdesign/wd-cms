@@ -1,0 +1,34 @@
+{% extends "form_div_layout.html.twig" %}
+
+{% block form_label %}
+    {% spaceless %}
+        {% import _self as macros %}
+
+        {% if label is empty and label is not same as(false) %}
+            {% set label = macros.form_parent_name(form)|trim %}
+        {% endif %}
+
+        {{ parent() }}
+
+    {% endspaceless %}
+{% endblock form_label %}
+
+{% macro form_parent_name(form, prefix) %}
+    {% spaceless %}
+
+        {% import _self as macros %}
+
+        {% set prefix = prefix|default(false) %}
+
+        {% if form.parent is empty %}
+            {{ form.vars.name }}.labels
+        {% else %}
+            {% if form.vars.compound and not prefix %}
+                {{ macros.form_parent_name(form.parent) }}.{{ form.vars.name }}.label
+            {% else %}
+                {{ macros.form_parent_name(form.parent, true) }}.{{ form.vars.name }}
+            {% endif %}
+        {% endif %}
+
+    {% endspaceless %}
+{% endmacro %}

@@ -107,7 +107,7 @@ class CmsPageAdmin extends AbstractAdmin
                 foreach ($sites as $site) {
                     $active = $site->getId() == $this->request->attributes->get('id');
                     $menu->addChild(
-                        $site->getLabel(),
+                        $site->__toString(),
                         ['uri' => $admin->generateUrl('tree', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
                     );
                 }
