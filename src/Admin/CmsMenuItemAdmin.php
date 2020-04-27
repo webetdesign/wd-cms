@@ -160,7 +160,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                             return str_repeat('—', $page->getLvl()) . ' ' . $page->getTitle();
                         },
                         'group_by'      => function ($choice, $key, $value) {
-                            return $choice->getSite()->getLabel();
+                            return $choice->getSite()->__toString();
                         },
                     ]);
 
