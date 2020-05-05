@@ -123,87 +123,89 @@ class CmsMenuBuilder
             $user = null;
         }
 
-        /** @var CmsMenuItem $child */
-        foreach ($items as $child) {
-            if (!$child->isVisible()) {
+        /** @var CmsMenuItem $item */
+        foreach ($items as $item) {
+            if (!$item->isVisible()) {
                 continue;
             }
-            if ($child->getRole() && !$this->authorizationChecker->isGranted($child->getRole())) {
+            if ($item->getRole() && !$this->authorizationChecker->isGranted($item->getRole())) {
                 continue;
             }
-            if ($child->getConnected() == 'ONLY_LOGIN' && $user === 'anon.') {
+            if ($item->getConnected() == 'ONLY_LOGIN' && $user === 'anon.') {
                 continue;
             }
-            if ($child->getConnected() == 'ONLY_LOGOUT' && $user !== 'anon.') {
+            if ($item->getConnected() == 'ONLY_LOGOUT' && $user !== 'anon.') {
                 continue;
             }
 
-            $children  = $child->getChildren();
-            $childItem = $menu->addChild($child->getName());
+            $children  = $item->getChildren();
+            $menuItem = $menu->addChild($item->getName());
+            $menuItem->setExtra('lvl', $item->getLvl());
 
             $childItemClass = '';
-            if ($child->getClasses()) {
-                $childItemClass .= $child->getClasses() . ' ';
+            if ($item->getClasses()) {
+                $childItemClass .= $item->getClasses() . ' ';
             }
 
             if (sizeof($children) == 0 || (sizeof($children) > 0 && $parentActive)) {
-                switch ($child->getLinkType()) {
+                $anchor = !empty($item->getAnchor()) ? '#'.$item->getAnchor() : '';
+                switch ($item->getLinkType()) {
                     case CmsMenuLinkTypeEnum::CMS_PAGE:
-                        if ($child->getPage()) {
-                            if (!$child->getPage()->isActive()) {
-                                $menu->removeChild($child->getName());
+                        if ($item->getPage()) {
+                            if (!$item->getPage()->isActive()) {
+                                dump('ici');
+                                $menu->removeChild($item->getName());
                                 continue 2;
                             }
-                            $childItem->setExtra('page', $child->getPage());
-                            if ($this->isActive($child)) {
+                            $menuItem->setExtra('page', $item->getPage());
+                            if ($this->isActive($item)) {
                                 $childItemClass .= $activeClass;
                             }
-                            $route = $child->getPage()->getRoute();
+                            $route = $item->getPage()->getRoute();
                             if ($route) {
                                 if ($route->isDynamic()) {
-                                    $params = json_decode($child->getParams(), true) ?: [];
+                                    $params = json_decode($item->getParams(), true) ?: [];
                                     try {
-                                        $childItem->setUri($this->router->generate($route->getName(),
+                                        $menuItem->setUri($this->router->generate($route->getName().$anchor,
                                             $params));
                                     } catch (InvalidParameterException $exception) {
                                     }
                                 } else {
-                                    $childItem->setUri($this->router->generate($route->getName()));
+                                    $menuItem->setUri($this->router->generate($route->getName()).$anchor);
                                 }
                             }
                         }
                         break;
                     case CmsMenuLinkTypeEnum::ROUTENAME:
-                        if (!empty($child->getLinkValue() && (null === $this->router->getRouteCollection()->get($child->getLinkValue())) ? false : true)) {
-                            $childItem->setUri($this->router->generate($child->getLinkValue()));
+                        if (!empty($item->getLinkValue() && (null === $this->router->getRouteCollection()->get($item->getLinkValue())) ? false : true)) {
+                            $menuItem->setUri($this->router->generate($item->getLinkValue()).$anchor);
                         }
                         break;
                     case CmsMenuLinkTypeEnum::URL:
-                        $url = $child->getLinkValue();
+                        $url = $item->getLinkValue();
                         if (!preg_match('/^https?:\/\//', $url)) {
                             $url = 'http://' . $url;
                         }
-                        $childItem->setUri($url);
+                        $menuItem->setUri($url.$anchor);
                         break;
                     case CmsMenuLinkTypeEnum::PATH:
-                        $childItem->setUri($child->getLinkValue());
+                        $menuItem->setUri($item->getLinkValue().$anchor);
                         break;
                     case CmsMenuLinkTypeEnum::SERVICE:
-                        if (isset($this->configMenu[$child->getLinkValue()])) {
-                            $service = $this->container->get($this->configMenu[$child->getLinkValue()]['service']);
-                            $service->build($childItem, $locale);
+                        if (isset($this->configMenu[$item->getLinkValue()])) {
+                            $service = $this->container->get($this->configMenu[$item->getLinkValue()]['service']);
+                            $service->build($menuItem, $locale);
                         }
                         break;
-
                 }
             }
             if (count($children) > 0) {
-                $this->buildNodes($childItem, $children, $parentActive, $activeClass, $locale);
+                $this->buildNodes($menuItem, $children, $parentActive, $activeClass, $locale);
             }
 
-            $childItem->setAttribute('class', $childItemClass);
-            if ($child->isBlank()) {
-                $childItem->setLinkAttribute('target', '_blank');
+            $menuItem->setAttribute('class', $childItemClass);
+            if ($item->isBlank()) {
+                $menuItem->setLinkAttribute('target', '_blank');
             }
         }
     }

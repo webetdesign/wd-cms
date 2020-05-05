@@ -353,7 +353,7 @@ class CmsPageAdmin extends AbstractAdmin
                     $formMapper->add('crossSitePages', MultilingualType::class, [
                         'site'  => $object->getRoot()->getSite(),
                         'page'  => $object,
-                        'label' => 'Page associées',
+                        'label' => 'Pages associées',
                     ]);
 
                     $formMapper->getFormBuilder()->get('crossSitePages')->addModelTransformer(new CallbackTransformer(

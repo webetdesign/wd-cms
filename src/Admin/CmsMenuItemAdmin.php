@@ -14,6 +14,7 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -206,6 +207,11 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                         ]);
                     break;
             }
+
+            $formMapper->add('anchor', TextType::class, [
+                'label'    => 'Ancre',
+                'required' => false,
+            ]);
 
             $formMapper
                 ->end()
