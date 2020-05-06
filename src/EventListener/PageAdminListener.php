@@ -102,7 +102,7 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
-        if ($config['disableRoute'] || $page->getRoute() != null) {
+        if ($config['disableRoute'] || $page->getRoute() != null || !$page->initRoute) {
             return;
         }
 
@@ -123,7 +123,7 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
-        if (!$config['disableRoute'] && $page->getRoute() === null) {
+        if (!$config['disableRoute'] && $page->getRoute() === null && $page->initRoute) {
             $this->createRoute($config, $page);
         }
 

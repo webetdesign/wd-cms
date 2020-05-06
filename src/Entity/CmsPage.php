@@ -154,7 +154,7 @@ class CmsPage
 
     /**
      * @var CmsPage[]|Collection
-     * @ORM\OneToMany(targetEntity="CmsPage", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="CmsPage", mappedBy="parent", cascade={"remove"})
      */
     private $children;
 
@@ -169,6 +169,12 @@ class CmsPage
      * @var bool
      */
     public $dontImportContent = false;
+
+    /**
+     * Set at false tu disable the creation of route in listener
+     * @var bool
+     */
+    public $initRoute = true;
 
     public $indexedContent = null;
 
@@ -189,6 +195,13 @@ class CmsPage
     public function getChildrenRight()
     {
         $criteria = Criteria::create()->orderBy(['rgt' => 'ASC']);
+
+        return $this->children->matching($criteria);
+    }
+
+    public function getChildrenLeft()
+    {
+        $criteria = Criteria::create()->orderBy(['lft' => 'ASC']);
 
         return $this->children->matching($criteria);
     }
@@ -247,6 +260,7 @@ class CmsPage
     public function __construct()
     {
         $this->contents = new ArrayCollection();
+        $this->declinations = new ArrayCollection();
         $this->setActive(false);
         $this->roles          = [];
         $this->crossSitePages = new ArrayCollection();
@@ -430,7 +444,6 @@ class CmsPage
      */
     public function setCrossSitePages(Collection $crossSitePages): self
     {
-        dump('set');
         /** @var CmsPage $crossSitePage */
         foreach ($crossSitePages as $crossSitePage) {
             $this->addCrossSitePage($crossSitePage);

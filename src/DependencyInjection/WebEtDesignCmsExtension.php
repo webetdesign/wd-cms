@@ -51,14 +51,16 @@ class WebEtDesignCmsExtension extends Extension
 
         // TODO : work for autowired configuration
         $container->setParameter('wd_cms.cms', $config['cms']);
-        $container->setParameter('wd_cms.cms.multisite', $config['cms']['multilingual'] || $config['cms']['multisite'] ? true : false);
+        $container->setParameter('wd_cms.cms.multisite',
+            $config['cms']['multilingual'] || $config['cms']['multisite'] ? true : false);
         $container->setParameter('wd_cms.cms.multilingual', $config['cms']['multilingual']);
         $container->setParameter('wd_cms.cms.declination', $config['cms']['declination']);
         $container->setParameter('wd_cms.cms.page_extension', $config['cms']['page_extension']);
         $container->setParameter('wd_cms.templates', $config['pages']);
         $container->setParameter('wd_cms.shared_block', $config['sharedBlock']);
         $container->setParameter('wd_cms.custom_contents', $config['customContents']);
-        $container->setParameter('wd_cms.custom_contents_form_themes', $config['customContentsFormThemes']);
+        $container->setParameter('wd_cms.custom_contents_form_themes',
+            $config['customContentsFormThemes']);
 
         $container->setParameter('wd_cms.vars', $config['cms']['vars']);
 
@@ -78,26 +80,44 @@ class WebEtDesignCmsExtension extends Extension
 
     public function configureAdmin($config, ContainerBuilder $container)
     {
-        $container->setParameter('wd_cms.admin.config.class.content', $config['admin']['configuration']['class']['content']);
-        $container->setParameter('wd_cms.admin.config.class.content_slider', $config['admin']['configuration']['class']['content_slider']);
-        $container->setParameter('wd_cms.admin.config.class.menu', $config['admin']['configuration']['class']['menu']);
-        $container->setParameter('wd_cms.admin.config.class.page', $config['admin']['configuration']['class']['page']);
-        $container->setParameter('wd_cms.admin.config.class.route', $config['admin']['configuration']['class']['route']);
-        $container->setParameter('wd_cms.admin.config.class.site', $config['admin']['configuration']['class']['site']);
+        $container->setParameter('wd_cms.admin.config.class.content',
+            $config['admin']['configuration']['class']['content']);
+        $container->setParameter('wd_cms.admin.config.class.content_slider',
+            $config['admin']['configuration']['class']['content_slider']);
+        $container->setParameter('wd_cms.admin.config.class.menu',
+            $config['admin']['configuration']['class']['menu']);
+        $container->setParameter('wd_cms.admin.config.class.page',
+            $config['admin']['configuration']['class']['page']);
+        $container->setParameter('wd_cms.admin.config.class.route',
+            $config['admin']['configuration']['class']['route']);
+        $container->setParameter('wd_cms.admin.config.class.site',
+            $config['admin']['configuration']['class']['site']);
 
-        $container->setParameter('wd_cms.admin.config.controller.content', $config['admin']['configuration']['controller']['content']);
-        $container->setParameter('wd_cms.admin.config.controller.content_slider', $config['admin']['configuration']['controller']['content_slider']);
-        $container->setParameter('wd_cms.admin.config.controller.menu', $config['admin']['configuration']['controller']['menu']);
-        $container->setParameter('wd_cms.admin.config.controller.page', $config['admin']['configuration']['controller']['page']);
-        $container->setParameter('wd_cms.admin.config.controller.route', $config['admin']['configuration']['controller']['route']);
-        $container->setParameter('wd_cms.admin.config.controller.site', $config['admin']['configuration']['controller']['site']);
+        $container->setParameter('wd_cms.admin.config.controller.content',
+            $config['admin']['configuration']['controller']['content']);
+        $container->setParameter('wd_cms.admin.config.controller.content_slider',
+            $config['admin']['configuration']['controller']['content_slider']);
+        $container->setParameter('wd_cms.admin.config.controller.menu',
+            $config['admin']['configuration']['controller']['menu']);
+        $container->setParameter('wd_cms.admin.config.controller.page',
+            $config['admin']['configuration']['controller']['page']);
+        $container->setParameter('wd_cms.admin.config.controller.route',
+            $config['admin']['configuration']['controller']['route']);
+        $container->setParameter('wd_cms.admin.config.controller.site',
+            $config['admin']['configuration']['controller']['site']);
 
-        $container->setParameter('wd_cms.admin.config.entity.content', $config['admin']['configuration']['entity']['content']);
-        $container->setParameter('wd_cms.admin.config.entity.content_slider', $config['admin']['configuration']['entity']['content_slider']);
-        $container->setParameter('wd_cms.admin.config.entity.menu', $config['admin']['configuration']['entity']['menu']);
-        $container->setParameter('wd_cms.admin.config.entity.page', $config['admin']['configuration']['entity']['page']);
-        $container->setParameter('wd_cms.admin.config.entity.route', $config['admin']['configuration']['entity']['route']);
-        $container->setParameter('wd_cms.admin.config.entity.site', $config['admin']['configuration']['entity']['site']);
+        $container->setParameter('wd_cms.admin.config.entity.content',
+            $config['admin']['configuration']['entity']['content']);
+        $container->setParameter('wd_cms.admin.config.entity.content_slider',
+            $config['admin']['configuration']['entity']['content_slider']);
+        $container->setParameter('wd_cms.admin.config.entity.menu',
+            $config['admin']['configuration']['entity']['menu']);
+        $container->setParameter('wd_cms.admin.config.entity.page',
+            $config['admin']['configuration']['entity']['page']);
+        $container->setParameter('wd_cms.admin.config.entity.route',
+            $config['admin']['configuration']['entity']['route']);
+        $container->setParameter('wd_cms.admin.config.entity.site',
+            $config['admin']['configuration']['entity']['site']);
     }
 
     public function getAlias()
@@ -109,14 +129,16 @@ class WebEtDesignCmsExtension extends Extension
     {
         $collector = DoctrineCollector::getInstance();
 
-        $collector->addInheritanceType(AbstractCmsRoute::class, ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE);
+        $collector->addInheritanceType(AbstractCmsRoute::class,
+            ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE);
         $collector->addDiscriminator(AbstractCmsRoute::class, 'base', CmsRoute::class);
         $collector->addDiscriminatorColumn(AbstractCmsRoute::class, [
             'name' => 'discr',
             'type' => 'string'
         ]);
         if ($config['admin']['configuration']['entity']['route'] !== CmsRoute::class) {
-            $collector->addDiscriminator(AbstractCmsRoute::class, 'override', $config['admin']['configuration']['entity']['route']);
+            $collector->addDiscriminator(AbstractCmsRoute::class, 'override',
+                $config['admin']['configuration']['entity']['route']);
         }
 
         $this->addCmsPageMapping($collector, $config);
@@ -131,20 +153,20 @@ class WebEtDesignCmsExtension extends Extension
 
     protected function addCmsPageMapping(DoctrineCollector $collector, $config)
     {
-//        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
-//            'fieldName'     => 'contents',
-//            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
-//            'cascade'       => [
-//                "remove",
-//                "persist"
-//            ],
-//            'mappedBy'      => 'page',
-//            'inversedBy'    => null,
-//            'orphanRemoval' => false,
-//            'orderBy'       => [
-//                "position" => "ASC"
-//            ]
-//        ]);
+        //        $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
+        //            'fieldName'     => 'contents',
+        //            'targetEntity'  => $config['admin']['configuration']['entity']['content'],
+        //            'cascade'       => [
+        //                "remove",
+        //                "persist"
+        //            ],
+        //            'mappedBy'      => 'page',
+        //            'inversedBy'    => null,
+        //            'orphanRemoval' => false,
+        //            'orderBy'       => [
+        //                "position" => "ASC"
+        //            ]
+        //        ]);
 
         $collector->addAssociation(CmsPage::class, 'mapOneToMany', [
             'fieldName'     => 'declinations',
@@ -389,6 +411,7 @@ class WebEtDesignCmsExtension extends Extension
                 [
                     'name'                 => 'page_id',
                     'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
                 ],
             ],
             'orphanRemoval' => false,
@@ -405,6 +428,7 @@ class WebEtDesignCmsExtension extends Extension
                 [
                     'name'                 => 'declination_id',
                     'referencedColumnName' => 'id',
+                    'onDelete'             => 'CASCADE'
                 ],
             ],
             'orphanRemoval' => false,

@@ -241,6 +241,13 @@ class CmsMenuItem
         return $this->children->matching($criteria);
     }
 
+    public function getChildrenLeft()
+    {
+        $criteria = Criteria::create()->orderBy(['lft'=>'ASC']);
+
+        return $this->children->matching($criteria);
+    }
+
     public function getId(): ?int
     {
         return $this->id;
