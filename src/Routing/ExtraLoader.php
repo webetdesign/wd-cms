@@ -66,6 +66,11 @@ class ExtraLoader implements LoaderInterface
                     $cmsRoute->getController() ?? 'WebEtDesign\CmsBundle\Controller\CmsController::index',
             ];
 
+
+            if ($locale = $cmsSite->getLocale()) {
+                $defaults['_locale'] = $locale;
+            }
+
             if ($cmsRoute->getDefaults()) {
                 $defaults = array_merge($defaults, json_decode($cmsRoute->getDefaults(), true));
             }
