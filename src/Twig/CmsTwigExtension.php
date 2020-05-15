@@ -342,7 +342,7 @@ class CmsTwigExtension extends AbstractExtension
             $routeParams  = [];
             $paramsConfig = $this->pageProvider->getConfigurationFor($page->getTemplate())['params'];
             foreach ($params[1] as $param) {
-                if (isset($paramsConfig[$param]) && $paramsConfig[$param]['entity'] !== null &&
+                if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null &&
                     is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class)) {
                     $repoMethod = 'findOneBy' . ucfirst($paramsConfig[$param]['property']);
                     /** @var Category $object */
