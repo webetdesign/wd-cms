@@ -186,6 +186,8 @@ class CmsPageAdmin extends AbstractAdmin
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
             '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
+            '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
+            '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
         ], $this->customFormThemes));
 
         $container = $this->getConfigurationPool()->getContainer();

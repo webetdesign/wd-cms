@@ -1,0 +1,82 @@
+{% block sortable_collection_widget %}
+
+    {% apply spaceless %}
+        {% if prototype is defined %}
+            {% set child = prototype %}
+            {% set allow_delete_backup = allow_delete %}
+            {% set allow_delete = true %}
+            {% set attr = attr|merge({'data-prototype': block('sonata_type_native_collection_widget_row'), 'data-prototype-name': prototype.vars.name, 'class': attr.class|default('') }) %}
+            {% set allow_delete = allow_delete_backup %}
+        {% endif %}
+        <div {{ block('widget_container_attributes') }}>
+            {{ form_errors(form) }}
+            {% for child in form %}
+                {{ block('sonata_type_native_collection_widget_row') }}
+            {% endfor %}
+            {{ form_rest(form) }}
+            {% if allow_add %}
+                <div>
+                    <a href="#" class="btn btn-link sonata-collection-add"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                </div>
+            {% endif %}
+        </div>
+
+        <script type="application/javascript">
+          var $collection{{ id }} = $('#{{ id }}');
+          function refreshPosition_{{ id }} () {
+            var $fieldPosition_{{ id }} = $collection{{ id }}
+              .find('.position-field');
+            var count = $fieldPosition_{{ id }}.length;
+            $fieldPosition_{{ id }}
+              .each(function(k) {
+                var $this = $(this);
+                var $bottom = $this.find('button[data-type="bottom"]');
+                var $down = $this.find('button[data-type="down"]');
+                var $up = $this.find('button[data-type="up"]');
+                var $top = $this.find('button[data-type="top"]');
+                if (k === (count - 1) || count === 1) {
+                  $bottom.hide();
+                  $down.hide();
+                } else {
+                  $bottom.show();
+                  $down.show();
+                }
+                if (k === 0 || count === 1) {
+                  $up.hide();
+                  $top.hide();
+                } else {
+                  $up.show();
+                  $top.show();
+                }
+                $(this)
+                  .find('input')
+                  .val(k);
+              });
+          }
+          $collection{{ id }}
+            .on('click', '.sortable-button', function() {
+              var $this = $(this);
+              var $row = $this.parents('.sonata-collection-row');
+              if ($this.data('type') === 'bottom') {
+                var $last = $row.parent().find('.sonata-collection-row').last();
+                $row.insertAfter($last);
+              } else if ($this.data('type') === 'top') {
+                $row.prependTo($row.parent());
+              } else if ($this.data('type') === 'up') {
+                $row.insertBefore($row.prev());
+              } else if ($this.data('type') === 'down') {
+                $row.insertAfter($row.next());
+              }
+              refreshPosition_{{ id }}();
+            })
+            .on('sonata-collection-item-added', function() {
+              refreshPosition_{{ id }}();
+            })
+            .on('sonata-collection-item-deleted-successful', function() {
+              refreshPosition_{{ id }}();
+            })
+          ;
+          refreshPosition_{{ id }}();
+        </script>
+    {% endapply %}
+{% endblock %}

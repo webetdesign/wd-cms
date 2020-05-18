@@ -1,4 +1,18 @@
 services:
+  cms.custom_content.media_collection:
+    class: WebEtDesign\CmsBundle\Services\CustomContents\SortableCollection
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - App\Entity\Media
+      - '@sonata.media.admin.media'
+      - {'context': 'cms_page', 'hide_context': true, btn_delete: false}
+    public: true
+
+  WebEtDesign\CmsBundle\Form\CustomContents\SortableEntityType:
+    tags: {name: form.type}
+    arguments:
+      ['@cms.admin.cms_content']
+
   cms.custom_content.user:
     public: true
     class: WebEtDesign\CmsBundle\Services\EntityContent
