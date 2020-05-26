@@ -107,7 +107,7 @@ class CmsPageAdmin extends AbstractAdmin
                 foreach ($sites as $site) {
                     $active = $site->getId() == $this->request->attributes->get('id');
                     $menu->addChild(
-                        $site->getLabel(),
+                        $site->__toString(),
                         ['uri' => $admin->generateUrl('tree', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
                     );
                 }
@@ -186,6 +186,8 @@ class CmsPageAdmin extends AbstractAdmin
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
             '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
+            '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
+            '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
         ], $this->customFormThemes));
 
         $container = $this->getConfigurationPool()->getContainer();
@@ -353,7 +355,7 @@ class CmsPageAdmin extends AbstractAdmin
                     $formMapper->add('crossSitePages', MultilingualType::class, [
                         'site'  => $object->getRoot()->getSite(),
                         'page'  => $object,
-                        'label' => 'Page associées',
+                        'label' => 'Pages associées',
                     ]);
 
                     $formMapper->getFormBuilder()->get('crossSitePages')->addModelTransformer(new CallbackTransformer(

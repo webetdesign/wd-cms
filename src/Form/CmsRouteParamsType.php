@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Form;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -21,13 +22,15 @@ class CmsRouteParamsType extends AbstractType
      * @var EntityManagerInterface
      */
     protected $em;
+    private   $cmsConfig;
 
     /**
      * @inheritDoc
      */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, $cmsConfig)
     {
-        $this->em = $em;
+        $this->em        = $em;
+        $this->cmsConfig = $cmsConfig;
     }
 
 
@@ -43,7 +46,6 @@ class CmsRouteParamsType extends AbstractType
 
         $defaults     = json_decode($route->getDefaults(), true);
         $requirements = json_decode($route->getRequirements(), true);
-
 
         foreach ($route->getParams() as $name) {
             $param = $config['params'][$name] ?? null;
@@ -89,14 +91,20 @@ class CmsRouteParamsType extends AbstractType
         }
 
         $builder->addModelTransformer(new CallbackTransformer(
-            function ($values) use ($config) {
+            function ($values) use ($config, $object) {
                 if ($values != null) {
                     $values = json_decode($values, true);
                     foreach ($values as $name => $value) {
                         $param = $config['params'][$name] ?? null;
                         if ($param && isset($param['entity']) && isset($param['property'])) {
-                            $object        = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
-                            $values[$name] = $object;
+                            if ($this->cmsConfig['multilingual'] == true && is_subclass_of($param['entity'], TranslatableInterface::class)) {
+                                $method = 'findOneBy'.ucfirst($param['property']);
+                                $locale = $object->getPage()->getSite()->getLocale();
+                                $entity = $this->em->getRepository($param['entity'])->$method($value, $locale);
+                            } else {
+                                $entity = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
+                            }
+                            $values[$name] = $entity ?? null;
                         }
                     }
                 }

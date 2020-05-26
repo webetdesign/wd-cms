@@ -83,6 +83,8 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_route_params.html.twig',
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
+            '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
+            '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
         ], $this->customFormThemes));
 
         /** @var CmsPageDeclination $object */

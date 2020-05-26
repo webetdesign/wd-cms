@@ -65,6 +65,7 @@ class CmsMenu
     public function __construct()
     {
         $this->type = CmsMenuTypeEnum::DEFAULT;
+        $this->children = new ArrayCollection();
     }
 
     /**

@@ -13,12 +13,16 @@ class CmsContentHasSharedBlock
 {
     /**
      * @Gedmo\SortableGroup
-     * Mapping defined in WebEtDesignCmsExtension
+     * @ORM\Id()
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", inversedBy="sharedBlockList")
+     * @ORM\JoinColumn(name="content_id", referencedColumnName="id")
      */
     private $content;
-    
+
     /**
-     * Mapping defined in WebEtDesignCmsExtension
+     * @ORM\Id()
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", inversedBy="contentList"))
+     * @ORM\JoinColumn(name="shared_block_id", referencedColumnName="id")
      */
     private $sharedBlock;
 
@@ -29,6 +33,12 @@ class CmsContentHasSharedBlock
      *
      */
     private $position;
+
+    public function __toString()
+    {
+        return (string) $this->content . ' ' . $this->sharedBlock;
+    }
+
 
     /**
      * @return mixed

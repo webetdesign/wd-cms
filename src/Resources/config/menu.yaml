@@ -8,6 +8,8 @@ services:
       - "@security.token_storage"
       - "@security.authorization_checker"
       - "@request_stack"
+      - "@service_container"
+      - "%wd_cms.menu%"
     tags:
       - { name: knp_menu.menu_builder, method: cmsMenu, alias: cmsMenu }
 

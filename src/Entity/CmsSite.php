@@ -240,6 +240,11 @@ class CmsSite
         return $menus[0] ?? null;
     }
 
+    public function getMenu()
+    {
+        return $this->menus;
+    }
+
     public function addMenu($menu): self
     {
         if (!$this->menus->contains($menu)) {

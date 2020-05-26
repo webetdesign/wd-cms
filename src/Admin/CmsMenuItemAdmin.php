@@ -13,14 +13,8 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\Form\Type\ImmutableArrayType;
-use stdClass;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -39,16 +33,24 @@ final class CmsMenuItemAdmin extends AbstractAdmin
      * @var EntityManagerInterface
      */
     protected $em;
+    private   $configMenu;
 
     /**
      * @inheritDoc
      */
-    public function __construct($code, $class, $baseControllerName, EntityManagerInterface $em, TemplateProvider $pageProvider)
-    {
+    public function __construct(
+        $code,
+        $class,
+        $baseControllerName,
+        EntityManagerInterface $em,
+        TemplateProvider $pageProvider,
+        $configMenu
+    ) {
         $this->em           = $em;
         $this->pageProvider = $pageProvider;
 
         parent::__construct($code, $class, $baseControllerName);
+        $this->configMenu = $configMenu;
     }
 
 
@@ -149,17 +151,17 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             switch ($object->getLinkType()) {
                 case CmsMenuLinkTypeEnum::CMS_PAGE:
                     $formMapper->add('page', null, [
-                        'required' => false,
-                        'label'    => 'Page',
+                        'required'      => false,
+                        'label'         => 'Page',
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('p')
                                 ->orderBy('p.lft', 'ASC');
                         },
-                        'choice_label' => function (CmsPage $page) {
+                        'choice_label'  => function (CmsPage $page) {
                             return str_repeat('—', $page->getLvl()) . ' ' . $page->getTitle();
                         },
-                        'group_by' => function($choice, $key, $value) {
-                            return $choice->getSite()->getLabel();
+                        'group_by'      => function ($choice, $key, $value) {
+                            return $choice->getSite()->__toString();
                         },
                     ]);
 
@@ -192,7 +194,24 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                             'label'    => 'Valeur du lien',
                         ]);
                     break;
+                case CmsMenuLinkTypeEnum::SERVICE:
+                    $choices = [];
+                    foreach ($this->configMenu as $code => $configMenu) {
+                        $choices[$configMenu['label']] = $code;
+                    }
+                    $formMapper
+                        ->add('linkValue', ChoiceType::class, [
+                            'choices'  => $choices,
+                            'required' => false,
+                            'label'    => 'Service',
+                        ]);
+                    break;
             }
+
+            $formMapper->add('anchor', TextType::class, [
+                'label'    => 'Ancre',
+                'required' => false,
+            ]);
 
             $formMapper
                 ->end()
@@ -216,7 +235,8 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                     ],
                     'label'   => 'Visible',
                 ])
-                ->addHelp('connected', "Permet de dynamiser le menu si l'utilisateur est connecté ou non")
+                ->addHelp('connected',
+                    "Permet de dynamiser le menu si l'utilisateur est connecté ou non")
                 ->add('role');
 
             $formMapper

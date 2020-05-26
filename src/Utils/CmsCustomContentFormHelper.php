@@ -42,15 +42,30 @@ trait CmsCustomContentFormHelper
             'type'      => ClassMetadataInfo::MANY_TO_ONE,
         ]);
 
+        $opts = [
+            'model_manager'            => $adminClass->getModelManager(),
+            'sonata_field_description' => $fieldDescription,
+            'class'                    => $class,
+            'required'                 => false,
+            'label'                    => $options['label'] ?? null,
+        ];
+
+        if (isset($linkParameters['btn_delete'])) {
+            $opts['btn_delete'] = $linkParameters['btn_delete'];
+        }
+        if (isset($linkParameters['btn_edit'])) {
+            $opts['btn_edit'] = $linkParameters['btn_edit'];
+        }
+        if (isset($linkParameters['btn_list'])) {
+            $opts['btn_list'] = $linkParameters['btn_list'];
+        }
+        if (isset($linkParameters['btn_add'])) {
+            $opts['btn_add'] = $linkParameters['btn_add'];
+        }
+
         $builder->add($filedName,
             ModelListType::class,
-            [
-                'model_manager' => $adminClass->getModelManager(),
-                'sonata_field_description' => $fieldDescription,
-                'class' => $class,
-                'required' => false,
-                'label' => $options['label'] ?? null
-            ]
+            $opts
         );
     }
 

@@ -5,6 +5,13 @@ parameters:
   cms.admin.cms_site_entity_listener.class: WebEtDesign\CmsBundle\EventListener\CmsSiteListener
 
 services:
+  cms.user.validator.password_strength:
+    class: WebEtDesign\Validator\Constraints\PasswordStrengthValidator
+    arguments:
+      - '@translator'
+    tags:
+      - { name: validator.constraint_validator, alias: password_strength }
+
   WebEtDesign\CmsBundle\Collectors\CmsCollector:
     tags:
       -
@@ -49,6 +56,7 @@ services:
   WebEtDesign\CmsBundle\Form\CmsRouteParamsType:
     arguments:
       - '@doctrine.orm.entity_manager'
+      - '%wd_cms.cms%'
     tags:
       - { name: form.type }
 

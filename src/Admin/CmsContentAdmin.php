@@ -3,7 +3,7 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
-use Sonata\CoreBundle\Form\Type\CollectionType;
+use Sonata\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -263,7 +263,7 @@ final class CmsContentAdmin extends AbstractAdmin
 
                     $formMapper->add(
                         'sharedBlockList',
-                        CollectionType::class,
+                        \Sonata\CoreBundle\Form\Type\CollectionType::class,
                         [
                             'by_reference' => false,
                             'required'     => false,
@@ -276,7 +276,7 @@ final class CmsContentAdmin extends AbstractAdmin
                     );
 
                     $formMapper->add('parent_heritance', null, [
-                        'label' => 'Héritage',
+                        'label' => 'Contenu hérité',
                     ]);
                     $this->addHelp($formMapper, $subject, 'parent_heritance');
                     break;

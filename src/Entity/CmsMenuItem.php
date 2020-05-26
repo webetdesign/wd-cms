@@ -154,6 +154,12 @@ class CmsMenuItem
      */
     private $blank = 0;
 
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $anchor;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
@@ -231,6 +237,13 @@ class CmsMenuItem
     public function getChildrenRight()
     {
         $criteria = Criteria::create()->orderBy(['rgt'=>'ASC']);
+
+        return $this->children->matching($criteria);
+    }
+
+    public function getChildrenLeft()
+    {
+        $criteria = Criteria::create()->orderBy(['lft'=>'ASC']);
 
         return $this->children->matching($criteria);
     }
@@ -566,5 +579,21 @@ class CmsMenuItem
         return $this->blank;
     }
 
+    /**
+     * @param string $anchor
+     * @return CmsMenuItem
+     */
+    public function setAnchor(?string $anchor): CmsMenuItem
+    {
+        $this->anchor = $anchor;
+        return $this;
+    }
 
+    /**
+     * @return string
+     */
+    public function getAnchor(): ?string
+    {
+        return $this->anchor;
+    }
 }

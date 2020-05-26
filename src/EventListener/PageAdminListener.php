@@ -102,7 +102,7 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
-        if ($config['disableRoute'] || $page->getRoute() != null) {
+        if ($config['disableRoute'] || $page->getRoute() != null || !$page->initRoute) {
             return;
         }
 
@@ -123,7 +123,7 @@ class PageAdminListener
 
         $config = $this->provider->getConfigurationFor($page->getTemplate());
 
-        if (!$config['disableRoute'] && $page->getRoute() === null) {
+        if (!$config['disableRoute'] && $page->getRoute() === null && $page->initRoute) {
             $this->createRoute($config, $page);
         }
 
@@ -237,7 +237,7 @@ class PageAdminListener
         $this->router->warmUp($cacheDir);
     }
 
-    protected function createRoute($config, $page)
+    protected function createRoute($config, CmsPage $page)
     {
         $paramString  = '';
         $defaults     = [];
@@ -250,7 +250,11 @@ class PageAdminListener
 
         // hydrate route
         $CmsRoute = new $this->routeClass();
-        $CmsRoute->setName(sprintf('cms_route_%s', $page->getId()));
+        if ($this->configCms['multilingual']) {
+            $CmsRoute->setName(sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId()));
+        } else {
+            $CmsRoute->setName(sprintf('cms_route_%s', $page->getId()));
+        }
 
         if ($config['controller'] && $config['action']) {
             $CmsRoute->setController(sprintf('%s::%s', $config['controller'], $config['action']));
