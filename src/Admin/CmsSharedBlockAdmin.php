@@ -92,7 +92,6 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             if (sizeof($sites) > 1) {
                 foreach ($sites as $site) {
                     $active = $site->getId() == $id;
-                    dump($active);
                     $menu->addChild(
                         $site->getLabel(),
                         ['uri' => $admin->generateUrl('list', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]

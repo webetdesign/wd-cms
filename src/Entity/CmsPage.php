@@ -430,7 +430,6 @@ class CmsPage
      */
     public function setCrossSitePages(Collection $crossSitePages): self
     {
-        dump('set');
         /** @var CmsPage $crossSitePage */
         foreach ($crossSitePages as $crossSitePage) {
             $this->addCrossSitePage($crossSitePage);
