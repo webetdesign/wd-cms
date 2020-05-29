@@ -131,8 +131,14 @@ class CmsTwigExtension extends AbstractExtension
         $path             = preg_replace('(\?.*)', '', $path);
         $withoutExtension = $this->pageExtension ? preg_replace('/\.([a-z]+)$/', '', $path) : false;
 
+        $declinations = $page->getDeclinations()->toArray();
+
+        uasort($declinations, function (CmsPageDeclination $a, CmsPageDeclination $b){
+            return strlen($a->getPath()) < strlen($b->getPath());
+        });
+
         /** @var CmsPageDeclination $declination */
-        foreach ($page->getDeclinations() as $declination) {
+        foreach ($declinations as $declination) {
             $dPath = $declination->getPath();
             if ($this->configCms['multilingual'] && !empty( $page->getSite()->getLocale() )) {
                 $dPath = '/' . $page->getSite()->getLocale() . $dPath;
