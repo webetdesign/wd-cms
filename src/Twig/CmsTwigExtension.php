@@ -278,10 +278,10 @@ class CmsTwigExtension extends AbstractExtension
 
     public function cmsMedia($object, $content_code)
     {
-        if ($this->declination && $object instanceof CmsPageDeclination) {
-            $content = $this->getContent($object, $content_code);
-            if (!$content->isSet()) {
-                $content = $this->getContent($object->getPage(), $content_code);
+        if ($this->declination && $object instanceof CmsPage) {
+            $content = null;
+            if ($this->getDeclination($object)) {
+                $content = $this->getContent($this->getDeclination($object), $content_code);
             }
         } else {
             $content = $this->getContent($object, $content_code);
