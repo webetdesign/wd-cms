@@ -283,6 +283,9 @@ class CmsTwigExtension extends AbstractExtension
             if ($this->getDeclination($object)) {
                 $content = $this->getContent($this->getDeclination($object), $content_code);
             }
+            if(!$content) {
+                $content = $this->getContent($object, $content_code);
+            }
         } else {
             $content = $this->getContent($object, $content_code);
         }
