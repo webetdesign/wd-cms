@@ -23,7 +23,7 @@ final class CmsSiteAdmin extends AbstractAdmin
      */
     public function __construct(string $code, string $class, string $baseControllerName, $cmsConfig)
     {
-        $this->isMultisite = $cmsConfig['multisite'];
+        $this->isMultisite    = $cmsConfig['multisite'];
         $this->isMultilingual = $cmsConfig['multilingual'];
 
         parent::__construct($code, $class, $baseControllerName);
@@ -71,7 +71,6 @@ final class CmsSiteAdmin extends AbstractAdmin
             ->add('label')
             ->add('host')
             ->add('default')
-            ->add('visible')
             ->addHelp('default', "Site associé par défaut lorsque l'on crée une page");
         if ($this->isMultisite) {
             $formMapper->add('templateFilter')
@@ -79,6 +78,7 @@ final class CmsSiteAdmin extends AbstractAdmin
         }
         if ($this->isMultilingual) {
             $formMapper
+                ->add('visible')
                 ->add('locale')
                 ->add('hostMultilingual')
                 ->addHelp('hostMultilingual', "Dans un contexte multilingue, cocher cette case permet de gérer la langue avec l’extension du domaine sans préfixé la route <br>
