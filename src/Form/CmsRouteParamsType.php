@@ -4,6 +4,7 @@
 namespace WebEtDesign\CmsBundle\Form;
 
 
+use App\Entity\Product\Range\RangeCategory;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -43,6 +44,7 @@ class CmsRouteParamsType extends AbstractType
         /** @var CmsRoute $route */
         $route  = $options['route'];
         $object = $options['object'];
+        $locale = $object->getPage()->getSite()->getLocale();
 
         $defaults     = json_decode($route->getDefaults(), true);
         $requirements = json_decode($route->getRequirements(), true);
@@ -52,10 +54,13 @@ class CmsRouteParamsType extends AbstractType
             $type  = !empty($param['entity']) ? EntityType::class : TextType::class;
             $opts  = !empty($param['entity']) ? [
                 'class'        => $param['entity'],
-                'choice_value' => function ($entity = null) use ($param) {
+                'choice_value' => function ($entity = null) use ($param, $locale) {
                     $getter = 'get' . ucfirst($param['property']);
-
-                    return $entity ? $entity->$getter() : '';
+                    if ($this->cmsConfig['multilingual'] == true && is_subclass_of($entity, TranslatableInterface::class)) {
+                        return $entity ? $entity->translate($locale)->$getter() : '';
+                    } else {
+                        return $entity ? $entity->$getter() : '';
+                    }
                 },
                 'required'     => false
             ] : [
@@ -108,20 +113,22 @@ class CmsRouteParamsType extends AbstractType
                         }
                     }
                 }
-
                 return $values;
             },
-            function ($values) use ($config) {
+            function ($values) use ($config, $locale) {
                 foreach ($values as $name => $value) {
                     $param = $config['params'][$name] ?? null;
                     if ($param && isset($param['property'])) {
                         $getter = 'get' . ucfirst($param['property']);
                         if (method_exists($value, $getter)) {
-                            $values[$name] = $value->$getter();
+                            if ($this->cmsConfig['multilingual'] == true && is_subclass_of($value, TranslatableInterface::class)) {
+                                $values[$name] = $value->translate($locale)->$getter();
+                            } else {
+                                $values[$name] = $value->$getter();
+                            }
                         }
                     }
                 }
-
                 return json_encode($values);
             }
         ));
