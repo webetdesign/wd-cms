@@ -118,7 +118,7 @@ class CmsPageAdmin extends AbstractAdmin
             return;
         }
 
-        if ($this->declination && $subject->getId() != null && $subject->getRoute()->isDynamic()) {
+        if ($this->declination && $subject->getId() != null && $subject->getRoute() && $subject->getRoute()->isDynamic()) {
             $menu->addChild(
                 'Page',
                 ['uri' => $admin->generateUrl('edit', ['id' => $id])]
