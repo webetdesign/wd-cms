@@ -89,6 +89,12 @@ class CmsSite
     private $sharedBlocks;
 
     /**
+     * @var boolean
+     * @ORM\Column(type="boolean", options={"default": true})
+     */
+    private $visible;
+
+    /**
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -371,6 +377,24 @@ class CmsSite
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible(): bool
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param bool $visible
+     * @return CmsSite
+     */
+    public function setVisible(bool $visible): CmsSite
+    {
+        $this->visible = $visible;
         return $this;
     }
 

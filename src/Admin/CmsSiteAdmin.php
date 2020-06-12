@@ -47,6 +47,7 @@ final class CmsSiteAdmin extends AbstractAdmin
             ->add('id')
             ->add('label')
             ->add('host')
+            ->add('visible')
             ->add('default');
         if ($this->isMultilingual) {
             $listMapper
@@ -70,6 +71,7 @@ final class CmsSiteAdmin extends AbstractAdmin
             ->add('label')
             ->add('host')
             ->add('default')
+            ->add('visible')
             ->addHelp('default', "Site associé par défaut lorsque l'on crée une page");
         if ($this->isMultisite) {
             $formMapper->add('templateFilter')

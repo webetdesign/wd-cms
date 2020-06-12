@@ -347,6 +347,9 @@ class CmsTwigExtension extends AbstractExtension
     {
         $pages = [];
         foreach ($page->getCrossSitePages() as $p) {
+            if (!$p->getSite()->isVisible()) {
+                continue;
+            }
             preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
             $routeParams  = [];
             $paramsConfig = $this->pageProvider->getConfigurationFor($page->getTemplate())['params'];
