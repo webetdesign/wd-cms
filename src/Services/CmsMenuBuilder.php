@@ -199,7 +199,6 @@ class CmsMenuBuilder
                             if ($menuItem->getAttribute('class')) {
                                 $childItemClass .= $menuItem->getAttribute('class');
                             }
-                            dump($childItemClass);
                         }
                         break;
                 }
