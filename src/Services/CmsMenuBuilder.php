@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Services;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\User;
 use HttpInvalidParamException;
+use Knp\Menu\MenuItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\RouterInterface;
@@ -195,6 +196,10 @@ class CmsMenuBuilder
                         if (isset($this->configMenu[$item->getLinkValue()])) {
                             $service = $this->container->get($this->configMenu[$item->getLinkValue()]['service']);
                             $service->build($menuItem, $locale);
+                            if ($menuItem->getAttribute('class')) {
+                                $childItemClass .= $menuItem->getAttribute('class');
+                            }
+                            dump($childItemClass);
                         }
                         break;
                 }
@@ -233,5 +238,4 @@ class CmsMenuBuilder
 
         return $active;
     }
-
 }
