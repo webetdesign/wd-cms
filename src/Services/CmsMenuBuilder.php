@@ -154,7 +154,6 @@ class CmsMenuBuilder
                     case CmsMenuLinkTypeEnum::CMS_PAGE:
                         if ($item->getPage()) {
                             if (!$item->getPage()->isActive()) {
-                                dump('ici');
                                 $menu->removeChild($item->getName());
                                 continue 2;
                             }
