@@ -143,9 +143,19 @@ class CmsMenuBuilder
             $menuItem = $menu->addChild($item->getName());
             $menuItem->setExtra('lvl', $item->getLvl());
 
-            $childItemClass = '';
-            if ($item->getClasses()) {
-                $childItemClass .= $item->getClasses() . ' ';
+            $liClass = '';
+            if ($item->getLiClass()) {
+                $liClass .= $item->getLiClass() . ' ';
+            }
+
+            $ulClass = '';
+            if ($item->getUlClass()) {
+                $ulClass .= $item->getUlClass() . ' ';
+            }
+
+            $linkClass = '';
+            if ($item->getLinkClass()) {
+                $linkClass .= $item->getLinkClass() . ' ';
             }
 
             if (sizeof($children) == 0 || (sizeof($children) > 0 && $parentActive)) {
@@ -159,7 +169,7 @@ class CmsMenuBuilder
                             }
                             $menuItem->setExtra('page', $item->getPage());
                             if ($this->isActive($item)) {
-                                $childItemClass .= $activeClass;
+                                $liClass .= $activeClass;
                             }
                             $route = $item->getPage()->getRoute();
                             if ($route) {
@@ -196,7 +206,16 @@ class CmsMenuBuilder
                             $service = $this->container->get($this->configMenu[$item->getLinkValue()]['service']);
                             $service->build($menuItem, $locale);
                             if ($menuItem->getAttribute('class')) {
-                                $childItemClass .= $menuItem->getAttribute('class');
+                                $liClass .= $menuItem->getAttribute('class');
+                            }
+                            if ($menuItem->getChildrenAttribute('class')) {
+                                $ulClass .= $menuItem->getChildrenAttribute('class');
+                            }
+                            if ($menuItem->getLinkAttribute('class')) {
+                                $linkClass .= $menuItem->getLinkAttribute('class');
+                            }
+                            if ($menuItem->getLabelAttribute('class')) {
+                                $linkClass .= $menuItem->getLabelAttribute('class');
                             }
                         }
                         break;
@@ -206,7 +225,10 @@ class CmsMenuBuilder
                 $this->buildNodes($menuItem, $children, $parentActive, $activeClass, $locale);
             }
 
-            $menuItem->setAttribute('class', $childItemClass);
+            $menuItem->setAttribute('class', $liClass);
+            $menuItem->setChildrenAttribute('class', $ulClass);
+            $menuItem->setLinkAttribute('class', $linkClass);
+            $menuItem->setLabelAttribute('class', $linkClass);
             if ($item->isBlank()) {
                 $menuItem->setLinkAttribute('target', '_blank');
             }
