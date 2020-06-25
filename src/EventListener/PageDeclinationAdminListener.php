@@ -70,7 +70,7 @@ class PageDeclinationAdminListener
                     $entity = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
                 }
 
-                $technicName .= '__' . $name . '_' . $entity->getId();
+                $technicName .= $entity ?? '__' . $name . '_' . $entity->getId();
                 $values[$name] = $entity ?? null;
             }
         }
