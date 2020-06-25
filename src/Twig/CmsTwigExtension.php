@@ -25,6 +25,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
@@ -40,9 +41,9 @@ class CmsTwigExtension extends AbstractExtension
     protected $globalVarsEnable;
     protected $pageProvider;
     protected $pageExtension;
-    private   $sharedBlockProvider;
-    private   $twig;
-    private   $container;
+    private $sharedBlockProvider;
+    private $twig;
+    private $container;
 
     private $em;
 
@@ -62,20 +63,21 @@ class CmsTwigExtension extends AbstractExtension
         TemplateProvider $templateProvider,
         RequestStack $requestStack,
         ParameterBagInterface $parameterBag
-    ) {
-        $this->em                  = $entityManager;
-        $this->router              = $router;
-        $this->container           = $container;
-        $this->twig                = $twig;
-        $this->pageProvider        = $pageProvider;
+    )
+    {
+        $this->em = $entityManager;
+        $this->router = $router;
+        $this->container = $container;
+        $this->twig = $twig;
+        $this->pageProvider = $pageProvider;
         $this->sharedBlockProvider = $templateProvider;
-        $this->requestStack        = $requestStack;
+        $this->requestStack = $requestStack;
 
-        $this->pageExtension  = $parameterBag->get('wd_cms.cms.page_extension');
-        $this->declination    = $parameterBag->get('wd_cms.cms.declination');
+        $this->pageExtension = $parameterBag->get('wd_cms.cms.page_extension');
+        $this->declination = $parameterBag->get('wd_cms.cms.declination');
         $this->customContents = $parameterBag->get('wd_cms.custom_contents');
         $globalVarsDefinition = $parameterBag->get('wd_cms.vars');
-        $this->configCms      = $parameterBag->get('wd_cms.cms');
+        $this->configCms = $parameterBag->get('wd_cms.cms');
 
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
         if ($globalVarsDefinition['enable']) {
@@ -126,21 +128,24 @@ class CmsTwigExtension extends AbstractExtension
 
     private function getDeclination(CmsPage $page)
     {
-        $request          = $this->requestStack->getCurrentRequest();
-        $path             = $request->getRequestUri();
-        $path             = preg_replace('(\?.*)', '', $path);
+        $request = $this->requestStack->getCurrentRequest();
+        $path = $request->getRequestUri();
+
+        $path = preg_replace('(\?.*)', '', $path);
         $withoutExtension = $this->pageExtension ? preg_replace('/\.([a-z]+)$/', '', $path) : false;
 
         $declinations = $page->getDeclinations()->toArray();
 
-        uasort($declinations, function (CmsPageDeclination $a, CmsPageDeclination $b){
+        uasort($declinations, function (CmsPageDeclination $a, CmsPageDeclination $b) {
+            return strlen($a->getPath()) < strlen($b->getPath());
             return strlen($a->getPath()) < strlen($b->getPath());
         });
 
         /** @var CmsPageDeclination $declination */
         foreach ($declinations as $declination) {
             $dPath = $declination->getPath();
-            if ($this->configCms['multilingual'] && !empty( $page->getSite()->getLocale() )) {
+
+            if ($this->configCms['multilingual'] && !empty($page->getSite()->getLocale())) {
                 $dPath = '/' . $page->getSite()->getLocale() . $dPath;
             }
 
@@ -174,7 +179,6 @@ class CmsTwigExtension extends AbstractExtension
                     CmsContentTypeEnum::CHECKBOX,
                 ], array_keys($this->customContents))
             );
-
         return $content;
     }
 
@@ -184,12 +188,21 @@ class CmsTwigExtension extends AbstractExtension
      * @return string|null
      * @throws Exception
      */
-    public function cmsRenderContent($object, $content_code)
+    public function cmsRenderContent($object, $content_code, $default = null)
     {
+        $defaultLangSite = $this->em->getRepository(CmsSite::class)->findOneBy(['default' => true]);
+
         if ($this->declination && $object instanceof CmsPage) {
             $content = null;
-            if ($this->getDeclination($object)) {
-                $content = $this->getContent($this->getDeclination($object), $content_code);
+            if ($declination = $this->getDeclination($object)) {
+                $content = $this->getContent($declination, $content_code);
+                if (!$content->getValue() && $defaultLangSite && $this->configCms['multilingual']) {
+                    $technicName = preg_replace('/^' . $declination->getLocale() . '_(.*)/', $defaultLangSite->getLocale() . '_$1', $declination->getTechnicName());
+                    $declinationDefault = $this->em->getRepository(CmsPageDeclination::class)->findOneBy(['technic_name' => $technicName]);
+                    if($declinationDefault) {
+                        $content = $this->getContent($declinationDefault, $content_code);
+                    }
+                }
             }
             if ($content) {
                 $isSet = false;
@@ -254,7 +267,9 @@ class CmsTwigExtension extends AbstractExtension
             return filter_var($content->getValue(), FILTER_VALIDATE_BOOLEAN);
         }
 
-        return $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
+        $value = $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
+
+        return $value;
     }
 
     public function getSharedBlock($code)
@@ -278,12 +293,21 @@ class CmsTwigExtension extends AbstractExtension
 
     public function cmsMedia($object, $content_code)
     {
+        $defaultLangSite = $this->em->getRepository(CmsSite::class)->findOneBy(['default' => true]);
+
         if ($this->declination && $object instanceof CmsPage) {
             $content = null;
-            if ($this->getDeclination($object)) {
-                $content = $this->getContent($this->getDeclination($object), $content_code);
+            if ($declination = $this->getDeclination($object)) {
+                $content = $this->getContent($declination, $content_code);
+                if (!$content->getValue() && $defaultLangSite && $this->configCms['multilingual']) {
+                    $technicName = preg_replace('/^' . $declination->getLocale() . '_(.*)/', $defaultLangSite->getLocale() . '_$1', $declination->getTechnicName());
+                    $declinationDefault = $this->em->getRepository(CmsPageDeclination::class)->findOneBy(['technic_name' => $technicName]);
+                    if($declinationDefault) {
+                        $content = $this->getContent($declinationDefault, $content_code);
+                    }
+                }
             }
-            if(!$content) {
+            if (!$content) {
                 $content = $this->getContent($object, $content_code);
             }
         } else {
@@ -351,7 +375,7 @@ class CmsTwigExtension extends AbstractExtension
                 continue;
             }
             preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
-            $routeParams  = [];
+            $routeParams = [];
             $paramsConfig = $this->pageProvider->getConfigurationFor($page->getTemplate())['params'];
             foreach ($params[1] as $param) {
                 if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null &&
@@ -360,7 +384,7 @@ class CmsTwigExtension extends AbstractExtension
                     /** @var Category $object */
                     $object = $this->em->getRepository($paramsConfig[$param]['entity'])
                         ->$repoMethod($request->get($param), $page->getSite()->getLocale());
-                    $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
+                    $getProperty = 'get' . ucfirst($paramsConfig[$param]['property']);
                     $routeParams[$param] = $object->translate($p->getSite()->getLocale())->$getProperty();
 
                 } else {
@@ -382,7 +406,7 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         return $this->twig->render('@WebEtDesignCms/block/cms_locale_switch.html.twig', [
-            'page'  => $page,
+            'page' => $page,
             'pages' => $pages
         ]);
     }
@@ -394,7 +418,7 @@ class CmsTwigExtension extends AbstractExtension
         $value = null;
         if ($object instanceof CmsPage && $this->declination && ($declination = $this->getDeclination($object))) {
             $value = $this->getSeoSmoValue($declination, $method);
-            if(empty($value)){
+            if (empty($value)) {
                 $value = $this->getSeoSmoValueFallbackParentPage($object, $method);
             }
         } else {
@@ -444,7 +468,7 @@ class CmsTwigExtension extends AbstractExtension
             if (!$page->getRoute()->isDynamic()) {
                 $items[] = [
                     'title' => $page->getTitle(),
-                    'link'  => $this->router->generate($page->getRoute()->getName())
+                    'link' => $this->router->generate($page->getRoute()->getName())
                 ];
             }
             /** @var CmsPage $page */

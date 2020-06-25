@@ -41,6 +41,20 @@ class CmsPageDeclination
     private $title;
 
     /**
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
+     *
+     */
+    private $technic_name;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", length=255, nullable=false)
+     *
+     */
+    private $locale;
+
+    /**
      *
      * @var ArrayCollection|PersistentCollection
      *
@@ -169,7 +183,7 @@ class CmsPageDeclination
     }
 
     /**
-     * @return mixed
+     * @return CmsPage
      */
     public function getPage()
     {
@@ -201,6 +215,35 @@ class CmsPageDeclination
         }
 
         return $this->seo_title;
+    }
+
+    public function getTechnicName(): ?string
+    {
+        return $this->technic_name;
+    }
+
+    public function setTechnicName(?string $technic_name): self
+    {
+        $this->technic_name = $technic_name;
+
+        return $this;
+    }
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): self
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getActive(): ?bool
+    {
+        return $this->active;
     }
 
 }

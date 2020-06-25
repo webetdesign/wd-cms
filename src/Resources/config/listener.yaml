@@ -21,8 +21,11 @@ services:
     class: WebEtDesign\CmsBundle\EventListener\PageDeclinationAdminListener
     arguments:
       - '@doctrine.orm.entity_manager'
+      - '%wd_cms.templates%'
+      - '%wd_cms.cms%'
     tags:
       - { name: doctrine.event_listener, event: prePersist }
+      - { name: doctrine.event_listener, event: preUpdate }
 
   cms.admin.cms_site_listener:
     class: '%cms.admin.cms_site_listener.class%'

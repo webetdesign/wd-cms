@@ -264,6 +264,8 @@ class CmsPage
         $this->setActive(false);
         $this->roles          = [];
         $this->crossSitePages = new ArrayCollection();
+        $this->menuItems = new ArrayCollection();
+        $this->children = new ArrayCollection();
     }
 
     /**

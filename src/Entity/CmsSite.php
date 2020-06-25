@@ -107,6 +107,7 @@ class CmsSite
     {
         $this->pages = new ArrayCollection();
         $this->menus = new ArrayCollection();
+        $this->sharedBlocks = new ArrayCollection();
     }
 
     /**
@@ -396,6 +397,29 @@ class CmsSite
     {
         $this->visible = $visible;
         return $this;
+    }
+
+    public function getHostMultilingual(): ?bool
+    {
+        return $this->hostMultilingual;
+    }
+
+    public function getDefault(): ?bool
+    {
+        return $this->default;
+    }
+
+    public function getVisible(): ?bool
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @return Collection|CmsMenu[]
+     */
+    public function getMenus(): Collection
+    {
+        return $this->menus;
     }
 
 }

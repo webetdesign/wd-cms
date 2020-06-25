@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -237,6 +238,39 @@ class CmsSharedBlock
     public function getSite()
     {
         return $this->site;
+    }
+
+    public function getPublic(): ?bool
+    {
+        return $this->public;
+    }
+
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function addContentList(CmsContentHasSharedBlock $contentList): self
+    {
+        if (!$this->contentList->contains($contentList)) {
+            $this->contentList[] = $contentList;
+            $contentList->setSharedBlock($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContentList(CmsContentHasSharedBlock $contentList): self
+    {
+        if ($this->contentList->contains($contentList)) {
+            $this->contentList->removeElement($contentList);
+            // set the owning side to null (unless already changed)
+            if ($contentList->getSharedBlock() === $this) {
+                $contentList->setSharedBlock(null);
+            }
+        }
+
+        return $this;
     }
 
 }

@@ -7,6 +7,7 @@
  */
 
 namespace WebEtDesign\CmsBundle\Entity;
+use App\Entity\Media;
 use Doctrine\ORM\Mapping as ORM;
 
 

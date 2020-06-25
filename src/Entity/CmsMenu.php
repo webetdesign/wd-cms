@@ -206,4 +206,27 @@ class CmsMenu
         return $this->site;
     }
 
+    public function addChild(CmsMenuItem $child): self
+    {
+        if (!$this->children->contains($child)) {
+            $this->children[] = $child;
+            $child->setMenu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChild(CmsMenuItem $child): self
+    {
+        if ($this->children->contains($child)) {
+            $this->children->removeElement($child);
+            // set the owning side to null (unless already changed)
+            if ($child->getMenu() === $this) {
+                $child->setMenu(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

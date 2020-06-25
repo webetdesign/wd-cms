@@ -596,4 +596,14 @@ class CmsMenuItem
     {
         return $this->anchor;
     }
+
+    public function getIsVisible(): ?bool
+    {
+        return $this->isVisible;
+    }
+
+    public function getBlank(): ?bool
+    {
+        return $this->blank;
+    }
 }
