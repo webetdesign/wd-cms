@@ -191,6 +191,16 @@ class CmsTwigExtension extends AbstractExtension
     public function cmsRenderContent($object, $content_code, $default = null)
     {
         $defaultLangSite = $this->em->getRepository(CmsSite::class)->findOneBy(['default' => true]);
+        $defaultPage = null;
+        if ($defaultLangSite) {
+            $defaultPages = $object->getCrossSitePages()->filter(function (CmsPage $crossPage) use ($defaultLangSite) {
+                return $crossPage->getSite() === $defaultLangSite;
+            });
+
+            if ($defaultPages->count()) {
+                $defaultPage = $defaultPages->first();
+            }
+        }
 
         if ($this->declination && $object instanceof CmsPage) {
             $content = null;
@@ -239,8 +249,11 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         if (in_array($content->getType(), array_keys($this->customContents))) {
-            $contentService = $this->container->get($this->customContents[$content->getType()]['service']);
+            if(!$content->getValue() || $content->getValue() === '[]') {
+                $content = $this->getContent($defaultPage, $content_code);
+            }
 
+            $contentService = $this->container->get($this->customContents[$content->getType()]['service']);
             return $contentService->render($content);
         }
 
@@ -268,6 +281,15 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         $value = $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
+
+        if (!$value) {
+            if ($defaultLangSite) {
+                if ($defaultPage) {
+                    $content = $this->getContent($defaultPage, $content_code);
+                    $value = $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
+                }
+            }
+        }
 
         return $value;
     }
@@ -320,6 +342,24 @@ class CmsTwigExtension extends AbstractExtension
 
         if (!$content->isActive()) {
             return null;
+        }
+
+        if (!$content->getMedia() && $defaultLangSite) {
+            $defaultPages = $object->getCrossSitePages()->filter(function (CmsPage $crossPage) use ($defaultLangSite) {
+                return $crossPage->getSite() === $defaultLangSite;
+            });
+
+            if ($defaultPages->count()) {
+                $content = $this->getContent($defaultPages->first(), $content_code);
+
+                if (!$content) {
+                    return null;
+                }
+
+                if (!$content->isActive()) {
+                    return null;
+                }
+            }
         }
 
         return $content->getMedia();
