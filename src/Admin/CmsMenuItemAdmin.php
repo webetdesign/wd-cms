@@ -223,8 +223,17 @@ final class CmsMenuItemAdmin extends AbstractAdmin
 
             $formMapper
                 ->add('blank', null, ['label' => 'Nouvelle fenetre'])
-                ->add('classes', null, [
-                    'label'    => 'Classes',
+
+                ->add('liClass', null, [
+                    'label'    => 'item class (li)',
+                    'required' => false,
+                ])
+                ->add('ulClass', null, [
+                    'label'    => 'list class (ul)',
+                    'required' => false,
+                ])
+                ->add('linkClass', null, [
+                    'label'    => 'link class (a, span)',
                     'required' => false,
                 ])
                 ->add('connected', ChoiceType::class, [

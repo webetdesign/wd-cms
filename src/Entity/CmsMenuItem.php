@@ -108,9 +108,20 @@ class CmsMenuItem
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
-     *
      */
-    private $classes;
+    private $liClass;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $ulClass;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $linkClass;
 
     /**
      * @var string
@@ -442,20 +453,11 @@ class CmsMenuItem
 
     /**
      * @return string
+     * @deprecated use getLiClass()
      */
     public function getClasses(): ?string
     {
-        return $this->classes;
-    }
-
-    /**
-     * @param string $classes
-     * @return CmsMenuItem
-     */
-    public function setClasses(?string $classes): CmsMenuItem
-    {
-        $this->classes = $classes;
-        return $this;
+        return $this->liClass;
     }
 
     /**
@@ -605,5 +607,59 @@ class CmsMenuItem
     public function getBlank(): ?bool
     {
         return $this->blank;
+    }
+    
+    /**
+     * @param string $liClass
+     * @return CmsMenuItem
+     */
+    public function setLiClass(?string $liClass): CmsMenuItem
+    {
+        $this->liClass = $liClass;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLiClass(): ?string
+    {
+        return $this->liClass;
+    }
+
+    /**
+     * @param string $ulClass
+     * @return CmsMenuItem
+     */
+    public function setUlClass(?string $ulClass): CmsMenuItem
+    {
+        $this->ulClass = $ulClass;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUlClass(): ?string
+    {
+        return $this->ulClass;
+    }
+
+    /**
+     * @param string $linkClass
+     * @return CmsMenuItem
+     */
+    public function setLinkClass(?string $linkClass): CmsMenuItem
+    {
+        $this->linkClass = $linkClass;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLinkClass(): ?string
+    {
+        return $this->linkClass;
     }
 }
