@@ -249,7 +249,7 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         if (in_array($content->getType(), array_keys($this->customContents))) {
-            if(!$content->getValue() || $content->getValue() === '[]') {
+            if((!$content->getValue() || $content->getValue() === '[]') && $defaultPage) {
                 $content = $this->getContent($defaultPage, $content_code);
             }
 
