@@ -159,6 +159,8 @@ class CmsDuplicateSiteCommand extends Command
 
     public function processRouteName(CmsPage $page, $newLocale)
     {
+        $route = $page->getRoute();
+
         $name   = $page->getRoute()->getName();
         $locale = $page->getSite()->getLocale();
 
@@ -181,6 +183,10 @@ class CmsDuplicateSiteCommand extends Command
     {
         /** @var CmsRoute $route */
         $route = $page->getRoute();
+
+        if (!$route) {
+            return;
+        }
 
         if ($newPage->getRoute() === null) {
             $newRoute = new CmsRoute();

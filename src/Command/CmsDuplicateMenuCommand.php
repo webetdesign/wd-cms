@@ -114,7 +114,9 @@ class CmsDuplicateMenuCommand extends Command
             $item = new CmsMenuItem();
             $item->setMenu($newRoot->getMenu());
             $item->setName($ref->getName());
-            $item->setClasses($ref->getClasses());
+            $item->setLiClass($ref->getLiClass());
+            $item->setUlClass($ref->getUlClass());
+            $item->setLinkClass($ref->getLinkClass());
             $item->setLinkType($ref->getLinkType());
             $item->setLinkValue($item->getLinkValue());
             $item->setIsVisible($ref->isVisible());
