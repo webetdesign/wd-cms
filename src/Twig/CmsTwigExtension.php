@@ -321,7 +321,7 @@ class CmsTwigExtension extends AbstractExtension
             $content = null;
             if ($declination = $this->getDeclination($object)) {
                 $content = $this->getContent($declination, $content_code);
-                if (!$content->getValue() && $defaultLangSite && $this->configCms['multilingual']) {
+                if (!$content->getMedia() && $defaultLangSite && $this->configCms['multilingual']) {
                     $technicName = preg_replace('/^' . $declination->getLocale() . '_(.*)/', $defaultLangSite->getLocale() . '_$1', $declination->getTechnicName());
                     $declinationDefault = $this->em->getRepository(CmsPageDeclination::class)->findOneBy(['technic_name' => $technicName]);
                     if($declinationDefault) {
