@@ -192,7 +192,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         $defaultLangSite = $this->em->getRepository(CmsSite::class)->findOneBy(['default' => true]);
         $defaultPage = null;
-        if ($defaultLangSite) {
+        if ($defaultLangSite && $this->configCms['multilingual']) {
             $defaultPages = $object->getCrossSitePages()->filter(function (CmsPage $crossPage) use ($defaultLangSite) {
                 return $crossPage->getSite() === $defaultLangSite;
             });
