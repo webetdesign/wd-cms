@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Twig;
 
-use App\Entity\Product\Category;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -420,10 +419,13 @@ class CmsTwigExtension extends AbstractExtension
             foreach ($params[1] as $param) {
                 if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null &&
                     is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class)) {
+
                     $repoMethod = 'findOneBy' . ucfirst($paramsConfig[$param]['property']);
-                    /** @var Category $object */
+                    $criterion = $request->get('_route_params')[$param] ?? null;
+
                     $object = $this->em->getRepository($paramsConfig[$param]['entity'])
-                        ->$repoMethod($request->get($param), $page->getSite()->getLocale());
+                        ->$repoMethod($criterion, $page->getSite()->getLocale());
+
                     $getProperty = 'get' . ucfirst($paramsConfig[$param]['property']);
                     $routeParams[$param] = $object->translate($p->getSite()->getLocale())->$getProperty();
 
