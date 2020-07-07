@@ -92,7 +92,7 @@ class CmsSite
      * @var boolean
      * @ORM\Column(type="boolean", options={"default": true})
      */
-    private $visible;
+    private $visible = true;
 
     /**
      *
