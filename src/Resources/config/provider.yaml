@@ -10,7 +10,7 @@ services:
       - "@sonata.media.generator.default"
       - "@sonata.media.thumbnail.format"
       - ['svg']
-      - ['image/svg+xml']
+      - ['image/svg+xml', 'image/svg']
 
     calls:
       - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/SVG/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/SVG/view_svg.html.twig' }]]
