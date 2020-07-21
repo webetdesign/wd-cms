@@ -70,6 +70,7 @@ services:
       - [setTranslationDomain, ['cms']]
       #      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/menu/actionButtons/button_create.html.twig']]
+      - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/menu:edit.html.twig']]
       - [addChild, ['@cms.admin.cms_menu_item', 'menu']]
     public: true
 
