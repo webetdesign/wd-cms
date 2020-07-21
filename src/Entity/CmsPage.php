@@ -61,7 +61,9 @@ class CmsPage
     /**
      * @var string
      * @ORM\Column(type="string", length=255, nullable=false)
-     * @Gedmo\Slug(fields={"title"}, separator="-")
+     * @Gedmo\Slug(handlers={
+     *      @Gedmo\SlugHandler(class="WebEtDesign\CmsBundle\Handler\CmsPageSlugHandler")
+     * }, fields={"title"}, unique=false)
      *
      */
     private $slug;
