@@ -1,0 +1,22 @@
+{% extends '@SonataAdmin/CRUD/base_edit_form.html.twig' %}
+
+{% if action == 'create' %}
+    {% set options = {
+        'id': object.site.id,
+        'uniqid': admin.uniqid,
+        'subclass': app.request.get('subclass'),
+    } %}
+{% else %}
+    {% set options = {
+        'id': objectId|default(admin.id(object)),
+        'uniqid': admin.uniqid,
+    } %}
+{% endif %}
+
+{%- block sonata_form_action_url -%}
+    {{ admin.generateUrl(action, options) }}
+{%- endblock -%}
+
+{% block form %}
+    {{ parent() }}
+{% endblock %}

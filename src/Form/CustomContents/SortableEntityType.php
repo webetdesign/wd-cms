@@ -33,7 +33,6 @@ class SortableEntityType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('position', HiddenType::class);
-
         if($options['admin']) {
             $this->buildModelListType($builder, $this->cmsContentAdmin, $options['admin'], 'entity', $options['entity_class'], [
                 'label'           => false,

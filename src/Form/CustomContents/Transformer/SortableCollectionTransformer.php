@@ -58,19 +58,26 @@ class SortableCollectionTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
+        $data = [];
         if (is_array($value)) {
             foreach ($value as $sortableEntity) {
                 if (method_exists($sortableEntity->entity, 'getId')) {
                     $sortableEntity->entity = $sortableEntity->entity->getId();
+                    if ($sortableEntity->entity){
+                        $data[] = $sortableEntity;
+                    }
                 }
             }
 
-            $value = array_values($value);
-            usort($value, function (SortableEntity $a, SortableEntity $b) {
+            $data = array_values($data);
+            usort($data, function (SortableEntity $a, SortableEntity $b) {
                 return $a->position < $b->position ? -1 : 1;
             });
+
+        }else{
+            $data = $value;
         }
 
-        return json_encode($value, true);
+        return json_encode($data, true);
     }
 }

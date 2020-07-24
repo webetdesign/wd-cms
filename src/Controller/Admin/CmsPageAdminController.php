@@ -545,6 +545,7 @@ class CmsPageAdminController extends CRUDController
             if ($this->admin->hasActiveSubClass()) {
                 $params['subclass'] = $request->get('subclass');
             }
+            $params['id'] = $object->getSite()->getId();
             $url = $this->admin->generateUrl('create', $params);
         }
 

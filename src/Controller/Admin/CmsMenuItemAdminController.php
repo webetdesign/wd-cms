@@ -143,8 +143,6 @@ final class CmsMenuItemAdminController extends CRUDController
                     // redirect to edit mode
                     return $this->redirectTo($newObject);
                 } catch (ModelManagerException $e) {
-                    dump($e);
-                    die();
                     $this->handleModelManagerException($e);
 
                     $isFormValid = false;
