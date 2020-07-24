@@ -226,7 +226,7 @@ class CmsMenuBuilder
             }
 
             if ($this->isChildActive($menuItem)) {
-                $liClass .= 'active';
+                $liClass .= $activeClass;
             }
 
             $menuItem->setAttribute('class', $liClass);
