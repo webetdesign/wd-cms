@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
+use Sonata\AdminBundle\Builder\FormContractorInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\Form\Type\CollectionType;
 use Sonata\UserBundle\Form\Type\SecurityRolesType;
@@ -48,6 +49,8 @@ class CmsPageAdmin extends AbstractAdmin
     protected $globalVarsEnable;
     protected $pageProvider;
     protected $customFormThemes;
+    /** @var FormContractorInterface  */
+    protected $customFormContractor;
 
     public function __construct(
         string $code,
@@ -61,13 +64,13 @@ class CmsPageAdmin extends AbstractAdmin
         TemplateProvider $pageProvider,
         $customFormThemes
     ) {
-        $this->multisite        = $multisite;
-        $this->multilingual     = $multilingual;
-        $this->declination      = $declination;
-        $this->em               = $em;
-        $this->globalVarsEnable = $globalVarsDefinition['enable'];
-        $this->pageProvider     = $pageProvider;
-        $this->customFormThemes = $customFormThemes;
+        $this->multisite            = $multisite;
+        $this->multilingual         = $multilingual;
+        $this->declination          = $declination;
+        $this->em                   = $em;
+        $this->globalVarsEnable     = $globalVarsDefinition['enable'];
+        $this->pageProvider         = $pageProvider;
+        $this->customFormThemes     = $customFormThemes;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -94,8 +97,11 @@ class CmsPageAdmin extends AbstractAdmin
         parent::configureRoutes($collection);
     }
 
-    protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
-    {
+    protected function configureSideMenu(
+        MenuItemInterface $menu,
+        $action,
+        AdminInterface $childAdmin = null
+    ) {
         $admin   = $this->isChild() ? $this->getParent() : $this;
         $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
 
@@ -108,7 +114,10 @@ class CmsPageAdmin extends AbstractAdmin
                     $active = $site->getId() == $this->request->attributes->get('id');
                     $menu->addChild(
                         $site->__toString(),
-                        ['uri' => $admin->generateUrl('tree', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
+                        [
+                            'uri'        => $admin->generateUrl('tree', ['id' => $site->getId()]),
+                            'attributes' => ['class' => $active ? 'active' : ""]
+                        ]
                     );
                 }
             }
@@ -180,7 +189,8 @@ class CmsPageAdmin extends AbstractAdmin
 
         $site = $object->getSite();
 
-        $formMapper->getFormBuilder()->setAction($this->generateUrl('create', ['id' => $site->getId()]));
+        $formMapper->getFormBuilder()->setAction($this->generateUrl('create',
+            ['id' => $site->getId()]));
 
         $admin->setFormTheme(array_merge($admin->getFormTheme(), [
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
@@ -284,7 +294,10 @@ class CmsPageAdmin extends AbstractAdmin
             //region Contenus
             $formMapper->tab('Contenus');
             $formMapper
-                ->with('', ['box_class' => 'header_none', 'class' => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'])
+                ->with('', [
+                    'box_class' => 'header_none',
+                    'class'     => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'
+                ])
                 ->add('contents', CmsContentsType::class, [
                     'label'        => false,
                     'by_reference' => false,
@@ -301,7 +314,8 @@ class CmsPageAdmin extends AbstractAdmin
                 $formMapper->tab('Route')
                     ->with('', ['box_class' => ''])
                     ->add('route.name', null, ['label' => 'Route name (technique)'])
-                    ->add('route.path', null, ['label' => 'Chemin', 'attr' => ['class' => 'cms_route_path_input']])
+                    ->add('route.path', null,
+                        ['label' => 'Chemin', 'attr' => ['class' => 'cms_route_path_input']])
                     ->add(
                         'route.methods',
                         ChoiceType::class,

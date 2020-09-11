@@ -50,8 +50,8 @@ class SharedBlockAdminListener
         // hydrate content
         foreach ($config['contents'] as $content) {
             $CmsContent = new CmsContent();
-            $CmsContent->setCode($content['code'] ?? $content['label']);
-            $CmsContent->setLabel($content['label']);
+            $CmsContent->setCode($content['code']);
+            $CmsContent->setLabel($content['label'] ?? $content['code']);
             $CmsContent->setType($content['type']);
             $block->addContent($CmsContent);
         }

@@ -31,6 +31,7 @@ services:
     calls:
       - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
       - [addChild, ['@cms.admin.cms_page_declination']]
+      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
     public: true
 
   cms.admin.cms_content:
@@ -104,6 +105,7 @@ services:
     calls:
       - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/sharedBlock/actionButtons/button_create.html.twig']]
+      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
 
     public: true
 
@@ -129,4 +131,6 @@ services:
       - '%wd_cms.custom_contents_form_themes%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
+    calls:
+      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
     public: true

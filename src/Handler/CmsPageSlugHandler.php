@@ -9,6 +9,9 @@ use Gedmo\Sluggable\SluggableListener;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 
+/**
+ * Permets la génération du slug de page identique pour des sites différents
+ */
 class CmsPageSlugHandler implements SlugHandlerInterface
 {
     /**

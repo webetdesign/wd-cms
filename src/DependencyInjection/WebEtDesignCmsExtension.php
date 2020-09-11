@@ -46,6 +46,7 @@ class WebEtDesignCmsExtension extends Extension
         $loader->load('listener.yaml');
         $loader->load('menu.yaml');
         $loader->load('provider.yaml');
+        $loader->load('form.yaml');
 
         $this->registerDoctrineMapping($config);
 
