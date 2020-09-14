@@ -54,6 +54,8 @@ class CmsContent
     /**
      * @var null|CmsPage
      * @Gedmo\SortableGroup()
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="contents")
+     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $page;
 
@@ -67,7 +69,8 @@ class CmsContent
     /**
      * @var null|CmsSharedBlock
      * @Gedmo\SortableGroup()
-     * Mapping Relation in WebEtDesignCmsExtension
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", inversedBy="contents")
+     * @ORM\JoinColumn(name="shared_block_parent_id", referencedColumnName="id")
      */
     private $sharedBlockParent;
 
@@ -79,7 +82,7 @@ class CmsContent
     private $sharedBlockList;
 
     /**
-     * @var mixed
+     * @var MediaInterface
      */
     private $media;
 
@@ -97,15 +100,10 @@ class CmsContent
     private $active;
 
     /**
-     *
-     * @var ArrayCollection|PersistentCollection
-     *
-     */
-    private $sliders;
-
-    /**
      * Mapping Relation in WebEtDesignCmsExtension
      * @Gedmo\SortableGroup()
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", inversedBy="contents")
+     * @ORM\JoinColumn(name="declination_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $declination;
 
@@ -242,48 +240,6 @@ class CmsContent
     public function setMedia($media): self
     {
         $this->media = $media;
-
-        return $this;
-    }
-
-    public function setSliders($sliders)
-    {
-        if (count($sliders) > 0) {
-            foreach ($sliders as $i) {
-                $this->addSlider($i);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|CmsContentSlider[]
-     */
-    public function getSliders(): ?Collection
-    {
-        return $this->sliders;
-    }
-
-    public function addSlider(CmsContentSlider $slider): self
-    {
-        if (!$this->sliders->contains($slider)) {
-            $this->sliders[] = $slider;
-            $slider->setContent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSlider(CmsContentSlider $slider): self
-    {
-        if ($this->sliders->contains($slider)) {
-            $this->sliders->removeElement($slider);
-            // set the owning side to null (unless already changed)
-            if ($slider->getContent() === $this) {
-                $slider->setContent(null);
-            }
-        }
 
         return $this;
     }

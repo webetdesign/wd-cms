@@ -1,0 +1,5 @@
+services:
+  cms.sonata.form_contractor.bridge:
+    class: WebEtDesign\CmsBundle\Form\FormContractor
+    arguments:
+      - '@form.factory'
