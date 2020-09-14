@@ -24,7 +24,7 @@ class ImageProvider extends FileProvider
     /**
      * @var ImagineInterface
      */
-    private $imagineAdapter;
+    protected $imagineAdapter;
 
     /**
      * @param string $name
@@ -37,22 +37,32 @@ class ImageProvider extends FileProvider
      * @param array $allowedMimeTypes
      * @param MetadataBuilderInterface $metadata
      */
-    public function __construct($name, Filesystem $filesystem, CDNInterface $cdn, GeneratorInterface $pathGenerator, ThumbnailInterface $thumbnail, ImagineInterface $adapter, $resizer, array $allowedExtensions = [], array $allowedMimeTypes = [], ?MetadataBuilderInterface $metadata = null)
-    {
+    public function __construct(
+        $name,
+        Filesystem $filesystem,
+        CDNInterface $cdn,
+        GeneratorInterface $pathGenerator,
+        ThumbnailInterface $thumbnail,
+        ImagineInterface $adapter,
+        $resizer,
+        array $allowedExtensions = [],
+        array $allowedMimeTypes = [],
+        ?MetadataBuilderInterface $metadata = null
+    ) {
         parent::__construct($name, $filesystem, $cdn, $pathGenerator, $thumbnail);
 
         $this->allowedExtensions = $allowedExtensions;
-        $this->allowedMimeTypes = $allowedMimeTypes;
-        $this->metadata = $metadata;
-        $this->imagineAdapter = $adapter;
-        $this->resizer = $resizer;
+        $this->allowedMimeTypes  = $allowedMimeTypes;
+        $this->metadata          = $metadata;
+        $this->imagineAdapter    = $adapter;
+        $this->resizer           = $resizer;
     }
 
     public function getProviderMetadata()
     {
         return new Metadata(
             $this->getName(),
-            $this->getName().'.description',
+            $this->getName() . '.description',
             null,
             'SonataMediaBundle',
             ['class' => 'fa fa-picture-o']
@@ -71,7 +81,8 @@ class ImageProvider extends FileProvider
             $resizerFormat = $this->getFormat($format);
             if (false === $resizerFormat) {
                 throw new \RuntimeException(sprintf('The image format "%s" is not defined.
-                        Is the format registered in your ``sonata_media`` configuration?', $format));
+                        Is the format registered in your ``sonata_media`` configuration?',
+                    $format));
             }
 
             $box = $this->resizer->getBox($media, $resizerFormat);
@@ -80,10 +91,10 @@ class ImageProvider extends FileProvider
         $mediaWidth = $box->getWidth();
 
         $params = [
-            'alt' => $media->getDescription() ?: $media->getName(),
-            'title' => $media->getName(),
-            'src' => $this->generatePublicUrl($media, $format),
-            'width' => $mediaWidth,
+            'alt'    => $media->getDescription() ?: $media->getName(),
+            'title'  => $media->getName(),
+            'src'    => $this->generatePublicUrl($media, $format),
+            'width'  => $mediaWidth,
             'height' => $box->getHeight(),
         ];
 
@@ -91,25 +102,26 @@ class ImageProvider extends FileProvider
             $pictureParams = [];
             foreach ($options['picture'] as $key => $pictureFormat) {
                 $formatName = $this->getFormatName($media, $pictureFormat);
-                $settings = $this->getFormat($formatName);
-                $src = $this->generatePublicUrl($media, $formatName);
+                $settings   = $this->getFormat($formatName);
+                $src        = $this->generatePublicUrl($media, $formatName);
                 $mediaQuery = \is_string($key)
                     ? $key
-                    : sprintf('(max-width: %dpx)', $this->resizer->getBox($media, $settings)->getWidth());
+                    : sprintf('(max-width: %dpx)',
+                        $this->resizer->getBox($media, $settings)->getWidth());
 
                 $pictureParams['source'][] = ['media' => $mediaQuery, 'srcset' => $src];
             }
 
             unset($options['picture']);
             $pictureParams['img'] = $params + $options;
-            $params = ['picture' => $pictureParams];
+            $params               = ['picture' => $pictureParams];
         } elseif (MediaProviderInterface::FORMAT_ADMIN !== $format) {
             $srcSetFormats = $this->getFormats();
 
             if (isset($options['srcset']) && \is_array($options['srcset'])) {
                 $srcSetFormats = [];
                 foreach ($options['srcset'] as $srcSetFormat) {
-                    $formatName = $this->getFormatName($media, $srcSetFormat);
+                    $formatName                 = $this->getFormatName($media, $srcSetFormat);
                     $srcSetFormats[$formatName] = $this->getFormat($formatName);
                 }
                 unset($options['srcset']);
@@ -128,7 +140,8 @@ class ImageProvider extends FileProvider
                     if (0 === strpos($providerFormat, $media->getContext())) {
                         $width = $this->resizer->getBox($media, $settings)->getWidth();
 
-                        $srcSet[] = sprintf('%s %dw', $this->generatePublicUrl($media, $providerFormat), $width);
+                        $srcSet[] = sprintf('%s %dw',
+                            $this->generatePublicUrl($media, $providerFormat), $width);
                     }
                 }
 
@@ -153,7 +166,7 @@ class ImageProvider extends FileProvider
         try {
             if (!$media->getBinaryContent() instanceof \SplFileInfo) {
                 // this is now optimized at all!!!
-                $path = tempnam(sys_get_temp_dir(), 'sonata_update_metadata');
+                $path       = tempnam(sys_get_temp_dir(), 'sonata_update_metadata');
                 $fileObject = new \SplFileObject($path, 'w');
                 $fileObject->fwrite($this->getReferenceFile($media)->getContent());
             } else {
@@ -161,7 +174,7 @@ class ImageProvider extends FileProvider
             }
 
             $image = $this->imagineAdapter->open($fileObject->getPathname());
-            $size = $image->getSize();
+            $size  = $image->getSize();
 
             $media->setSize($fileObject->getSize());
             $media->setWidth($size->getWidth());
@@ -202,9 +215,10 @@ class ImageProvider extends FileProvider
      */
     public function getFormatsForContext(string $context): array
     {
-        return array_filter($this->getFormats(), static function (string $providerFormat) use ($context): bool {
-            return 0 === strpos($providerFormat, $context);
-        }, ARRAY_FILTER_USE_KEY);
+        return array_filter($this->getFormats(),
+            static function (string $providerFormat) use ($context): bool {
+                return 0 === strpos($providerFormat, $context);
+            }, ARRAY_FILTER_USE_KEY);
     }
 
     protected function doTransform(MediaInterface $media)
@@ -220,8 +234,10 @@ class ImageProvider extends FileProvider
             return;
         }
 
-        if (!in_array(strtolower(pathinfo($fileName, PATHINFO_EXTENSION)), $this->allowedExtensions, true)
-            || !in_array($media->getBinaryContent()->getMimeType(), $this->allowedMimeTypes, true)) {
+        if (!in_array(strtolower(pathinfo($fileName, PATHINFO_EXTENSION)), $this->allowedExtensions,
+                true)
+            || !in_array($media->getBinaryContent()->getMimeType(), $this->allowedMimeTypes,
+                true)) {
             return;
         }
 
