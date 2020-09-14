@@ -64,7 +64,7 @@ class ImageProvider extends FileProvider
             $this->getName(),
             $this->getName() . '.description',
             null,
-            'SonataMediaBundle',
+            'wd_cms',
             ['class' => 'fa fa-picture-o']
         );
     }
