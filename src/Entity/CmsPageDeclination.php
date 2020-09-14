@@ -31,6 +31,12 @@ class CmsPageDeclination
      */
     private $id;
 
+    /**
+     * @var CmsPage
+     *
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="declinations")
+     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
+     */
     private $page;
 
     /**
@@ -55,9 +61,9 @@ class CmsPageDeclination
     private $locale;
 
     /**
-     *
      * @var ArrayCollection|PersistentCollection
      *
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="declination", cascade={"remove", "persist"})
      */
     private $contents;
 

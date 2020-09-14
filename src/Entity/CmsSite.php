@@ -67,9 +67,9 @@ class CmsSite
     private $default;
 
     /**
-     * Mapping Relation in WebEtDesignCmsExtension
-     *
      * @var CmsPage[]|Collection|Selectable
+     *
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="site", cascade={"persist", "remove"})
      */
     private $pages;
 
@@ -86,6 +86,11 @@ class CmsSite
      */
     private $menus;
 
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", mappedBy="site", cascade={"persist", "remove"})
+     */
     private $sharedBlocks;
 
     /**

@@ -46,11 +46,13 @@ class CmsSharedBlock
 
     /**
      * @var ArrayCollection|PersistentCollection
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="sharedBlockParent", cascade={"persist", "remove"})
      */
     private $contents;
 
     /**
      * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock", mappedBy="sharedBlock", cascade={"persist", "remove"})
      */
     private $contentList;
 
@@ -60,7 +62,11 @@ class CmsSharedBlock
      */
     private $template;
 
-
+    /**
+     * @var CmsSite
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="sharedBlocks")
+     * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="SET NULL")
+     */
     private $site;
 
     public $indexedContent = null;
@@ -68,22 +74,22 @@ class CmsSharedBlock
     /**
      * @inheritDoc
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->contentList = new ArrayCollection();
-        $this->contents = new ArrayCollection();
+        $this->contents    = new ArrayCollection();
         $this->setActive(false);
     }
 
     public function __toString()
     {
-        return (string) $this->getLabel();
+        return (string)$this->getLabel();
     }
 
     public function getId(): ?int
     {
         return $this->id;
     }
-
 
     /**
      * @param string $label
@@ -92,6 +98,7 @@ class CmsSharedBlock
     public function setLabel(string $label): CmsSharedBlock
     {
         $this->label = $label;
+
         return $this;
     }
 
@@ -157,6 +164,7 @@ class CmsSharedBlock
     public function setTemplate(?string $template): CmsSharedBlock
     {
         $this->template = $template;
+
         return $this;
     }
 
@@ -175,6 +183,7 @@ class CmsSharedBlock
     public function setActive(bool $active): CmsSharedBlock
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -193,6 +202,7 @@ class CmsSharedBlock
     public function setPublic(bool $public): CmsSharedBlock
     {
         $this->public = $public;
+
         return $this;
     }
 
@@ -211,6 +221,7 @@ class CmsSharedBlock
     public function setCode(?string $code): CmsSharedBlock
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -229,6 +240,7 @@ class CmsSharedBlock
     public function setSite($site)
     {
         $this->site = $site;
+
         return $this;
     }
 
