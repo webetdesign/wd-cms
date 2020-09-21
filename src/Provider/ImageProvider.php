@@ -18,6 +18,7 @@ use Sonata\MediaBundle\Provider\Metadata;
 use Sonata\MediaBundle\Thumbnail\ThumbnailInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Sonata\MediaBundle\Thumbnail\LiipImagineThumbnail;
 
 class ImageProvider extends FileProvider
 {
@@ -206,6 +207,10 @@ class ImageProvider extends FileProvider
 
     public function generatePrivateUrl(MediaInterface $media, $format)
     {
+        if ($this->thumbnail instanceof LiipImagineThumbnail) {
+            return $this->getReferenceImage($media);
+        }
+
         return $this->thumbnail->generatePrivateUrl($this, $media, $format);
     }
 
