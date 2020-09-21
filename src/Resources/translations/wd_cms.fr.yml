@@ -3,3 +3,12 @@ persistAsFirstChildOf: 'Déplacer en premier, dessous :'
 persistAsLastChildOf: 'Déplacer en dernier, dessous :'
 persistAsNextSiblingOf: 'Déplacer après :'
 persistAsPrevSiblingOf: 'Déplacer avant :'
+cms.media.provider.image: Image
+cms.media.provider.file: Fichier
+cms.media.provider.svg: SVG
+cms.media.provider.video: Video
+
+cms.media.provider.image.description: Image (png, jpeg, jpg)
+cms.media.provider.file.description: Fichier
+cms.media.provider.svg.description: Image de type svg
+cms.media.provider.video.description: Video (mp4)

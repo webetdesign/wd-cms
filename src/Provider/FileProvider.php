@@ -17,6 +17,7 @@ use Sonata\MediaBundle\Model\MediaInterface;
 use Sonata\MediaBundle\Provider\BaseProvider;
 use Sonata\MediaBundle\Provider\FileProviderInterface;
 use Sonata\MediaBundle\Provider\MediaProviderInterface;
+use Sonata\MediaBundle\Provider\Metadata;
 use Sonata\MediaBundle\Thumbnail\ThumbnailInterface;
 use SplFileInfo;
 use SplFileObject;
@@ -58,6 +59,17 @@ class FileProvider extends BaseProvider implements FileProviderInterface
         $this->allowedExtensions = $allowedExtensions;
         $this->allowedMimeTypes = $allowedMimeTypes;
         $this->metadata = $metadata;
+    }
+
+    public function getProviderMetadata()
+    {
+        return new Metadata(
+            $this->getName(),
+            $this->getName().'.description',
+            null,
+            'wd_cms',
+            ['class' => 'fa fa-file']
+        );
     }
 
     protected function doTransform(MediaInterface $media)
