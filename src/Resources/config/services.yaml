@@ -85,6 +85,11 @@ services:
     arguments:
       $config: '%wd_cms.shared_block%'
 
+  WebEtDesign\CmsBundle\Utils\SitemapIterator:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@router'
+
   # ===============================================
   # TWIG EXTENSION
   # ===============================================
