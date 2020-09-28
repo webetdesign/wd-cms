@@ -19,16 +19,21 @@ class ExtraLoader implements LoaderInterface
     protected $em = null;
 
     protected $parameterBag = null;
+    private   $cmsConfig;
 
     /**
      * ExtraLoader constructor.
      * @param EntityManager $entityManager
      * @param ContainerBagInterface $parameterBag
      */
-    public function __construct(EntityManager $entityManager, ContainerBagInterface $parameterBag)
-    {
+    public function __construct(
+        EntityManager $entityManager,
+        ContainerBagInterface $parameterBag,
+        $cmsConfig
+    ) {
         $this->em           = $entityManager;
         $this->parameterBag = $parameterBag;
+        $this->cmsConfig    = $cmsConfig;
     }
 
     public function load($resource, $type = null)
@@ -116,6 +121,15 @@ class ExtraLoader implements LoaderInterface
         foreach ($routes as $route) {
             $routeCollection->add($route['name'], $route['route']);
         }
+
+
+        if ($this->cmsConfig['multisite']) {
+            $sitemap = new Route('/sitemap.xml', [
+                '_controller' => 'WebEtDesign\CmsBundle\Controller\SitemapController'
+            ]);
+            $routeCollection->add('sitemap', $sitemap);
+        }
+
         return $routeCollection;
     }
 

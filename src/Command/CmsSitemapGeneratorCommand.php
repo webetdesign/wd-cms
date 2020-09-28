@@ -216,17 +216,14 @@ EOT
             }
         }
 
-        // simple site
-        if (!$this->configCms['multisite']) {
-            $this->smithSitemapIterator->configure();
-            $write = new SitemapWriter($dir, 'pages', [], false);
-            try {
-                Handler::create($this->smithSitemapIterator, $write)->export();
-            } catch (\Exception $e) {
-                $this->filesystem->remove($dir);
+        $this->smithSitemapIterator->configure($this->configCms['multisite'] ? $host : null);
+        $write = new SitemapWriter($dir, 'pages', [], false);
+        try {
+            Handler::create($this->smithSitemapIterator, $write)->export();
+        } catch (\Exception $e) {
+            $this->filesystem->remove($dir);
 
-                throw $e;
-            }
+            throw $e;
         }
 
         // generate global sitemap index
