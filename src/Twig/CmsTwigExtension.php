@@ -109,7 +109,6 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_render_shared_block', [$this, 'getSharedBlock'],
                 ['is_safe' => ['html']]),
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
-            new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
             new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'],
                 ['is_safe' => ['html']]),
@@ -363,35 +362,7 @@ class CmsTwigExtension extends AbstractExtension
 
         return $content->getMedia();
     }
-
-    public function cmsSliders(CmsPage $page, $content_code)
-    {
-        /** @var CmsContent $content */
-        $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByObjectAndContentCodeAndType(
-                $page,
-                $content_code,
-                [
-                    CmsContentTypeEnum::SLIDER,
-                ]
-            );
-        if (!$content) {
-            if (getenv('APP_ENV') != 'dev') {
-                return null;
-            } else {
-                $message = sprintf(
-                    'No content sliders found with the code "%s" in page "%s" (#%s)',
-                    $content_code,
-                    $page->getTitle(),
-                    $page->getId()
-                );
-                throw new Exception($message);
-            }
-        }
-
-        return $content->getSliders();
-    }
-
+    
     public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
     {
         if ($this->configCms['multilingual'] && $page !== null) {

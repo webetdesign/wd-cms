@@ -40,7 +40,7 @@ web_et_design_cms:
 
 The content section offers you the possibility to preset variables that are in your template. 
 
-The authorized types are `'TEXT','TEXTAREA','WYSYWYG','MEDIA','SLIDER'`.
+The authorized types are `'TEXT','TEXTAREA','WYSYWYG','MEDIA'`.
 
 ### Example of custom controller
 
@@ -84,17 +84,6 @@ class exempleController extends BaseCmsController
 	See sonata documentation for more
 	https://sonata-project.org/bundles/media/master/doc/reference/installation.html
 #}
-```
-
-### SLIDERS 
-
-The slider type looks like the media type except that the cms_slider function returns a collection of media. You should loop on the collection to render them.
-
-```twig
-{% set slides = cms_sliders(page, 'sliders') %}
-{% for slide in slides %}
-    {% media slide.media, 'format' %}
-{% endfor %}
 ```
 
 ## SMO

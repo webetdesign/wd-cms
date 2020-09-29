@@ -149,26 +149,6 @@ final class CmsContentAdmin extends AbstractAdmin
                     $this->addHelp($formMapper, $subject, 'value');
                     break;
 
-                case CmsContentTypeEnum::SLIDER:
-                    $formMapper->add(
-                        'sliders',
-                        CollectionType::class,
-                        [
-                            'label'        => false,
-                            'by_reference' => false,
-                            //                            'btn_add'      => $roleAdmin ? 'Ajouter' : false,
-                            'type_options' => [
-                                'delete' => $roleAdmin,
-                            ],
-                        ],
-                        [
-                            'inline' => 'table',
-                            'edit'   => 'inline',
-                        ]
-                    );
-                    $this->addHelp($formMapper, $subject, 'sliders');
-                    break;
-
                 case CmsContentTypeEnum::IMAGE:
                     $formMapper->add(
                         'media',
@@ -343,7 +323,6 @@ final class CmsContentAdmin extends AbstractAdmin
 
     public function preUpdate($content)
     {
-        $content->setSliders($content->getSliders());
     }
 
     protected function getContentTypeChoices()

@@ -121,7 +121,6 @@ class CmsContent
     public function __construct()
     {
         $this->sharedBlockList  = new ArrayCollection();
-        $this->sliders          = new ArrayCollection();
         $this->active           = true;
         $this->parent_heritance = false;
     }

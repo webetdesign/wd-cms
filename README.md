@@ -158,21 +158,18 @@ web_et_design_cms:
     admin:
         configuration:
             class:
-                content_slider:       WebEtDesign\CmsBundle\Admin\CmsContentSliderAdmin
                 content:              WebEtDesign\CmsBundle\Admin\CmsContentAdmin
                 menu:                 WebEtDesign\CmsBundle\Admin\CmsMenuAdmin
                 page:                 WebEtDesign\CmsBundle\Admin\CmsPageAdmin
                 route:                WebEtDesign\CmsBundle\Admin\CmsRouteAdmin
                 site:                 WebEtDesign\CmsBundle\Admin\CmsSiteAdmin
             controller:
-                content_slider:       WebEtDesign\CmsBundle\Controller\Admin\CmsContentSliderAdminController
                 content:              WebEtDesign\CmsBundle\Controller\Admin\CmsContentAdminController
                 menu:                 WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController
                 page:                 WebEtDesign\CmsBundle\Controller\Admin\CmsPageAdminController
                 route:                WebEtDesign\CmsBundle\Controller\Admin\CmsRouteAdminController
                 site:                 WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController
             entity:
-                content_slider:       WebEtDesign\CmsBundle\Entity\CmsContentSlider
                 shared_block:         WebEtDesign\CmsBundle\Entity\CmsSharedBlock
                 cms_content_has_shared_block: WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock
                 content:              WebEtDesign\CmsBundle\Entity\CmsContent
