@@ -31,6 +31,7 @@ services:
     calls:
       - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
       - [addChild, ['@cms.admin.cms_page_declination']]
+      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
     public: true
 
   cms.admin.cms_content:
@@ -50,17 +51,6 @@ services:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Content, show_in_dashboard: false }
     public: true
 
-  cms.admin.cms_content_slider:
-    class: '%wd_cms.admin.config.class.content_slider%'
-    arguments:
-      - ~
-      - '%wd_cms.admin.config.entity.content_slider%'
-      - '%wd_cms.admin.config.controller.content_slider%'
-      - '%wd_cms.admin.content.media%'
-    tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: ContentSlider, show_in_dashboard: false }
-    public: true
-
   cms.admin.cms_menu:
     class: '%wd_cms.admin.config.class.menu%'
     arguments: [~, WebEtDesign\CmsBundle\Entity\CmsMenu, '%wd_cms.admin.config.controller.menu%', '@doctrine.orm.default_entity_manager', '@cms.page_provider']
@@ -70,6 +60,7 @@ services:
       - [setTranslationDomain, ['cms']]
       #      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/menu/actionButtons/button_create.html.twig']]
+      - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/menu:edit.html.twig']]
       - [addChild, ['@cms.admin.cms_menu_item', 'menu']]
     public: true
 
@@ -103,6 +94,7 @@ services:
     calls:
       - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/sharedBlock/actionButtons/button_create.html.twig']]
+      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
 
     public: true
 
@@ -128,4 +120,6 @@ services:
       - '%wd_cms.custom_contents_form_themes%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
+    calls:
+      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
     public: true

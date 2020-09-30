@@ -39,7 +39,6 @@ class CmsContentHasSharedBlock
         return (string) $this->content . ' ' . $this->sharedBlock;
     }
 
-
     /**
      * @return mixed
      */

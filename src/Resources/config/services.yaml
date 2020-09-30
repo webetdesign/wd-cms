@@ -63,7 +63,7 @@ services:
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
-    arguments: ['@doctrine.orm.entity_manager', '@parameter_bag']
+    arguments: ['@doctrine.orm.entity_manager', '@parameter_bag', '%wd_cms.cms%']
     tags:
       - { name: routing.loader }
 
@@ -84,6 +84,11 @@ services:
     class: WebEtDesign\CmsBundle\Services\TemplateProvider
     arguments:
       $config: '%wd_cms.shared_block%'
+
+  WebEtDesign\CmsBundle\Utils\SitemapIterator:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@router'
 
   # ===============================================
   # TWIG EXTENSION
@@ -112,3 +117,8 @@ services:
     resource: '../../Repository'
     autowire: true
     tags: ['doctrine.repository_service']
+
+  WebEtDesign\CmsBundle\Controller\SitemapController:
+    arguments:
+      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
+    tags: ['controller.service_arguments']

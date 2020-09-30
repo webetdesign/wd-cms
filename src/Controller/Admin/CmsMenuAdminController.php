@@ -268,6 +268,7 @@ class CmsMenuAdminController extends CRUDController
      */
     public function createAction($id = null)
     {
+
         if ($id === null) {
             $site = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
         } else {
@@ -320,6 +321,7 @@ class CmsMenuAdminController extends CRUDController
 
             // persist if the form was valid and if in preview mode the preview was approved
             if ($isFormValid && (!$this->isInPreviewMode() || $this->isPreviewApproved())) {
+                /** @var CmsMenu $submittedObject */
                 $submittedObject = $form->getData();
                 $this->admin->setSubject($submittedObject);
                 $this->admin->checkAccess('create', $submittedObject);

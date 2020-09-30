@@ -225,6 +225,10 @@ class CmsMenuBuilder
                 $this->buildNodes($menuItem, $children, $parentActive, $activeClass, $locale);
             }
 
+            if ($this->isChildActive($menuItem)) {
+                $liClass .= $activeClass;
+            }
+
             $menuItem->setAttribute('class', $liClass);
             $menuItem->setChildrenAttribute('class', $ulClass);
             $menuItem->setLinkAttribute('class', $linkClass);
@@ -233,6 +237,28 @@ class CmsMenuBuilder
                 $menuItem->setLinkAttribute('target', '_blank');
             }
         }
+    }
+
+    public function isChildActive(MenuItem $item)
+    {
+        $active = false;
+        $class = $item->getAttribute('class');
+        if (preg_match('/active/', $class)){
+            $active = true;
+        }
+        foreach ($item->getChildren() as $child){
+            if (count($child->getChildren()) > 0){
+                if ($this->isChildActive($child)) {
+                    $active = true;
+                }
+            } else {
+                $class = $child->getAttribute('class');
+                if (preg_match('/active/', $class)){
+                    $active = true;
+                }
+            }
+        }
+        return $active;
     }
 
     public function isActive(CmsMenuItem $item)

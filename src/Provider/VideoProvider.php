@@ -2,7 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Provider;
 
-use Sonata\CoreBundle\Validator\ErrorElement;
+use Sonata\Form\Validator\ErrorElement;
 use Sonata\MediaBundle\Provider\FileProvider;
 use Gaufrette\Filesystem;
 use Sonata\AdminBundle\Form\FormMapper;
@@ -104,7 +104,7 @@ class VideoProvider extends FileProvider
             $this->getName(),
             $this->getName().'.description',
             null,
-            'SonataMediaBundle',
+            'wd_cms',
             ['class' => 'fa fa-video-camera']
         );
     }

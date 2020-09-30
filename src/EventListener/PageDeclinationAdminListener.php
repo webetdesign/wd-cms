@@ -42,6 +42,12 @@ class PageDeclinationAdminListener
 
             $declination->addContent($content);
         }
+
+        $technicName = $this->generateTechnicName($declination);
+        $declination
+            ->setTechnicName($technicName)
+            ->setLocale($declination->getPage()->getSite()->getLocale())
+        ;
     }
 
     public function preUpdate($event)
@@ -53,12 +59,20 @@ class PageDeclinationAdminListener
             return;
         }
 
+        $technicName = $this->generateTechnicName($declination);
+
+        $declination
+            ->setTechnicName($technicName)
+            ->setLocale($declination->getPage()->getSite()->getLocale());
+    }
+
+    private function generateTechnicName(CmsPageDeclination $declination) {
+        
+        $technicName = $declination->getPage()->getRoute()->getName();
+        $values = json_decode($declination->getParams(), true);
         $route = $declination->getPage()->getRoute();
         $config = $this->pageConfig[$declination->getPage()->getTemplate()];
 
-        $values = json_decode($declination->getParams(), true);
-
-        $technicName = $declination->getPage()->getRoute()->getName();
         foreach ($values as $name => $value) {
             $param = $config['params'][$name] ?? null;
             if ($param && isset($param['entity']) && isset($param['property'])) {
@@ -70,14 +84,13 @@ class PageDeclinationAdminListener
                     $entity = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
                 }
 
-                $technicName .= $entity ?? '__' . $name . '_' . $entity->getId();
+                if ($entity) {
+                    $technicName .= '__' . $name . '_' . $entity->getId();
+                }
                 $values[$name] = $entity ?? null;
             }
         }
-
-        $declination
-            ->setTechnicName($technicName)
-            ->setLocale($declination->getPage()->getSite()->getLocale());
+        
+        return $technicName;
     }
-
 }

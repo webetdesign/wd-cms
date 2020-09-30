@@ -16,8 +16,6 @@ class CmsContentTypeEnum
     const WYSYWYG                 = 'WYSYWYG';
     const IMAGE                   = 'IMAGE';
     const MEDIA                   = 'MEDIA';
-    const SLIDER                  = 'SLIDER';
-    const HIGHLIGHT               = 'HIGHLIGHT';
     const SHARED_BLOCK            = 'SHARED_BLOCK';
     const SHARED_BLOCK_COLLECTION = 'SHARED_BLOCK_COLLECTION';
     const CHECKBOX                = "CHECKBOX";
@@ -29,8 +27,6 @@ class CmsContentTypeEnum
         self::WYSYWYG                 => 'WYSYWYG',
         self::IMAGE                   => 'Image',
         self::MEDIA                   => 'Media',
-        self::SLIDER                  => 'Slider',
-        self::HIGHLIGHT               => 'Highlight',
         self::SHARED_BLOCK            => 'Shared block',
         self::SHARED_BLOCK_COLLECTION => 'Shared block list',
         self::CHECKBOX                => 'CheckBox',
@@ -60,8 +56,6 @@ class CmsContentTypeEnum
             self::WYSYWYG,
             self::IMAGE,
             self::MEDIA,
-            self::SLIDER,
-            self::HIGHLIGHT,
             self::SHARED_BLOCK,
             self::SHARED_BLOCK_COLLECTION,
             self::CHECKBOX,

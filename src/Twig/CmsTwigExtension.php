@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Twig;
 
-use App\Entity\Product\Category;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -110,7 +109,6 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_render_shared_block', [$this, 'getSharedBlock'],
                 ['is_safe' => ['html']]),
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
-            new TwigFunction('cms_sliders', [$this, 'cmsSliders']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
             new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'],
                 ['is_safe' => ['html']]),
@@ -364,35 +362,7 @@ class CmsTwigExtension extends AbstractExtension
 
         return $content->getMedia();
     }
-
-    public function cmsSliders(CmsPage $page, $content_code)
-    {
-        /** @var CmsContent $content */
-        $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByObjectAndContentCodeAndType(
-                $page,
-                $content_code,
-                [
-                    CmsContentTypeEnum::SLIDER,
-                ]
-            );
-        if (!$content) {
-            if (getenv('APP_ENV') != 'dev') {
-                return null;
-            } else {
-                $message = sprintf(
-                    'No content sliders found with the code "%s" in page "%s" (#%s)',
-                    $content_code,
-                    $page->getTitle(),
-                    $page->getId()
-                );
-                throw new Exception($message);
-            }
-        }
-
-        return $content->getSliders();
-    }
-
+    
     public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
     {
         if ($this->configCms['multilingual'] && $page !== null) {
@@ -420,10 +390,13 @@ class CmsTwigExtension extends AbstractExtension
             foreach ($params[1] as $param) {
                 if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null &&
                     is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class)) {
+
                     $repoMethod = 'findOneBy' . ucfirst($paramsConfig[$param]['property']);
-                    /** @var Category $object */
+                    $criterion = $request->get('_route_params')[$param] ?? null;
+
                     $object = $this->em->getRepository($paramsConfig[$param]['entity'])
-                        ->$repoMethod($request->get($param), $page->getSite()->getLocale());
+                        ->$repoMethod($criterion, $page->getSite()->getLocale());
+
                     $getProperty = 'get' . ucfirst($paramsConfig[$param]['property']);
                     $routeParams[$param] = $object->translate($p->getSite()->getLocale())->$getProperty();
 

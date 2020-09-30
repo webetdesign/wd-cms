@@ -79,7 +79,7 @@ class PageAdminListener
             foreach ($config['contents'] as $content) {
                 $CmsContent = new CmsContent();
                 $CmsContent->setCode($content['code']);
-                $CmsContent->setLabel($content['code'] ?? $content['label']);
+                $CmsContent->setLabel($content['label'] ?? $content['code']);
                 $CmsContent->setType($content['type']);
                 $CmsContent->setHelp($content['help'] ?? null);
                 $page->addContent($CmsContent);

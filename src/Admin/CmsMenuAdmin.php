@@ -141,6 +141,8 @@ final class CmsMenuAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $formMapper)
     {
 
+        $formMapper->getFormBuilder()->setAction($this->generateUrl('create', ['id' => $this->request->attributes->get('id')]));
+
         $formMapper
             ->with('Configuration')
             ->add('label', null, [
@@ -150,7 +152,6 @@ final class CmsMenuAdmin extends AbstractAdmin
 
         // end configuration
         $formMapper->end();
-
 
     }
 
