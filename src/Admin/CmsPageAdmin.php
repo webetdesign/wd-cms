@@ -10,7 +10,6 @@ use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Builder\FormContractorInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\Form\Type\CollectionType;
-use Sonata\UserBundle\Form\Type\SecurityRolesType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -29,6 +28,7 @@ use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
+use WebEtDesign\CmsBundle\Form\Type\SecurityRolesType;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
@@ -49,28 +49,28 @@ class CmsPageAdmin extends AbstractAdmin
     protected $globalVarsEnable;
     protected $pageProvider;
     protected $customFormThemes;
-    /** @var FormContractorInterface  */
+    /** @var FormContractorInterface */
     protected $customFormContractor;
+    private   $cmsConfig;
 
     public function __construct(
         string $code,
         string $class,
         string $baseControllerName,
         EntityManager $em,
-        $multisite,
-        $multilingual,
-        $declination,
+        $cmsConfig,
         $globalVarsDefinition,
         TemplateProvider $pageProvider,
         $customFormThemes
     ) {
-        $this->multisite            = $multisite;
-        $this->multilingual         = $multilingual;
-        $this->declination          = $declination;
-        $this->em                   = $em;
-        $this->globalVarsEnable     = $globalVarsDefinition['enable'];
-        $this->pageProvider         = $pageProvider;
-        $this->customFormThemes     = $customFormThemes;
+        $this->cmsConfig        = $cmsConfig;
+        $this->multisite        = $cmsConfig['multisite'];
+        $this->multilingual     = $cmsConfig['multilingual'];
+        $this->declination      = $cmsConfig['declination'];
+        $this->em               = $em;
+        $this->globalVarsEnable = $globalVarsDefinition['enable'];
+        $this->pageProvider     = $pageProvider;
+        $this->customFormThemes = $customFormThemes;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -347,18 +347,20 @@ class CmsPageAdmin extends AbstractAdmin
                 //endregion
             }
 
-            //region Sécurité
-            $formMapper->tab('Sécurité')
-                ->with('', ['box_class' => ''])
-                ->add('roles', SecurityRolesType::class, [
-                    'label'    => false,
-                    'expanded' => true,
-                    'multiple' => true,
-                    'required' => false,
-                ])
-                ->end()
-                ->end();
-            //endregion
+            if ($this->cmsConfig['security']['page']['enable']) {
+                //region Sécurité
+                $formMapper->tab('Sécurité')
+                    ->with('', ['box_class' => ''])
+                    ->add('roles', SecurityRolesType::class, [
+                        'label'    => false,
+                        'expanded' => true,
+                        'multiple' => true,
+                        'required' => false,
+                    ])
+                    ->end()
+                    ->end();
+                //endregion
+            }
 
             if ($this->multilingual) {
                 //region MultiLingue

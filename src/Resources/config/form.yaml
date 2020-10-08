@@ -3,3 +3,9 @@ services:
     class: WebEtDesign\CmsBundle\Form\FormContractor
     arguments:
       - '@form.factory'
+
+  WebEtDesign\CmsBundle\Form\Type\SecurityRolesType:
+    arguments:
+      - '@cms.security.editable_role_builder'
+    tags:
+      - { name: form.type }

@@ -90,6 +90,16 @@ services:
       - '@doctrine.orm.entity_manager'
       - '@router'
 
+  cms.security.editable_role_builder:
+    class: WebEtDesign\CmsBundle\Security\EditableRolesBuilder
+    arguments:
+      - '@security.token_storage'
+      - '@security.authorization_checker'
+      - '@sonata.admin.pool'
+      - '%wd_cms.cms%'
+      - '%security.role_hierarchy.roles%'
+
+
   # ===============================================
   # TWIG EXTENSION
   # ===============================================
