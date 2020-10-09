@@ -66,7 +66,7 @@ class SecurityRolesType extends AbstractType
             $attr['class'] = 'sonata-medium';
         }
 
-        $view->vars['choice_translation_domain'] = false; // RolesBuilder all ready does translate them
+        $view->vars['choice_translation_domain'] = 'CmsPageSecurity';
 
         $view->vars['attr'] = $attr;
         $view->vars['read_only_choices'] = $options['read_only_choices'];
