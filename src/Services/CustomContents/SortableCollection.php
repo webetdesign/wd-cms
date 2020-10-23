@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\DataTransformerInterface;
+use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\EventListener\JsonFormListener;
 use WebEtDesign\CmsBundle\Form\CustomContents\SortableEntityType;
@@ -36,23 +37,37 @@ class SortableCollection extends AbstractCustomContent
      * @var array
      */
     private $link_parameters;
+    /**
+     * @var null
+     */
+    private $template;
+    /**
+     * @var Environment
+     */
+    private $twig;
 
     /**
      * @param EntityManagerInterface $em
+     * @param Environment $twig
      * @param $entity
      * @param AdminInterface $admin
      * @param array $link_prameters
+     * @param null|string $template
      */
     public function __construct(
         EntityManagerInterface $em,
+        Environment $twig,
         $entity = null,
         AdminInterface $admin = null,
-        $link_prameters = []
+        $link_prameters = [],
+        $template = null
     ) {
-        $this->em             = $em;
-        $this->entity         = $entity;
-        $this->admin          = $admin;
+        $this->em              = $em;
+        $this->entity          = $entity;
+        $this->admin           = $admin;
         $this->link_parameters = $link_prameters;
+        $this->template        = $template;
+        $this->twig            = $twig;
     }
 
     function getFormOptions(): array
@@ -87,19 +102,15 @@ class SortableCollection extends AbstractCustomContent
 
     function render(CmsContent $content)
     {
-        $rp     = $this->em->getRepository($this->entity);
-        $values = json_decode($content->getValue(), true);
+        $values = $this->getCallbackTransformer()
+            ->transform(json_decode($content->getValue(),true));
 
-        $content = [];
 
-        if (!empty($values)) {
-            foreach ($values as $item) {
-                $entity    = $rp->find($item['entity']);
-                $content[] = $entity;
-            }
+        if ($this->template) {
+            return $this->twig->render($this->template, ['entities' => array_column($values, 'entity')]);
         }
 
-        return $content;
+        return array_column($values, 'entity');
     }
 
 }

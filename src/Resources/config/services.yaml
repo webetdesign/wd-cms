@@ -101,6 +101,21 @@ services:
 
 
   # ===============================================
+  # CKEditor Renderer
+  # ===============================================
+
+  fos_ck_editor.renderer:
+    class: WebEtDesign\CmsBundle\Services\CKEditorRenderer
+    arguments:
+      - '@fos_ck_editor.builder.json_builder'
+      - '@router'
+      - '@assets.packages'
+      - '@request_stack'
+      - "@=container.has('twig') ? container.get('twig') : container.get('templating')"
+      - "@=container.hasParameter('locale') ? parameter('locale') : null"
+    public: true
+
+  # ===============================================
   # TWIG EXTENSION
   # ===============================================
 

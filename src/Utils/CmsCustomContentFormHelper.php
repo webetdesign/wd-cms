@@ -4,7 +4,6 @@
 namespace WebEtDesign\CmsBundle\Utils;
 
 
-use App\Entity\MediaResponsive;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Form\Type\ModelListType;

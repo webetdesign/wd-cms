@@ -68,6 +68,14 @@
                 $row.insertAfter($row.next());
               }
               refreshPosition_{{ id }}();
+
+              // Destroy and rebuild CKEditor instance
+              $.each($row.find('.cke'), (key, item) => {
+                var name = item.id.substring(4);
+                var fonctionName = 'fos_ckeditor_' + name + '_init()';
+                CKEDITOR.instances[name].destroy();
+                eval(fonctionName);
+              })
             })
             .on('sonata-collection-item-added', function() {
               refreshPosition_{{ id }}();
