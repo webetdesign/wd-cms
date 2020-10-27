@@ -36,12 +36,6 @@ class CmsSharedBlock
      * @var boolean
      * @ORM\Column(type="boolean")
      */
-    private $public = true;
-
-    /**
-     * @var boolean
-     * @ORM\Column(type="boolean")
-     */
     private $active;
 
     /**
@@ -187,22 +181,23 @@ class CmsSharedBlock
         return $this;
     }
 
+
     /**
      * @return bool
+     * @deprecated
      */
-    public function isPublic(): bool
+    public function isPublic()
     {
-        return (bool)$this->public;
+        return null;
     }
 
     /**
      * @param bool $public
+     * @deprecated
      * @return CmsSharedBlock
      */
     public function setPublic(bool $public): CmsSharedBlock
     {
-        $this->public = $public;
-
         return $this;
     }
 
