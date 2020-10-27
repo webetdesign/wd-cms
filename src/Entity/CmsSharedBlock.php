@@ -164,40 +164,39 @@ class CmsSharedBlock
 
     /**
      * @return bool
-     */
-    public function isActive(): bool
-    {
-        return $this->active;
-    }
-
-    /**
-     * @param bool $active
-     * @return CmsSharedBlock
-     */
-    public function setActive(bool $active): CmsSharedBlock
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
-
-    /**
-     * @return bool
      * @deprecated
      */
-    public function isPublic()
+    public function isActive(): bool
     {
         return null;
     }
 
     /**
-     * @param bool $public
+     * @param bool $active
+     * @return CmsSharedBlock
      * @deprecated
+     */
+    public function setActive(bool $active): CmsSharedBlock
+    {
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPublic(): bool
+    {
+        return (bool)$this->public;
+    }
+
+    /**
+     * @param bool $public
      * @return CmsSharedBlock
      */
     public function setPublic(bool $public): CmsSharedBlock
     {
+        $this->public = $public;
+
         return $this;
     }
 

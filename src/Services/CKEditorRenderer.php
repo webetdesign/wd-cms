@@ -132,7 +132,7 @@ class CKEditorRenderer implements CKEditorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderBasePath($basePath)
+    public function renderBasePath($basePath): string
     {
         return $this->fixPath($basePath);
     }
@@ -140,7 +140,7 @@ class CKEditorRenderer implements CKEditorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderJsPath($jsPath)
+    public function renderJsPath($jsPath): string
     {
         return $this->fixPath($jsPath);
     }
@@ -148,7 +148,7 @@ class CKEditorRenderer implements CKEditorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderWidget($id, array $config, array $options = [])
+    public function renderWidget($id, array $config, array $options = []): string
     {
         $config = $this->fixConfigLanguage($config);
         $config = $this->fixConfigContentsCss($config);
@@ -189,7 +189,7 @@ class CKEditorRenderer implements CKEditorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderDestroy($id)
+    public function renderDestroy($id): string
     {
         return sprintf(
             'if (CKEDITOR.instances["%1$s"]) { '.
@@ -203,7 +203,7 @@ class CKEditorRenderer implements CKEditorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderPlugin($name, array $plugin)
+    public function renderPlugin($name, array $plugin): string
     {
         return sprintf(
             'CKEDITOR.plugins.addExternal("%s", "%s", "%s");',
@@ -216,7 +216,7 @@ class CKEditorRenderer implements CKEditorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderStylesSet($name, array $stylesSet)
+    public function renderStylesSet($name, array $stylesSet): string
     {
         return sprintf(
             'if (CKEDITOR.stylesSet.get("%1$s") === null) { '.
@@ -230,7 +230,7 @@ class CKEditorRenderer implements CKEditorRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderTemplate($name, array $template)
+    public function renderTemplate($name, array $template): string
     {
         if (isset($template['imagesPath'])) {
             $template['imagesPath'] = $this->fixPath($template['imagesPath']);
