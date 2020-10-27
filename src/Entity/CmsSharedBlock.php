@@ -168,7 +168,7 @@ class CmsSharedBlock
      */
     public function isActive(): bool
     {
-        return null;
+        return $this->active;
     }
 
     /**
@@ -178,6 +178,7 @@ class CmsSharedBlock
      */
     public function setActive(bool $active): CmsSharedBlock
     {
+        $this->active = $this->active;
         return $this;
     }
 
@@ -186,7 +187,7 @@ class CmsSharedBlock
      */
     public function isPublic(): bool
     {
-        return (bool)$this->public;
+        return null;
     }
 
     /**
@@ -195,8 +196,6 @@ class CmsSharedBlock
      */
     public function setPublic(bool $public): CmsSharedBlock
     {
-        $this->public = $public;
-
         return $this;
     }
 

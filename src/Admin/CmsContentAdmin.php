@@ -245,7 +245,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         'sharedBlockList',
                         \Sonata\CoreBundle\Form\Type\CollectionType::class,
                         [
-                            'by_reference' => false,
+                            'by_reference' => true,
                             'required'     => false,
                         ],
                         [
