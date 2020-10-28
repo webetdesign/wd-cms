@@ -46,7 +46,8 @@ class EditableRolesBuilder
         Pool $pool,
         array $cmsConfig,
         array $rolesHierarchy = []
-    ) {
+    )
+    {
         $this->tokenStorage         = $tokenStorage;
         $this->authorizationChecker = $authorizationChecker;
         $this->pool                 = $pool;

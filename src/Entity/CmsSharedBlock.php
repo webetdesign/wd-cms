@@ -164,7 +164,6 @@ class CmsSharedBlock
 
     /**
      * @return bool
-     * @deprecated
      */
     public function isActive(): bool
     {
@@ -174,15 +173,15 @@ class CmsSharedBlock
     /**
      * @param bool $active
      * @return CmsSharedBlock
-     * @deprecated
      */
     public function setActive(bool $active): CmsSharedBlock
     {
-        $this->active = $this->active;
+        $this->active = $active;
         return $this;
     }
 
     /**
+     * @deprecated
      * @return bool
      */
     public function isPublic(): bool
@@ -192,6 +191,7 @@ class CmsSharedBlock
 
     /**
      * @param bool $public
+     * @deprecated
      * @return CmsSharedBlock
      */
     public function setPublic(bool $public): CmsSharedBlock
