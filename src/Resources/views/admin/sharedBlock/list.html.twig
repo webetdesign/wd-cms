@@ -273,8 +273,6 @@ file that was distributed with this source code.
                             <div class="col-sm-9">
                                 {% set withAdvancedFilter = false %}
                                 {% for filter in admin.datagrid.filters %}
-                                    {% dump(filter) %}
-                                    {% dump(filter.isActive()) %}
                                     {% if filter.name == 'site' %}
                                         {% set filterDisplayed = false %}
                                     {% else %}
