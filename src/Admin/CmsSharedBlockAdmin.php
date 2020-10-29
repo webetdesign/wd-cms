@@ -41,7 +41,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             ->add('code')
             ->add('label')
             ->add('active')
-            ->add('site')
+            ->add('site' , null, ['show_filter' => false])
         ;
     }
 
