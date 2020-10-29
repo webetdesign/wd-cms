@@ -1,5 +1,6 @@
 services:
   cms.media.provider.image:
+    public: true
     class: WebEtDesign\CmsBundle\Provider\ImageProvider
     tags:
       - { name: sonata.media.provider }
@@ -17,6 +18,7 @@ services:
       - [ setTemplates, [{ helper_thumbnail: '@@SonataMedia/Provider/thumbnail.html.twig', helper_view: '@@SonataMedia/Provider/view_image.html.twig' }]]
 
   cms.media.provider.file:
+    public: true
     class: WebEtDesign\CmsBundle\Provider\FileProvider
     tags:
       - { name: sonata.media.provider }
@@ -30,6 +32,7 @@ services:
       - [ setTemplates, [{ helper_thumbnail: '@@SonataMedia/Provider/thumbnail.html.twig', helper_view: '@@SonataMedia/Provider/view_file.html.twig' }]]
 
   cms.media.provider.svg:
+    public: true
     class: WebEtDesign\CmsBundle\Provider\SvgProvider
     tags:
       - { name: sonata.media.provider }
@@ -46,6 +49,7 @@ services:
       - [ setTemplates, [{ helper_thumbnail: '@@WebEtDesignCms/provider/SVG/thumbnail.html.twig', helper_view: '@@WebEtDesignCms/provider/SVG/view_svg.html.twig' }]]
 
   cms.media.provider.video:
+    public: true
     class: WebEtDesign\CmsBundle\Provider\VideoProvider
     tags:
       - { name: sonata.media.provider }
