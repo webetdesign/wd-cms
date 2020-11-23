@@ -107,12 +107,14 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
             return false;
         }
 
+        if (!$page->getRoute()) return false;
+
         $this->updateParams($page->getRoute(), $config);
 
         return true;
     }
 
-    private function updateParams(?CmsRouteInterface $cmsRoute, $config){
+    private function updateParams(CmsRouteInterface $cmsRoute, $config){
         preg_match('/{.*}/', $cmsRoute->getPath(), $defined);
         $config = isset($config['params']) ? $config['params'] : [];
 
@@ -136,7 +138,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         $this->em->persist($cmsRoute);
     }
 
-    private function removeParam(?CmsRouteInterface $cmsRoute, $param){
+    private function removeParam(CmsRouteInterface $cmsRoute, $param){
         $cmsRoute->setPath(
             str_replace('/{' . $param . '}', '', $cmsRoute->getPath())
         );
@@ -154,7 +156,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         return $cmsRoute;
     }
 
-    private function addParam(?CmsRouteInterface $cmsRoute, $param, $config){
+    private function addParam(CmsRouteInterface $cmsRoute, $param, $config){
         $cmsRoute->setPath($cmsRoute->getPath() . '/{' . $param . '}');
 
        if (isset($config['default'])){
