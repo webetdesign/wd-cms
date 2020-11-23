@@ -21,6 +21,14 @@ services:
     tags:
       - { name: 'console.command', command: 'cms:page:update-contents' }
 
+  WebEtDesign\CmsBundle\Command\CmsUpdatePageParamsCommand:
+    arguments:
+      - ~
+      - '@doctrine.orm.default_entity_manager'
+      - '@cms.page_provider'
+    tags:
+      - { name: 'console.command', command: 'cms:page:update-params' }
+
   WebEtDesign\CmsBundle\Command\CmsUpdateContentsSharedBlockCommand:
     arguments:
       - ~
