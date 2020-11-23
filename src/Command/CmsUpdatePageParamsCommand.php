@@ -109,14 +109,6 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
         $this->updateParams($page->getRoute(), $config);
 
-        if (count($page->getDeclinations()) > 0) {
-            /** @var CmsPageDeclination $declination */
-            foreach ($page->getDeclinations() as $declination) {
-                $this->io->title('Reset declination ' . $declination->getTitle());
-                $this->updateParams($declination, $config);
-            }
-        }
-
         return true;
     }
 
