@@ -11,6 +11,7 @@ namespace WebEtDesign\CmsBundle\EventListener;
 
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use WebEtDesign\CmsBundle\Controller\BaseCmsController;
 use WebEtDesign\CmsBundle\Services\CmsHelper;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;

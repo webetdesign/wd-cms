@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,8 @@ class CmsHelper
 
     private $page;
 
+    private $roleHierarchy;
+
     /**
      * @param EntityManagerInterface $em
      * @param TemplateProvider $provider
@@ -31,12 +34,14 @@ class CmsHelper
         EntityManagerInterface $em,
         TemplateProvider $provider,
         Twig_Environment $twig,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        RoleHierarchyInterface  $roleHierarchy
     ) {
         $this->em                   = $em;
         $this->provider             = $provider;
         $this->twig                 = $twig;
         $this->authorizationChecker = $authorizationChecker;
+        $this->roleHierarchy = $roleHierarchy;
     }
 
     public function getPage(Request $request)
@@ -103,7 +108,7 @@ class CmsHelper
             return true;
         }
 
-        foreach ($page->getRoles() as $role) {
+        foreach ($this->roleHierarchy->getReachableRoleNames($page->getRoles()) as $role) {
             if ($this->authorizationChecker->isGranted($role)) {
                 return true;
             }
