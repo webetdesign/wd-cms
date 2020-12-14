@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Services;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -24,6 +25,8 @@ class CmsHelper
 
     private $roleHierarchy;
 
+    private $tokenStorage;
+
     /**
      * @param EntityManagerInterface $em
      * @param TemplateProvider $provider
@@ -35,13 +38,15 @@ class CmsHelper
         TemplateProvider $provider,
         Twig_Environment $twig,
         AuthorizationCheckerInterface $authorizationChecker,
-        RoleHierarchyInterface  $roleHierarchy
+        RoleHierarchyInterface  $roleHierarchy,
+        TokenStorageInterface $tokenStorage
     ) {
         $this->em                   = $em;
         $this->provider             = $provider;
         $this->twig                 = $twig;
         $this->authorizationChecker = $authorizationChecker;
         $this->roleHierarchy = $roleHierarchy;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function getPage(Request $request)
@@ -108,8 +113,20 @@ class CmsHelper
             return true;
         }
 
-        foreach ($this->roleHierarchy->getReachableRoleNames($page->getRoles()) as $role) {
+        $roles = $this->roleHierarchy->getReachableRoleNames($page->getRoles());
+
+        foreach ($roles as $role) {
             if ($this->authorizationChecker->isGranted($role)) {
+                return true;
+            }
+        }
+
+        /**
+         * Permet de mettre un role anonyme valable que pour les users non LOG. Ne marche pas avec IS_AUTHENTICATED_ANONYMOUSLY
+         * @TODO : remove en SF5
+         **/
+        if ($this->tokenStorage->getToken() !== null){
+            if (!in_array('IS_ANONYMOUS', $roles) || (in_array('IS_ANONYMOUS', $roles) && $this->tokenStorage->getToken()->getUser() === 'anon.')){
                 return true;
             }
         }

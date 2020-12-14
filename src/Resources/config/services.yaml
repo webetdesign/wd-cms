@@ -69,7 +69,7 @@ services:
 
   cms.helper:
     class: WebEtDesign\CmsBundle\Services\CmsHelper
-    arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker", '@security.role_hierarchy']
+    arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker", '@security.role_hierarchy', '@security.token_storage']
     public: true
 
   WebEtDesign\CmsBundle\Services\TemplateProvider:
