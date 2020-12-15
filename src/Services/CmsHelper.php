@@ -126,7 +126,7 @@ class CmsHelper
          * @TODO : remove en SF5
          **/
         if ($this->tokenStorage->getToken() !== null){
-            if (!in_array('IS_ANONYMOUS', $roles) || (in_array('IS_ANONYMOUS', $roles) && $this->tokenStorage->getToken()->getUser() === 'anon.')){
+            if ((in_array('IS_ANONYMOUS', $roles) && $this->tokenStorage->getToken()->getUser() === 'anon.')){
                 return true;
             }
         }
