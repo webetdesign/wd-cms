@@ -13,6 +13,7 @@ use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Doctrine\ORM\EntityManager;
@@ -251,10 +252,19 @@ class PageAdminListener
         // hydrate route
         $CmsRoute = new $this->routeClass();
         if ($this->configCms['multilingual']) {
-            $CmsRoute->setName(sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId()));
+            $routeName = sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId());
         } else {
-            $CmsRoute->setName(sprintf('cms_route_%s', $page->getId()));
+            $routeName = sprintf('cms_route_%s', $page->getId());
         }
+
+        // Pour éviter le problème de doublon de route
+        $exists = $this->em->getRepository(CmsRoute::class)->findBy(['name' => $routeName]);
+
+        if (is_array($exists) && count($exists) > 0){
+            $routeName .= '_' . uniqid();
+        }
+
+        $CmsRoute->setName($routeName);
 
         if ($config['controller'] && $config['action']) {
             $CmsRoute->setController(sprintf('%s::%s', $config['controller'], $config['action']));
