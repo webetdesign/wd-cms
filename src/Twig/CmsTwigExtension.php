@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Twig\Environment;
 use Twig\TwigTest;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
@@ -190,7 +191,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         $defaultLangSite = $this->em->getRepository(CmsSite::class)->findOneBy(['default' => true]);
         $defaultPage = null;
-        if ($defaultLangSite && $this->configCms['multilingual']) {
+        if ($defaultLangSite && $this->configCms['multilingual'] && $object instanceof CmsPage) {
             $defaultPages = $object->getCrossSitePages()->filter(function (CmsPage $crossPage) use ($defaultLangSite) {
                 return $crossPage->getSite() === $defaultLangSite;
             });
@@ -292,9 +293,17 @@ class CmsTwigExtension extends AbstractExtension
         return $value;
     }
 
-    public function getSharedBlock($code)
+    public function getSharedBlock($code, CmsPage $page = null)
     {
-        $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code]);
+        if ($this->configCms['multilingual']) {
+            if (!$page) {
+                throw new HttpException('500', 'A CmsPage must be passed as the second parameter of the `cms_render_shared_block` twig function, null given');
+            }
+
+            $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code, 'site' => $page->getSite()]);
+        } else {
+            $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code]);
+        }
 
         return $this->renderSharedBlock($block);
     }
@@ -362,7 +371,7 @@ class CmsTwigExtension extends AbstractExtension
 
         return $content->getMedia();
     }
-    
+
     public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
     {
         if ($this->configCms['multilingual'] && $page !== null) {
