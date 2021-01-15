@@ -487,7 +487,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         $items = [];
         while ($page != null) {
-            if (!$page->getRoute()->isDynamic()) {
+            if ($page->getRoute() && !$page->getRoute()->isDynamic()) {
                 $items[] = [
                     'title' => $page->getTitle(),
                     'link' => $this->router->generate($page->getRoute()->getName())
