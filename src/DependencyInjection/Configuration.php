@@ -141,6 +141,8 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                            ->scalarNode('route')->defaultValue(null)->end()
+                            ->scalarNode('path')->defaultValue(null)->end()
                             ->scalarNode('action')
                                 ->defaultValue('index')
 //                                ->treatNullLike('index')

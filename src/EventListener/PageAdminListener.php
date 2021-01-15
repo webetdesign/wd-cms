@@ -48,7 +48,8 @@ class PageAdminListener
         $configCms,
         $configCustomContent,
         ContainerInterface $container
-    ) {
+    )
+    {
         $this->provider            = $provider;
         $this->em                  = $em;
         $this->router              = $router;
@@ -109,7 +110,6 @@ class PageAdminListener
 
         $this->createRoute($config, $page);
 
-
         $this->warmUpRouteCache();
     }
 
@@ -156,7 +156,6 @@ class PageAdminListener
         if ($menuItem) {
             $em->remove($menuItem);
         }
-
     }
 
     protected function moveMenuItem(EntityManager $em, CmsPage $page)
@@ -194,7 +193,6 @@ class PageAdminListener
                 $menuRepo->persistAsFirstChildOf($menu, $target);
                 $em->flush();
             }
-
         }
     }
 
@@ -243,24 +241,27 @@ class PageAdminListener
         $paramString  = '';
         $defaults     = [];
         $requirements = [];
+
         foreach ($config['params'] as $param => $attributes) {
             $paramString          .= "/{" . $param . "}";
             $defaults[$param]     = $attributes['default'];
             $requirements[$param] = $attributes['requirement'];
         }
 
+        $defaultName = isset($config['route']) && $config['route'] !== null ? $config['route'] : null;
+
         // hydrate route
         $CmsRoute = new $this->routeClass();
         if ($this->configCms['multilingual']) {
-            $routeName = sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId());
+            $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(), $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId());
         } else {
-            $routeName = sprintf('cms_route_%s', $page->getId());
+            $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s', $page->getId());
         }
 
         // Pour éviter le problème de doublon de route
         $exists = $this->em->getRepository(CmsRoute::class)->findBy(['name' => $routeName]);
 
-        if (is_array($exists) && count($exists) > 0){
+        if (is_array($exists) && count($exists) > 0) {
             $routeName .= '_' . uniqid();
         }
 
@@ -270,8 +271,10 @@ class PageAdminListener
             $CmsRoute->setController(sprintf('%s::%s', $config['controller'], $config['action']));
         }
 
+        $route_slug = isset($config['path']) && $config['path'] !== null ? $config['path'] : $page->getSlug();
+
         $CmsRoute->setMethods($config['methods']);
-        $CmsRoute->setPath($page->rootPage ? '/' : '/' . $page->getSlug() . $paramString);
+        $CmsRoute->setPath($page->rootPage ? '/' : '/' . $route_slug . $paramString);
         $CmsRoute->setDefaults(json_encode($defaults));
         $CmsRoute->setRequirements(json_encode($requirements));
         $CmsRoute->setPage($page);
@@ -321,6 +324,5 @@ class PageAdminListener
 
         $em->flush();
     }
-
 
 }
