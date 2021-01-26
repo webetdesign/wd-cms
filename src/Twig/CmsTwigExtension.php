@@ -308,7 +308,7 @@ class CmsTwigExtension extends AbstractExtension
         return $this->renderSharedBlock($block);
     }
 
-    public function renderSharedBlock(CmsSharedBlock $block)
+    public function renderSharedBlock(?CmsSharedBlock $block)
     {
         if (!$block) {
             return null;
