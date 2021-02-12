@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\Annotation;
 
 /**
  * @Annotation
+ * @deprecated use the class in wd-rgpd-bundle instead
  */
 class PasswordStrength extends Constraint
 {
@@ -29,7 +30,7 @@ class PasswordStrength extends Constraint
     {
         return ['minStrength'];
     }
-    
+
     public function getTargets()
     {
         return array(self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT);
