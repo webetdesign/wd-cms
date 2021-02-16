@@ -82,5 +82,6 @@ services:
       - '@service_container'
       - '%wd_cms.vars%'
       - '%wd_cms.cms%'
+      - '@twig'
     tags:
       - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
