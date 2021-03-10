@@ -293,14 +293,14 @@ class CmsTwigExtension extends AbstractExtension
         return $value;
     }
 
-    public function getSharedBlock($code, CmsPage $page = null)
+    public function getSharedBlock($code, $object = null)
     {
         if ($this->configCms['multilingual']) {
-            if (!$page) {
-                throw new HttpException('500', 'A CmsPage must be passed as the second parameter of the `cms_render_shared_block` twig function, null given');
+            if (!$object) {
+                throw new HttpException('500', 'A CmsPage or CmsSharedBlock must be passed as the second parameter of the `cms_render_shared_block` twig function, null given');
             }
 
-            $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code, 'site' => $page->getSite()]);
+            $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code, 'site' => $object->getSite()]);
         } else {
             $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code]);
         }
@@ -308,7 +308,7 @@ class CmsTwigExtension extends AbstractExtension
         return $this->renderSharedBlock($block);
     }
 
-    public function renderSharedBlock(CmsSharedBlock $block)
+    public function renderSharedBlock(?CmsSharedBlock $block)
     {
         if (!$block) {
             return null;
@@ -487,7 +487,7 @@ class CmsTwigExtension extends AbstractExtension
     {
         $items = [];
         while ($page != null) {
-            if (!$page->getRoute()->isDynamic()) {
+            if ($page->getRoute() && !$page->getRoute()->isDynamic()) {
                 $items[] = [
                     'title' => $page->getTitle(),
                     'link' => $this->router->generate($page->getRoute()->getName())

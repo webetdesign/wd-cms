@@ -10,9 +10,16 @@ namespace WebEtDesign\CmsBundle\EventListener;
 
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 use WebEtDesign\CmsBundle\Controller\BaseCmsController;
+use WebEtDesign\CmsBundle\Controller\CmsController;
 use WebEtDesign\CmsBundle\Services\CmsHelper;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
@@ -20,12 +27,10 @@ class CmsControllerListener
 {
 
     protected $helper;
-
     protected $globalVars;
-    /** @var TemplateProvider */
     protected $provider;
-
     protected $cmsConfig;
+    protected $environment;
 
     /**
      * CmsControllerListener constructor.
@@ -35,18 +40,19 @@ class CmsControllerListener
      * @param $globalVarsDefinition
      * @throws \Exception
      */
-    public function __construct(CmsHelper $cmsHelper, TemplateProvider $provider, Container $container, $globalVarsDefinition, $cmsConfig)
+    public function __construct(CmsHelper $cmsHelper, TemplateProvider $provider, Container $container, $globalVarsDefinition, $cmsConfig, Environment $environment)
     {
         $this->helper = $cmsHelper;
         $this->provider = $provider;
         $this->cmsConfig = $cmsConfig;
+        $this->environment = $environment;
         if ($globalVarsDefinition['enable']) {
             $this->globalVars = $container->get($globalVarsDefinition['global_service']);
             $this->globalVars->setDelimiter($globalVarsDefinition['delimiter']);
         }
     }
 
-    public function onKernelController($event)
+    public function onKernelController(ControllerEvent $event)
     {
         $controller = $event->getController();
         if (is_array($controller)) {
@@ -56,6 +62,13 @@ class CmsControllerListener
 
         if ($controller instanceof BaseCmsController) {
 
+            if(!$this->helper->isGranted($request)){
+                $event->setController(function() {
+                    $content = $this->environment->render('@WebEtDesignCms/page/page_access_denied.html.twig');
+                    return new Response($content, 403);
+                });
+            }
+            
             $page   = $this->helper->getPage($request);
             $locale = $this->helper->getLocale($request);
             if (!empty($locale)) {
@@ -63,6 +76,8 @@ class CmsControllerListener
                 $controller->setLocale($locale);
             }
             $controller->setPage($page);
+
+
             $controller->setGranted($this->helper->isGranted($request));
             $controller->setProvider($this->provider);
             $controller->setCmsConfig($this->cmsConfig);

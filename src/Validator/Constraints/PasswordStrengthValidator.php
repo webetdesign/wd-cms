@@ -10,6 +10,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use WebEtDesign\CmsBundle\Validator\Constraints\PasswordStrength;
 
+/**
+ * @deprecated use the class in wd-rgpd-bundle instead
+ */
 class PasswordStrengthValidator extends ConstraintValidator
 {
     private $translator;
