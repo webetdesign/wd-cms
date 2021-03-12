@@ -35,3 +35,13 @@ services:
     tags:
       # The alias is what is used to retrieve the menu
       - { name: knp_menu.renderer, alias: 'cms_menu_admin_renderer' }
+
+  cms.menu_renderer:
+    class: Knp\Menu\Renderer\TwigRenderer
+    arguments:
+      - "@twig"
+      - "@@WebEtDesignCms/menu/knp_menu.html.twig"
+      - "@knp_menu.matcher"
+    tags:
+      # The alias is used to retrieve the menu
+      - { name: knp_menu.renderer, alias: 'cms_menu_renderer' }

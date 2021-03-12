@@ -127,6 +127,12 @@ class CmsMenuItem
      * @var string
      * @ORM\Column(type="string", nullable=true)
      */
+    private $iconClass;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
     private $connected;
 
     /**
@@ -608,7 +614,7 @@ class CmsMenuItem
     {
         return $this->blank;
     }
-    
+
     /**
      * @param string $liClass
      * @return CmsMenuItem
@@ -661,5 +667,23 @@ class CmsMenuItem
     public function getLinkClass(): ?string
     {
         return $this->linkClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIconClass(): ?string
+    {
+        return $this->iconClass;
+    }
+
+    /**
+     * @param string $iconClass
+     * @return CmsMenuItem
+     */
+    public function setIconClass(?string $iconClass): CmsMenuItem
+    {
+        $this->iconClass = $iconClass;
+        return $this;
     }
 }

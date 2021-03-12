@@ -21,6 +21,7 @@ use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
+use WebEtDesign\CmsBundle\Form\Type\MenuIconType;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 final class CmsMenuItemAdmin extends AbstractAdmin
@@ -106,6 +107,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
         $this->setFormTheme(array_merge($this->getFormTheme(), [
             '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
             '@WebEtDesignCms/form/cms_route_params.html.twig',
+            '@WebEtDesignCms/form/cms_menu_icon_widget.html.twig',
         ]));
 
 
@@ -234,6 +236,10 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                 ])
                 ->add('linkClass', null, [
                     'label'    => 'link class (a, span)',
+                    'required' => false,
+                ])
+                ->add('iconClass', MenuIconType::class, [
+                    'label'    => 'icon class',
                     'required' => false,
                 ])
                 ->add('connected', ChoiceType::class, [

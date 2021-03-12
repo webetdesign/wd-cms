@@ -9,3 +9,9 @@ services:
       - '@cms.security.editable_role_builder'
     tags:
       - { name: form.type }
+
+  WebEtDesign\CmsBundle\Form\Type\MenuIconType:
+    arguments:
+      - '%wd_cms.menu.icon_set%'
+    tags:
+      - { name: form.type }

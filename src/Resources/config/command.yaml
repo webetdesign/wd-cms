@@ -73,3 +73,8 @@ services:
     tags:
       - { name: 'console.command', command: 'cms:sitemap-helper' }
 
+  WebEtDesign\CmsBundle\Command\CmsMenuIconSetGeneratorCommand:
+    arguments:
+      - '%wd_cms.menu.icon_set%'
+    tags:
+      - { name: 'console.command', command: 'cms:menu:icon-set-generator' }

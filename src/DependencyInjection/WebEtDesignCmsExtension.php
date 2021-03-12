@@ -45,6 +45,7 @@ class WebEtDesignCmsExtension extends Extension
         $this->registerDoctrineMapping($config);
 
         // TODO : work for autowired configuration
+        $container->setParameter('wd_cms.menu.icon_set', []);
         $container->setParameter('wd_cms.cms', $config['cms']);
         $container->setParameter('wd_cms.cms.multisite',
             $config['cms']['multilingual'] || $config['cms']['multisite'] ? true : false);

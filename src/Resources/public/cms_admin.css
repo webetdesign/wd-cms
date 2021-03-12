@@ -351,6 +351,30 @@
 .small-box-crud {
   color: white !important; }
 
+.cms-menu-icon-set {
+  width: 500px;
+  height: 300px;
+  padding: 5px;
+  border: solid 1px #b5b5b5;
+  border-radius: 2px;
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+  display: none; }
+  .cms-menu-icon-set .form-inline {
+    margin-bottom: 4px; }
+  .cms-menu-icon-set.open {
+    display: block;
+    left: 218px;
+    top: 178px; }
+  .cms-menu-icon-set .items {
+    height: calc(100% - 35px);
+    overflow: scroll; }
+    .cms-menu-icon-set .items button {
+      margin: 1px; }
+      .cms-menu-icon-set .items button .hide {
+        display: none; }
+
 .spinbox {
   height: 120px; }
   .spinbox .spinner {

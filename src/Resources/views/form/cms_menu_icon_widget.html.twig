@@ -1,0 +1,54 @@
+{% block cms_menu_icon_widget %}
+
+
+    <div class="input-group">
+        {{ form_widget(form) }}
+        <span class="input-group-addon" id="{{ form.vars.id }}_book" style="cursor: pointer"><i class="fa fa-book"></i></span>
+    </div>
+
+    <div class="cms-menu-icon-set" id="{{ form.vars.id }}_library">
+        <div class="form-inline">
+            <input id="{{ form.vars.id }}_filter" type="text" class="form-control" placeholder="Filter" style="width: calc(100% - 35px)">
+            <span class="btn btn-sm btn-danger" onclick="$('#{{ form.vars.id }}_library').removeClass('open');"><i class="fa fa-close"></i></span>
+        </div>
+        <div class="items" id="{{ form.vars.id }}_items">
+            {% for icon, label in iconSet %}
+                <button type="button" data-icon="{{ icon }}" data-label="{{ label }}"><i class="{{ icon }}"></i></button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+
+    $(document)
+      .ready(function () {
+        var $buttons = $('#{{ form.vars.id }}_items').find('button');
+
+        $buttons.on('click', function () {
+          $('#{{ form.vars.id }}').val($(this).data('icon'));
+          $('#{{ form.vars.id }}_library').removeClass('open');
+        })
+
+        $('#{{ form.vars.id }}_filter')
+          .on('keyup', function () {
+            var val = $(this).val();
+
+            $buttons.each(function( index ) {
+              if ($(this).data('label').match(val)) {
+                $(this).removeClass('hide');
+              } else {
+                $(this).addClass('hide');
+              }
+            });
+
+          });
+
+        $('#{{ form.vars.id }}_book')
+          .on('click', function () {
+              $('#{{ form.vars.id }}_library').addClass('open');
+          });
+      });
+
+
+    </script>
+{% endblock %}
