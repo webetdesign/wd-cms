@@ -94,7 +94,7 @@ class SiteAdminListener
     private function createMenu(EntityManager $em, CmsSite $site)
     {
         $menu = new CmsMenu();
-        $menu->setLabel('Menu principale')
+        $menu->setLabel('Menu principal')
             ->setCode('main_menu')
             ->setSite($site)
             ->setType(CmsMenuTypeEnum::DEFAULT);
