@@ -297,4 +297,9 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             ]);
         }
     }
+
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->em;
+    }
 }

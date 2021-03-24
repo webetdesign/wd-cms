@@ -12,3 +12,51 @@ cms.media.provider.image.description: Image (png, jpeg, jpg)
 cms.media.provider.file.description: Fichier
 cms.media.provider.svg.description: Image de type svg
 cms.media.provider.video.description: Video (mp4)
+
+'Cms Page Tree': Arborescence de pages
+'Cms Menu Tree': Menus
+'Cms Menu Item Tree': Menus
+'Cms Shared Block List': Blocs partagés
+'Cms Site List': Sites
+
+cms_page.tab.general: Général
+cms_page.tab.seo: Référencement naturel
+cms_page.tab.content: Gestion des contenus
+cms_page.tab.route: Route
+cms_page.tab.security: Sécurité
+cms_page.tab.multilingual: MultiLingue
+
+cms_page.form.title.label: Titre de la page dans l'interface d'administraion
+cms_page.form.template.label: Modèle de page
+cms_page.form.active.label: Accessible
+cms_page.form.cross_site_pages.label: Pages associées
+
+
+cms_page.form.seo_title.label: Titre (balise title)
+cms_page.form.seo_description.label: Description (balise description)
+cms_page.form.seo_keywords.label: Mots clés (balise keyword)
+cms_page.form.seo_breadcrumb.label: 'Fil d''Ariane'
+
+cms_page.form.seo.open_graph: Partage (OpenGraph)
+cms_page.form.seo.twitter: Partage Twitter
+cms_page.form.og_title.label: Titre du lien
+cms_page.form.og_type.label: Type (article|website|book|music|video)
+cms_page.form.og_url.label: Lien (URL de la page)
+cms_page.form.og_image.label: Image
+cms_page.form.og_image.help: Taille de l'image 1200 x 627
+cms_page.form.og_description.label: Courte description (4 phrases max.)
+cms_page.form.og_site_name.label: Nom du site
+cms_page.form.og_admins.label: Administrateur (obsolète)
+
+cms_page.form.twitter_card.label: 'Type de présentation (summary|summary_large_image|app|player)'
+cms_page.form.twitter_site.label: 'Nom du site (@compte pour lier au compte twitter)'
+cms_page.form.twitter_title.label: 'Titre du tweet'
+cms_page.form.twitter_description.label: 'Contenu du tweet (280 caractères)'
+cms_page.form.twitter_creator.label: 'Auteur du contenu (@auteur pour lier à un compte twitter)'
+cms_page.form.twitter_image.label: Image
+cms_page.form.twitter_image.help: Taille de l'image 1200 x 627
+
+cms_route.form.name.label: Route name (technique)
+cms_route.form.path.label: Chemin
+cms_route.form.method.label: Méthodes
+cms_route.form.controller.label: Controller (technique)

@@ -102,10 +102,10 @@ final class CmsContentAdmin extends AbstractAdmin
         $admin     = $this;
 
         /** @var CmsContent $subject */
-        $subject = $formMapper->getAdmin()->getSubject();
+        $subject = $this->getSubject();
 
         $formMapper->add('active', null, [
-            'label' => 'Actif',
+            'label' => 'Visible',
         ]);
         $formMapper->add(
             'label',
@@ -129,10 +129,6 @@ final class CmsContentAdmin extends AbstractAdmin
             );
         }
 
-        $formMapper->add('parent_heritance', null, [
-            'label' => 'Contenu hérité',
-        ]);
-        $this->addHelp($formMapper, $subject, 'parent_heritance');
 
         if ($subject->getPage()) {
             $configs = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
@@ -142,7 +138,27 @@ final class CmsContentAdmin extends AbstractAdmin
             $configs = $this->blockProvider->getConfigurationFor($subject->getSharedBlockParent()->getTemplate());
         }
 
+
+
+        if ($this->canInheritFromParent($subject)) {
+            $formMapper->add('parent_heritance', null, [
+                'label' => 'Hériter le contenu de la page parent',
+                'attr'  => [
+                    'class' => 'checkbox-right'
+                ]
+            ]);
+        }
+
+        $contents = [];
+        foreach ($configs['contents'] as $content) {
+            $contents[$content['code']] = $content;
+        }
+        $contentParams = $contents[$subject->getCode()] ?? [];
+
         if ($subject && $subject->getId()) {
+
+            $subject->collapseOpen = $contentParams['open'] ?? false;
+
             switch ($subject->getType()) {
                 case CmsContentTypeEnum::TEXT:
                     $formMapper->add('value', TextType::class, ['required' => false]);
@@ -161,7 +177,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         [
                             "link_parameters" => [
                                 'context'  => 'cms_page',
-                                'provider' => 'sonata.media.provider.image',
+                                'provider' => 'cms.media.provider.image',
                             ],
                         ]
                     );
@@ -187,11 +203,7 @@ final class CmsContentAdmin extends AbstractAdmin
                     break;
 
                 case CmsContentTypeEnum::WYSYWYG:
-                    $contents = [];
-                    foreach ($configs['contents'] as $content) {
-                        $contents[$content['code']] = $content;
-                    }
-                    $options = $contents[$subject->getCode()]['options'] ?? [];
+                    $options = $contentParams['options'] ?? [];
 
                     $formMapper->add(
                         'value',
@@ -261,7 +273,8 @@ final class CmsContentAdmin extends AbstractAdmin
                     $this->addHelp($formMapper, $subject, 'parent_heritance');
                     break;
                 case CmsContentTypeEnum::CHECKBOX:
-                    $formMapper->add('value', CheckboxType::class, ['required' => false, 'label' => false]);
+                    $formMapper->add('value', CheckboxType::class,
+                        ['required' => false, 'label' => false]);
 
                     $formMapper->getFormBuilder()->get('value')->addModelTransformer(new CallbackTransformer(
                         function ($value) {
@@ -340,5 +353,14 @@ final class CmsContentAdmin extends AbstractAdmin
         if ($subject && !empty($subject->getHelp())) {
             $formMapper->addHelp($field, $subject->getHelp());
         }
+    }
+
+    private function canInheritFromParent(CmsContent $content)
+    {
+        if ($content->getPage() && $content->getPage()->getParent() && $content->getPage()->getParent()->getContent($content->getCode())) {
+            return true;
+        }
+
+        return false;
     }
 }

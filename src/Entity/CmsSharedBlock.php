@@ -184,7 +184,7 @@ class CmsSharedBlock
      * @deprecated
      * @return bool
      */
-    public function isPublic(): bool
+    public function isPublic(): ?bool
     {
         return null;
     }

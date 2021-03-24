@@ -319,5 +319,22 @@ final class CmsMenuItemAdminController extends CRUDController
         return array_filter(['_tab' => $request->request->get('_tab')]);
     }
 
+    /**
+     * @inheritDoc
+     */
+    protected function addRenderExtraParams(array $parameters = []): array
+    {
+        if (!$this->isXmlHttpRequest()) {
+            $parameters['breadcrumbs_builder'] = $this
+                ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder');
+        }
+
+        $parameters['admin'] = $parameters['admin'] ?? $this->admin;
+        $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
+        // NEXT_MAJOR: Remove next line.
+        $parameters['admin_pool'] = $this->get('sonata.admin.pool');
+
+        return $parameters;
+    }
 
 }

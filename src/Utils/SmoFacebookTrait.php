@@ -4,6 +4,12 @@ namespace WebEtDesign\CmsBundle\Utils;
 
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Trait SmoFacebookTrait
+ * @package WebEtDesign\CmsBundle\Utils
+ *
+ * @deprecated(use WebEtDesign\CmsBundle\Utils\SmoOpenGraphTrait instead)
+ */
 trait SmoFacebookTrait
 {
     /**

@@ -3,14 +3,16 @@ services:
     class: '%wd_cms.admin.config.class.site%'
     arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%', '%wd_cms.cms%']
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Site}
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Sites}
+    calls:
+      - [ setTranslationDomain, [ 'wd_cms' ] ]
     public: true
 
   cms.admin.cms_route:
     class: '%wd_cms.admin.config.class.route%'
     arguments: [~, '%wd_cms.admin.config.entity.route%', '%wd_cms.admin.config.controller.route%']
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Route, show_in_dashboard: false }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Routes, show_in_dashboard: false }
     public: true
 
   cms.admin.cms_page:
@@ -25,8 +27,9 @@ services:
       - '@cms.page_provider'
       - '%wd_cms.custom_contents_form_themes%'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Page }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Pages }
     calls:
+      - [setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
       - [addChild, ['@cms.admin.cms_page_declination']]
       - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
@@ -46,16 +49,18 @@ services:
       - '@cms.block_provider'
       - '@cms.page_provider'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Content, show_in_dashboard: false }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Contents, show_in_dashboard: false }
+    calls:
+      - [ setTranslationDomain, [ 'wd_cms' ] ]
     public: true
 
   cms.admin.cms_menu:
     class: '%wd_cms.admin.config.class.menu%'
     arguments: [~, WebEtDesign\CmsBundle\Entity\CmsMenu, '%wd_cms.admin.config.controller.menu%', '@doctrine.orm.default_entity_manager', '@cms.page_provider']
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Menu }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Menus }
     calls:
-      - [setTranslationDomain, ['cms']]
+      - [setTranslationDomain, ['wd_cms']]
       #      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/menu/actionButtons/button_create.html.twig']]
       - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/menu:edit.html.twig']]
@@ -74,6 +79,7 @@ services:
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false }
     calls:
+      - [ setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['edit', '@@WebEtDesignCms/admin/menuItem/edit.html.twig']]
     public: true
 
@@ -88,8 +94,9 @@ services:
       - '%wd_cms.cms%'
       - '%wd_cms.custom_contents_form_themes%'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Block partagé }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Blocs partagés }
     calls:
+      - [ setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/sharedBlock/actionButtons/button_create.html.twig']]
       - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
@@ -119,5 +126,6 @@ services:
     tags:
       - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
     calls:
+      - [ setTranslationDomain, [ 'wd_cms' ] ]
       - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
     public: true

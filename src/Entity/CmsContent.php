@@ -113,6 +113,8 @@ class CmsContent
      */
     private $help;
 
+    public bool $collapseOpen = false;
+
     public function __toString()
     {
         return $this->label;
@@ -337,7 +339,7 @@ class CmsContent
     }
 
     /**
-     * @return mixed
+     * @return CmsPageDeclination
      */
     public function getDeclination()
     {

@@ -29,9 +29,6 @@
             .enable {
                 width : 80px;
             }
-            .inherit {
-                width : 150px;
-            }
 
             .info {
                 align-self   : center;
@@ -48,6 +45,15 @@
                     i {
                         transform : rotate(180deg);
                     }
+                }
+            }
+        }
+
+        .inherit {
+            .checkbox {
+                label {
+                    display: flex;
+                    justify-content: flex-end;
                 }
             }
         }

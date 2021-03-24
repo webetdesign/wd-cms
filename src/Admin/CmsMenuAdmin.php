@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\Form\Type\ImmutableArrayType;
@@ -211,4 +212,8 @@ final class CmsMenuAdmin extends AbstractAdmin
         return $query;
     }
 
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->em;
+    }
 }

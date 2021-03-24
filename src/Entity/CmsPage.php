@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\PersistentCollection;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookTrait;
+use WebEtDesign\CmsBundle\Utils\SmoOpenGraphTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -19,7 +20,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class CmsPage
 {
     use SeoAwareTrait;
-    use SmoFacebookTrait;
+    use SmoOpenGraphTrait;
     use SmoTwitterTrait;
 
     /**

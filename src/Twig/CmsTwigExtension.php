@@ -2,7 +2,9 @@
 
 namespace WebEtDesign\CmsBundle\Twig;
 
+use App\Entity\Media;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
+use Sonata\MediaBundle\Provider\Pool;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -50,6 +52,10 @@ class CmsTwigExtension extends AbstractExtension
     protected $router;
 
     protected $customContents;
+    /**
+     * @var Pool
+     */
+    private Pool $mediaProviderPool;
 
     /**
      * @inheritDoc
@@ -62,7 +68,8 @@ class CmsTwigExtension extends AbstractExtension
         TemplateProvider $pageProvider,
         TemplateProvider $templateProvider,
         RequestStack $requestStack,
-        ParameterBagInterface $parameterBag
+        ParameterBagInterface $parameterBag,
+        Pool $mediaProviderPool
     )
     {
         $this->em = $entityManager;
@@ -83,6 +90,7 @@ class CmsTwigExtension extends AbstractExtension
         if ($globalVarsDefinition['enable']) {
             $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
         }
+        $this->mediaProviderPool = $mediaProviderPool;
     }
 
     public function getTests()
@@ -452,6 +460,12 @@ class CmsTwigExtension extends AbstractExtension
         }
 
         $value = !empty($value) ? $value : $default;
+
+        if ($value instanceof Media) {
+            $provider = $this->mediaProviderPool->getProvider($value->getProviderName());
+
+            return $provider->generatePublicUrl($value, 'open_graph');
+        }
 
         if ($this->globalVarsEnable) {
             $value = $this->globalVars->replaceVars($value);

@@ -13,6 +13,7 @@ use Sonata\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -31,13 +32,13 @@ use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Form\Type\SecurityRolesType;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
+use WebEtDesign\CmsBundle\Utils\SmoOpenGraphAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
 
 class CmsPageAdmin extends AbstractAdmin
 {
     use SmoTwitterAdminTrait;
-    use SmoFacebookAdminTrait;
+    use SmoOpenGraphAdminTrait;
     use GlobalVarsAdminTrait;
 
     protected $multilingual;
@@ -206,20 +207,20 @@ class CmsPageAdmin extends AbstractAdmin
 
         //region Général
         $formMapper
-            ->tab('Général')// The tab call is optional
+            ->tab('cms_page.tab.general')// The tab call is optional
             ->with('', ['box_class' => '']);
 
         $formMapper
-            ->add('title', null, ['label' => 'Title']);
+            ->add('title', null, ['label' => 'cms_page.form.title.label']);
         if (empty($site->getTemplateFilter())) {
             $formMapper
                 ->add('template', PageTemplateType::class, [
-                    'label' => 'Modèle de page',
+                    'label' => 'cms_page.form.template.label',
                 ]);
         } else {
             $formMapper
                 ->add('template', PageTemplateType::class, [
-                    'label'   => 'Modèle de page',
+                    'label'   => 'cms_page.form.template.label',
                     'choices' => $this->pageProvider->getTemplateList($site->getTemplateFilter())
                 ]);
         }
@@ -253,46 +254,30 @@ class CmsPageAdmin extends AbstractAdmin
 
             //region Général - additional
             $formMapper
-                ->tab('Général')// The tab call is optional
+                ->tab('cms_page.tab.general')// The tab call is optional
                 ->with('', ['box_class' => ''])
-                ->add('active');
-
-            //region Association
-            if ($object->getClassAssociation()) {
-                $entities = $em->getRepository($object->getClassAssociation())->{$object->getQueryAssociation()}();
-                $choices  = [];
-                foreach ($entities as $entity) {
-                    $choices[$entity->__toString()] = $entity->getId();
-                }
-                $formMapper->add('association', ChoiceType::class,
-                    [
-                        'label'   => 'Association',
-                        'choices' => $choices
-                    ]
-                );
-            }
-            //endregion
+                ->add('active', null, ['label' => 'cms_page.form.active.label']);
 
             $formMapper->end();// End form group
             $formMapper->end();// End tab
             //endregion
 
             //region SEO
-            $formMapper->tab('SEO');// The tab call is optional
+            $formMapper->tab('cms_page.tab.seo');// The tab call is optional
             $this->addGlobalVarsHelp($formMapper, $object, $this->globalVarsEnable);
-            $formMapper->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('seo_title')
-                ->add('seo_description')
-                ->add('seo_keywords')
-                ->add('seo_breadcrumb')
+            $formMapper->with('cms_page.tab.general', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
+                ->add('seo_title', null, ['label' => 'cms_page.form.seo_title.label'])
+                ->add('seo_description', TextareaType::class, ['label' => 'cms_page.form.seo_description.label', 'required' => false])
+                ->add('seo_keywords', null, ['label' => 'cms_page.form.seo_keywords.label'])
+                ->add('seo_breadcrumb', null, ['label' => 'cms_page.form.seo_breadcrumb.label'])
                 ->end();
-            $this->addFormFieldSmoFacebook($formMapper);
+            $this->addFormFieldSmoOpenGraph($formMapper);
             $this->addFormFieldSmoTwitter($formMapper);
             $formMapper->end();
             //endregion
 
             //region Contenus
-            $formMapper->tab('Contenus');
+            $formMapper->tab('cms_page.tab.content');
             $formMapper
                 ->with('', [
                     'box_class' => 'header_none',
@@ -311,16 +296,19 @@ class CmsPageAdmin extends AbstractAdmin
 
             if ($object->getRoute() != null) {
                 //region Route
-                $formMapper->tab('Route')
-                    ->with('', ['box_class' => ''])
-                    ->add('route.name', null, ['label' => 'Route name (technique)'])
+                $formMapper->tab('cms_page.tab.route')
+                    ->with('', ['box_class' => 'header_none'])
+                    ->add('route.name', null, ['label' => 'cms_route.form.name.label'])
                     ->add('route.path', null,
-                        ['label' => 'Chemin', 'attr' => ['class' => 'cms_route_path_input']])
+                        [
+                            'label' => 'cms_route.form.path.label',
+                            'attr'  => ['class' => 'cms_route_path_input']
+                        ])
                     ->add(
                         'route.methods',
                         ChoiceType::class,
                         [
-                            'label'    => 'Méthodes',
+                            'label'    => 'cms_route.form.method.label',
                             'choices'  => [
                                 Request::METHOD_GET    => Request::METHOD_GET,
                                 Request::METHOD_POST   => Request::METHOD_POST,
@@ -331,7 +319,7 @@ class CmsPageAdmin extends AbstractAdmin
                             'multiple' => true,
                         ]
                     )
-                    ->add('route.controller', null, ['label' => 'Controller (technique)'])
+                    ->add('route.controller', null, ['label' => 'cms_route.form.controller.label'])
                     ->add('route.defaults', HiddenType::class, [
                         'attr' => [
                             'class' => 'cms_route_default_input'
@@ -349,7 +337,7 @@ class CmsPageAdmin extends AbstractAdmin
 
             if ($this->cmsConfig['security']['page']['enable']) {
                 //region Sécurité
-                $formMapper->tab('Sécurité')
+                $formMapper->tab('cms_page.tab.security')
                     ->with('', ['box_class' => ''])
                     ->add('roles', SecurityRolesType::class, [
                         'label'    => false,
@@ -364,14 +352,14 @@ class CmsPageAdmin extends AbstractAdmin
 
             if ($this->multilingual) {
                 //region MultiLingue
-                $formMapper->tab('MultiLingue')
+                $formMapper->tab('cms_page.tab.multilingual')
                     ->with('', ['box_class' => '']);
 
                 if ($object->getRoot()->getSite()) {
                     $formMapper->add('crossSitePages', MultilingualType::class, [
                         'site'  => $object->getRoot()->getSite(),
                         'page'  => $object,
-                        'label' => 'Pages associées',
+                        'label' => 'cms_page.form.cross_site_pages.label',
                     ]);
 
                     $formMapper->getFormBuilder()->get('crossSitePages')->addModelTransformer(new CallbackTransformer(
@@ -403,6 +391,11 @@ class CmsPageAdmin extends AbstractAdmin
             ->add('id')
             ->add('name')
             ->add('title');
+    }
+
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->em;
     }
 
     protected function canManageContent()

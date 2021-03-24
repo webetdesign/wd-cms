@@ -131,7 +131,6 @@ class CmsMenuAdminController extends CRUDController
         $request  = $this->getRequest();
         $session  = $request->getSession();
 
-
         if ($id === null) {
             if ($session->get('admin_current_site_id')) {
                 $id = $session->get('admin_current_site_id');
@@ -501,5 +500,22 @@ class CmsMenuAdminController extends CRUDController
         $twig->getRuntime(FormRenderer::class)->setTheme($formView, $theme);
     }
 
+    /**
+     * @inheritDoc
+     */
+    protected function addRenderExtraParams(array $parameters = []): array
+    {
+        if (!$this->isXmlHttpRequest()) {
+            $parameters['breadcrumbs_builder'] = $this
+                ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder');
+        }
+
+        $parameters['admin'] = $parameters['admin'] ?? $this->admin;
+        $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
+        // NEXT_MAJOR: Remove next line.
+        $parameters['admin_pool'] = $this->get('sonata.admin.pool');
+
+        return $parameters;
+    }
 
 }

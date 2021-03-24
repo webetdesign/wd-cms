@@ -11,48 +11,48 @@ file that was distributed with this source code.
 
 {% extends base_template %}
 
-{% block sonata_breadcrumb %}
-    <div class="hidden-xs">
-        {% if _breadcrumb is not empty or action is defined %}
-            <ol class="nav navbar-top-links breadcrumb">
-                {% if _breadcrumb is empty %}
-                    {% if action is defined %}
-                        {% for key, menu in breadcrumbs_builder.breadcrumbs(admin, action) %}
-                            {% if key not in [2,3] %}
+{#{% block sonata_breadcrumb %}#}
+{#    <div class="hidden-xs">#}
+{#        {% if _breadcrumb is not empty or action is defined %}#}
+{#            <ol class="nav navbar-top-links breadcrumb">#}
+{#                {% if _breadcrumb is empty %}#}
+{#                    {% if action is defined %}#}
+{#                        {% for key, menu in breadcrumbs_builder.breadcrumbs(admin, action) %}#}
+{#                            {% if key not in [2,3] %}#}
 
-                                {%- set translation_domain = menu.extra('translation_domain', 'messages') -%}
-                                {%- set label = menu.label -%}
-                                {%- if translation_domain is not same as(false) -%}
-                                    {%- set label = label|trans(menu.extra('translation_params', {}), translation_domain) -%}
-                                {%- endif -%}
+{#                                {%- set translation_domain = menu.extra('translation_domain', 'messages') -%}#}
+{#                                {%- set label = menu.label -%}#}
+{#                                {%- if translation_domain is not same as(false) -%}#}
+{#                                    {%- set label = label|trans(menu.extra('translation_params', {}), translation_domain) -%}#}
+{#                                {%- endif -%}#}
 
-                                {% if not loop.last %}
-                                    <li>
-                                        {% if menu.uri is not empty %}
-                                            <a href="{{ menu.uri }}">
-                                                {% if menu.extra('safe_label', true) %}
-                                                    {{- label|raw -}}
-                                                {% else %}
-                                                    {{- label|u.truncate(100) -}}
-                                                {% endif %}
-                                            </a>
-                                        {% else %}
-                                            <span>{{ label|u.truncate(100) }}</span>
-                                        {% endif %}
-                                    </li>
-                                {% else %}
-                                    <li class="active"><span>{{ label|u.truncate(100) }}</span></li>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                {% else %}
-                    {{ _breadcrumb|raw }}
-                {% endif %}
-            </ol>
-        {% endif %}
-    </div>
-{% endblock sonata_breadcrumb %}
+{#                                {% if not loop.last %}#}
+{#                                    <li>#}
+{#                                        {% if menu.uri is not empty %}#}
+{#                                            <a href="{{ menu.uri }}">#}
+{#                                                {% if menu.extra('safe_label', true) %}#}
+{#                                                    {{- label|raw -}}#}
+{#                                                {% else %}#}
+{#                                                    {{- label|u.truncate(100) -}}#}
+{#                                                {% endif %}#}
+{#                                            </a>#}
+{#                                        {% else %}#}
+{#                                            <span>{{ label|u.truncate(100) }}</span>#}
+{#                                        {% endif %}#}
+{#                                    </li>#}
+{#                                {% else %}#}
+{#                                    <li class="active"><span>{{ label|u.truncate(100) }}</span></li>#}
+{#                                {% endif %}#}
+{#                            {% endif %}#}
+{#                        {% endfor %}#}
+{#                    {% endif %}#}
+{#                {% else %}#}
+{#                    {{ _breadcrumb|raw }}#}
+{#                {% endif %}#}
+{#            </ol>#}
+{#        {% endif %}#}
+{#    </div>#}
+{#{% endblock sonata_breadcrumb %}#}
 
 {% block title %}
     {# NEXT_MAJOR: remove default filter #}

@@ -9,6 +9,7 @@ use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 
@@ -17,6 +18,12 @@ final class CmsSiteAdmin extends AbstractAdmin
 {
     protected $isMultilingual;
     protected $isMultisite;
+
+    protected function configureRoutes(RouteCollection $collection)
+    {
+        $collection->remove('export');
+    }
+
 
     /**
      * @inheritDoc

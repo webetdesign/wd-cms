@@ -36,44 +36,34 @@
 {% endif %}
 
 <!-- Open Graph data -->
-{% if object is defined and cms_render_seo_smo_value(object, 'fbTitle') is not empty %}
-    <meta property="og:title" content="{{ cms_render_seo_smo_value(object, 'fbTitle') }}">
+{% if object is defined and cms_render_seo_smo_value(object, 'ogTitle') is not empty %}
+    <meta property="og:title" content="{{ cms_render_seo_smo_value(object, 'ogTitle') }}">
 {% else %}
-    <meta property="og:title" content="{{ cms_render_seo_smo_value(page, 'fbTitle') }}">
+    <meta property="og:title" content="{{ cms_render_seo_smo_value(page, 'ogTitle') }}">
 {% endif %}
 
-{% if object is defined and cms_render_seo_smo_value(object, 'fbType') is not empty %}
-    <meta property="og:type" content="{{ cms_render_seo_smo_value(object, 'fbType') }}">
+{% if object is defined and cms_render_seo_smo_value(object, 'ogType') is not empty %}
+    <meta property="og:type" content="{{ cms_render_seo_smo_value(object, 'ogType') }}">
 {% else %}
-    <meta property="og:type" content="{{ cms_render_seo_smo_value(page, 'fbType') }}">
+    <meta property="og:type" content="{{ cms_render_seo_smo_value(page, 'ogType') }}">
 {% endif %}
 
-{% if object is defined and cms_render_seo_smo_value(object, 'fbUrl') is not empty %}
-    <meta property="og:url" content="{{ cms_render_seo_smo_value(object, 'fbUrl') }}">
+{% if object is defined and cms_render_seo_smo_value(object, 'ogImage') is not empty %}
+    <meta property="og:image" content="{{ cms_render_seo_smo_value(object, 'ogImage') }}">
 {% else %}
-    <meta property="og:url" content="{{ cms_render_seo_smo_value(page, 'fbUrl') }}">
+    <meta property="og:image" content="{{ cms_render_seo_smo_value(page, 'ogImage') }}">
 {% endif %}
 
-{% if object is defined and cms_render_seo_smo_value(object, 'fbImage') is not empty %}
-    <meta property="og:image" content="{{ cms_render_seo_smo_value(object, 'fbImage') }}">
+{% if object is defined and cms_render_seo_smo_value(object, 'ogDescription') is not empty %}
+    <meta property="og:description" content="{{ cms_render_seo_smo_value(object, 'ogDescription') }}">
 {% else %}
-    <meta property="og:image" content="{{ cms_render_seo_smo_value(page, 'fbImage') }}">
+    <meta property="og:description" content="{{ cms_render_seo_smo_value(page, 'ogDescription') }}">
 {% endif %}
 
-{% if object is defined and cms_render_seo_smo_value(object, 'fbDescription') is not empty %}
-    <meta property="og:description" content="{{ cms_render_seo_smo_value(object, 'fbDescription') }}">
+{% if object is defined and cms_render_seo_smo_value(object, 'ogSiteName') is not empty %}
+    <meta property="og:site_name" content="{{ cms_render_seo_smo_value(object, 'ogSiteName') }}">
 {% else %}
-    <meta property="og:description" content="{{ cms_render_seo_smo_value(page, 'fbDescription') }}">
+    <meta property="og:site_name" content="{{ cms_render_seo_smo_value(page, 'ogSiteName') }}">
 {% endif %}
 
-{% if object is defined and cms_render_seo_smo_value(object, 'fbSiteName') is not empty %}
-    <meta property="og:site_name" content="{{ cms_render_seo_smo_value(object, 'fbSiteName') }}">
-{% else %}
-    <meta property="og:site_name" content="{{ cms_render_seo_smo_value(page, 'fbSiteName') }}">
-{% endif %}
-
-{% if object is defined and cms_render_seo_smo_value(object, 'fbAdmins') is not empty %}
-    <meta property="fb:admins" content="{{ cms_render_seo_smo_value(object, 'fbAdmins') }}">
-{% else %}
-    <meta property="fb:admins" content="{{ cms_render_seo_smo_value(page, 'fbAdmins') }}">
-{% endif %}
+<meta property="og:url" content="{{ app.request.schemeAndHttpHost ~ app.request.requestUri }}">

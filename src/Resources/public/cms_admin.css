@@ -471,8 +471,6 @@
       justify-content: flex-end; }
     #contents_collapse .panel-heading .enable {
       width: 80px; }
-    #contents_collapse .panel-heading .inherit {
-      width: 150px; }
     #contents_collapse .panel-heading .info {
       align-self: center;
       margin-right: 15px;
@@ -482,5 +480,8 @@
       align-self: center; }
       #contents_collapse .panel-heading .btn_arrow .collapsed i {
         transform: rotate(180deg); }
+  #contents_collapse .panel .inherit .checkbox label {
+    display: flex;
+    justify-content: flex-end; }
   #contents_collapse .panel-title {
     align-self: center; }

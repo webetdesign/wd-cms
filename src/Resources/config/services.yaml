@@ -99,6 +99,13 @@ services:
       - '%wd_cms.cms%'
       - '%security.role_hierarchy.roles%'
 
+  WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder:
+    autowire: true
+    public: true
+
+  WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder:
+    autowire: true
+    public: true
 
   # ===============================================
   # CKEditor Renderer
@@ -130,6 +137,7 @@ services:
       - '@cms.block_provider'
       - '@request_stack'
       - '@parameter_bag'
+      - '@Sonata\MediaBundle\Provider\Pool'
     tags:
       - { name: twig.extension }
     public: true

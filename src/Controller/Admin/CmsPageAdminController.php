@@ -51,18 +51,20 @@ class CmsPageAdminController extends CRUDController
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse([
                 'label'        => $object->getTitle(),
-                'modalContent' => $this->renderView('@WebEtDesignCms/admin/nestedTreeMoveAction/moveForm.html.twig', [
-                    'admin'  => $this->admin,
-                    'form'   => $form->createView(),
-                    'object' => $object
-                ])
+                'modalContent' => $this->renderView('@WebEtDesignCms/admin/nestedTreeMoveAction/moveForm.html.twig',
+                    [
+                        'admin'  => $this->admin,
+                        'form'   => $form->createView(),
+                        'object' => $object
+                    ])
             ]);
         }
 
-        return $this->renderWithExtraParams('@WebEtDesignCms/admin/nestedTreeMoveAction/move.html.twig', [
-            'form'   => $form->createView(),
-            'object' => $object
-        ]);
+        return $this->renderWithExtraParams('@WebEtDesignCms/admin/nestedTreeMoveAction/move.html.twig',
+            [
+                'form'   => $form->createView(),
+                'object' => $object
+            ]);
     }
 
     public function treeAction($id = null)
@@ -72,7 +74,7 @@ class CmsPageAdminController extends CRUDController
         /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine();
         if ($id === null) {
-            if($session->get('admin_current_site_id')) {
+            if ($session->get('admin_current_site_id')) {
                 $id = $session->get('admin_current_site_id');
             } else {
                 $defaultSite = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
@@ -185,11 +187,11 @@ class CmsPageAdminController extends CRUDController
         // $template = $this->templateRegistry->getTemplate('list');
 
         return $this->renderWithExtraParams($template, [
-            'action'         => 'list',
-            'form'           => $formView,
-            'datagrid'       => $datagrid,
-            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
-            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
+            'action'              => 'list',
+            'form'                => $formView,
+            'datagrid'            => $datagrid,
+            'csrf_token'          => $this->getCsrfToken('sonata.batch'),
+            'export_formats'      => $this->has('sonata.admin.admin_exporter') ?
                 $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
                 $this->admin->getExportFormats(),
         ], null);
@@ -362,7 +364,8 @@ class CmsPageAdminController extends CRUDController
         $existingObject = $this->admin->getObject($id);
 
         if (!$existingObject) {
-            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
+            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s',
+                $id));
         }
 
         $this->admin->checkAccess('edit', $existingObject);
@@ -425,7 +428,8 @@ class CmsPageAdminController extends CRUDController
                 } catch (LockException $e) {
                     $this->addFlash('sonata_flash_error', $this->trans('flash_lock_error', [
                         '%name%'       => $this->escapeHtml($this->admin->toString($existingObject)),
-                        '%link_start%' => '<a href="' . $this->admin->generateObjectUrl('edit', $existingObject) . '">',
+                        '%link_start%' => '<a href="' . $this->admin->generateObjectUrl('edit',
+                                $existingObject) . '">',
                         '%link_end%'   => '</a>',
                     ], 'SonataAdminBundle'));
                 }
@@ -480,7 +484,8 @@ class CmsPageAdminController extends CRUDController
         if ($object->isRoot()) {
             $this->addFlash('error', "Vous ne pouvez supprimer la page d'accueil");
 
-            return $this->redirect($this->admin->generateUrl('tree', ['id' => $object->getSite()->getId()]));
+            return $this->redirect($this->admin->generateUrl('tree',
+                ['id' => $object->getSite()->getId()]));
         }
 
         return null;
@@ -493,28 +498,32 @@ class CmsPageAdminController extends CRUDController
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $CmsRepo->persistAsFirstChildOf($submittedObject, $submittedObject->getMoveTarget());
+                    $CmsRepo->persistAsFirstChildOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $CmsRepo->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsLastChildOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $CmsRepo->persistAsLastChildOf($submittedObject, $submittedObject->getMoveTarget());
+                    $CmsRepo->persistAsLastChildOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $CmsRepo->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsNextSiblingOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $CmsRepo->persistAsNextSiblingOf($submittedObject, $submittedObject->getMoveTarget());
+                    $CmsRepo->persistAsNextSiblingOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $CmsRepo->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsPrevSiblingOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $CmsRepo->persistAsPrevSiblingOf($submittedObject, $submittedObject->getMoveTarget());
+                    $CmsRepo->persistAsPrevSiblingOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $CmsRepo->persistAsPrevSibling($submittedObject);
                 }
@@ -546,7 +555,7 @@ class CmsPageAdminController extends CRUDController
                 $params['subclass'] = $request->get('subclass');
             }
             $params['id'] = $object->getSite()->getId();
-            $url = $this->admin->generateUrl('create', $params);
+            $url          = $this->admin->generateUrl('create', $params);
         }
 
         if ('DELETE' === $this->getRestMethod()) {
@@ -578,5 +587,24 @@ class CmsPageAdminController extends CRUDController
     {
         return $this->redirect($this->admin->generateUrl('tree'));
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function addRenderExtraParams(array $parameters = []): array
+    {
+        if (!$this->isXmlHttpRequest()) {
+            $parameters['breadcrumbs_builder'] = $this
+                ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder');
+        }
+
+        $parameters['admin'] = $parameters['admin'] ?? $this->admin;
+        $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
+        // NEXT_MAJOR: Remove next line.
+        $parameters['admin_pool'] = $this->get('sonata.admin.pool');
+
+        return $parameters;
+    }
+
 
 }

@@ -37,11 +37,11 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
-            ->add('id')
-            ->add('code')
-            ->add('label')
-            ->add('active')
-            ->add('site' , null, ['show_filter' => false])
+//            ->add('id')
+//            ->add('code')
+//            ->add('label')
+//            ->add('active')
+//            ->add('site' , null, ['show_filter' => false])
         ;
     }
 
@@ -72,6 +72,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     protected function configureRoutes(RouteCollection $collection)
     {
         $collection
+            ->remove('export')
             ->add('createRootNode', 'initRoot')
             ->add('move', 'move')
             ->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
