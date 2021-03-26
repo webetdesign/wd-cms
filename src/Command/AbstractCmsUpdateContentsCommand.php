@@ -65,6 +65,10 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
             $contentConf[$content['code']] = $content;
         }
         $codes = array_keys($contentConf);
+        
+        if(count($codes) == 0){
+            return true;
+        }
 
         $ins  = $this->contentRp->findByParentInOutCodes($object, $codes, 'IN');
         $outs = $this->contentRp->findByParentInOutCodes($object, $codes, 'OUT');
@@ -77,8 +81,12 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
 
         /** @var CmsContent $in */
         foreach ($ins as $in) {
-            $contentDone[] = $in->getCode();
+            if(!isset($contentConf[$in->getCode()])){
+                $this->em->remove($in);
+                continue;
+            }
             $conf          = $contentConf[$in->getCode()];
+            $contentDone[] = $in->getCode();
             $in->setPosition(array_search($in->getCode(), $codes));
             if (isset($conf['label'])) {
                 $in->setLabel($conf['label']);
