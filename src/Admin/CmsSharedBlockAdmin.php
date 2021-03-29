@@ -121,7 +121,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
 
         $formMapper
             ->tab('Général')// The tab call is optional
-            ->with('', ['box_class' => ''])
+            ->with('', ['box_class' => 'header_none'])
             ->add('site', null, [
                 'attr'  => ['style' => 'display:none;'],
                 'label' => false
