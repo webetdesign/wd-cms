@@ -264,6 +264,10 @@ class CmsTwigExtension extends AbstractExtension
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 
+        if (!$content) {
+            return null;
+        }
+
         if (in_array($content->getType(), array_keys($this->customContents))) {
             if ((!$content->getValue() || $content->getValue() === '[]') && $defaultPage) {
                 $content = $this->retrieveContent($defaultPage, $content_code);
