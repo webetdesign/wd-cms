@@ -345,6 +345,10 @@ class CmsTwigExtension extends AbstractExtension
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 
+        if (!$content) {
+            return null;
+        }
+
         if (!$content->getMedia() && $defaultLangSite) {
             $defaultPages = $object->getCrossSitePages()->filter(function (CmsPage $crossPage) use (
                 $defaultLangSite
