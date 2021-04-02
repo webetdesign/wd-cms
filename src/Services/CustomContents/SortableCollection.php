@@ -49,8 +49,8 @@ class SortableCollection extends AbstractCustomContent
     /**
      * @param EntityManagerInterface $em
      * @param Environment $twig
-     * @param $entity
-     * @param AdminInterface $admin
+     * @param null $entity
+     * @param bool $useModelListeType
      * @param array $link_prameters
      * @param null|string $template
      */
@@ -58,13 +58,13 @@ class SortableCollection extends AbstractCustomContent
         EntityManagerInterface $em,
         Environment $twig,
         $entity = null,
-        AdminInterface $admin = null,
+        $useModelListeType = false,
         $link_prameters = [],
         $template = null
     ) {
         $this->em              = $em;
         $this->entity          = $entity;
-        $this->admin           = $admin;
+        $this->admin           = $useModelListeType;
         $this->link_parameters = $link_prameters;
         $this->template        = $template;
         $this->twig            = $twig;
@@ -75,9 +75,9 @@ class SortableCollection extends AbstractCustomContent
         return [
             'entry_type'    => SortableEntityType::class,
             'entry_options' => [
-                'entity_class'    => $this->entity,
-                'admin'           => $this->admin,
-                'link_parameters' => $this->link_parameters,
+                'entity_class'     => $this->entity,
+                'useModelListType' => $this->admin,
+                'link_parameters'  => $this->link_parameters,
             ],
             'allow_add'     => true,
             'allow_delete'  => true,
@@ -103,11 +103,12 @@ class SortableCollection extends AbstractCustomContent
     function render(CmsContent $content)
     {
         $values = $this->getCallbackTransformer()
-            ->transform(json_decode($content->getValue(),true));
+            ->transform(json_decode($content->getValue(), true));
 
 
         if ($this->template) {
-            return $this->twig->render($this->template, ['entities' => array_column($values, 'entity')]);
+            return $this->twig->render($this->template,
+                ['entities' => array_column($values, 'entity')]);
         }
 
         return array_column($values, 'entity');

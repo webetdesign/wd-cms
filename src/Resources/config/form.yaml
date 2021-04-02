@@ -15,3 +15,46 @@ services:
       - '%wd_cms.menu.icon_set%'
     tags:
       - { name: form.type }
+
+  WebEtDesign\CmsBundle\Form\PageTemplateType:
+    arguments:
+      - '@cms.page_provider'
+    tags:
+      - { name: form.type }
+
+  WebEtDesign\CmsBundle\Form\BlockTemplateType:
+    arguments:
+      - '@cms.block_provider'
+    tags:
+      - { name: form.type }
+
+  WebEtDesign\CmsBundle\Form\MultilingualType:
+    arguments:
+      - '@doctrine.orm.default_entity_manager'
+      - '%wd_cms.admin.config.entity.page%'
+      - '%wd_cms.admin.config.entity.site%'
+    tags:
+      - { name: form.type }
+
+  WebEtDesign\CmsBundle\Form\GlobalVarsType:
+    arguments:
+      - '@cms.page_provider'
+      - '@service_container'
+      - '%wd_cms.vars%'
+    tags:
+      - { name: form.type }
+
+  WebEtDesign\CmsBundle\Form\CmsRouteParamsType:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '%wd_cms.cms%'
+    tags:
+      - { name: form.type }
+
+  # ===============================================
+  # Helpers
+  # ===============================================
+
+  WebEtDesign\CmsBundle\Services\CmsSonataFormBuilderHelper:
+    autowire: true
+    public: true

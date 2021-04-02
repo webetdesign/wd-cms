@@ -1,58 +1,52 @@
 <?php
 
 
-namespace WebEtDesign\CmsBundle\Utils;
+namespace WebEtDesign\CmsBundle\Services;
 
 
-use App\Entity\Media;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Admin\Pool;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\DoctrineORMAdminBundle\Admin\FieldDescription;
 use Symfony\Component\Form\FormBuilderInterface;
 
-
-/**
- * Trait CmsCustomContentFormHelper
- * @package WebEtDesign\CmsBundle\Utils
- * @deprecated(use service WebEtDesign\CmsBundle\Services\CmsSonataFormBuilderHelper instead)
- */
-trait CmsCustomContentFormHelper
+class CmsSonataFormBuilderHelper
 {
-
     /**
-     * @param FormBuilderInterface $builder
-     * @param AdminInterface $cmsContentAdmin
-     * @param AdminInterface $adminClass
-     * @param $filedName
-     * @param $class
-     * @param array $options
-     *
-     * @deprecated use service WebEtDesign\CmsBundle\Services\CmsSonataFormBuilderHelper::buildModelListType instead
+     * @var Pool
      */
+    private Pool $adminPool;
+
+    public function __construct(Pool $adminPool) {
+
+        $this->adminPool = $adminPool;
+    }
+
     public function buildModelListType(
         FormBuilderInterface $builder,
-        AdminInterface $cmsContentAdmin,
-        AdminInterface $adminClass,
         $filedName,
-        $class,
+        $parentClass,
+        $childClass,
         $options = []
     ) {
+
+        $parentAdmin = $this->adminPool->getAdminByClass($parentClass);
+        $childAdmin = $this->adminPool->getAdminByClass($childClass);
+
         $linkParameters = ['context' => 'default'];
         if (isset($options['link_parameters'])) {
             $linkParameters = $options['link_parameters'];
         }
 
         /** @var FieldDescription $fieldDescription */
-        $fieldDescription = $adminClass
+        $fieldDescription = $childAdmin
             ->getModelManager()
-            ->getNewFieldDescriptionInstance($adminClass->getClass(), $filedName, [
+            ->getNewFieldDescriptionInstance($childAdmin->getClass(), $filedName, [
                 'translation_domain' => $options['translation_domain'] ?? 'wd_cms',
                 'link_parameters'    => $linkParameters
             ]);
-        $fieldDescription->setAssociationAdmin($adminClass);
-        $fieldDescription->setAdmin($cmsContentAdmin);
+        $fieldDescription->setAdmin($parentAdmin);
+        $fieldDescription->setAssociationAdmin($childAdmin);
         $fieldDescription->setOption('edit', 'list');
         $fieldDescription->setAssociationMapping([
             'fieldName' => $filedName,
@@ -60,9 +54,9 @@ trait CmsCustomContentFormHelper
         ]);
 
         $opts = [
-            'model_manager'            => $adminClass->getModelManager(),
+            'model_manager'            => $childAdmin->getModelManager(),
             'sonata_field_description' => $fieldDescription,
-            'class'                    => $class,
+            'class'                    => $childClass,
             'required'                 => false,
             'label'                    => $options['label'] ?? null,
         ];

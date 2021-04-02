@@ -11,7 +11,7 @@ services:
   WebEtDesign\CmsBundle\Form\CustomContents\SortableEntityType:
     tags: {name: form.type}
     arguments:
-      ['@cms.admin.cms_content']
+      ['@WebEtDesign\CmsBundle\Services\CmsSonataFormBuilderHelper']
 
   cms.custom_content.user:
     public: true

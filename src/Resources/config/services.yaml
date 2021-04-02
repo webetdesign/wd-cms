@@ -25,41 +25,6 @@ services:
       - '@cms.admin.cms_page_declination'
       - '%wd_cms.cms%'
 
-  WebEtDesign\CmsBundle\Form\PageTemplateType:
-    arguments:
-      - '@cms.page_provider'
-    tags:
-      - { name: form.type }
-
-  WebEtDesign\CmsBundle\Form\BlockTemplateType:
-    arguments:
-      - '@cms.block_provider'
-    tags:
-      - { name: form.type }
-
-  WebEtDesign\CmsBundle\Form\MultilingualType:
-    arguments:
-      - '@doctrine.orm.default_entity_manager'
-      - '%wd_cms.admin.config.entity.page%'
-      - '%wd_cms.admin.config.entity.site%'
-    tags:
-      - { name: form.type }
-
-  WebEtDesign\CmsBundle\Form\GlobalVarsType:
-    arguments:
-      - '@cms.page_provider'
-      - '@service_container'
-      - '%wd_cms.vars%'
-    tags:
-      - { name: form.type }
-
-  WebEtDesign\CmsBundle\Form\CmsRouteParamsType:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '%wd_cms.cms%'
-    tags:
-      - { name: form.type }
-
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
@@ -67,23 +32,6 @@ services:
     tags:
       - { name: routing.loader }
 
-  cms.helper:
-    class: WebEtDesign\CmsBundle\Services\CmsHelper
-    arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker", '@security.role_hierarchy', '@security.token_storage']
-    public: true
-
-  WebEtDesign\CmsBundle\Services\TemplateProvider:
-    arguments:
-      $config: '%wd_cms.templates%'
-
-  cms.page_provider:
-    alias: WebEtDesign\CmsBundle\Services\TemplateProvider
-    public: true
-
-  cms.block_provider:
-    class: WebEtDesign\CmsBundle\Services\TemplateProvider
-    arguments:
-      $config: '%wd_cms.shared_block%'
 
   WebEtDesign\CmsBundle\Utils\SitemapIterator:
     arguments:
@@ -98,6 +46,32 @@ services:
       - '@sonata.admin.pool'
       - '%wd_cms.cms%'
       - '%security.role_hierarchy.roles%'
+
+  cms.helper:
+    class: WebEtDesign\CmsBundle\Services\CmsHelper
+    arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker", '@security.role_hierarchy', '@security.token_storage']
+    public: true
+
+  # ===============================================
+  # CMS provider
+  # ===============================================
+
+  WebEtDesign\CmsBundle\Services\TemplateProvider:
+    arguments:
+      $config: '%wd_cms.templates%'
+
+  cms.page_provider:
+    alias: WebEtDesign\CmsBundle\Services\TemplateProvider
+    public: true
+
+  cms.block_provider:
+    class: WebEtDesign\CmsBundle\Services\TemplateProvider
+    arguments:
+      $config: '%wd_cms.shared_block%'
+
+  # ===============================================
+  # Menu
+  # ===============================================
 
   WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder:
     autowire: true
