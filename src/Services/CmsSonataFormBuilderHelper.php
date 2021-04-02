@@ -24,7 +24,7 @@ class CmsSonataFormBuilderHelper
 
     public function buildModelListType(
         FormBuilderInterface $builder,
-        $filedName,
+        $fieldName,
         $parentClass,
         $childClass,
         $options = []
@@ -41,7 +41,7 @@ class CmsSonataFormBuilderHelper
         /** @var FieldDescription $fieldDescription */
         $fieldDescription = $childAdmin
             ->getModelManager()
-            ->getNewFieldDescriptionInstance($childAdmin->getClass(), $filedName, [
+            ->getNewFieldDescriptionInstance($childAdmin->getClass(), $fieldName, [
                 'translation_domain' => $options['translation_domain'] ?? 'wd_cms',
                 'link_parameters'    => $linkParameters
             ]);
@@ -49,7 +49,7 @@ class CmsSonataFormBuilderHelper
         $fieldDescription->setAssociationAdmin($childAdmin);
         $fieldDescription->setOption('edit', 'list');
         $fieldDescription->setAssociationMapping([
-            'fieldName' => $filedName,
+            'fieldName' => $fieldName,
             'type'      => ClassMetadataInfo::MANY_TO_ONE,
         ]);
 
@@ -74,7 +74,7 @@ class CmsSonataFormBuilderHelper
             $opts['btn_add'] = $linkParameters['btn_add'];
         }
 
-        $builder->add($filedName,
+        $builder->add($fieldName,
             ModelListType::class,
             $opts
         );
