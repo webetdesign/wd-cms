@@ -406,8 +406,10 @@ class CmsTwigExtension extends AbstractExtension
                     $object = $this->em->getRepository($paramsConfig[$param]['entity'])
                         ->$repoMethod($criterion, $page->getSite()->getLocale());
 
-                    $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
-                    $routeParams[$param] = $object->translate($p->getSite()->getLocale())->$getProperty();
+                   if($object){
+                       $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
+                       $routeParams[$param] = $object->translate($p->getSite()->getLocale())->$getProperty();
+                   }
 
                 } else {
                     $routeParams[$param] = $request->get($param);
