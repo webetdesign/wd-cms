@@ -57,6 +57,9 @@
 
         var select = document.querySelector('#{{ form.moveTarget.vars.id }}');
         var opt = select.querySelector('option[selected="selected"]');
+        if (opt === null) {
+            opt = select.querySelectorAll('option')[0];
+        }
         toggleRadio(opt);
 
         $('#{{ form.moveTarget.vars.id }}').on('change', function (e) {
