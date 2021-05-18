@@ -133,10 +133,14 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
                 ],
             ]);
         } else {
-            $cmsMenu = $admin->getEntityManager()->getRepository(CmsMenu::class)
+
+            $site = $admin->getEntityManager()->getRepository(CmsSite::class)
                 ->find($admin->getRequest()->attributes->get("id"));
 
-            $site = $cmsMenu->getSite();
+            // Ancienne logique qui ne fonctionne pas car on tente de récupérer un menu avec un id qui appartient à un site
+//            $cmsMenu = $admin->getEntityManager()->getRepository(CmsMenu::class)
+//                ->find($admin->getRequest()->attributes->get("id"));
+//            $site = $cmsMenu->getSite();
 
             $menu = $this->createMenuItem(
                 $admin,

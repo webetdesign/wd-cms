@@ -177,6 +177,7 @@ class CmsMenuAdminController extends CRUDController
                 ->leftJoin('p.contents', 'c')
                 ->leftJoin('c.sharedBlockList', 'sbl')
                 ->getQuery()->getResult();
+
         }
 
         $formView = $datagrid->getForm()->createView();
