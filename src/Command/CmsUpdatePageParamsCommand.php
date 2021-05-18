@@ -31,13 +31,16 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
      */
     protected $pageRp;
 
+    protected $configCms;
 
     public function __construct(
         string $name = null,
         EntityManagerInterface $em,
-        TemplateProvider $pageProvider
+        TemplateProvider $pageProvider,
+        array $configCms
     ) {
         parent::__construct($name, $em, $pageProvider);
+        $this->configCms = $configCms;
     }
 
 
@@ -117,19 +120,28 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
         $this->updateParams($page->getRoute(), $config);
 
-        $this->updateRouteMetadata($page->getRoute(), $config);
+        $this->updateRouteMetadata($page, $config);
 
         return true;
     }
 
-    private function updateRouteMetadata(CmsRouteInterface $route, $config)
+    private function updateRouteMetadata(CmsPage $page, $config)
     {
+        $route = $page->getRoute();
+
         $route->setController($config['controller'] . '::' . $config['action']);
 
         $route->setMethods($config['methods']);
 
         if (!empty($config['route'])) {
-            $route->setName($config['route']);
+            $defaultName = $config['route'];
+            if ($this->configCms['multilingual']) {
+                $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(), $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId());
+            } else {
+                $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s', $page->getId());
+            }
+
+            $route->setName($routeName);
         }
 
         return $route;

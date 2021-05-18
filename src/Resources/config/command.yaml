@@ -26,6 +26,8 @@ services:
       - ~
       - '@doctrine.orm.default_entity_manager'
       - '@cms.page_provider'
+      - '%wd_cms.cms%'
+
     tags:
       - { name: 'console.command', command: 'cms:page:update-params' }
 
