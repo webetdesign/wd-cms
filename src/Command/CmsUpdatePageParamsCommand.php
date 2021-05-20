@@ -129,11 +129,11 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
     {
         $route = $page->getRoute();
 
-        if($config['controller'] && strlen($config['controller']) > 0 && $config['action'] & strlen($config['action']) > 0){
+        if(!empty($config['controller']) && strlen($config['controller']) > 0 && !empty($config['action']) & strlen($config['action']) > 0){
             $route->setController($config['controller'] . '::' . $config['action']);
 
         }
-        if($config['methods'] && strlen($config['methods']) > 0){
+        if(!empty($config['methods']) && count($config['methods']) > 0){
             $route->setMethods($config['methods']);
         }
 
