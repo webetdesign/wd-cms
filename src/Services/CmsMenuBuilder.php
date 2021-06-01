@@ -8,6 +8,7 @@ use HttpInvalidParamException;
 use Knp\Menu\MenuItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -86,7 +87,7 @@ class CmsMenuBuilder
         $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
         if ($page) {
             $locale = $page->getSite()->getLocale();
-            $menu = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy([
+            $menu   = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy([
                 'code' => $code,
                 'site' => $page->getSite()
             ]);
@@ -139,7 +140,7 @@ class CmsMenuBuilder
                 continue;
             }
 
-            $children  = $item->getChildren();
+            $children = $item->getChildren();
             $menuItem = $menu->addChild($item->getName());
             $menuItem->setExtra('lvl', $item->getLvl());
 
@@ -159,7 +160,7 @@ class CmsMenuBuilder
             }
 
             if (sizeof($children) == 0 || (sizeof($children) > 0 && $parentActive)) {
-                $anchor = !empty($item->getAnchor()) ? '#'.$item->getAnchor() : '';
+                $anchor = !empty($item->getAnchor()) ? '#' . $item->getAnchor() : '';
                 switch ($item->getLinkType()) {
                     case CmsMenuLinkTypeEnum::CMS_PAGE:
                         if ($item->getPage()) {
@@ -176,19 +177,23 @@ class CmsMenuBuilder
                                 if ($route->isDynamic()) {
                                     $params = json_decode($item->getParams(), true) ?: [];
                                     try {
-                                        $menuItem->setUri($this->router->generate($route->getName().$anchor,
+                                        $menuItem->setUri($this->router->generate($route->getName() . $anchor,
                                             $params));
                                     } catch (InvalidParameterException $exception) {
+                                    } catch (RouteNotFoundException $exception) {
                                     }
                                 } else {
-                                    $menuItem->setUri($this->router->generate($route->getName()).$anchor);
+                                    try {
+                                        $menuItem->setUri($this->router->generate($route->getName()) . $anchor);
+                                    } catch (RouteNotFoundException $exception) {
+                                    }
                                 }
                             }
                         }
                         break;
                     case CmsMenuLinkTypeEnum::ROUTENAME:
                         if (!empty($item->getLinkValue() && (null === $this->router->getRouteCollection()->get($item->getLinkValue())) ? false : true)) {
-                            $menuItem->setUri($this->router->generate($item->getLinkValue()).$anchor);
+                            $menuItem->setUri($this->router->generate($item->getLinkValue()) . $anchor);
                         }
                         break;
                     case CmsMenuLinkTypeEnum::URL:
@@ -196,10 +201,10 @@ class CmsMenuBuilder
                         if (!preg_match('/^https?:\/\//', $url)) {
                             $url = 'http://' . $url;
                         }
-                        $menuItem->setUri($url.$anchor);
+                        $menuItem->setUri($url . $anchor);
                         break;
                     case CmsMenuLinkTypeEnum::PATH:
-                        $menuItem->setUri($item->getLinkValue().$anchor);
+                        //                        $menuItem->setUri($item->getLinkValue().$anchor);
                         break;
                     case CmsMenuLinkTypeEnum::SERVICE:
                         if (isset($this->configMenu[$item->getLinkValue()])) {
@@ -235,7 +240,7 @@ class CmsMenuBuilder
             $menuItem->setLabelAttribute('class', $linkClass);
 
             $menuItem->setExtra('icon_class', $item->getIconClass());
-            
+
             if ($item->isBlank()) {
                 $menuItem->setLinkAttribute('target', '_blank');
             }
@@ -245,18 +250,18 @@ class CmsMenuBuilder
     public function isChildActive(MenuItem $item)
     {
         $active = false;
-        $class = $item->getAttribute('class');
-        if (preg_match('/active/', $class)){
+        $class  = $item->getAttribute('class');
+        if (preg_match('/active/', $class)) {
             $active = true;
         }
-        foreach ($item->getChildren() as $child){
-            if (count($child->getChildren()) > 0){
+        foreach ($item->getChildren() as $child) {
+            if (count($child->getChildren()) > 0) {
                 if ($this->isChildActive($child)) {
                     $active = true;
                 }
             } else {
                 $class = $child->getAttribute('class');
-                if (preg_match('/active/', $class)){
+                if (preg_match('/active/', $class)) {
                     $active = true;
                 }
             }
