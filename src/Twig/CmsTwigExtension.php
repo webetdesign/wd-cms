@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Twig;
 
 use App\Entity\Media;
+use App\Entity\Video\Video;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Sonata\MediaBundle\Provider\Pool;
 use Symfony\Component\DependencyInjection\Container;
@@ -480,11 +481,15 @@ class CmsTwigExtension extends AbstractExtension
 
     private function getSeoSmoValue($object, $method)
     {
+        if($object instanceof Video && method_exists($object, $method)){
+            dump(method_exists($object, $method), $method, call_user_func_array([$object, $method], []));
+        }
         if (method_exists($object, $method)) {
             return call_user_func_array([$object, $method], []);
         } else {
-            trigger_error('Call to undefined method ' . get_class($object) . '::' . $method . '()',
-                E_USER_ERROR);
+//            trigger_error('Call to undefined method ' . get_class($object) . '::' . $method . '()',
+//                E_USER_ERROR);
+            return null;
         }
     }
 
