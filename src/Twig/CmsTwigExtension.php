@@ -481,9 +481,6 @@ class CmsTwigExtension extends AbstractExtension
 
     private function getSeoSmoValue($object, $method)
     {
-        if($object instanceof Video && method_exists($object, $method)){
-            dump(method_exists($object, $method), $method, call_user_func_array([$object, $method], []));
-        }
         if (method_exists($object, $method)) {
             return call_user_func_array([$object, $method], []);
         } else {
