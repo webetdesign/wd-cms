@@ -28,7 +28,6 @@ final class CmsContentAdmin extends AbstractAdmin
 {
     protected $em;
     protected $customContents;
-    protected $media_class;
     protected $container;
     protected $cmsSharedBlockAdmin;
     /**
@@ -46,14 +45,12 @@ final class CmsContentAdmin extends AbstractAdmin
         string $baseControllerName,
         EntityManager $em,
         $contentTypeOption,
-        string $media_class,
         Container $container,
         TemplateProvider $blockProvider,
         TemplateProvider $pageProvider
     ) {
         $this->em             = $em;
         $this->customContents = $contentTypeOption;
-        $this->media_class    = $media_class;
         $this->container      = $container;
         $this->blockProvider  = $blockProvider;
         $this->pageProvider   = $pageProvider;
@@ -163,43 +160,6 @@ final class CmsContentAdmin extends AbstractAdmin
                 case CmsContentTypeEnum::TEXT:
                     $formMapper->add('value', TextType::class, ['required' => false]);
                     $this->addHelp($formMapper, $subject, 'value');
-                    break;
-
-                case CmsContentTypeEnum::IMAGE:
-                    $formMapper->add(
-                        'media',
-                        ModelListType::class,
-                        [
-                            'class'         => $this->media_class,
-                            'required'      => false,
-                            'model_manager' => $admin->getModelManager(),
-                        ],
-                        [
-                            "link_parameters" => [
-                                'context'  => 'cms_page',
-                                'provider' => 'cms.media.provider.image',
-                            ],
-                        ]
-                    );
-                    $this->addHelp($formMapper, $subject, 'media');
-                    break;
-
-                case CmsContentTypeEnum::MEDIA:
-                    $formMapper->add(
-                        'media',
-                        ModelListType::class,
-                        [
-                            'class'         => $this->media_class,
-                            'required'      => false,
-                            'model_manager' => $admin->getModelManager(),
-                        ],
-                        [
-                            "link_parameters" => [
-                                'context' => 'cms_page',
-                            ],
-                        ]
-                    );
-                    $this->addHelp($formMapper, $subject, 'media');
                     break;
 
                 case CmsContentTypeEnum::WYSYWYG:

@@ -2,11 +2,9 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-use App\Entity\Media;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
-use Sonata\MediaBundle\Model\MediaInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -82,11 +80,6 @@ class CmsContent
     private $sharedBlockList;
 
     /**
-     * @var MediaInterface
-     */
-    private $media;
-
-    /**
      * @var boolean
      * @ORM\Column(type="boolean", nullable=true)
      */
@@ -131,8 +124,6 @@ class CmsContent
     {
         switch (true) {
             case $this->getValue() !== null:
-                return true;
-            case $this->getMedia() !== null:
                 return true;
             case $this->getSharedBlockList() !== null && $this->getSharedBlockList()->count() > 0:
                 return true;
@@ -229,18 +220,6 @@ class CmsContent
     public function setSharedBlockParent(?CmsSharedBlock $sharedBlockParent): self
     {
         $this->sharedBlockParent = $sharedBlockParent;
-
-        return $this;
-    }
-
-    public function getMedia(): ?MediaInterface
-    {
-        return $this->media;
-    }
-
-    public function setMedia($media): self
-    {
-        $this->media = $media;
 
         return $this;
     }

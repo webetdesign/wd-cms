@@ -65,7 +65,7 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
             $contentConf[$content['code']] = $content;
         }
         $codes = array_keys($contentConf);
-        
+
         if(count($codes) == 0){
             return true;
         }
@@ -97,7 +97,6 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
 
             if ($in->getType() !== $conf['type']) {
                 $in->setValue(null);
-                $in->setMedia(null);
                 $in->setSharedBlockList(null);
                 $in->setType($conf['type']);
             }

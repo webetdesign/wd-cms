@@ -109,7 +109,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('class')
                     ->children()
                         ->scalarNode('user')->cannotBeEmpty()->end()
-                        ->scalarNode('media')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
                 ->arrayNode('menu')

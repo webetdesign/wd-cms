@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Utils;
 
-use App\Entity\Media;
 use Doctrine\ORM\Mapping as ORM;
 
 trait SmoTwitterTrait
@@ -42,12 +41,13 @@ trait SmoTwitterTrait
      */
     private $twitter_creator;
 
-    /**
-     * @var Media|null
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Media", cascade={"persist"})
-     */
-    private $twitter_image;
+//    /**
+//     * @var Media|null
+//     *
+//     * @ORM\ManyToOne(targetEntity="App\Entity\Media", cascade={"persist"})
+//     */
+//    private $twitter_image;
+//    TODO convert WDMedia
 
     /**
      * @return string|null
@@ -134,21 +134,21 @@ trait SmoTwitterTrait
         return $this;
     }
 
-    /**
-     * @return Media|null
-     */
-    public function getTwitterImage(): ?Media
-    {
-        return $this->twitter_image;
-    }
-
-    /**
-     * @param Media|null $twitter_image
-     * @return SmoTwitterTrait
-     */
-    public function setTwitterImage(?Media $twitter_image)
-    {
-        $this->twitter_image = $twitter_image;
-        return $this;
-    }
+//    /**
+//     * @return Media|null
+//     */
+//    public function getTwitterImage(): ?Media
+//    {
+//        return $this->twitter_image;
+//    }
+//
+//    /**
+//     * @param Media|null $twitter_image
+//     * @return SmoTwitterTrait
+//     */
+//    public function setTwitterImage(?Media $twitter_image)
+//    {
+//        $this->twitter_image = $twitter_image;
+//        return $this;
+//    }
 }

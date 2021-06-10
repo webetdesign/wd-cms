@@ -111,7 +111,6 @@ services:
       - '@cms.block_provider'
       - '@request_stack'
       - '@parameter_bag'
-      - '@Sonata\MediaBundle\Provider\Pool'
     tags:
       - { name: twig.extension }
     public: true

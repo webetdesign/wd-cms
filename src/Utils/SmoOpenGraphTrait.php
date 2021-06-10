@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Utils;
 
-use App\Entity\Media;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,12 +24,13 @@ trait SmoOpenGraphTrait
      */
     private $og_type;
 
-    /**
-     * @var Media|null
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Media", cascade={"persist"})
-     */
-    private $og_image;
+//    /**
+//     * @var Media|null
+//     *
+//     * @ORM\ManyToOne(targetEntity="App\Entity\Media", cascade={"persist"})
+//     */
+//    private $og_image;
+//    TODO Convert WDMedia
 
     /**
      * @var string|null
@@ -82,23 +82,23 @@ trait SmoOpenGraphTrait
         return $this;
     }
 
-    /**
-     * @return Media|null
-     */
-    public function getOgImage(): ?Media
-    {
-        return $this->og_image;
-    }
-
-    /**
-     * @param Media|null $og_image
-     * @return SmoOpenGraphTrait
-     */
-    public function setOgImage(?Media $og_image)
-    {
-        $this->og_image = $og_image;
-        return $this;
-    }
+//    /**
+//     * @return Media|null
+//     */
+//    public function getOgImage(): ?Media
+//    {
+//        return $this->og_image;
+//    }
+//
+//    /**
+//     * @param Media|null $og_image
+//     * @return SmoOpenGraphTrait
+//     */
+//    public function setOgImage(?Media $og_image)
+//    {
+//        $this->og_image = $og_image;
+//        return $this;
+//    }
 
     /**
      * @return string|null

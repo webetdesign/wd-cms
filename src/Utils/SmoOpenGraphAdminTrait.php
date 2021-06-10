@@ -33,18 +33,19 @@ trait SmoOpenGraphAdminTrait
                 'required' => false
 
             ])
-            ->add('og_image', ModelListType::class, [
-                'label'              => 'cms_page.form.og_image.label',
-                'required'           => false,
-                'translation_domain' => 'wd_cms',
-                'help'               => 'cms_page.form.og_image.help'
-
-            ], [
-                'link_parameters' => [
-                    'context'  => 'cms_smo_image',
-                    'provider' => 'cms.media.provider.image'
-                ]
-            ])
+//            TODO convert WDMedia
+//            ->add('og_image', ModelListType::class, [
+//                'label'              => 'cms_page.form.og_image.label',
+//                'required'           => false,
+//                'translation_domain' => 'wd_cms',
+//                'help'               => 'cms_page.form.og_image.help'
+//
+//            ], [
+//                'link_parameters' => [
+//                    'context'  => 'cms_smo_image',
+//                    'provider' => 'cms.media.provider.image'
+//                ]
+//            ])
             ->end();
     }
 

@@ -14,8 +14,6 @@ class CmsContentTypeEnum
     const TEXT                    = 'TEXT';
     const TEXTAREA                = 'TEXTAREA';
     const WYSYWYG                 = 'WYSYWYG';
-    const IMAGE                   = 'IMAGE';
-    const MEDIA                   = 'MEDIA';
     const SHARED_BLOCK            = 'SHARED_BLOCK';
     const SHARED_BLOCK_COLLECTION = 'SHARED_BLOCK_COLLECTION';
     const CHECKBOX                = "CHECKBOX";
@@ -25,8 +23,6 @@ class CmsContentTypeEnum
         self::TEXT                    => 'Text',
         self::TEXTAREA                => 'Textarea',
         self::WYSYWYG                 => 'WYSYWYG',
-        self::IMAGE                   => 'Image',
-        self::MEDIA                   => 'Media',
         self::SHARED_BLOCK            => 'Shared block',
         self::SHARED_BLOCK_COLLECTION => 'Shared block list',
         self::CHECKBOX                => 'CheckBox',
@@ -54,8 +50,6 @@ class CmsContentTypeEnum
             self::TEXT,
             self::TEXTAREA,
             self::WYSYWYG,
-            self::IMAGE,
-            self::MEDIA,
             self::SHARED_BLOCK,
             self::SHARED_BLOCK_COLLECTION,
             self::CHECKBOX,

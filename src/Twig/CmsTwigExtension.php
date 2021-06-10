@@ -2,10 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Twig;
 
-use App\Entity\Media;
-use App\Entity\Video\Video;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
-use Sonata\MediaBundle\Provider\Pool;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -53,10 +50,6 @@ class CmsTwigExtension extends AbstractExtension
     protected $router;
 
     protected $customContents;
-    /**
-     * @var Pool
-     */
-    private Pool $mediaProviderPool;
 
     /**
      * @inheritDoc
@@ -69,8 +62,7 @@ class CmsTwigExtension extends AbstractExtension
         TemplateProvider $pageProvider,
         TemplateProvider $templateProvider,
         RequestStack $requestStack,
-        ParameterBagInterface $parameterBag,
-        Pool $mediaProviderPool
+        ParameterBagInterface $parameterBag
     ) {
         $this->em                  = $entityManager;
         $this->router              = $router;
@@ -90,7 +82,6 @@ class CmsTwigExtension extends AbstractExtension
         if ($globalVarsDefinition['enable']) {
             $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
         }
-        $this->mediaProviderPool = $mediaProviderPool;
     }
 
     public function getTests()
@@ -117,7 +108,6 @@ class CmsTwigExtension extends AbstractExtension
                 ['is_safe' => ['html']]),
             new TwigFunction('cms_render_shared_block', [$this, 'getSharedBlock'],
                 ['is_safe' => ['html']]),
-            new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
             new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'],
                 ['is_safe' => ['html']]),
@@ -181,8 +171,6 @@ class CmsTwigExtension extends AbstractExtension
                     CmsContentTypeEnum::WYSYWYG,
                     CmsContentTypeEnum::SHARED_BLOCK,
                     CmsContentTypeEnum::SHARED_BLOCK_COLLECTION,
-                    CmsContentTypeEnum::MEDIA,
-                    CmsContentTypeEnum::IMAGE,
                     CmsContentTypeEnum::CHECKBOX,
                 ], array_keys($this->customContents))
             );
@@ -342,37 +330,6 @@ class CmsTwigExtension extends AbstractExtension
             ]);
     }
 
-    public function cmsMedia($object, $content_code)
-    {
-        [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
-
-        if (!$content) {
-            return null;
-        }
-
-        if (!$content->getMedia() && $defaultLangSite) {
-            $defaultPages = $object->getCrossSitePages()->filter(function (CmsPage $crossPage) use (
-                $defaultLangSite
-            ) {
-                return $crossPage->getSite() === $defaultLangSite;
-            });
-
-            if ($defaultPages->count()) {
-                $content = $this->retrieveContent($defaultPages->first(), $content_code);
-
-                if (!$content) {
-                    return null;
-                }
-
-                if (!$content->isActive()) {
-                    return null;
-                }
-            }
-        }
-
-        return $content->getMedia();
-    }
-
     public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
     {
         if ($this->configCms['multilingual'] && $page !== null) {
@@ -456,11 +413,12 @@ class CmsTwigExtension extends AbstractExtension
 
         $value = !empty($value) ? $value : $default;
 
-        if ($value instanceof Media) {
-            $provider = $this->mediaProviderPool->getProvider($value->getProviderName());
-
-            return $provider->generatePublicUrl($value, 'open_graph');
-        }
+        // TODO convert in WDMedia
+//        if ($value instanceof Media) {
+//            $provider = $this->mediaProviderPool->getProvider($value->getProviderName());
+//
+//            return $provider->generatePublicUrl($value, 'open_graph');
+//        }
 
         if ($this->globalVarsEnable) {
             $value = $this->globalVars->replaceVars($value);

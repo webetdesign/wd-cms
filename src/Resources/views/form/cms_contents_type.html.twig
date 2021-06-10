@@ -41,9 +41,6 @@
                         {% if item.value is defined %}
                             {{ form_widget(item.value) }}
                         {% endif %}
-                        {% if item.media is defined %}
-                            {{ form_widget(item.media) }}
-                        {% endif %}
                         {% if item.sharedBlockList is defined %}
                             {{ form_widget(item.sharedBlockList) }}
                         {% endif %}

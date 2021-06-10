@@ -38,17 +38,18 @@ trait SmoTwitterAdminTrait
                 'required' => false
 
             ])
-            ->add('twitter_image', ModelListType::class, [
-                'label'               => 'cms_page.form.twitter_image.label',
-                'required'            => false,
-                'translation_domain' => 'wd_cms',
-                'help'                => 'cms_page.form.twitter_image.help'
-            ], [
-                'link_parameters' => [
-                    'context'  => 'cms_smo_image',
-                    'provider' => 'cms.media.provider.image'
-                ]
-            ])
+//            TODO Convert WDMedia
+//            ->add('twitter_image', ModelListType::class, [
+//                'label'               => 'cms_page.form.twitter_image.label',
+//                'required'            => false,
+//                'translation_domain' => 'wd_cms',
+//                'help'                => 'cms_page.form.twitter_image.help'
+//            ], [
+//                'link_parameters' => [
+//                    'context'  => 'cms_smo_image',
+//                    'provider' => 'cms.media.provider.image'
+//                ]
+//            ])
             ->end();
     }
 

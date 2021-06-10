@@ -44,7 +44,6 @@ services:
       - '%wd_cms.admin.config.controller.content%'
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.custom_contents%'
-      - '%wd_cms.admin.content.media%'
       - '@service_container'
       - '@cms.block_provider'
       - '@cms.page_provider'
