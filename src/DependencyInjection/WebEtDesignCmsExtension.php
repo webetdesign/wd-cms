@@ -30,7 +30,6 @@ class WebEtDesignCmsExtension extends Extension
         $config        = $processor->processConfiguration($configuration, $configs);
 
         $this->configureClass($config, $container);
-        $this->configureAdmin($config, $container);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
@@ -39,7 +38,6 @@ class WebEtDesignCmsExtension extends Extension
         $loader->load('customContent.yaml');
         $loader->load('listener.yaml');
         $loader->load('menu.yaml');
-        $loader->load('provider.yaml');
         $loader->load('form.yaml');
 
         $this->registerDoctrineMapping($config);

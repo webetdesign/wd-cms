@@ -47,7 +47,7 @@ class SharedBlockListener
             if (in_array($content->getType(), [
                 CmsContentTypeEnum::TEXT,
                 CmsContentTypeEnum::TEXTAREA,
-                CmsContentTypeEnum::WYSYWYG,
+                CmsContentTypeEnum::WYSIWYG,
             ])) {
                 $str .= $content->getValue() . ' ';
             } elseif (in_array($content->getType(), array_keys($this->configCustomContent))) {

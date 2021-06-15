@@ -28,6 +28,8 @@ use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use WebEtDesign\MediaBundle\Entity\Media;
+use WebEtDesign\MediaBundle\Services\WDMediaService;
 
 /**
  * @property mixed configCms
@@ -49,7 +51,8 @@ class CmsTwigExtension extends AbstractExtension
 
     protected $router;
 
-    protected $customContents;
+    protected              $customContents;
+    private WDMediaService $mediaService;
 
     /**
      * @inheritDoc
@@ -62,7 +65,8 @@ class CmsTwigExtension extends AbstractExtension
         TemplateProvider $pageProvider,
         TemplateProvider $templateProvider,
         RequestStack $requestStack,
-        ParameterBagInterface $parameterBag
+        ParameterBagInterface $parameterBag,
+        WDMediaService $mediaService
     ) {
         $this->em                  = $entityManager;
         $this->router              = $router;
@@ -82,6 +86,7 @@ class CmsTwigExtension extends AbstractExtension
         if ($globalVarsDefinition['enable']) {
             $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
         }
+        $this->mediaService = $mediaService;
     }
 
     public function getTests()
@@ -168,9 +173,7 @@ class CmsTwigExtension extends AbstractExtension
                 array_merge([
                     CmsContentTypeEnum::TEXT,
                     CmsContentTypeEnum::TEXTAREA,
-                    CmsContentTypeEnum::WYSYWYG,
-                    CmsContentTypeEnum::SHARED_BLOCK,
-                    CmsContentTypeEnum::SHARED_BLOCK_COLLECTION,
+                    CmsContentTypeEnum::WYSIWYG,
                     CmsContentTypeEnum::CHECKBOX,
                 ], array_keys($this->customContents))
             );
@@ -413,12 +416,9 @@ class CmsTwigExtension extends AbstractExtension
 
         $value = !empty($value) ? $value : $default;
 
-        // TODO convert in WDMedia
-//        if ($value instanceof Media) {
-//            $provider = $this->mediaProviderPool->getProvider($value->getProviderName());
-//
-//            return $provider->generatePublicUrl($value, 'open_graph');
-//        }
+        if ($value instanceof Media) {
+            return $this->mediaService->getImagePath($value, 'default', 'xl');
+        }
 
         if ($this->globalVarsEnable) {
             $value = $this->globalVars->replaceVars($value);

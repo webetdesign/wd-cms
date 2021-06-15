@@ -1,7 +1,7 @@
 services:
   cms.admin.cms_site:
-    class: '%wd_cms.admin.config.class.site%'
-    arguments: [~, '%wd_cms.admin.config.entity.site%', '%wd_cms.admin.config.controller.site%', '%wd_cms.cms%']
+    class: WebEtDesign\CmsBundle\Admin\CmsSiteAdmin
+    arguments: [~, WebEtDesign\CmsBundle\Entity\CmsSite, WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController, '%wd_cms.cms%']
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Sites}
     calls:
@@ -9,18 +9,18 @@ services:
     public: true
 
   cms.admin.cms_route:
-    class: '%wd_cms.admin.config.class.route%'
-    arguments: [~, '%wd_cms.admin.config.entity.route%', '%wd_cms.admin.config.controller.route%']
+    class: WebEtDesign\CmsBundle\Admin\CmsRouteAdmin
+    arguments: [~, WebEtDesign\CmsBundle\Entity\CmsRoute, WebEtDesign\CmsBundle\Controller\Admin\CmsRouteAdminController]
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Routes, show_in_dashboard: false }
     public: true
 
   cms.admin.cms_page:
-    class: '%wd_cms.admin.config.class.page%'
+    class: WebEtDesign\CmsBundle\Admin\CmsPageAdmin
     arguments:
       - ~
-      - '%wd_cms.admin.config.entity.page%'
-      - '%wd_cms.admin.config.controller.page%'
+      - WebEtDesign\CmsBundle\Entity\CmsPage
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsPageAdminController
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.cms%'
       - '%wd_cms.vars%'
@@ -36,12 +36,11 @@ services:
     public: true
 
   cms.admin.cms_content:
-    class: '%wd_cms.admin.config.class.content%'
-    #        arguments: [~, '%wd_cms.admin.config.entity.content%', '%wd_cms.admin.config.controller.content%']
+    class: WebEtDesign\CmsBundle\Admin\CmsContentAdmin
     arguments:
       - ~
-      - '%wd_cms.admin.config.entity.content%'
-      - '%wd_cms.admin.config.controller.content%'
+      - WebEtDesign\CmsBundle\Entity\CmsContent
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsContentAdminController
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.custom_contents%'
       - '@service_container'
@@ -54,8 +53,13 @@ services:
     public: true
 
   cms.admin.cms_menu:
-    class: '%wd_cms.admin.config.class.menu%'
-    arguments: [~, WebEtDesign\CmsBundle\Entity\CmsMenu, '%wd_cms.admin.config.controller.menu%', '@doctrine.orm.default_entity_manager', '@cms.page_provider']
+    class: WebEtDesign\CmsBundle\Admin\CmsMenuAdmin
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsMenu
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController
+      - '@doctrine.orm.default_entity_manager'
+      - '@cms.page_provider'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Menus }
     calls:

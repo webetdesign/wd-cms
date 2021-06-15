@@ -38,7 +38,7 @@ class SortableEntityType extends AbstractType
                 ]);
         } else {
             $builder->add('entity', EntityType::class, [
-                'class' => $options['entity_type']
+                'class' => $options['entity_class']
             ]);
         }
 

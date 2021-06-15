@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Utils;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use WebEtDesign\MediaBundle\Form\Type\WDMediaType;
 
 trait SmoTwitterAdminTrait
 {
@@ -38,18 +39,10 @@ trait SmoTwitterAdminTrait
                 'required' => false
 
             ])
-//            TODO Convert WDMedia
-//            ->add('twitter_image', ModelListType::class, [
-//                'label'               => 'cms_page.form.twitter_image.label',
-//                'required'            => false,
-//                'translation_domain' => 'wd_cms',
-//                'help'                => 'cms_page.form.twitter_image.help'
-//            ], [
-//                'link_parameters' => [
-//                    'context'  => 'cms_smo_image',
-//                    'provider' => 'cms.media.provider.image'
-//                ]
-//            ])
+            ->add('twitter_image', WDMediaType::class, [
+                'category' => 'SEO',
+                'required' => false
+            ])
             ->end();
     }
 

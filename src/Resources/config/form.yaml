@@ -31,8 +31,8 @@ services:
   WebEtDesign\CmsBundle\Form\MultilingualType:
     arguments:
       - '@doctrine.orm.default_entity_manager'
-      - '%wd_cms.admin.config.entity.page%'
-      - '%wd_cms.admin.config.entity.site%'
+      - WebEtDesign\CmsBundle\Entity\CmsPage
+      - WebEtDesign\CmsBundle\Entity\CmsSite
     tags:
       - { name: form.type }
 

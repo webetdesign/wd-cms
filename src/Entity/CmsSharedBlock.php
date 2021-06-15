@@ -18,59 +18,49 @@ class CmsSharedBlock
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="string", length=255, nullable=false)
      */
-    private $code;
+    private ?string $code = null;
 
     /**
      * @var string | null
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $label;
+    private ?string $label = null;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private bool $active;
 
     /**
      * @var ArrayCollection|PersistentCollection
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="sharedBlockParent", cascade={"persist", "remove"})
      */
-    private $contents;
-
-    /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock", mappedBy="sharedBlock", cascade={"persist", "remove"})
-     */
-    private $contentList;
+    private Collection $contents;
 
     /**
      * @var string | null
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $template;
+    private ?string $template = null;
 
     /**
-     * @var CmsSite
+     * @var CmsSite|null
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="sharedBlocks")
      * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    private $site;
+    private ?CmsSite $site = null;
 
     public $indexedContent = null;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct()
     {
-        $this->contentList = new ArrayCollection();
         $this->contents    = new ArrayCollection();
         $this->setActive(false);
     }
@@ -208,7 +198,7 @@ class CmsSharedBlock
     }
 
     /**
-     * @param string $code
+     * @param string|null $code
      * @return CmsSharedBlock
      */
     public function setCode(?string $code): CmsSharedBlock
@@ -219,18 +209,10 @@ class CmsSharedBlock
     }
 
     /**
-     * @return ArrayCollection
-     */
-    public function getContentList()
-    {
-        return $this->contentList;
-    }
-
-    /**
-     * @param mixed $site
+     * @param CmsSite|null $site
      * @return CmsSharedBlock
      */
-    public function setSite($site)
+    public function setSite(?CmsSite $site): CmsSharedBlock
     {
         $this->site = $site;
 
@@ -238,44 +220,15 @@ class CmsSharedBlock
     }
 
     /**
-     * @return mixed
+     * @return CmsSite|null
      */
-    public function getSite()
+    public function getSite(): ?CmsSite
     {
         return $this->site;
-    }
-
-    public function getPublic(): ?bool
-    {
-        return $this->public;
     }
 
     public function getActive(): ?bool
     {
         return $this->active;
     }
-
-    public function addContentList(CmsContentHasSharedBlock $contentList): self
-    {
-        if (!$this->contentList->contains($contentList)) {
-            $this->contentList[] = $contentList;
-            $contentList->setSharedBlock($this);
-        }
-
-        return $this;
-    }
-
-    public function removeContentList(CmsContentHasSharedBlock $contentList): self
-    {
-        if ($this->contentList->contains($contentList)) {
-            $this->contentList->removeElement($contentList);
-            // set the owning side to null (unless already changed)
-            if ($contentList->getSharedBlock() === $this) {
-                $contentList->setSharedBlock(null);
-            }
-        }
-
-        return $this;
-    }
-
 }

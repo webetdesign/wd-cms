@@ -97,7 +97,6 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
 
             if ($in->getType() !== $conf['type']) {
                 $in->setValue(null);
-                $in->setSharedBlockList(null);
                 $in->setType($conf['type']);
             }
             $this->em->persist($in);

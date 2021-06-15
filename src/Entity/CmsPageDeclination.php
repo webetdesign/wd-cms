@@ -3,14 +3,10 @@
 namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Symfony\Component\Debug\Exception\UndefinedMethodException;
-use WebEtDesign\CmsBundle\Utils\SmoFacebookTrait;
+use WebEtDesign\CmsBundle\Utils\SmoOpenGraphTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 
 /**
@@ -20,7 +16,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class CmsPageDeclination
 {
     use SeoAwareTrait;
-    use SmoFacebookTrait;
+    use SmoOpenGraphTrait;
     use SmoTwitterTrait;
 
 

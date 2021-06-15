@@ -155,16 +155,14 @@ final class CmsContentAdmin extends AbstractAdmin
         if ($subject && $subject->getId()) {
 
             $subject->collapseOpen = $contentParams['open'] ?? false;
-
+            $options = $contentParams['options'] ?? [];
             switch ($subject->getType()) {
                 case CmsContentTypeEnum::TEXT:
                     $formMapper->add('value', TextType::class, ['required' => false]);
                     $this->addHelp($formMapper, $subject, 'value');
                     break;
 
-                case CmsContentTypeEnum::WYSYWYG:
-                    $options = $contentParams['options'] ?? [];
-
+                case CmsContentTypeEnum::WYSIWYG:
                     $formMapper->add(
                         'value',
                         SimpleFormatterType::class,
@@ -190,48 +188,6 @@ final class CmsContentAdmin extends AbstractAdmin
                     $this->addHelp($formMapper, $subject, 'value');
                     break;
 
-                case CmsContentTypeEnum::SHARED_BLOCK:
-                    $formMapper->add(
-                        'value',
-                        EntityType::class,
-                        [
-                            'class'    => CmsSharedBlock::class,
-                            'required' => false,
-                        ]
-                    );
-
-                    $formMapper->getFormBuilder()->get('value')->addModelTransformer(new CallbackTransformer(
-                        function ($value) {
-                            return $this->em->getRepository(CmsSharedBlock::class)->find((int)$value);
-                        },
-                        function ($value) {
-                            return $value !== null ? $value->getId() : null;
-                        }
-                    ));
-                    $this->addHelp($formMapper, $subject, 'value');
-
-                    break;
-                case CmsContentTypeEnum::SHARED_BLOCK_COLLECTION:
-
-                    $formMapper->add(
-                        'sharedBlockList',
-                        \Sonata\CoreBundle\Form\Type\CollectionType::class,
-                        [
-                            'by_reference' => true,
-                            'required'     => false,
-                        ],
-                        [
-                            'edit'     => 'inline',
-                            'inline'   => 'table',
-                            'sortable' => 'position',
-                        ]
-                    );
-
-                    $formMapper->add('parent_heritance', null, [
-                        'label' => 'Contenu hérité',
-                    ]);
-                    $this->addHelp($formMapper, $subject, 'parent_heritance');
-                    break;
                 case CmsContentTypeEnum::CHECKBOX:
                     $formMapper->add('value', CheckboxType::class,
                         ['required' => false, 'label' => false]);
@@ -253,6 +209,7 @@ final class CmsContentAdmin extends AbstractAdmin
                 if ($subject->getType() === $content) {
                     /** @var AbstractCustomContent $contentService */
                     $contentService = $this->container->get($configuration['service']);
+                    $contentService->setContentOptions($options);
                     $formMapper->add(
                         'value',
                         $contentService->getFormType(),

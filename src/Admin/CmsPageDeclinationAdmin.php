@@ -21,12 +21,13 @@ use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
+use WebEtDesign\CmsBundle\Utils\SmoOpenGraphAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
 
 final class CmsPageDeclinationAdmin extends AbstractAdmin
 {
     use SmoTwitterAdminTrait;
-    use SmoFacebookAdminTrait;
+    use SmoOpenGraphAdminTrait;
     use GlobalVarsAdminTrait;
 
     protected $em;
@@ -124,7 +125,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             ->add('seo_description')
             ->add('seo_keywords')
             ->end();
-        $this->addFormFieldSmoFacebook($formMapper);
+        $this->addFormFieldSmoOpenGraph($formMapper);
         $this->addFormFieldSmoTwitter($formMapper);
         $formMapper->end();
         //endregion

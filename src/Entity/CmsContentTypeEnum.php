@@ -11,28 +11,24 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 class CmsContentTypeEnum
 {
-    const TEXT                    = 'TEXT';
-    const TEXTAREA                = 'TEXTAREA';
-    const WYSYWYG                 = 'WYSYWYG';
-    const SHARED_BLOCK            = 'SHARED_BLOCK';
-    const SHARED_BLOCK_COLLECTION = 'SHARED_BLOCK_COLLECTION';
-    const CHECKBOX                = "CHECKBOX";
+    const TEXT     = 'TEXT';
+    const TEXTAREA = 'TEXTAREA';
+    const WYSIWYG  = 'WYSIWYG';
+    const CHECKBOX = "CHECKBOX";
 
     /** @var array user friendly named type */
-    protected static $typeName = [
-        self::TEXT                    => 'Text',
-        self::TEXTAREA                => 'Textarea',
-        self::WYSYWYG                 => 'WYSYWYG',
-        self::SHARED_BLOCK            => 'Shared block',
-        self::SHARED_BLOCK_COLLECTION => 'Shared block list',
-        self::CHECKBOX                => 'CheckBox',
+    protected static array $typeName = [
+        self::TEXT     => 'Text',
+        self::TEXTAREA => 'Textarea',
+        self::WYSIWYG  => 'WYSIWYG',
+        self::CHECKBOX => 'CheckBox',
     ];
 
     /**
      * @param string $typeShortName
      * @return string
      */
-    public static function getName($typeShortName)
+    public static function getName(string $typeShortName): string
     {
         if (!isset(static::$typeName[$typeShortName])) {
             return "Unknown type ($typeShortName)";
@@ -44,14 +40,12 @@ class CmsContentTypeEnum
     /**
      * @return array<string>
      */
-    public static function getAvailableTypes()
+    public static function getAvailableTypes(): array
     {
         return [
             self::TEXT,
             self::TEXTAREA,
-            self::WYSYWYG,
-            self::SHARED_BLOCK,
-            self::SHARED_BLOCK_COLLECTION,
+            self::WYSIWYG,
             self::CHECKBOX,
         ];
     }

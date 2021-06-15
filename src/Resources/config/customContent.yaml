@@ -1,21 +1,29 @@
 services:
+
+  # -------------------------------
+  #        FORM
+  # -------------------------------
+
   WebEtDesign\CmsBundle\Form\CustomContents\SortableEntityType:
     tags: {name: form.type}
     arguments:
       ['@WebEtDesign\CmsBundle\Services\CmsSonataFormBuilderHelper']
 
-  cms.custom_content.user:
-    public: true
-    class: WebEtDesign\CmsBundle\Services\EntityContent
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '%wd_cms.admin.content.user%'
-      - false
+  # -------------------------------
+  #        Content service
+  # -------------------------------
 
-  cms.custom_content.users:
+  WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockContent:
     public: true
-    class: WebEtDesign\CmsBundle\Services\EntityContent
     arguments:
-      - '@doctrine.orm.entity_manager'
-      - '%wd_cms.admin.content.user%'
-      - true
+      - '@doctrine.orm.default_entity_manager'
+      - '@cms.block_provider'
+      - '@twig'
+
+  cms.content.shared_block_collection:
+    public: true
+    class: WebEtDesign\CmsBundle\Services\CustomContents\SortableCollection
+    arguments:
+      - '@doctrine.orm.default_entity_manager'
+      - '@twig'
+      - WebEtDesign\CmsBundle\Entity\CmsSharedBlock

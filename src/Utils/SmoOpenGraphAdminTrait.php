@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Utils;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use WebEtDesign\MediaBundle\Form\Type\WDMediaType;
 
 trait SmoOpenGraphAdminTrait
 {
@@ -33,19 +34,10 @@ trait SmoOpenGraphAdminTrait
                 'required' => false
 
             ])
-//            TODO convert WDMedia
-//            ->add('og_image', ModelListType::class, [
-//                'label'              => 'cms_page.form.og_image.label',
-//                'required'           => false,
-//                'translation_domain' => 'wd_cms',
-//                'help'               => 'cms_page.form.og_image.help'
-//
-//            ], [
-//                'link_parameters' => [
-//                    'context'  => 'cms_smo_image',
-//                    'provider' => 'cms.media.provider.image'
-//                ]
-//            ])
+            ->add('og_image', WDMediaType::class, [
+                'category' => 'SEO',
+                'required' => false
+            ])
             ->end();
     }
 

@@ -2,29 +2,16 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use App\Entity\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Admin\AdminInterface;
-use Sonata\Form\Type\ImmutableArrayType;
-use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
-use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
-use Doctrine\ORM\EntityRepository;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Sonata\AdminBundle\Route\RouteCollection;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Knp\Menu\ItemInterface as MenuItemInterface;
@@ -34,8 +21,13 @@ final class CmsMenuAdmin extends AbstractAdmin
     protected $pageProvider;
     private   $em;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, TemplateProvider $pageProvider)
-    {
+    public function __construct(
+        string $code,
+        string $class,
+        string $baseControllerName,
+        EntityManager $em,
+        TemplateProvider $pageProvider
+    ) {
         $this->em           = $em;
         $this->pageProvider = $pageProvider;
         parent::__construct($code, $class, $baseControllerName);
@@ -87,12 +79,16 @@ final class CmsMenuAdmin extends AbstractAdmin
         $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
         $collection->add('tree', 'tree/{id}', ['id' => null], ['id' => '\d*']);
         $collection->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
-        $collection->add('generateFromPage', 'generateFromPage/{id}', ['id' => null], ['id' => '\d*']);
+        $collection->add('generateFromPage', 'generateFromPage/{id}', ['id' => null],
+            ['id' => '\d*']);
 
     }
 
-    protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
-    {
+    protected function configureSideMenu(
+        MenuItemInterface $menu,
+        $action,
+        AdminInterface $childAdmin = null
+    ) {
         $admin   = $this->isChild() ? $this->getParent() : $this;
         $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
 
@@ -105,7 +101,10 @@ final class CmsMenuAdmin extends AbstractAdmin
                     $active = $site->getId() == $this->request->attributes->get('id');
                     $menu->addChild(
                         $site->__toString(),
-                        ['uri' => $admin->generateUrl('tree', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
+                        [
+                            'uri'        => $admin->generateUrl('tree', ['id' => $site->getId()]),
+                            'attributes' => ['class' => $active ? 'active' : ""]
+                        ]
                     );
                 }
             }
@@ -142,7 +141,8 @@ final class CmsMenuAdmin extends AbstractAdmin
     protected function configureFormFields(FormMapper $formMapper)
     {
 
-        $formMapper->getFormBuilder()->setAction($this->generateUrl('create', ['id' => $this->request->attributes->get('id')]));
+        $formMapper->getFormBuilder()->setAction($this->generateUrl('create',
+            ['id' => $this->request->attributes->get('id')]));
 
         $formMapper
             ->with('Configuration')

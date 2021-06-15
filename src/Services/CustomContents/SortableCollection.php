@@ -19,15 +19,12 @@ class SortableCollection extends AbstractCustomContent
 
     const CMS_SORTABLE_COLLECTION = 'CMS_SORTABLE_COLLECTION';
 
-    /**
-     * @var mixed
-     */
-    protected $entity;
+    protected ?string $entity;
 
     /**
      * @var EntityManagerInterface
      */
-    protected $em;
+    protected EntityManagerInterface $em;
 
     /**
      * @var AdminInterface
@@ -36,36 +33,36 @@ class SortableCollection extends AbstractCustomContent
     /**
      * @var array
      */
-    private $link_parameters;
+    private array $link_parameters;
     /**
-     * @var null
+     * @var string|null
      */
-    private $template;
+    private ?string $template;
     /**
      * @var Environment
      */
-    private $twig;
+    private Environment $twig;
 
     /**
      * @param EntityManagerInterface $em
      * @param Environment $twig
-     * @param null $entity
+     * @param string|null $entity
      * @param bool $useModelListeType
-     * @param array $link_prameters
-     * @param null|string $template
+     * @param array $link_parameters
+     * @param string|null $template
      */
     public function __construct(
         EntityManagerInterface $em,
         Environment $twig,
-        $entity = null,
-        $useModelListeType = false,
-        $link_prameters = [],
-        $template = null
+        string $entity = null,
+        bool $useModelListeType = false,
+        array $link_parameters = [],
+        string $template = null
     ) {
         $this->em              = $em;
         $this->entity          = $entity;
         $this->admin           = $useModelListeType;
-        $this->link_parameters = $link_prameters;
+        $this->link_parameters = $link_parameters;
         $this->template        = $template;
         $this->twig            = $twig;
     }

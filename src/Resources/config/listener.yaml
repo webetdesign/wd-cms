@@ -7,7 +7,7 @@ services:
       - '@router'
       - '@filesystem'
       - '@kernel'
-      - '%wd_cms.admin.config.entity.route%'
+      - WebEtDesign\CmsBundle\Entity\CmsRoute
       - '%wd_cms.cms%'
       - '%wd_cms.custom_contents%'
       - '@service_container'
@@ -33,7 +33,7 @@ services:
       - '@router'
       - '@filesystem'
       - '@kernel'
-      - '%wd_cms.admin.config.entity.site%'
+      - WebEtDesign\CmsBundle\Entity\CmsSite
     tags:
       - { name: doctrine.event_listener, event: prePersist }
       - { name: doctrine.event_listener, event: postPersist }
@@ -61,7 +61,7 @@ services:
       - '@router'
       - '@filesystem'
       - '@kernel'
-      - '%wd_cms.admin.config.entity.route%'
+      - WebEtDesign\CmsBundle\Entity\CmsRoute
     tags:
       - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildSharedBlock }
 

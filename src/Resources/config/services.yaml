@@ -111,6 +111,7 @@ services:
       - '@cms.block_provider'
       - '@request_stack'
       - '@parameter_bag'
+      - '@WebEtDesign\MediaBundle\Services\WDMediaService'
     tags:
       - { name: twig.extension }
     public: true

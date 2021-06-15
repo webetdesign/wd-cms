@@ -19,35 +19,35 @@ class CmsContent
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
-    private $code;
+    private ?string $code = null;
+
+    /**
+     * @var null|string
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     */
+    private ?string $label = null;
 
     /**
      * @var string
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
-    private $label;
+    private string $type = '';
 
     /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
-    private $type;
-
-    /**
-     * @var string
+     * @var null|string
      * @ORM\Column(type="text", nullable=true)
      *
      */
-    private $value;
+    private ?string $value = null;
 
     /**
      * @var null|CmsPage
@@ -55,14 +55,14 @@ class CmsContent
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="contents")
      * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    private $page;
+    private ?CmsPage $page = null;
 
     /**
      * @var integer
      * @ORM\Column(type="integer", nullable=true)
      * @Gedmo\SortablePosition()
      */
-    private $position;
+    private int $position = 0;
 
     /**
      * @var null|CmsSharedBlock
@@ -70,27 +70,20 @@ class CmsContent
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", inversedBy="contents")
      * @ORM\JoinColumn(name="shared_block_parent_id", referencedColumnName="id")
      */
-    private $sharedBlockParent;
-
-    /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock", mappedBy="content", cascade={"persist", "remove"}, orphanRemoval=true)
-     * @ORM\OrderBy({"position" = "ASC"})
-     */
-    private $sharedBlockList;
+    private ?CmsSharedBlock $sharedBlockParent = null;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $parent_heritance;
+    private bool $parent_heritance;
 
     /**
      * @var boolean
      *
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private bool $active;
 
     /**
      * Mapping Relation in WebEtDesignCmsExtension
@@ -98,13 +91,13 @@ class CmsContent
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", inversedBy="contents")
      * @ORM\JoinColumn(name="declination_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    private $declination;
+    private ?CmsPageDeclination $declination = null;
 
     /**
-     * @var string
+     * @var null|string
      * @ORM\Column(type="text", nullable=true)
      */
-    private $help;
+    private ?string $help = null;
 
     public bool $collapseOpen = false;
 
@@ -115,17 +108,14 @@ class CmsContent
 
     public function __construct()
     {
-        $this->sharedBlockList  = new ArrayCollection();
         $this->active           = true;
         $this->parent_heritance = false;
     }
 
-    public function isSet()
+    public function isSet(): bool
     {
         switch (true) {
             case $this->getValue() !== null:
-                return true;
-            case $this->getSharedBlockList() !== null && $this->getSharedBlockList()->count() > 0:
                 return true;
         }
 
@@ -262,48 +252,6 @@ class CmsContent
     public function getParentHeritance(): ?bool
     {
         return $this->parent_heritance;
-    }
-
-    /**
-     * @return Collection|CmsContentHasSharedBlock[]
-     */
-    public function getSharedBlockList(): Collection
-    {
-        return $this->sharedBlockList;
-    }
-
-    /**
-     * @param mixed $sharedBlockList
-     * @return CmsContent
-     */
-    public function setSharedBlockList($sharedBlockList)
-    {
-        $this->sharedBlockList = $sharedBlockList;
-
-        return $this;
-    }
-
-    public function addSharedBlockList(CmsContentHasSharedBlock $sharedBlockList): self
-    {
-        if (!$this->sharedBlockList->contains($sharedBlockList)) {
-            $this->sharedBlockList[] = $sharedBlockList;
-            $sharedBlockList->setContent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSharedBlockList(CmsContentHasSharedBlock $sharedBlockList): self
-    {
-        if ($this->sharedBlockList->contains($sharedBlockList)) {
-            $this->sharedBlockList->removeElement($sharedBlockList);
-            // set the owning side to null (unless already changed)
-            if ($sharedBlockList->getContent() === $this) {
-                $sharedBlockList->setContent(null);
-            }
-        }
-
-        return $this;
     }
 
     /**
