@@ -13,8 +13,10 @@ services:
   #        Content service
   # -------------------------------
 
-  WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockContent:
+
+  cms.content.shared_block:
     public: true
+    class: WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockContent
     arguments:
       - '@doctrine.orm.default_entity_manager'
       - '@cms.block_provider'
