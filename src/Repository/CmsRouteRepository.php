@@ -19,6 +19,19 @@ class CmsRouteRepository extends ServiceEntityRepository
         parent::__construct($registry, CmsRoute::class);
     }
 
+    public function findSameRoute(CmsRoute $route){
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.name = :name')
+            ->andWhere('c.id != :id')
+            ->setParameters([
+                'name' => $route->getName(),
+                'id' => $route->getId()
+            ])
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
     // /**
     //  * @return CmsRoute[] Returns an array of CmsRoute objects
     //  */

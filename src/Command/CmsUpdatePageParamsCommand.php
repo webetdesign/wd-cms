@@ -145,6 +145,13 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
                 $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s', $page->getId());
             }
 
+            // Pour éviter le problème de doublon de route
+            $exists = $this->em->getRepository(CmsRoute::class)->findSameRoute($route);
+
+            if (is_array($exists) && count($exists) > 0) {
+                $routeName .= '_' . uniqid();
+            }
+
             $route->setName($routeName);
         }
 
