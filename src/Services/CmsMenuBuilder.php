@@ -204,7 +204,7 @@ class CmsMenuBuilder
                         $menuItem->setUri($url . $anchor);
                         break;
                     case CmsMenuLinkTypeEnum::PATH:
-                        //                        $menuItem->setUri($item->getLinkValue().$anchor);
+                        $menuItem->setUri($item->getLinkValue().$anchor);
                         break;
                     case CmsMenuLinkTypeEnum::SERVICE:
                         if (isset($this->configMenu[$item->getLinkValue()])) {
