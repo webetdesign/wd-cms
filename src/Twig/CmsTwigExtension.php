@@ -269,25 +269,6 @@ class CmsTwigExtension extends AbstractExtension
             return $contentService->render($content);
         }
 
-        if ($content->getType() === CmsContentTypeEnum::SHARED_BLOCK) {
-            $block = $this->em->getRepository(CmsSharedBlock::class)->find((int)$content->getValue());
-            if (!$block) {
-                return null;
-            }
-
-            return $this->renderSharedBlock($block);
-        }
-
-        if ($content->getType() === CmsContentTypeEnum::SHARED_BLOCK_COLLECTION) {
-            $result = '';
-            /** @var CmsContentHasSharedBlock $item */
-            foreach ($content->getSharedBlockList() as $item) {
-                $result .= $this->renderSharedBlock($item->getSharedBlock());
-            }
-
-            return $result;
-        }
-
         if ($content->getType() === CmsContentTypeEnum::CHECKBOX) {
             return filter_var($content->getValue(), FILTER_VALIDATE_BOOLEAN);
         }
