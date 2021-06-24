@@ -146,7 +146,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
             }
 
             // Pour éviter le problème de doublon de route
-            $exists = $this->em->getRepository(CmsRoute::class)->findSameRoute($route);
+            $exists = $this->em->getRepository(CmsRoute::class)->findSameRoute($route, $routeName);
 
             if (is_array($exists) && count($exists) > 0) {
                 $routeName .= '_' . uniqid();
