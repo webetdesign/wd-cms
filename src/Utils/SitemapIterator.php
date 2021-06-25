@@ -85,7 +85,7 @@ class SitemapIterator implements SourceIteratorInterface
             'url'        => $this->router->generate($current->getName(), [], RouterInterface::ABSOLUTE_URL),
             'lastmod'    => 'now',
             'changefreq' => $current->getPath() == '/' ? 'monthly' : 'yearly',
-            'priority'   => $current->getPath() == '/' ? 2 : 1,
+            'priority'   => $current->getPath() == '/' ? 1 : 0.5,
         ];
 
         return $this->current;
