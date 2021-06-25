@@ -119,8 +119,8 @@ class CmsTwigExtension extends AbstractExtension
                 ['is_safe' => ['html']]),
             new TwigFunction('cms_media', [$this, 'cmsMedia']),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
-            new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'],
-                ['is_safe' => ['html']]),
+            new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'], ['is_safe' => ['html']]),
+            new TwigFunction('cms_render_meta_locale_switch', [$this, 'renderMetaLocalSwitch'], ['is_safe' => ['html']]),
             new TwigFunction('cms_render_seo_smo_value', [$this, 'renderSeoSmo']),
             new TwigFunction('cms_breadcrumb', [$this, 'breadcrumb']),
             new TwigFunction('route_exist', [$this, 'routeExist']),
@@ -387,8 +387,10 @@ class CmsTwigExtension extends AbstractExtension
         }
     }
 
-    public function renderLocaleSwitch(CmsPage $page, Request $request)
+    private function getLocalSwithPages(CmsPage $page)
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         $pages = [];
         foreach ($page->getCrossSitePages() as $p) {
             if (!$p->getSite()->isVisible()) {
@@ -406,10 +408,10 @@ class CmsTwigExtension extends AbstractExtension
 
                     $object = $this->em->getRepository($paramsConfig[$param]['entity'])
                         ->$repoMethod($criterion, $page->getSite()->getLocale());
-                   if($object){
-                       $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
-                       $routeParams[$param] = $object->translate($p->getSite()->getLocale())->$getProperty();
-                   }
+                    if ($object) {
+                        $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
+                        $routeParams[$param] = $object->translate($p->getSite()->getLocale())->$getProperty();
+                    }
 
                 } else {
                     $routeParams[$param] = $request->get($param);
@@ -423,13 +425,31 @@ class CmsTwigExtension extends AbstractExtension
             }
 
             $pages[] = [
-                'path' => $path,
-                'code' => $p->getSite()->getLocale(),
-                'icon' => $p->getSite()->getFlagIcon(),
+                'path'   => $path,
+                'code'   => $p->getSite()->getLocale(),
+                'icon'   => $p->getSite()->getFlagIcon(),
+                'locale' => $p->getSite()->getLocale(),
             ];
         }
 
+        return $pages;
+    }
+
+    public function renderLocaleSwitch(CmsPage $page, $useless = null): ?string
+    {
+        $pages = $this->getLocalSwithPages($page);
+
         return $this->twig->render('@WebEtDesignCms/block/cms_locale_switch.html.twig', [
+            'page'  => $page,
+            'pages' => $pages
+        ]);
+    }
+
+    public function renderMetaLocalSwitch(CmsPage $page): ?string
+    {
+        $pages = $this->getLocalSwithPages($page);
+
+        return $this->twig->render('@WebEtDesignCms/block/cms_meta_locale_switch.html.twig', [
             'page'  => $page,
             'pages' => $pages
         ]);
@@ -483,8 +503,8 @@ class CmsTwigExtension extends AbstractExtension
         if (method_exists($object, $method)) {
             return call_user_func_array([$object, $method], []);
         } else {
-//            trigger_error('Call to undefined method ' . get_class($object) . '::' . $method . '()',
-//                E_USER_ERROR);
+            //            trigger_error('Call to undefined method ' . get_class($object) . '::' . $method . '()',
+            //                E_USER_ERROR);
             return null;
         }
     }
