@@ -96,13 +96,12 @@ class CmsMenuItemRepository extends NestedTreeRepository
     {
         $qb = $this->createQueryBuilder('mi');
         $qb
-            ->select(['mi', 'p', 'r', 'c', 's', 'contents', 'sbl'])
+            ->select(['mi', 'p', 'r', 'c', 's', 'contents'])
             ->leftJoin('mi.page', 'p')
             ->leftJoin('p.route', 'r')
             ->leftJoin('mi.children', 'c')
             ->leftJoin('p.site', 's')
             ->leftJoin('p.contents', 'contents')
-            ->leftJoin('contents.sharedBlockList', 'sbl')
             ->where('mi.menu = :menu')
             ->setParameter('menu', $menu)
             ->orderBy('mi.lft', 'ASC');
