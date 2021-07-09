@@ -34,6 +34,13 @@ class CmsMenuItem
     private $name;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     *
+     * @var ?string
+     */
+    private $information;
+
+    /**
      * @var string
      * @ORM\Column(type="string", length=255, nullable=true, name="link_type")
      *
@@ -375,6 +382,24 @@ class CmsMenuItem
     public function setName(?string $name): void
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInformation(): ?string
+    {
+        return $this->information;
+    }
+
+    /**
+     * @param string|null $information
+     * @return CmsMenuItem
+     */
+    public function setInformation(?string $information): self
+    {
+        $this->information = $information;
+        return $this;
     }
 
     /**
