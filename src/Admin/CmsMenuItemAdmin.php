@@ -119,6 +119,10 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             ->tab('General')
             ->with('', ['box_class' => ''])
             ->add('name')
+            ->add('information', TextType::class, [
+                'label' => 'Informations',
+                'required' => false
+            ])
             ->add('isVisible', null, ['label' => 'Actif']);
 
         if ($object->getId() === null) {
