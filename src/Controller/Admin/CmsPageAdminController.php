@@ -2,17 +2,23 @@
 
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Knp\Menu\Renderer\TwigRenderer;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\LockException;
 use Sonata\AdminBundle\Exception\ModelManagerException;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 
 class CmsPageAdminController extends CRUDController
@@ -187,11 +193,11 @@ class CmsPageAdminController extends CRUDController
         // $template = $this->templateRegistry->getTemplate('list');
 
         return $this->renderWithExtraParams($template, [
-            'action'              => 'list',
-            'form'                => $formView,
-            'datagrid'            => $datagrid,
-            'csrf_token'          => $this->getCsrfToken('sonata.batch'),
-            'export_formats'      => $this->has('sonata.admin.admin_exporter') ?
+            'action'         => 'list',
+            'form'           => $formView,
+            'datagrid'       => $datagrid,
+            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
+            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
                 $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
                 $this->admin->getExportFormats(),
         ], null);
@@ -598,7 +604,7 @@ class CmsPageAdminController extends CRUDController
                 ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder');
         }
 
-        $parameters['admin'] = $parameters['admin'] ?? $this->admin;
+        $parameters['admin']         = $parameters['admin'] ?? $this->admin;
         $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
         // NEXT_MAJOR: Remove next line.
         $parameters['admin_pool'] = $this->get('sonata.admin.pool');
@@ -606,5 +612,135 @@ class CmsPageAdminController extends CRUDController
         return $parameters;
     }
 
+    public function duplicateAction($id = null)
+    {
+        $request = $this->getRequest();
+
+        $id = $request->get($this->admin->getIdParameter());
+        /** @var CmsPage $existingCmsPage */
+        $existingCmsPage = $this->admin->getObject($id);
+
+        if (!$existingCmsPage) {
+            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s',
+                $id));
+        }
+
+        $form = $this->createFormBuilder()
+            ->add('site', EntityType::class, [
+                'class'       => CmsSite::class,
+                'required'    => true,
+                'placeholder' => 'Choisir le site',
+                'label'       => 'Site vers lequel copier la page',
+            ])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var CmsSite $site */
+            $site = $form->getData()['site'];
+
+            $newCmsPage = clone $existingCmsPage;
+
+            $newCmsPage->setId(null);
+            $newCmsPage->setSlug(null);
+            $newCmsPage->setRoute(null);
+            $newCmsPage->setRoot(null);
+            $newCmsPage->setContents(new ArrayCollection());
+            $newCmsPage->setMenuItems(new ArrayCollection());
+            $newCmsPage->setDeclinations(new ArrayCollection());
+            $newCmsPage->setSite($site);
+
+            if ($existingCmsPage->getSite()->getId() !== $newCmsPage->getSite()->getId()) {
+                foreach ($existingCmsPage->getCrossSitePages() as $crossSitePage) {
+                    $newCmsPage->addCrossSitePage($crossSitePage);
+                }
+
+                $newCmsPage->addCrossSitePage($existingCmsPage);
+                $existingCmsPage->addCrossSitePage($newCmsPage);
+            }
+
+            foreach ($existingCmsPage->getDeclinations() as $declination) {
+                $newCmsPage = $this->copyDeclination($declination, $newCmsPage);
+            }
+
+            $newCmsPage->setRoot($site->getRootPage());
+            $newCmsPage->setParent($newCmsPage->getParent() ? $this->getParentPage($existingCmsPage, $newCmsPage) : $site->getRootPage());
+            $newCmsPage = $this->copyContent($existingCmsPage, $newCmsPage);
+
+            $this->getDoctrine()->getManager()->persist($newCmsPage);
+            $this->getDoctrine()->getManager()->flush();
+
+            $this->addFlash(
+                'sonata_flash_success',
+                'Page ' . $existingCmsPage . ' - ' . $existingCmsPage->getSite() . ' copiée'
+            );
+
+            // redirect to edit mode
+            return $this->redirectTo($newCmsPage);
+        }
+
+        return $this->renderWithExtraParams('@WebEtDesignCms/admin/page/duplicate.html.twig', [
+            'form'   => $form->createView(),
+            'object' => $existingCmsPage
+        ], null);
+    }
+
+    private function copyDeclination(CmsPageDeclination $declination, CmsPage $page)
+    {
+        $newDeclination = clone $declination;
+        $contents       = $newDeclination->getContents();
+        $newDeclination->setContents(new ArrayCollection());
+
+        foreach ($contents as $content) {
+            /** @var CmsContent $nc */
+            $nc = clone $content;
+            $nc->setId(null);
+            $nc->setDeclination($declination);
+            $this->getDoctrine()->getManager()->persist($nc);
+            $newDeclination->addContent($nc);
+        }
+
+        $page->addDeclination($newDeclination);
+
+        return $page;
+    }
+
+    private function copyContent(CmsPage $origin, CmsPage $page)
+    {
+        foreach ($origin->getContents() as $cmsContent) {
+            /** @var CmsContent $newContent */
+            $newContent = clone $cmsContent;
+            $newContent->setId(null);
+            $newContent->setPage($page);
+
+            $this->getDoctrine()->getManager()->persist($newContent);
+            $page->addContent($newContent);
+        }
+
+        return $page;
+    }
+
+    /**
+     * @param CmsPage $src
+     * @param CmsPage $dest
+     * @return CmsPage
+     */
+    private function getParentPage(CmsPage $src, CmsPage $dest)
+    {
+        if ($src->getSite()->getId() === $dest->getSite()->getId()) {
+            return $src->getParent();
+        }
+
+        $srcParent = $src->getParent();
+
+        if (!$srcParent) {
+            return $src->getSite()->getRootPage();
+        }
+
+        $cross = $srcParent->getCrossSitePage($dest->getSite());
+
+        return $cross ? $cross : $src->getSite()->getRootPage();
+    }
 
 }

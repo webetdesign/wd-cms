@@ -1,0 +1,5 @@
+{% if admin.hasAccess('duplicate', object) and admin.hasRoute('duplicate') %}
+    <a href="{{ admin.generateObjectUrl('duplicate', { id: object.id}) }}" class="btn btn-sm btn-default" title="+">
+        <i class="fa fa-copy" aria-hidden="true"></i>
+    </a>
+{% endif %}

@@ -19,11 +19,17 @@ file that was distributed with this source code.
                     {% if page.lvl != 0 %}
                         <a class="label label-default pull-right treeMoveAction" data-toggle="tooltip" title="Déplacer" href="{{ admin.generateObjectUrl('move', page) }}"><i class="fa fa-arrows"></i></a>
                     {% endif %}
+
                     <a class="page-tree__item__edit" href="{{ admin.generateObjectUrl('edit', page) }}">{{ page.title }}</a>
                     {% if page.route != null %}
                         <i class="text-muted">{% if page.root.site.locale is not empty and not page.root.site.hostMultilingual %}/{{ page.root.site.locale }}{% endif %}{{ page.route.path }}</i>
                     {% endif %}
                     <a class="label label-default pull-right" data-toggle="tooltip" title="Editer" href="{{ admin.generateObjectUrl('edit', page) }}"><i class="fa fa-pencil"></i></a>
+                    {% if not page.rootPage %}
+                        <a href="{{ admin.generateObjectUrl('duplicate', page) }}" class="label label-default pull-right" title="+">
+                            <i class="fa fa-copy" aria-hidden="true"></i>
+                        </a>
+                    {% endif %}
                     <span class="label label-{% if page.isActive %}success{% else %}danger{% endif %} pull-right">Active</span>
                     {% if page.declinations.count > 0 %}
                         <span class="label label-primary pull-right declination-toggle">voir {{ page.declinations.count > 1 ? "les "~page.declinations.count : "la" }}  {{ page.declinations.count > 1 ? 'déclinaisons' : "déclinaison" }}</span>

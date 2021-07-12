@@ -94,6 +94,7 @@ class CmsPageAdmin extends AbstractAdmin
         $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
         $collection->add('tree', 'tree/{id}', ['id' => null], ['id' => '\d*']);
         $collection->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
+        $collection->add('duplicate', 'duplicate/{id}', ['id' => null], ['id' => '\d*']);
 
         parent::configureRoutes($collection);
     }
@@ -175,7 +176,8 @@ class CmsPageAdmin extends AbstractAdmin
                         'show'   => [],
                         'edit'   => [],
                         'delete' => [],
-                        'create' => ['template' => '@WebEtDesignCms/admin/page/list_action_add.html.twig']
+                        'create' => ['template' => '@WebEtDesignCms/admin/page/list_action_add.html.twig'],
+                        'duplicate' => ['template' => '@WebEtDesignCms/admin/page/list_action_duplicate.html.twig']
                     ],
                 ]
             );
