@@ -311,6 +311,14 @@ class CmsPage
         return $this->id;
     }
 
+    /**
+     * @param mixed $id
+     */
+    public function setId($id): void
+    {
+        $this->id = $id;
+    }
+
     public function getTitle(): ?string
     {
         return $this->title;
@@ -410,7 +418,7 @@ class CmsPage
         return $this->slug;
     }
 
-    public function setSlug(string $slug): self
+    public function setSlug(?string $slug): self
     {
         $this->slug = $slug;
 
@@ -459,6 +467,7 @@ class CmsPage
 
     /**
      * @param ArrayCollection $crossSitePages
+     * @return CmsPage
      */
     public function setCrossSitePages(Collection $crossSitePages): self
     {
@@ -476,6 +485,16 @@ class CmsPage
     public function getCrossSitePages(): Collection
     {
         return $this->crossSitePages;
+    }
+
+    public function getCrossSitePage(CmsSite $cmsSite): ?CmsPage
+    {
+        foreach ($this->getCrossSitePages() as $crossSitePage) {
+            if($crossSitePage->getSite()->getId() === $cmsSite->getId()){
+                return $crossSitePage;
+            }
+        }
+        return null;
     }
 
     public function addCrossSitePage(CmsPage $crossSitePage): self

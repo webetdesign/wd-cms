@@ -79,12 +79,14 @@ class PageAdminListener
         if (!$page->dontImportContent) {
             // hydrate content
             foreach ($config['contents'] as $content) {
-                $CmsContent = new CmsContent();
-                $CmsContent->setCode($content['code']);
-                $CmsContent->setLabel($content['label'] ?? $content['code']);
-                $CmsContent->setType($content['type']);
-                $CmsContent->setHelp($content['help'] ?? null);
-                $page->addContent($CmsContent);
+               if(!$page->getContent($content['code'])){
+                   $CmsContent = new CmsContent();
+                   $CmsContent->setCode($content['code']);
+                   $CmsContent->setLabel($content['label'] ?? $content['code']);
+                   $CmsContent->setType($content['type']);
+                   $CmsContent->setHelp($content['help'] ?? null);
+                   $page->addContent($CmsContent);
+               }
             }
         }
     }

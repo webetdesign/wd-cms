@@ -146,6 +146,16 @@ class CmsContent
         return $this->id;
     }
 
+    /**
+     * @param mixed $id
+     */
+    public function setId($id): void
+    {
+        $this->id = $id;
+    }
+
+
+
     public function getCode(): ?string
     {
         return $this->code;
