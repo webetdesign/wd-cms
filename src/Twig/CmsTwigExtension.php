@@ -392,6 +392,7 @@ class CmsTwigExtension extends AbstractExtension
         $request = $this->requestStack->getCurrentRequest();
 
         $pages = [];
+
         foreach ($page->getCrossSitePages() as $p) {
             if (!$p->getSite()->isVisible() || $p->getId() === $page->getId()) {
                 continue;
@@ -414,7 +415,13 @@ class CmsTwigExtension extends AbstractExtension
                     }
 
                 } else {
-                    $routeParams[$param] = $request->get($param);
+                    if(isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null) {
+                        $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
+                        $routeParams[$param] = $request->get($param)->$getProperty();
+
+                    } else {
+                        $routeParams[$param] = $request->get($param);
+                    }
                 }
             }
 
