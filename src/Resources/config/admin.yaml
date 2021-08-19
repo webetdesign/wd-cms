@@ -31,7 +31,7 @@ services:
     calls:
       - [setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
-      - [addChild, ['@cms.admin.cms_page_declination']]
+      - [addChild, ['@cms.admin.cms_page_declination', 'declination']]
     public: true
 
   cms.admin.cms_content:
