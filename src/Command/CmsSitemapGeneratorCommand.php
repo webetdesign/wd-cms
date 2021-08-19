@@ -22,25 +22,13 @@ class CmsSitemapGeneratorCommand extends Command implements ContainerAwareInterf
 {
     protected static $defaultName = 'cms:seo:sitemap';
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private RouterInterface $router;
 
-    /**
-     * @var SourceManager
-     */
-    private $sitemapManager;
+    private SourceManager $sitemapManager;
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private Filesystem $filesystem;
 
-    /**
-     * @var SitemapIterator
-     */
-    private $smithSitemapIterator;
+    private SitemapIterator $smithSitemapIterator;
 
     /**
      * @deprecated since sonata-project/seo-bundle 2.0

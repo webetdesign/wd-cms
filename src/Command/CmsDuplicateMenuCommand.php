@@ -5,7 +5,8 @@ namespace WebEtDesign\CmsBundle\Command;
 
 
 use Doctrine\ORM\EntityManager;
-use RuntimeException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,27 +14,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
-use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use WebEtDesign\CmsBundle\Entity\CmsRoute;
-use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository;
 use WebEtDesign\CmsBundle\Repository\CmsMenuRepository;
-use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 class CmsDuplicateMenuCommand extends Command
 {
     protected static $defaultName = 'cms:duplicate:menu';
 
-    protected $em;
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
-    private $siteRepository;
-    private $menuRepository;
-    private $menuItemRepository;
+    protected EntityManager $em;
+    private CmsSiteRepository $siteRepository;
+    private CmsMenuRepository $menuRepository;
+    private CmsMenuItemRepository $menuItemRepository;
 
     /**
      * @inheritDoc
@@ -56,14 +48,20 @@ class CmsDuplicateMenuCommand extends Command
     {
         $this
             ->setDescription('Duplicate Menu for an other locale')
-            //            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            //            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
         ;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @author Benjamin Robert
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
 
         $sites       = $this->siteRepository->findAll();
         $defaultSite = $this->siteRepository->getDefault();
@@ -73,10 +71,10 @@ class CmsDuplicateMenuCommand extends Command
             $choices[$site->getId()] = $site->__toString();
         }
 
-        $choice = $this->io->choice('Copy menu from site ? ', $choices, $defaultSite->getId());
+        $choice = $io->choice('Copy menu from site ? ', $choices, $defaultSite->getId());
         $siteFrom = $this->siteRepository->find(array_search($choice, $choices));
 
-        $choice = $this->io->choice('to site ? ', $choices);
+        $choice = $io->choice('to site ? ', $choices);
         $siteTo = $this->siteRepository->find(array_search($choice, $choices));
 
         $choices = [];
@@ -84,7 +82,7 @@ class CmsDuplicateMenuCommand extends Command
             $choices[$menu->getId()] = $menu->getLabel();
         }
 
-        $choice = $this->io->choice('Menu to copy ? ', $choices, $defaultSite->getId());
+        $choice = $io->choice('Menu to copy ? ', $choices, $defaultSite->getId());
         $menu = $this->menuRepository->find(array_search($choice, $choices));
 
         $newMenu = new CmsMenu();
@@ -107,6 +105,12 @@ class CmsDuplicateMenuCommand extends Command
         $this->em->flush();
     }
 
+    /**
+     * @param CmsMenuItem $root
+     * @param CmsMenuItem $newRoot
+     * @throws ORMException
+     * @author Benjamin Robert
+     */
     private function duplicate(CmsMenuItem $root, CmsMenuItem $newRoot)
     {
         /** @var CmsMenuItem $ref */

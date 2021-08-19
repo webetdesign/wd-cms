@@ -3,23 +3,19 @@
 namespace WebEtDesign\CmsBundle\Command;
 
 use Doctrine\ORM\EntityManager;
-use PDO;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
 
 class CmsGenerateContentsPositionCommand extends Command
 {
     protected static $defaultName = 'cms:gen-contents-position';
 
-    /** @var PDO */
-    protected $con;
-    protected $em;
+    protected EntityManager $em;
 
     /**
      * @inheritDoc
@@ -35,16 +31,19 @@ class CmsGenerateContentsPositionCommand extends Command
     {
         $this
             ->setDescription('Generer les postion des contenus')
-            //            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            //            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
         ;
     }
 
-
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @author Benjamin Robert
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
-
         /** @var CmsContentRepository $repo */
         $repo = $this->em->getRepository(CmsContent::class);
 
@@ -71,6 +70,13 @@ class CmsGenerateContentsPositionCommand extends Command
 
     }
 
+    /**
+     * @param $contents
+     * @param $getter
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @author Benjamin Robert
+     */
     protected function processContents($contents, $getter)
     {
         $groups = [];

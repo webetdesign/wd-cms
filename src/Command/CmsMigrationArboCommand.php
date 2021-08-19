@@ -15,9 +15,8 @@ class CmsMigrationArboCommand extends Command
 {
     protected static $defaultName = 'cms:migration-arbo';
 
-    /** @var PDO */
-    protected $con;
-    protected $em;
+    protected PDO $con;
+    protected EntityManager $em;
 
     /**
      * @inheritDoc
@@ -32,8 +31,6 @@ class CmsMigrationArboCommand extends Command
     {
         $this
             ->setDescription('Add a short description for your command')
-            //            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            //            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
         ;
     }
 
@@ -41,7 +38,6 @@ class CmsMigrationArboCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-//        $this->con = $this->getConnection($io);
         $oSites   = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->findAll();
         $menuRepo = $this->em->getRepository('CmsMenuItem');
         if (empty($oSites)) {

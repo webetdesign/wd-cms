@@ -12,31 +12,17 @@ use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
-use WebEtDesign\CmsBundle\Repository\CmsSharedBlockRepository;
-use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 abstract class AbstractCmsUpdateContentsCommand extends Command
 {
-    /**
-     * @var SymfonyStyle
-     */
-    protected $io;
+    protected SymfonyStyle $io;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
+    protected EntityManagerInterface $em;
 
-    /**
-     * @var CmsContentRepository
-     */
-    protected $contentRp;
+    protected CmsContentRepository $contentRp;
 
-    /**
-     * @var TemplateProvider
-     */
-    protected $templateProvider;
+    protected TemplateProvider $templateProvider;
 
     public function __construct(string $name = null, EntityManagerInterface $em, TemplateProvider $templateProvider)
     {

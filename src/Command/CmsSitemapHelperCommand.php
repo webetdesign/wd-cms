@@ -15,11 +15,8 @@ use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 class CmsSitemapHelperCommand extends Command
 {
     protected static $defaultName = 'cms:sitemap-helper';
-    /**
-     * @var CmsSiteRepository
-     */
-    private $cmsSiteRepository;
-    private $cmsConfig;
+    private CmsSiteRepository $cmsSiteRepository;
+    private ?array $cmsConfig;
 
     public function __construct(
         CmsSiteRepository $cmsSiteRepository,

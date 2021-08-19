@@ -16,7 +16,7 @@ class ManageContentVoter extends Voter
 
     protected function supports(string $attribute, $subject)
     {
-        return $subject instanceof UserInterface && $attribute === self::CAN_MANAGE_CONTENT;
+        return $attribute === self::CAN_MANAGE_CONTENT;
     }
 
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token)

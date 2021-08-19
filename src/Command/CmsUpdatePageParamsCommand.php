@@ -4,34 +4,23 @@ namespace WebEtDesign\CmsBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
-use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsRouteInterface;
-use WebEtDesign\CmsBundle\Entity\CmsSite;
-use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
-use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 {
     protected static $defaultName = 'cms:page:update-params';
 
-    /**
-     * @var CmsPageRepository
-     */
-    protected $pageRp;
+    protected CmsPageRepository $pageRp;
 
-    protected $configCms;
+    protected ?array $configCms;
 
     public function __construct(
         string $name = null,
@@ -172,7 +161,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
         foreach ($config as $param => $item) {
             if (strpos($cmsRoute->getPath(), $param) < 0 || !strpos($cmsRoute->getPath(), $param)) {
-                $cmsRoute = $this->addParam($cmsRoute, $param, $config[$param]);
+                $cmsRoute = $this->addParam($cmsRoute, $param);
             }
             $this->upsertDefaultAndRequirement($cmsRoute, $param, $config[$param]);
         }
@@ -203,7 +192,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         return $cmsRoute;
     }
 
-    private function addParam(CmsRouteInterface $cmsRoute, $param, $config)
+    private function addParam(CmsRouteInterface $cmsRoute, $param)
     {
         $cmsRoute->setPath($cmsRoute->getPath() . '/{' . $param . '}');
 

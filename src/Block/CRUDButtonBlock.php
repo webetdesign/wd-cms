@@ -8,6 +8,7 @@ use Sonata\BlockBundle\Block\Service\AbstractBlockService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Class CRUDButtonBlock
@@ -22,13 +23,12 @@ class CRUDButtonBlock extends AbstractBlockService
 
     /**
      * CRUDButtonBlock constructor.
-     * @param $name
-     * @param EngineInterface $templating
      * @param Pool $pool
+     * @param Environment $environment
      */
-    public function __construct($name, EngineInterface $templating, Pool $pool)
+    public function __construct(Pool $pool, Environment $environment)
     {
-        parent::__construct($name, $templating);
+        parent::__construct($environment);
 
         $this->pool = $pool;
     }
@@ -39,7 +39,7 @@ class CRUDButtonBlock extends AbstractBlockService
      * @return Response|void
      * @throws Exception
      */
-    public function execute(BlockContextInterface $blockContext, Response $response = null)
+    public function execute(BlockContextInterface $blockContext, Response $response = null): Response
     {
 
         $admin = $this->pool->getAdminByAdminCode($blockContext->getSetting('code'));
@@ -62,7 +62,7 @@ class CRUDButtonBlock extends AbstractBlockService
     /**
      * @param OptionsResolver $resolver
      */
-    public function configureSettings(OptionsResolver $resolver)
+    public function configureSettings(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'icon' => 'fa-line-chart',
@@ -77,7 +77,5 @@ class CRUDButtonBlock extends AbstractBlockService
         $resolver->setAllowedTypes('color', ['string', 'null']);
         $resolver->setAllowedTypes('button', ['string', 'null']);
         $resolver->setAllowedTypes('code', ['string', 'boolean', 'null']);
-
-
     }
 }

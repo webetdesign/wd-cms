@@ -5,6 +5,8 @@ namespace WebEtDesign\CmsBundle\Command;
 
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,13 +23,9 @@ class CmsDuplicateSiteCommand extends Command
 {
     protected static $defaultName = 'cms:duplicate:site';
 
-    protected $em;
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
-    private $pageRepository;
-    private $siteRepository;
+    protected EntityManager $em;
+    private CmsPageRepository $pageRepository;
+    private CmsSiteRepository $siteRepository;
 
     /**
      * @inheritDoc
@@ -48,14 +46,20 @@ class CmsDuplicateSiteCommand extends Command
     {
         $this
             ->setDescription('Duplicate site for an other locale')
-            //            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            //            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
         ;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @author Benjamin Robert
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
 
         $sites       = $this->siteRepository->findAll();
         $defaultSite = $this->siteRepository->getDefault();
@@ -65,11 +69,11 @@ class CmsDuplicateSiteCommand extends Command
             $choices[$site->getId()] = $site->__toString();
         }
 
-        $choice = $this->io->choice('Site ? ', $choices, $defaultSite->getId());
+        $choice = $io->choice('Site ? ', $choices, $defaultSite->getId());
 
         $site = $this->siteRepository->find(array_search($choice, $choices));
 
-        $newLocale = $this->io->ask('New locale ?', null, function ($locale) use ($site) {
+        $newLocale = $io->ask('New locale ?', null, function ($locale) use ($site) {
             if (empty($locale)) {
                 throw new RuntimeException('New locale can not be empty');
             }
@@ -85,8 +89,8 @@ class CmsDuplicateSiteCommand extends Command
 
         $doClean = false;
         if ($newSite) {
-            $this->io->note('A site already exist with locale "' . $newLocale . '"');
-            $doClean = $this->io->confirm('Would you like to remove exiting pages ?', false);
+            $io->note('A site already exist with locale "' . $newLocale . '"');
+            $doClean = $io->confirm('Would you like to remove exiting pages ?', false);
         } else {
             $newSite = new CmsSite();
             $newSite->setLocale($newLocale);
@@ -94,9 +98,9 @@ class CmsDuplicateSiteCommand extends Command
             $newSite->setHostMultilingual($site->isHostMultilingual());
             $newSite->setDefault(false);
 
-            $label = $this->io->ask('Label', $site->getLabel());
+            $label = $io->ask('Label', $site->getLabel());
             $newSite->setLabel($label);
-            $flag = $this->io->ask('Flag icon (optional)', $newLocale);
+            $flag = $io->ask('Flag icon (optional)', $newLocale);
             $newSite->setFlagIcon($flag);
 
             $this->em->persist($newSite);
@@ -107,6 +111,14 @@ class CmsDuplicateSiteCommand extends Command
         $this->duplicate($site, $newSite, $doClean);
     }
 
+    /**
+     * @param CmsSite|null $site
+     * @param CmsSite|null $newSite
+     * @param bool $doClean
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @author Benjamin Robert
+     */
     private function duplicate(?CmsSite $site, ?CmsSite $newSite, bool $doClean)
     {
         $home    = $site->getRootPage();
@@ -126,6 +138,13 @@ class CmsDuplicateSiteCommand extends Command
         $this->em->flush();
     }
 
+    /**
+     * @param CmsSite $site
+     * @param CmsPage $reference
+     * @param CmsPage $newParent
+     * @throws ORMException
+     * @author Benjamin Robert
+     */
     protected function processPages(CmsSite $site, CmsPage $reference, CmsPage $newParent)
     {
         /** @var CmsPage $referenceChild */
@@ -136,6 +155,13 @@ class CmsDuplicateSiteCommand extends Command
         }
     }
 
+    /**
+     * @param CmsSite $site
+     * @param CmsPage $page
+     * @return CmsPage
+     * @throws ORMException
+     * @author Benjamin Robert
+     */
     private function duplicatePage(CmsSite $site, CmsPage $page)
     {
         $newPage = new CmsPage();
@@ -159,14 +185,18 @@ class CmsDuplicateSiteCommand extends Command
 
     public function processRouteName(CmsPage $page, $newLocale)
     {
-        $route = $page->getRoute();
-
         $name   = $page->getRoute()->getName();
         $locale = $page->getSite()->getLocale();
 
         return preg_replace('/^' . $locale . '_/', $newLocale . '_', $name);
     }
 
+    /**
+     * @param CmsPage $page
+     * @param CmsPage $newPage
+     * @throws ORMException
+     * @author Benjamin Robert
+     */
     private function duplicateDeclinations(CmsPage $page, CmsPage $newPage)
     {
         /** @var CmsPageDeclination $declination */
@@ -179,6 +209,12 @@ class CmsDuplicateSiteCommand extends Command
         }
     }
 
+    /**
+     * @param CmsPage $page
+     * @param CmsPage $newPage
+     * @throws ORMException
+     * @author Benjamin Robert
+     */
     private function duplicateRoute(CmsPage $page, CmsPage $newPage)
     {
         /** @var CmsRoute $route */

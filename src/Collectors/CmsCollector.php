@@ -8,6 +8,7 @@ use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Throwable;
 use WebEtDesign\CmsBundle\Admin\CmsPageAdmin;
 use WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -19,23 +20,11 @@ class CmsCollector extends DataCollector
 {
     protected $data;
 
-    /**
-     * @var CmsHelper
-     */
-    private $cmsHelper;
-    /**
-     * @var TemplateProvider
-     */
-    private $templateProvider;
-    /**
-     * @var CmsPageAdmin
-     */
-    private $cmsPageAdmin;
-    private $cmsConfig;
-    /**
-     * @var CmsPageDeclinationAdmin
-     */
-    private $cmsPageDeclinationAdmin;
+    private CmsHelper $cmsHelper;
+    private TemplateProvider $templateProvider;
+    private CmsPageAdmin $cmsPageAdmin;
+    private array $cmsConfig;
+    private CmsPageDeclinationAdmin $cmsPageDeclinationAdmin;
 
     public function __construct(
         CmsHelper $cmsHelper,
@@ -54,7 +43,7 @@ class CmsCollector extends DataCollector
     /**
      * @inheritDoc
      */
-    public function collect(Request $request, Response $response)
+    public function collect(Request $request, Response $response, Throwable $exception = null)
     {
         /** @var CmsPage $page */
         $page = $this->cmsHelper->getPage($request);
@@ -115,7 +104,6 @@ class CmsCollector extends DataCollector
         foreach ($page->getDeclinations() as $declination) {
             if ($declination->getPath() === $path || $declination->getPath() === $withoutExtension) {
                 return $declination;
-                break;
             }
         }
 
