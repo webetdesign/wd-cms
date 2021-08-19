@@ -32,7 +32,6 @@ services:
       - [setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
       - [addChild, ['@cms.admin.cms_page_declination']]
-      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
     public: true
 
   cms.admin.cms_content:
@@ -102,7 +101,6 @@ services:
       - [ setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/sharedBlock/actionButtons/button_create.html.twig']]
-      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
 
     public: true
 
@@ -130,5 +128,4 @@ services:
       - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
     calls:
       - [ setTranslationDomain, [ 'wd_cms' ] ]
-      - [setFormContractor, ['@cms.sonata.form_contractor.bridge']]
     public: true
