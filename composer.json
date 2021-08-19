@@ -16,7 +16,7 @@
         "doctrine/doctrine-bundle": "^1.10",
         "doctrine/inflector": "^1.1",
         "doctrine/orm": "^2.6",
-        "sonata-project/block-bundle": "4.x-dev",
+        "sonata-project/block-bundle": "4.*",
         "sonata-project/admin-bundle": "^3.45",
         "sonata-project/formatter-bundle": "^4.2",
         "stof/doctrine-extensions-bundle": "^1.3",
