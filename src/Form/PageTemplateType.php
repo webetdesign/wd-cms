@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Form;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

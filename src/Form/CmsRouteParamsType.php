@@ -3,8 +3,6 @@
 
 namespace WebEtDesign\CmsBundle\Form;
 
-
-use App\Entity\Product\Range\RangeCategory;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
