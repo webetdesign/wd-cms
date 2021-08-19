@@ -4,8 +4,9 @@ namespace WebEtDesign\CmsBundle\Controller\Admin;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Knp\Menu\Renderer\TwigRenderer;
+use ReflectionClass;
+use ReflectionException;
+use RuntimeException;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\LockException;
 use Sonata\AdminBundle\Exception\ModelManagerException;
@@ -14,18 +15,33 @@ use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\MoveForm;
+use function count;
+use function is_array;
 
 class CmsPageAdminController extends CRUDController
 {
-    protected function preList(Request $request)
+
+    private RequestStack $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
+
+    protected function preList(Request $request): ?Response
     {
         $request->request->set('site', $request->attributes->get('id'));
+        return null;
     }
 
     public function moveAction(Request $request, $id)
@@ -75,7 +91,7 @@ class CmsPageAdminController extends CRUDController
 
     public function treeAction($id = null)
     {
-        $request = $this->getRequest();
+        $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
         /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine();
@@ -150,9 +166,9 @@ class CmsPageAdminController extends CRUDController
     /**
      * @inheritDoc
      */
-    public function listAction($id = null)
+    public function listAction(Request $request): Response
     {
-        $request = $this->getRequest();
+        $id = $request->get($this->admin->getIdParameter(), null);
 
         if ($this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault() == null) {
             $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
@@ -188,7 +204,7 @@ class CmsPageAdminController extends CRUDController
         $twig->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
-        $template = $this->admin->getTemplate('list');
+        $template = $this->admin->getTemplateRegistry()->getTemplate('list');
 
         // $template = $this->templateRegistry->getTemplate('list');
 
@@ -204,17 +220,22 @@ class CmsPageAdminController extends CRUDController
     }
 
     /**
-     * @inheritDoc
+     * @param Request $request
+     * @return Response
+     * @throws ReflectionException
+     * @author Benjamin Robert
      */
-    public function createAction($id = null)
+    public function createAction(Request $request): Response
     {
-        $request = $this->getRequest();
+        $id = $request->get($this->admin->getIdParameter(), null);
 
         /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine();
         if ($id === null) {
+            /** @var CmsSite $site */
             $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
         } else {
+            /** @var CmsSite $site */
             $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
         }
         // the key used to lookup the template
@@ -222,7 +243,7 @@ class CmsPageAdminController extends CRUDController
 
         $this->admin->checkAccess('create');
 
-        $class = new \ReflectionClass($this->admin->hasActiveSubClass() ? $this->admin->getActiveSubClass() : $this->admin->getClass());
+        $class = new ReflectionClass($this->admin->hasActiveSubClass() ? $this->admin->getActiveSubClass() : $this->admin->getClass());
 
         if ($class->isAbstract()) {
             return $this->renderWithExtraParams(
@@ -270,8 +291,8 @@ class CmsPageAdminController extends CRUDController
 
         $form = $this->admin->getForm();
 
-        if (!\is_array($fields = $form->all()) || 0 === \count($fields)) {
-            throw new \RuntimeException(
+        if (!is_array($fields = $form->all()) || 0 === count($fields)) {
+            throw new RuntimeException(
                 'No editable field defined. Did you forget to implement the "configureFormFields" method?'
             );
         }
@@ -283,7 +304,7 @@ class CmsPageAdminController extends CRUDController
             $isFormValid = $form->isValid();
 
             // persist if the form was valid and if in preview mode the preview was approved
-            if ($isFormValid && (!$this->isInPreviewMode() || $this->isPreviewApproved())) {
+            if ($isFormValid && (!$this->isInPreviewMode($this->requestStack->getCurrentRequest()) || $this->isPreviewApproved($this->requestStack->getCurrentRequest()))) {
                 $submittedObject = $form->getData();
                 $this->admin->setSubject($submittedObject);
                 $this->admin->checkAccess('create', $submittedObject);
@@ -293,7 +314,7 @@ class CmsPageAdminController extends CRUDController
 
                     $this->moveItems($submittedObject);
 
-                    if ($this->isXmlHttpRequest()) {
+                    if ($this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
                         return $this->renderJson([
                             'result'     => 'ok',
                             'objectId'   => $this->admin->getNormalizedIdentifier($newObject),
@@ -311,7 +332,7 @@ class CmsPageAdminController extends CRUDController
                     );
 
                     // redirect to edit mode
-                    return $this->redirectTo($newObject);
+                    return $this->redirectTo($this->requestStack->getCurrentRequest(), $newObject);
                 } catch (ModelManagerException $e) {
                     $this->handleModelManagerException($e);
 
@@ -321,7 +342,7 @@ class CmsPageAdminController extends CRUDController
 
             // show an error message if the form failed validation
             if (!$isFormValid) {
-                if (!$this->isXmlHttpRequest()) {
+                if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
                     $this->addFlash(
                         'sonata_flash_error',
                         $this->trans(
@@ -331,7 +352,7 @@ class CmsPageAdminController extends CRUDController
                         )
                     );
                 }
-            } elseif ($this->isPreviewRequested()) {
+            } elseif ($this->isPreviewRequested($this->requestStack->getCurrentRequest())) {
                 // pick the preview template if the form was valid and preview was requested
                 $templateKey = 'preview';
                 $this->admin->getShow();
@@ -344,7 +365,7 @@ class CmsPageAdminController extends CRUDController
         $twig->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFormTheme());
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
-        $template = $this->admin->getTemplate($templateKey);
+        $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
 
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
@@ -359,9 +380,8 @@ class CmsPageAdminController extends CRUDController
     /**
      * @inheritDoc
      */
-    public function editAction($id = null)
+    public function editAction(Request $request): Response
     {
-        $request = $this->getRequest();
         // the key used to lookup the template
         $templateKey = 'edit';
 
@@ -386,8 +406,8 @@ class CmsPageAdminController extends CRUDController
 
         $form = $this->admin->getForm();
 
-        if (!\is_array($fields = $form->all()) || 0 === \count($fields)) {
-            throw new \RuntimeException(
+        if (!is_array($fields = $form->all()) || 0 === count($fields)) {
+            throw new RuntimeException(
                 'No editable field defined. Did you forget to implement the "configureFormFields" method?'
             );
         }
@@ -399,7 +419,7 @@ class CmsPageAdminController extends CRUDController
             $isFormValid = $form->isValid();
 
             // persist if the form was valid and if in preview mode the preview was approved
-            if ($isFormValid && (!$this->isInPreviewMode() || $this->isPreviewApproved())) {
+            if ($isFormValid && (!$this->isInPreviewMode($this->requestStack->getCurrentRequest()) || $this->isPreviewApproved($this->requestStack->getCurrentRequest()))) {
                 $submittedObject = $form->getData();
                 $this->admin->setSubject($submittedObject);
 
@@ -408,7 +428,7 @@ class CmsPageAdminController extends CRUDController
 
                     $this->moveItems($submittedObject);
 
-                    if ($this->isXmlHttpRequest()) {
+                    if ($this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
                         return $this->renderJson([
                             'result'     => 'ok',
                             'objectId'   => $objectId,
@@ -426,7 +446,7 @@ class CmsPageAdminController extends CRUDController
                     );
 
                     // redirect to edit mode
-                    return $this->redirectTo($existingObject);
+                    return $this->redirectTo($this->requestStack->getCurrentRequest(), $existingObject);
                 } catch (ModelManagerException $e) {
                     $this->handleModelManagerException($e);
 
@@ -443,7 +463,7 @@ class CmsPageAdminController extends CRUDController
 
             // show an error message if the form failed validation
             if (!$isFormValid) {
-                if (!$this->isXmlHttpRequest()) {
+                if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
                     $this->addFlash(
                         'sonata_flash_error',
                         $this->trans(
@@ -453,7 +473,7 @@ class CmsPageAdminController extends CRUDController
                         )
                     );
                 }
-            } elseif ($this->isPreviewRequested()) {
+            } elseif ($this->isPreviewRequested($this->requestStack->getCurrentRequest())) {
                 // enable the preview template if the form was valid and preview was requested
                 $templateKey = 'preview';
                 $this->admin->getShow();
@@ -470,7 +490,7 @@ class CmsPageAdminController extends CRUDController
         $twig->getRuntime(FormRenderer::class)->setTheme($formView, $formTheme);
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
-        $template = $this->admin->getTemplate($templateKey);
+        $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
 
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
@@ -485,7 +505,7 @@ class CmsPageAdminController extends CRUDController
     /**
      * @inheritDoc
      */
-    protected function preDelete(Request $request, $object)
+    protected function preDelete(Request $request, $object): ?Response
     {
         if ($object->isRoot()) {
             $this->addFlash('error', "Vous ne pouvez supprimer la page d'accueil");
@@ -542,10 +562,8 @@ class CmsPageAdminController extends CRUDController
     /**
      * @inheritDoc
      */
-    protected function redirectTo($object)
+    protected function redirectTo(Request $request, object $object): RedirectResponse
     {
-        $request = $this->getRequest();
-
         $url = false;
 
         if (null !== $request->get('btn_update_and_list')) {
@@ -564,7 +582,7 @@ class CmsPageAdminController extends CRUDController
             $url          = $this->admin->generateUrl('create', $params);
         }
 
-        if ('DELETE' === $this->getRestMethod()) {
+        if ('DELETE' === $this->requestStack->getCurrentRequest()->getMethod()) {
             return $this->redirectToTree();
         }
 
@@ -599,7 +617,7 @@ class CmsPageAdminController extends CRUDController
      */
     protected function addRenderExtraParams(array $parameters = []): array
     {
-        if (!$this->isXmlHttpRequest()) {
+        if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
             $parameters['breadcrumbs_builder'] = $this
                 ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder');
         }
@@ -612,9 +630,9 @@ class CmsPageAdminController extends CRUDController
         return $parameters;
     }
 
-    public function duplicateAction($id = null)
+    public function duplicateAction()
     {
-        $request = $this->getRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         $id = $request->get($this->admin->getIdParameter());
         /** @var CmsPage $existingCmsPage */
@@ -677,7 +695,7 @@ class CmsPageAdminController extends CRUDController
             );
 
             // redirect to edit mode
-            return $this->redirectTo($newCmsPage);
+            return $this->redirectTo($this->requestStack->getCurrentRequest(), $newCmsPage);
         }
 
         return $this->renderWithExtraParams('@WebEtDesignCms/admin/page/duplicate.html.twig', [

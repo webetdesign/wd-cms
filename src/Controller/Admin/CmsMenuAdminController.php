@@ -2,18 +2,16 @@
 
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
-use Knp\Menu\Renderer\TwigRenderer;
+use Exception;
+use ReflectionClass;
+use ReflectionException;
+use RuntimeException;
 use Sonata\AdminBundle\Controller\CRUDController;
-use Sonata\AdminBundle\Exception\LockException;
 use Sonata\AdminBundle\Exception\ModelManagerException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormRenderer;
-use Symfony\Bridge\Twig\AppVariable;
-use Symfony\Bridge\Twig\Command\DebugCommand;
-use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
@@ -21,9 +19,22 @@ use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\MoveForm;
+use function count;
+use function is_array;
 
 class CmsMenuAdminController extends CRUDController
 {
+    private RequestStack $requestStack;
+
+    /**
+     * CmsMenuAdminController constructor.
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
+
     public function moveAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
@@ -45,7 +56,7 @@ class CmsMenuAdminController extends CRUDController
 
             return $this->redirect($this->admin->generateUrl('tree', [
                 'id'   => $object->getRoot()->getSite()->getId(),
-                '_tab' => 'tab_' . $object->getMenuCode()
+                '_tab' => 'tab_' . $object->getMenu() ? $object->getMenu()->getCode() : uniqid()
             ]));
         }
 
@@ -67,7 +78,7 @@ class CmsMenuAdminController extends CRUDController
         $em = $this->getDoctrine()->getManager();
         /** @var CmsSite $site */
         if ($id == null) {
-            $site = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
         } else {
             $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
         }
@@ -128,7 +139,7 @@ class CmsMenuAdminController extends CRUDController
     {
         $em       = $this->getDoctrine();
         $datagrid = $this->admin->getDatagrid();
-        $request  = $this->getRequest();
+        $request  = $this->requestStack->getCurrentRequest();
         $session  = $request->getSession();
 
         if ($id === null) {
@@ -191,9 +202,9 @@ class CmsMenuAdminController extends CRUDController
         ], null);
     }
 
-    public function listAction($id = null)
+    public function listAction($id = null): Response
     {
-        $request = $this->getRequest();
+        $request  = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
 
         if ($id === null) {
@@ -213,58 +224,15 @@ class CmsMenuAdminController extends CRUDController
         }
 
         return $this->redirect($this->admin->generateUrl('tree', ['id' => $id]));
-
-        $request = $this->getRequest();
-
-        $this->admin->checkAccess('list');
-
-        $preResponse = $this->preList($request);
-        if (null !== $preResponse) {
-            return $preResponse;
-        }
-
-        if ($listMode = $request->get('_list_mode')) {
-            $this->admin->setListMode($listMode);
-        }
-
-        $datagrid = $this->admin->getDatagrid();
-        if ($id) {
-            $datagrid->setValue('site', null, $id);
-        }
-        $formView = $datagrid->getForm()->createView();
-
-        // set the theme for the current Admin Form
-        $this->setFormTheme($formView, $this->admin->getFilterTheme());
-
-        // NEXT_MAJOR: Remove this line and use commented line below it instead
-        $template = $this->admin->getTemplate('list');
-        // $template = $this->templateRegistry->getTemplate('list');
-
-        $root = $this->getDoctrine()->getRepository('CmsMenuItem')->getByCode('root');
-
-        $menuRepo = $this->getDoctrine()->getRepository('CmsMenuItem');
-
-        $rootNodes = $menuRepo->findRoot();
-        $sites     = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->findSitesMenu();
-
-        return $this->renderWithExtraParams($template, [
-            'action'         => 'list',
-            'form'           => $formView,
-            'root'           => $root,
-            'datagrid'       => $datagrid,
-            'rootNodes'      => $rootNodes,
-            'sites'          => $sites,
-            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
-            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
-                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
-                $this->admin->getExportFormats(),
-        ], null);
     }
 
     /**
-     * @inheritDoc
+     * @param null $id
+     * @return Response
+     * @throws ReflectionException
+     * @author Benjamin Robert
      */
-    public function createAction($id = null)
+    public function createAction($id = null): Response
     {
 
         if ($id === null) {
@@ -273,13 +241,13 @@ class CmsMenuAdminController extends CRUDController
             $site = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
         }
 
-        $request = $this->getRequest();
+        $request  = $this->requestStack->getCurrentRequest();
         // the key used to lookup the template
         $templateKey = 'edit';
 
         $this->admin->checkAccess('create');
 
-        $class = new \ReflectionClass($this->admin->hasActiveSubClass() ? $this->admin->getActiveSubClass() : $this->admin->getClass());
+        $class = new ReflectionClass($this->admin->hasActiveSubClass() ? $this->admin->getActiveSubClass() : $this->admin->getClass());
 
         if ($class->isAbstract()) {
             return $this->renderWithExtraParams(
@@ -305,8 +273,8 @@ class CmsMenuAdminController extends CRUDController
 
         $form = $this->admin->getForm();
 
-        if (!\is_array($fields = $form->all()) || 0 === \count($fields)) {
-            throw new \RuntimeException(
+        if (!is_array($fields = $form->all()) || 0 === count($fields)) {
+            throw new RuntimeException(
                 'No editable field defined. Did you forget to implement the "configureFormFields" method?'
             );
         }
@@ -318,7 +286,7 @@ class CmsMenuAdminController extends CRUDController
             $isFormValid = $form->isValid();
 
             // persist if the form was valid and if in preview mode the preview was approved
-            if ($isFormValid && (!$this->isInPreviewMode() || $this->isPreviewApproved())) {
+            if ($isFormValid && (!$this->isInPreviewMode($this->requestStack->getCurrentRequest()) || $this->isPreviewApproved($this->requestStack->getCurrentRequest()))) {
                 /** @var CmsMenu $submittedObject */
                 $submittedObject = $form->getData();
                 $this->admin->setSubject($submittedObject);
@@ -327,7 +295,7 @@ class CmsMenuAdminController extends CRUDController
                 try {
                     $newObject = $this->admin->create($submittedObject);
 
-                    if ($this->isXmlHttpRequest()) {
+                    if ($this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
                         return $this->renderJson([
                             'result'     => 'ok',
                             'objectId'   => $this->admin->getNormalizedIdentifier($newObject),
@@ -345,9 +313,12 @@ class CmsMenuAdminController extends CRUDController
                     );
 
                     // redirect to edit mode
-                    return $this->redirectTo($newObject);
+                    return $this->redirectTo($this->requestStack->getCurrentRequest(), $newObject);
                 } catch (ModelManagerException $e) {
-                    $this->handleModelManagerException($e);
+                    try {
+                        $this->handleModelManagerException($e);
+                    } catch (Exception $e) {
+                    }
 
                     $isFormValid = false;
                 }
@@ -355,7 +326,7 @@ class CmsMenuAdminController extends CRUDController
 
             // show an error message if the form failed validation
             if (!$isFormValid) {
-                if (!$this->isXmlHttpRequest()) {
+                if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
                     $this->addFlash(
                         'sonata_flash_error',
                         $this->trans(
@@ -365,7 +336,7 @@ class CmsMenuAdminController extends CRUDController
                         )
                     );
                 }
-            } elseif ($this->isPreviewRequested()) {
+            } elseif ($this->isPreviewRequested($this->requestStack->getCurrentRequest())) {
                 // pick the preview template if the form was valid and preview was requested
                 $templateKey = 'preview';
                 $this->admin->getShow();
@@ -376,9 +347,7 @@ class CmsMenuAdminController extends CRUDController
         // set the theme for the current Admin Form
         $this->setFormTheme($formView, $this->admin->getFormTheme());
 
-        // NEXT_MAJOR: Remove this line and use commented line below it instead
-        $template = $this->admin->getTemplate($templateKey);
-        // $template = $this->templateRegistry->getTemplate($templateKey);
+         $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
             'action'   => 'create',
@@ -405,10 +374,8 @@ class CmsMenuAdminController extends CRUDController
     /**
      * @inheritDoc
      */
-    protected function redirectTo($object)
+    protected function redirectTo(Request $request, $object): RedirectResponse
     {
-        $request = $this->getRequest();
-
         $url = false;
 
         if (null !== $request->get('btn_update_and_list')) {
@@ -426,7 +393,7 @@ class CmsMenuAdminController extends CRUDController
             $url = $this->admin->generateUrl('create', $params);
         }
 
-        if ('DELETE' === $this->getRestMethod()) {
+        if ('DELETE' === $this->requestStack->getCurrentRequest()->getMethod()) {
             return $this->redirectToList();
         }
 
@@ -485,26 +452,12 @@ class CmsMenuAdminController extends CRUDController
         $this->getDoctrine()->getManager()->flush();
     }
 
-    protected function setFormTheme(FormView $formView, array $theme = null): void
-    {
-        $twig = $this->get('twig');
-
-        // BC for Symfony < 3.4 where runtime should be TwigRenderer
-        if (!method_exists(DebugCommand::class, 'getLoaderPaths')) {
-            $twig->getRuntime(TwigRenderer::class)->setTheme($formView, $theme);
-
-            return;
-        }
-
-        $twig->getRuntime(FormRenderer::class)->setTheme($formView, $theme);
-    }
-
     /**
      * @inheritDoc
      */
     protected function addRenderExtraParams(array $parameters = []): array
     {
-        if (!$this->isXmlHttpRequest()) {
+        if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
             $parameters['breadcrumbs_builder'] = $this
                 ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder');
         }
