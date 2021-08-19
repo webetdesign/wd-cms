@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
+use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Container;
@@ -15,7 +16,6 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\FormatterBundle\Form\Type\SimpleFormatterType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -165,7 +165,7 @@ final class CmsContentAdmin extends AbstractAdmin
                 case CmsContentTypeEnum::WYSIWYG:
                     $formMapper->add(
                         'value',
-                        SimpleFormatterType::class,
+                        CKEditorType::class,
                         [
                             'format'           => 'richhtml',
                             'ckeditor_context' => $options['ckeditor_context'] ?? 'cms_page',
