@@ -8,14 +8,12 @@ use Doctrine\ORM\QueryBuilder;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Builder\FormContractorInterface;
-use Sonata\AdminBundle\Route\RouteCollection;
-use Sonata\Form\Type\CollectionType;
+use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\CmsContentsType;
@@ -30,6 +28,7 @@ use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Form\Type\SecurityRolesType;
+use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoOpenGraphAdminTrait;
@@ -41,18 +40,17 @@ class CmsPageAdmin extends AbstractAdmin
     use SmoOpenGraphAdminTrait;
     use GlobalVarsAdminTrait;
 
-    protected $multilingual;
-    protected $multisite;
-    protected $declination;
-    protected $em;
+    protected ?bool $multilingual;
+    protected ?bool $multisite;
+    protected ?bool $declination;
+    protected EntityManager $em;
 
-    protected $datagridValues = [];
-    protected $globalVarsEnable;
-    protected $pageProvider;
-    protected $customFormThemes;
-    /** @var FormContractorInterface */
-    protected $customFormContractor;
-    private   $cmsConfig;
+    protected ?array $datagridValues = [];
+    protected ?bool $globalVarsEnable;
+    protected TemplateProvider $pageProvider;
+    protected ?array $customFormThemes;
+    protected FormContractorInterface $customFormContractor;
+    private   ?array $cmsConfig;
 
     public function __construct(
         string $code,
@@ -79,7 +77,7 @@ class CmsPageAdmin extends AbstractAdmin
     /**
      * @inheritDoc
      */
-    public function getActionButtons($action, $object = null)
+    public function configureActionButtons(array $list, string $action, ?object $object = null): array
     {
         $buttons           = parent::getActionButtons($action, $object);
         $buttons['create'] = ['template' => '@WebEtDesignCms/admin/page/create_button.html.twig'];
@@ -87,7 +85,7 @@ class CmsPageAdmin extends AbstractAdmin
         return $buttons;
     }
 
-    protected function configureRoutes(RouteCollection $collection)
+    protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection->add('move', 'move/{id}');
         $collection->add('test', 'test');
@@ -113,7 +111,7 @@ class CmsPageAdmin extends AbstractAdmin
             $sites = $this->em->getRepository(CmsSite::class)->findAll();
             if (sizeof($sites) > 1) {
                 foreach ($sites as $site) {
-                    $active = $site->getId() == $this->request->attributes->get('id');
+                    $active = $site->getId() == $this->getRequest()->attributes->get('id');
                     $menu->addChild(
                         $site->__toString(),
                         [
@@ -142,7 +140,7 @@ class CmsPageAdmin extends AbstractAdmin
         }
     }
 
-    protected function configureDatagridFilters(DatagridMapper $datagridMapper)
+    protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
             ->add('id')
@@ -150,15 +148,16 @@ class CmsPageAdmin extends AbstractAdmin
             ->add('site');
     }
 
-    protected function configureListFields(ListMapper $listMapper)
+    protected function configureListFields(ListMapper $listMapper): void
     {
-        unset($this->listModes['mosaic']);
+        $modes = $this->getListModes();
+        unset($modes['mosaic']);
+        $this->setListModes($modes);
 
-        $roleAdmin = $this->canManageContent();
-
-        if ($roleAdmin) {
+        if ($this->isGranted(ManageContentVoter::CAN_MANAGE_CONTENT)) {
             $listMapper->add('id');
         }
+
         $listMapper->add('title', null, [
             'label' => 'Titre',
         ])
@@ -173,19 +172,18 @@ class CmsPageAdmin extends AbstractAdmin
                 null,
                 [
                     'actions' => [
-                        'show'   => [],
-                        'edit'   => [],
-                        'delete' => [],
-                        'create' => ['template' => '@WebEtDesignCms/admin/page/list_action_add.html.twig'],
+                        'show'      => [],
+                        'edit'      => [],
+                        'delete'    => [],
+                        'create'    => ['template' => '@WebEtDesignCms/admin/page/list_action_add.html.twig'],
                         'duplicate' => ['template' => '@WebEtDesignCms/admin/page/list_action_duplicate.html.twig']
                     ],
                 ]
             );
     }
 
-    protected function configureFormFields(FormMapper $formMapper)
+    protected function configureFormFields(FormMapper $formMapper): void
     {
-        $roleAdmin = $this->canManageContent();
         $admin     = $this;
         /** @var CmsPage $object */
         $object = $this->getSubject();
@@ -202,10 +200,6 @@ class CmsPageAdmin extends AbstractAdmin
             '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
             '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
         ], $this->customFormThemes));
-
-        $container = $this->getConfigurationPool()->getContainer();
-        /** @var EntityManagerInterface $em */
-        $em = $container->get('doctrine.orm.entity_manager');
 
         //region Général
         $formMapper
@@ -288,7 +282,7 @@ class CmsPageAdmin extends AbstractAdmin
                 ->add('contents', CmsContentsType::class, [
                     'label'        => false,
                     'by_reference' => false,
-                    'role_admin'   => $roleAdmin,
+                    'role_admin'   => $this->isGranted(ManageContentVoter::CAN_MANAGE_CONTENT),
                 ])
                 ->end();
             $this->addGlobalVarsHelp($formMapper, $object, $this->globalVarsEnable, true);
@@ -387,7 +381,7 @@ class CmsPageAdmin extends AbstractAdmin
         }
     }
 
-    protected function configureShowFields(ShowMapper $showMapper)
+    protected function configureShowFields(ShowMapper $showMapper): void
     {
         $showMapper
             ->add('id')
@@ -400,23 +394,18 @@ class CmsPageAdmin extends AbstractAdmin
         return $this->em;
     }
 
-    protected function canManageContent()
-    {
-        $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
-
-        return $user->hasRole('ROLE_ADMIN_CMS');
-    }
-
-    public function createQuery($context = 'list')
+    public function configureQuery(ProxyQueryInterface $query): ProxyQueryInterface
     {
         /** @var QueryBuilder $query */
-        $query = parent::createQuery($context);
-        $alias = $query->getRootAlias();
+        $alias = $query->getRootAliases();
+        $alias = count($alias) > 0 ? $alias[0] : null;
 
-        $query
-            ->andWhere(
-                $query->expr()->eq($alias . '.lvl', 0)
-            );
+        if ($alias) {
+            $query
+                ->andWhere(
+                    $query->expr()->eq($alias . '.lvl', 0)
+                );
+        }
 
         return $query;
     }

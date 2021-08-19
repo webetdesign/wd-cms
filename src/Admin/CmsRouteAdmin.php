@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class CmsRouteAdmin extends AbstractAdmin
 {
 
-    protected function configureDatagridFilters(DatagridMapper $datagridMapper)
+    protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
             ->add('id')
@@ -22,9 +22,11 @@ final class CmsRouteAdmin extends AbstractAdmin
             ->add('path');
     }
 
-    protected function configureListFields(ListMapper $listMapper)
+    protected function configureListFields(ListMapper $listMapper): void
     {
-        unset($this->listModes['mosaic']);
+        $modes = $this->getListModes();
+        unset($modes['mosaic']);
+        $this->setListModes($modes);
 
         $listMapper
             ->add('id')
@@ -41,7 +43,7 @@ final class CmsRouteAdmin extends AbstractAdmin
             ]);
     }
 
-    protected function configureFormFields(FormMapper $formMapper)
+    protected function configureFormFields(FormMapper $formMapper): void
     {
         $formMapper
             ->with('General', ['class' => 'col-md-8',])
@@ -68,7 +70,7 @@ final class CmsRouteAdmin extends AbstractAdmin
             ->end();
     }
 
-    protected function configureShowFields(ShowMapper $showMapper)
+    protected function configureShowFields(ShowMapper $showMapper): void
     {
         $showMapper
             ->add('id')

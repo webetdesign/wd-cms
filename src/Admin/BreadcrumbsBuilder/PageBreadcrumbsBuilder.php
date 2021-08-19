@@ -20,7 +20,7 @@ final class PageBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
     /**
      * @var string[]
      */
-    private $config = [];
+    private array $config;
 
     /**
      * @param string[] $config
@@ -60,8 +60,11 @@ final class PageBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
     }
 
     /**
-     * {@inheritdoc}
      * NEXT_MAJOR : make this method private.
+     * @param AdminInterface $admin
+     * @param $action
+     * @param ItemInterface|null $menu
+     * @return ItemInterface
      */
     public function buildBreadcrumbs(
         AdminInterface $admin,
@@ -125,8 +128,9 @@ final class PageBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
      * @param AdminInterface $admin used for translation
      * @param ItemInterface $menu will be modified and returned
      * @param string $name the source of the final label
-     * @param string $translationDomain for label translation
+     * @param string|null $translationDomain for label translation
      * @param array<string, mixed> $options menu item options
+     * @return ItemInterface
      */
     private function createMenuItem(
         AdminInterface $admin,

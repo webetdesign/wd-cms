@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use App\Entity\Product\Brand;
 use Doctrine\ORM\EntityManager;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\CoreBundle\Form\Type\CollectionType;
-use Sonata\Form\Type\ImmutableArrayType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
+use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoOpenGraphAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
 
@@ -30,29 +24,34 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
     use SmoOpenGraphAdminTrait;
     use GlobalVarsAdminTrait;
 
-    protected $em;
-    protected $pageConfig;
-    protected $globalVarsEnable;
+    protected EntityManager $em;
+    protected ?array        $pageConfig;
+    protected ?bool         $globalVarsEnable;
 
-    protected $parentAssociationMapping = 'page';
-    protected $datagridValues           = [
+    protected ?string $parentAssociationMapping = 'page';
+    protected array   $datagridValues           = [
         '_page'       => 1,
         '_sort_order' => 'ASC',
         '_sort_by'    => 'position',
     ];
-    private   $customFormThemes;
+    private ?array    $customFormThemes;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $pageConfig, $globalVarsDefinition, $customFormThemes)
-    {
+    public function __construct(
+        string $code,
+        string $class,
+        string $baseControllerName,
+        EntityManager $em,
+        $pageConfig,
+        $globalVarsDefinition,
+        $customFormThemes
+    ) {
         $this->em               = $em;
         $this->pageConfig       = $pageConfig;
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
 
-
         parent::__construct($code, $class, $baseControllerName);
         $this->customFormThemes = $customFormThemes;
     }
-
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
@@ -63,7 +62,9 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
     protected function configureListFields(ListMapper $listMapper): void
     {
-        unset($this->listModes['mosaic']);
+        $modes = $this->getListModes();
+        unset($modes['mosaic']);
+        $this->setListModes($modes);
 
         $listMapper
             ->add('id')
@@ -79,7 +80,6 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $formMapper): void
     {
-        $roleAdmin = $this->canManageContent();
         $this->setFormTheme(array_merge($this->getFormTheme(), [
             '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_route_params.html.twig',
@@ -115,6 +115,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             ->end()// End form group
             ->end()// End tab
         ;
+        //endregion
 
         //region SEO
         $formMapper->tab('SEO');// The tab call is optional
@@ -129,7 +130,6 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         $this->addFormFieldSmoTwitter($formMapper);
         $formMapper->end();
         //endregion
-        //endregion
 
         //region Contenus
         $formMapper->tab('Contenus');
@@ -138,7 +138,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             ->add('contents', CmsContentsType::class, [
                 'label'        => false,
                 'by_reference' => false,
-                'role_admin'   => $roleAdmin,
+                'role_admin'   => $this->isGranted(ManageContentVoter::CAN_MANAGE_CONTENT),
             ])
             ->end();
         $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable, true);
@@ -168,13 +168,5 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             ->add('twitter_description')
             ->add('twitter_creator')
             ->add('twitter_image');
-    }
-
-
-    protected function canManageContent()
-    {
-        $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
-
-        return $user->hasRole('ROLE_ADMIN_CMS');
     }
 }

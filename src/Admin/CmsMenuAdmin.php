@@ -4,23 +4,33 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
+use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\AdminBundle\Route\RouteCollection;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
+use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Knp\Menu\ItemInterface as MenuItemInterface;
+use function in_array;
 
 final class CmsMenuAdmin extends AbstractAdmin
 {
-    protected $pageProvider;
-    private   $em;
+    protected TemplateProvider $pageProvider;
+    private   EntityManager $em;
 
+    /**
+     * CmsMenuAdmin constructor.
+     * @param string $code
+     * @param string $class
+     * @param string $baseControllerName
+     * @param EntityManager $em
+     * @param TemplateProvider $pageProvider
+     */
     public function __construct(
         string $code,
         string $class,
@@ -36,11 +46,10 @@ final class CmsMenuAdmin extends AbstractAdmin
     /**
      * @inheritDoc
      */
-    public function configureActionButtons($action, $object = null)
+    public function configureActionButtons(array $list, string $action, ?object $object = null): array
     {
-        $list = parent::configureActionButtons($action, $object);
 
-        if (\in_array($action, ['tree'], true)
+        if (in_array($action, ['tree'], true)
             && $this->getChild('cms.admin.cms_menu_item')->hasRoute('create')
         ) {
             $list['addItem'] = [
@@ -48,7 +57,7 @@ final class CmsMenuAdmin extends AbstractAdmin
             ];
         }
 
-        if (\in_array($action, ['tree'], true)
+        if (in_array($action, ['tree'], true)
             && $this->getChild('cms.admin.cms_menu_item')->hasRoute('create')
         ) {
             $list['editMenu'] = [
@@ -56,8 +65,8 @@ final class CmsMenuAdmin extends AbstractAdmin
             ];
         }
 
-        if (\in_array($action, ['tree'], true)
-            && $this->hasRoute('generateFromPage') && $this->canManageContent()
+        if (in_array($action, ['tree'], true)
+            && $this->hasRoute('generateFromPage') && $this->isGranted(ManageContentVoter::CAN_MANAGE_CONTENT)
         ) {
             $list['generateFromPage'] = [
                 'template' => "@WebEtDesignCms/admin/menu/actionButtons/button_create_form_arbo.html.twig",
@@ -70,7 +79,7 @@ final class CmsMenuAdmin extends AbstractAdmin
     }
 
 
-    protected function configureRoutes(RouteCollection $collection)
+    protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection
             ->add('createRootNode', 'initRoot')
@@ -90,15 +99,12 @@ final class CmsMenuAdmin extends AbstractAdmin
         AdminInterface $childAdmin = null
     ) {
         $admin   = $this->isChild() ? $this->getParent() : $this;
-        $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
-
-        $id = $this->getRequest()->get('id');
 
         if (!$childAdmin && in_array($action, ['list', 'tree'])) {
             $sites = $this->em->getRepository(CmsSite::class)->findAll();
             if (sizeof($sites) > 1) {
                 foreach ($sites as $site) {
-                    $active = $site->getId() == $this->request->attributes->get('id');
+                    $active = $site->getId() == $this->getRequest()->attributes->get('id');
                     $menu->addChild(
                         $site->__toString(),
                         [
@@ -111,7 +117,7 @@ final class CmsMenuAdmin extends AbstractAdmin
         }
     }
 
-    protected function configureDatagridFilters(DatagridMapper $datagridMapper)
+    protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
             ->add('id')
@@ -119,9 +125,11 @@ final class CmsMenuAdmin extends AbstractAdmin
             ->add('site');
     }
 
-    protected function configureListFields(ListMapper $listMapper)
+    protected function configureListFields(ListMapper $listMapper): void
     {
-        unset($this->listModes['mosaic']);
+        $modes = $this->getListModes();
+        unset($modes['mosaic']);
+        $this->setListModes($modes);
 
         $listMapper
             ->add('id')
@@ -138,11 +146,11 @@ final class CmsMenuAdmin extends AbstractAdmin
             ]);
     }
 
-    protected function configureFormFields(FormMapper $formMapper)
+    protected function configureFormFields(FormMapper $formMapper): void
     {
 
         $formMapper->getFormBuilder()->setAction($this->generateUrl('create',
-            ['id' => $this->request->attributes->get('id')]));
+            ['id' => $this->getRequest()->attributes->get('id')]));
 
         $formMapper
             ->with('Configuration')
@@ -156,22 +164,15 @@ final class CmsMenuAdmin extends AbstractAdmin
 
     }
 
-    protected function configureShowFields(ShowMapper $showMapper)
+    protected function configureShowFields(ShowMapper $showMapper): void
     {
         $showMapper
             ->add('id')
             ->add('name');
     }
 
-    protected function canManageContent()
-    {
-        /** @var User $user */
-        $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
 
-        return $user->hasRole('ROLE_ADMIN_CMS');
-    }
-
-    public function createQuery($context = 'list')
+    public function configureQuery(ProxyQueryInterface $proxyQuery): ProxyQueryInterface
     {
         //        $qb = $this->em->createQueryBuilder();
         //
@@ -207,9 +208,7 @@ final class CmsMenuAdmin extends AbstractAdmin
         //            )
         //            ->getQuery()->getResult();
 
-        /** @var QueryBuilder $query */
-        $query = parent::createQuery($context);
-        return $query;
+        return $proxyQuery;
     }
 
     public function getEntityManager(): EntityManagerInterface

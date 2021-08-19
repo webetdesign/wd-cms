@@ -11,7 +11,7 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Route\RouteCollection;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -26,15 +26,9 @@ use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 final class CmsMenuItemAdmin extends AbstractAdmin
 {
-    /**
-     * @var TemplateProvider
-     */
-    protected $pageProvider;
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
-    private   $configMenu;
+    protected TemplateProvider $pageProvider;
+    protected EntityManagerInterface $em;
+    private   ?array $configMenu;
 
     /**
      * @inheritDoc
@@ -55,7 +49,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
     }
 
 
-    protected function configureRoutes(RouteCollection $collection)
+    protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection->add('move', 'move/{itemId}');
         //        $collection->remove('list');
@@ -253,9 +247,8 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                         "uniquement si l'utilisateur n'est pas connecté" => 'ONLY_LOGOUT'
                     ],
                     'label'   => 'Visible',
+                    'help' =>  "Permet de dynamiser le menu si l'utilisateur est connecté ou non"
                 ])
-                ->addHelp('connected',
-                    "Permet de dynamiser le menu si l'utilisateur est connecté ou non")
                 ->add('role');
 
             $formMapper

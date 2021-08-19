@@ -21,7 +21,10 @@ final class CmsContentHasSharedBlockAdmin extends AbstractAdmin
 
     protected function configureListFields(ListMapper $listMapper): void
     {
-        unset($this->listModes['mosaic']);
+        $modes = $this->getListModes();
+        unset($modes['mosaic']);
+        $this->setListModes($modes);
+
 
         $listMapper
             ->add('position')

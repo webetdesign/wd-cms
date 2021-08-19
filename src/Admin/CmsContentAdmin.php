@@ -3,9 +3,8 @@
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
+use Exception;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
-use Sonata\Form\Type\CollectionType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
@@ -14,31 +13,34 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Form\Type\ModelListType;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use Symfony\Component\Form\CallbackTransformer;
+use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use WebEtDesign\CmsBundle\Services\AbstractCustomContent;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
-    protected $em;
-    protected $customContents;
-    protected $container;
-    protected $cmsSharedBlockAdmin;
-    /**
-     * @var TemplateProvider
-     */
-    private $blockProvider;
-    /**
-     * @var TemplateProvider
-     */
-    private $pageProvider;
+    protected EntityManager $em;
+    protected ?array $customContents;
+    protected Container $container;
+    private TemplateProvider $blockProvider;
+    private TemplateProvider $pageProvider;
 
+    /**
+     * CmsContentAdmin constructor.
+     * @param string $code
+     * @param string $class
+     * @param string $baseControllerName
+     * @param EntityManager $em
+     * @param $contentTypeOption
+     * @param Container $container
+     * @param TemplateProvider $blockProvider
+     * @param TemplateProvider $pageProvider
+     */
     public function __construct(
         string $code,
         string $class,
@@ -58,7 +60,7 @@ final class CmsContentAdmin extends AbstractAdmin
         parent::__construct($code, $class, $baseControllerName);
     }
 
-    protected function configureDatagridFilters(DatagridMapper $datagridMapper)
+    protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
         $datagridMapper
             ->add('id')
@@ -68,9 +70,12 @@ final class CmsContentAdmin extends AbstractAdmin
             ->add('type');
     }
 
-    protected function configureListFields(ListMapper $listMapper)
+    protected function configureListFields(ListMapper $listMapper): void
     {
-        unset($this->listModes['mosaic']);
+        $modes = $this->getListModes();
+        unset($modes['mosaic']);
+        $this->setListModes($modes);
+
 
         $listMapper
             ->add('id')
@@ -91,12 +96,14 @@ final class CmsContentAdmin extends AbstractAdmin
             );
     }
 
-    protected function configureFormFields(FormMapper $formMapper)
+    /**
+     * @param FormMapper $formMapper
+     * @throws Exception
+     * @author Benjamin Robert
+     */
+    protected function configureFormFields(FormMapper $formMapper): void
     {
         $formMapper->getFormBuilder()->setMethod('patch');
-
-        $roleAdmin = $this->canManageContent();
-        $admin     = $this;
 
         /** @var CmsContent $subject */
         $subject = $this->getSubject();
@@ -115,7 +122,7 @@ final class CmsContentAdmin extends AbstractAdmin
             ]
         );
 
-        if ($roleAdmin) {
+        if ($this->isGranted(ManageContentVoter::CAN_MANAGE_CONTENT)) {
             $formMapper->add('code');
             $formMapper->add(
                 'type',
@@ -133,9 +140,11 @@ final class CmsContentAdmin extends AbstractAdmin
             $configs = $this->pageProvider->getConfigurationFor($subject->getDeclination()->getPage()->getTemplate());
         } elseif ($subject->getSharedBlockParent() && $subject->getSharedBlockParent()->getTemplate()) {
             $configs = $this->blockProvider->getConfigurationFor($subject->getSharedBlockParent()->getTemplate());
+        }else{
+            $configs = [
+                'contents' => []
+            ];
         }
-
-
 
         if ($this->canInheritFromParent($subject)) {
             $formMapper->add('parent_heritance', null, [
@@ -158,8 +167,7 @@ final class CmsContentAdmin extends AbstractAdmin
             $options = $contentParams['options'] ?? [];
             switch ($subject->getType()) {
                 case CmsContentTypeEnum::TEXT:
-                    $formMapper->add('value', TextType::class, ['required' => false]);
-                    $this->addHelp($formMapper, $subject, 'value');
+                    $formMapper->add('value', TextType::class, ['required' => false, 'help' => $subject->getHelp()]);
                     break;
 
                 case CmsContentTypeEnum::WYSIWYG:
@@ -171,9 +179,9 @@ final class CmsContentAdmin extends AbstractAdmin
                             'ckeditor_context' => $options['ckeditor_context'] ?? 'cms_page',
                             'required'         => false,
                             'auto_initialize'  => false,
+                            'help' => $subject->getHelp()
                         ]
                     );
-                    $this->addHelp($formMapper, $subject, 'value');
                     break;
 
                 case CmsContentTypeEnum::TEXTAREA:
@@ -183,14 +191,18 @@ final class CmsContentAdmin extends AbstractAdmin
                         [
                             'required'        => false,
                             'auto_initialize' => false,
+                            'help' => $subject->getHelp()
                         ]
                     );
-                    $this->addHelp($formMapper, $subject, 'value');
                     break;
 
                 case CmsContentTypeEnum::CHECKBOX:
                     $formMapper->add('value', CheckboxType::class,
-                        ['required' => false, 'label' => false]);
+                        [
+                            'required' => false,
+                            'label' => false,
+                            'help' => $subject->getHelp()
+                        ]);
 
                     $formMapper->getFormBuilder()->get('value')->addModelTransformer(new CallbackTransformer(
                         function ($value) {
@@ -201,7 +213,6 @@ final class CmsContentAdmin extends AbstractAdmin
                         }
                     ));
 
-                    $this->addHelp($formMapper, $subject, 'value');
                     break;
             }
 
@@ -224,12 +235,9 @@ final class CmsContentAdmin extends AbstractAdmin
                 }
             }
         }
-        //        if ($roleAdmin) {
-        //            $formMapper->add('position');
-        //        }
     }
 
-    protected function configureShowFields(ShowMapper $showMapper)
+    protected function configureShowFields(ShowMapper $showMapper): void
     {
         $showMapper
             ->add('id')
@@ -239,19 +247,12 @@ final class CmsContentAdmin extends AbstractAdmin
             ->add('value');
     }
 
-    protected function canManageContent()
-    {
-        $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
-
-        return $user->hasRole('ROLE_ADMIN_CMS');
-    }
-
-    public function prePersist($content)
+    public function prePersist($content): void
     {
         $this->preUpdate($content);
     }
 
-    public function preUpdate($content)
+    public function preUpdate($content): void
     {
     }
 
@@ -263,13 +264,6 @@ final class CmsContentAdmin extends AbstractAdmin
         }
 
         return array_merge(CmsContentTypeEnum::getChoices(), $customs);
-    }
-
-    protected function addHelp(FormMapper $formMapper, $subject, $field)
-    {
-        if ($subject && !empty($subject->getHelp())) {
-            $formMapper->addHelp($field, $subject->getHelp());
-        }
     }
 
     private function canInheritFromParent(CmsContent $content)
