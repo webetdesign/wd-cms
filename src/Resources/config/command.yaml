@@ -58,22 +58,6 @@ services:
     tags:
       - { name: 'console.command', command: 'cms:duplicate:menu' }
 
-  WebEtDesign\CmsBundle\Command\CmsSitemapGeneratorCommand:
-    arguments:
-      - '@router'
-      - '@sonata.seo.sitemap.manager'
-      - '@filesystem'
-      - '@WebEtDesign\CmsBundle\Utils\SitemapIterator'
-      - '%wd_cms.cms%'
-    tags:
-      - { name: 'console.command', command: 'cms:seo:sitemap' }
-
-  WebEtDesign\CmsBundle\Command\CmsSitemapHelperCommand:
-    arguments:
-      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
-      - '%wd_cms.cms%'
-    tags:
-      - { name: 'console.command', command: 'cms:sitemap-helper' }
 
   WebEtDesign\CmsBundle\Command\CmsMenuIconSetGeneratorCommand:
     arguments:
