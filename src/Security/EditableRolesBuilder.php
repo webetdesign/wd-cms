@@ -7,7 +7,7 @@ namespace WebEtDesign\CmsBundle\Security;
 use Sonata\AdminBundle\Admin\Pool;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EditableRolesBuilder
 {
@@ -86,9 +86,7 @@ class EditableRolesBuilder
             }
         });
 
-        $isMaster = $this->authorizationChecker->isGranted(
-            $this->pool->getOption('role_super_admin', 'ROLE_SUPER_ADMIN')
-        );
+        $isMaster = $this->authorizationChecker->isGranted('ROLE_SUPER_ADMIN');
 
         // get roles from the service container
         foreach ($this->rolesHierarchy as $name => $rolesHierarchy) {
