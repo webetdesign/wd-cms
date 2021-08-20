@@ -5,6 +5,10 @@ parameters:
   cms.admin.cms_site_entity_listener.class: WebEtDesign\CmsBundle\EventListener\CmsSiteListener
 
 services:
+  WebEtDesign\CmsBundle\Controller\:
+    resource: '../../Controller'
+    tags: [ 'controller.service_arguments' ]
+
   cms.user.validator.password_strength:
     class: WebEtDesign\Validator\Constraints\PasswordStrengthValidator
     arguments:
