@@ -2,22 +2,13 @@ parameters:
   cms.admin.cms_page_listener.class: WebEtDesign\CmsBundle\EventListener\PageAdminListener
   cms.admin.cms_site_listener.class: WebEtDesign\CmsBundle\EventListener\SiteAdminListener
   cms.admin.cms_shared_block_listener.class: WebEtDesign\CmsBundle\EventListener\SharedBlockAdminListener
-  cms.admin.cms_site_entity_listener.class: WebEtDesign\CmsBundle\EventListener\CmsSiteListener
 
 services:
-  cms.user.validator.password_strength:
-    class: WebEtDesign\Validator\Constraints\PasswordStrengthValidator
-    arguments:
-      - '@translator'
-    tags:
-      - { name: validator.constraint_validator, alias: password_strength }
-
   WebEtDesign\CmsBundle\Collectors\CmsCollector:
     tags:
-      -
-        name:     data_collector
+      - name: data_collector
         template: '@WebEtDesignCms/collectors/template.html.twig'
-        id:       'cms.collector'
+        id: 'cms.collector'
     arguments:
       - '@cms.helper'
       - '@cms.page_provider'
@@ -28,7 +19,7 @@ services:
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
-    arguments: ['@doctrine.orm.entity_manager', '@parameter_bag', '%wd_cms.cms%']
+    arguments: [ '@doctrine.orm.entity_manager', '@parameter_bag', '%wd_cms.cms%' ]
     tags:
       - { name: routing.loader }
 
@@ -47,10 +38,20 @@ services:
       - '%wd_cms.cms%'
       - '%security.role_hierarchy.roles%'
 
-  cms.helper:
-    class: WebEtDesign\CmsBundle\Services\CmsHelper
-    arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker", '@security.role_hierarchy', '@security.token_storage']
+  WebEtDesign\CmsBundle\Services\CmsHelper:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@cms.page_provider'
+      - '@twig'
+      - "@security.authorization_checker"
+      - '@security.role_hierarchy'
+      - '@security.token_storage'
+      - '@parameter_bag'
+      - '@request_stack'
     public: true
+
+  cms.helper:
+    alias: WebEtDesign\CmsBundle\Services\CmsHelper
 
   # ===============================================
   # CMS provider
@@ -123,9 +124,9 @@ services:
   WebEtDesign\CmsBundle\Repository\:
     resource: '../../Repository'
     autowire: true
-    tags: ['doctrine.repository_service']
+    tags: [ 'doctrine.repository_service' ]
 
   WebEtDesign\CmsBundle\Controller\SitemapController:
     arguments:
       - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
-    tags: ['controller.service_arguments']
+    tags: [ 'controller.service_arguments' ]
