@@ -1,4 +1,7 @@
 services:
+  WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController:
+    public: true
+
   cms.admin.cms_site:
     class: WebEtDesign\CmsBundle\Admin\CmsSiteAdmin
     arguments: [~, WebEtDesign\CmsBundle\Entity\CmsSite, WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController, '%wd_cms.cms%']
