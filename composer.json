@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^7.4|^8.0",
         "cocur/slugify": "^4.0",
         "doctrine/common": "^2.7",
         "mailjet/mailjet-apiv3-php": "^1.4",
