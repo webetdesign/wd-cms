@@ -34,7 +34,7 @@ class CmsGenerateContentsPositionCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Generer les postion des contenus')
+            ->setDescription('Generer les positions des contenus')
             //            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
             //            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
         ;
@@ -84,7 +84,7 @@ class CmsGenerateContentsPositionCommand extends Command
 
         foreach ($groups as $group) {
             foreach ($group as $key => $content) {
-                $content->setPosition($key);
+                $content->setPosition($key + 1);
             }
             $this->em->persist($content);
         }
