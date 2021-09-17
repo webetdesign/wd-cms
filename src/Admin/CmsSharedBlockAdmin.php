@@ -55,7 +55,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         $listMapper
             ->add('label')
             ->add('active')
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'edit'   => [],
                     'delete' => [],

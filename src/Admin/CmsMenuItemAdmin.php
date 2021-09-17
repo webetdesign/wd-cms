@@ -87,7 +87,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             ->add('connected')
             ->add('role')
             ->add('params')
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show'   => [],
                     'edit'   => [],

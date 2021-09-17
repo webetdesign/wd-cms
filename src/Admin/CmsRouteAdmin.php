@@ -34,7 +34,7 @@ final class CmsRouteAdmin extends AbstractAdmin
             ->add('name')
             ->add('methods', null, ['template' => '@WebEtDesignCms/arrayListField.html.twig'])
             ->add('path')
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show'   => [],
                     'edit'   => [],

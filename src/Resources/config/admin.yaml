@@ -1,7 +1,4 @@
 services:
-  WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController:
-    public: true
-
   cms.admin.cms_site:
     class: WebEtDesign\CmsBundle\Admin\CmsSiteAdmin
     arguments: [~, WebEtDesign\CmsBundle\Entity\CmsSite, WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController, '%wd_cms.cms%']
@@ -117,8 +114,7 @@ services:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: content has sharedBlock, show_in_dashboard: false }
     public: true
 
-  cms.admin.cms_page_declination:
-    class: WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin
+  WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin:
     arguments:
       - ~
       - WebEtDesign\CmsBundle\Entity\CmsPageDeclination
@@ -132,3 +128,6 @@ services:
     calls:
       - [ setTranslationDomain, [ 'wd_cms' ] ]
     public: true
+
+  cms.admin.cms_page_declination:
+    alias: WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin

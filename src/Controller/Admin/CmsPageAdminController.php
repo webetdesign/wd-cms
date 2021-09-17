@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder;
+use WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
@@ -28,14 +30,21 @@ use function is_array;
 class CmsPageAdminController extends CRUDController
 {
 
-    private RequestStack $requestStack;
+    private RequestStack            $requestStack;
+    private CmsPageDeclinationAdmin $declinationAdmin;
+    private PageBreadcrumbsBuilder  $pageBreadcrumbsBuilder;
 
     /**
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        RequestStack $requestStack,
+        CmsPageDeclinationAdmin $declinationAdmin,
+        PageBreadcrumbsBuilder $pageBreadcrumbsBuilder
+    ) {
+        $this->requestStack           = $requestStack;
+        $this->declinationAdmin       = $declinationAdmin;
+        $this->pageBreadcrumbsBuilder = $pageBreadcrumbsBuilder;
     }
 
     protected function preList(Request $request): ?Response
@@ -153,7 +162,7 @@ class CmsPageAdminController extends CRUDController
 
         return $this->renderWithExtraParams('@WebEtDesignCms/admin/page/tree.html.twig', [
             'action'           => 'tree',
-            'declinationAdmin' => $this->get('cms.admin.cms_page_declination'),
+            'declinationAdmin' => $this->declinationAdmin,
             'form'             => $formView,
             'datagrid'         => $datagrid,
             'csrf_token'       => $this->getCsrfToken('sonata.batch'),
@@ -446,7 +455,8 @@ class CmsPageAdminController extends CRUDController
                     );
 
                     // redirect to edit mode
-                    return $this->redirectTo($this->requestStack->getCurrentRequest(), $existingObject);
+                    return $this->redirectTo($this->requestStack->getCurrentRequest(),
+                        $existingObject);
                 } catch (ModelManagerException $e) {
                     $this->handleModelManagerException($e);
 
@@ -618,14 +628,11 @@ class CmsPageAdminController extends CRUDController
     protected function addRenderExtraParams(array $parameters = []): array
     {
         if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
-            $parameters['breadcrumbs_builder'] = $this
-                ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder');
+            $parameters['breadcrumbs_builder'] = $this->pageBreadcrumbsBuilder;
         }
 
         $parameters['admin']         = $parameters['admin'] ?? $this->admin;
         $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
-        // NEXT_MAJOR: Remove next line.
-        $parameters['admin_pool'] = $this->get('sonata.admin.pool');
 
         return $parameters;
     }
@@ -683,7 +690,8 @@ class CmsPageAdminController extends CRUDController
             }
 
             $newCmsPage->setRoot($site->getRootPage());
-            $newCmsPage->setParent($newCmsPage->getParent() ? $this->getParentPage($existingCmsPage, $newCmsPage) : $site->getRootPage());
+            $newCmsPage->setParent($newCmsPage->getParent() ? $this->getParentPage($existingCmsPage,
+                $newCmsPage) : $site->getRootPage());
             $newCmsPage = $this->copyContent($existingCmsPage, $newCmsPage);
 
             $this->getDoctrine()->getManager()->persist($newCmsPage);

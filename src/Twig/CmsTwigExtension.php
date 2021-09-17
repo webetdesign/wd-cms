@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Twig;
 
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\HttpFoundation\Request;
@@ -60,7 +61,7 @@ class CmsTwigExtension extends AbstractExtension
     public function __construct(
         EntityManagerInterface $entityManager,
         RouterInterface $router,
-        Container $container,
+        ContainerInterface $container,
         Environment $twig,
         TemplateProvider $pageProvider,
         TemplateProvider $templateProvider,

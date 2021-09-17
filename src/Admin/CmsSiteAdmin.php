@@ -61,7 +61,7 @@ final class CmsSiteAdmin extends AbstractAdmin
                 ->add('hostMultilingual');
         }
         $listMapper
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show'   => [],
                     'edit'   => [],

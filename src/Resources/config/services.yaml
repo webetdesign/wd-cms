@@ -2,26 +2,29 @@ parameters:
   cms.admin.cms_page_listener.class: WebEtDesign\CmsBundle\EventListener\PageAdminListener
   cms.admin.cms_site_listener.class: WebEtDesign\CmsBundle\EventListener\SiteAdminListener
   cms.admin.cms_shared_block_listener.class: WebEtDesign\CmsBundle\EventListener\SharedBlockAdminListener
-  cms.admin.cms_site_entity_listener.class: WebEtDesign\CmsBundle\EventListener\CmsSiteListener
 
 services:
-  WebEtDesign\CmsBundle\Controller\:
-    resource: '../../Controller'
-    tags: [ 'controller.service_arguments' ]
+  _defaults:
+    autowire: true
+    autoconfigure: true
 
-  cms.user.validator.password_strength:
-    class: WebEtDesign\Validator\Constraints\PasswordStrengthValidator
-    arguments:
-      - '@translator'
-    tags:
-      - { name: validator.constraint_validator, alias: password_strength }
+  WebEtDesign\CmsBundle\:
+    resource: '../../*'
+    exclude:
+      - '../../DependencyInjection/'
+      - '../../Controller/'
+      - '../../Entity/'
+      - '../../Tests/'
+
+  WebEtDesign\CmsBundle\Controller\:
+    resource: '../../Controller/*'
+    tags: [ 'controller.service_arguments' ]
 
   WebEtDesign\CmsBundle\Collectors\CmsCollector:
     tags:
-      -
-        name:     data_collector
+      - name: data_collector
         template: '@WebEtDesignCms/collectors/template.html.twig'
-        id:       'cms.collector'
+        id: 'cms.collector'
     arguments:
       - '@cms.helper'
       - '@cms.page_provider'
@@ -32,7 +35,7 @@ services:
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
-    arguments: ['@doctrine.orm.entity_manager', '@parameter_bag', '%wd_cms.cms%']
+    arguments: [ '@doctrine.orm.entity_manager', '@parameter_bag', '%wd_cms.cms%' ]
     tags:
       - { name: routing.loader }
 
@@ -53,7 +56,7 @@ services:
 
   cms.helper:
     class: WebEtDesign\CmsBundle\Services\CmsHelper
-    arguments: ['@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker", '@security.role_hierarchy', '@security.token_storage']
+    arguments: [ '@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker", '@security.role_hierarchy', '@security.token_storage' ]
     public: true
 
   # ===============================================
@@ -104,21 +107,21 @@ services:
   # TWIG EXTENSION
   # ===============================================
 
-  cms.twig.extension:
-    class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@router'
-      - '@service_container'
-      - '@twig'
-      - '@cms.page_provider'
-      - '@cms.block_provider'
-      - '@request_stack'
-      - '@parameter_bag'
-      - '@WebEtDesign\MediaBundle\Services\WDMediaService'
-    tags:
-      - { name: twig.extension }
-    public: true
+  #  cms.twig.extension:
+  #    class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
+  #    arguments:
+  #      - '@doctrine.orm.entity_manager'
+  #      - '@router'
+  #      - '@service_container'
+  #      - '@twig'
+  #      - '@cms.page_provider'
+  #      - '@cms.block_provider'
+  #      - '@request_stack'
+  #      - '@parameter_bag'
+  #      - '@WebEtDesign\MediaBundle\Services\WDMediaService'
+  #    tags:
+  #      - { name: twig.extension }
+  #    public: true
 
   # ===============================================
   # REPOSITORY
@@ -127,9 +130,9 @@ services:
   WebEtDesign\CmsBundle\Repository\:
     resource: '../../Repository'
     autowire: true
-    tags: ['doctrine.repository_service']
+    tags: [ 'doctrine.repository_service' ]
 
-  WebEtDesign\CmsBundle\Controller\SitemapController:
-    arguments:
-      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
-    tags: ['controller.service_arguments']
+#  WebEtDesign\CmsBundle\Controller\SitemapController:
+#    arguments:
+#      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
+#    tags: ['controller.service_arguments']

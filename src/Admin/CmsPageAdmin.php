@@ -168,7 +168,7 @@ class CmsPageAdmin extends AbstractAdmin
                 'label' => 'Actif',
             ])
             ->add(
-                '_action',
+                ListMapper::NAME_ACTIONS,
                 null,
                 [
                     'actions' => [

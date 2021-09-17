@@ -84,7 +84,7 @@ final class CmsContentAdmin extends AbstractAdmin
             ->add('label')
             ->add('type')
             ->add(
-                '_action',
+                ListMapper::NAME_ACTIONS,
                 null,
                 [
                     'actions' => [

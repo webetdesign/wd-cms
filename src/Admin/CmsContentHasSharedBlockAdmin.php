@@ -29,7 +29,7 @@ final class CmsContentHasSharedBlockAdmin extends AbstractAdmin
         $listMapper
             ->add('position')
             ->add('sharedBlock')
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show' => [],
                     'edit' => [],

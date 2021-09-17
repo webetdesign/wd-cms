@@ -69,7 +69,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         $listMapper
             ->add('id')
             ->add('title')
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show'   => [],
                     'edit'   => [],

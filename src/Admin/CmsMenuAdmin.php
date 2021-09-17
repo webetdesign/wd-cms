@@ -137,7 +137,7 @@ final class CmsMenuAdmin extends AbstractAdmin
             ->add('lft')
             ->add('lvl')
             ->add('rgt')
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show'   => [],
                     'edit'   => [],
