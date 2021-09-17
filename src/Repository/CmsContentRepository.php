@@ -8,10 +8,9 @@ use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
-use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method CmsContent|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,7 +20,7 @@ use function Doctrine\ORM\QueryBuilder;
  */
 class CmsContentRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, CmsContent::class);
     }

@@ -5,7 +5,7 @@ namespace WebEtDesign\CmsBundle\Repository;
 use Doctrine\Common\Collections\Collection;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use LogicException;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 
@@ -18,7 +18,7 @@ use WebEtDesign\CmsBundle\Entity\CmsSite;
 class CmsPageRepository extends NestedTreeRepository
 {
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $manager = $registry->getManagerForClass(CmsPage::class);
 

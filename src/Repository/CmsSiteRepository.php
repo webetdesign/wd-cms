@@ -8,7 +8,7 @@
 namespace WebEtDesign\CmsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 /**
@@ -19,7 +19,7 @@ use WebEtDesign\CmsBundle\Entity\CmsSite;
  */
 class CmsSiteRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, CmsSite::class);
     }

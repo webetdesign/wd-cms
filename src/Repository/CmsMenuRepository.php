@@ -3,7 +3,7 @@
 namespace WebEtDesign\CmsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 
 /**
@@ -14,7 +14,7 @@ use WebEtDesign\CmsBundle\Entity\CmsMenu;
  */
 class CmsMenuRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, CmsMenu::class);
     }

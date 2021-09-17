@@ -3,20 +3,16 @@
 namespace WebEtDesign\CmsBundle\Handler;
 
 use Cocur\Slugify\Slugify;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Gedmo\Sluggable\Handler\SlugHandlerInterface;
 use Gedmo\Sluggable\SluggableListener;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 
 /**
  * Permets la génération du slug de page identique pour des sites différents
  */
 class CmsPageSlugHandler implements SlugHandlerInterface
 {
-    /**
-     * @var ObjectManager
-     */
     protected $om;
 
     /**
@@ -113,9 +109,9 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      * Validate handler options
      *
      * @param array $options
-     * @param \Doctrine\Common\Persistence\Mapping\ClassMetadata $meta
+     * @param ClassMetadata $meta
      */
-    public static function validate(array $options, \Doctrine\Common\Persistence\Mapping\ClassMetadata $meta)
+    public static function validate(array $options, ClassMetadata $meta)
     {
     }
 }

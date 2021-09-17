@@ -2,7 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Repository;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
@@ -20,7 +20,7 @@ use WebEtDesign\CmsBundle\Entity\CmsSite;
 class CmsMenuItemRepository extends NestedTreeRepository
 {
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $manager = $registry->getManagerForClass(CmsMenuItem::class);
 
