@@ -6,10 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\PersistentCollection;
-use WebEtDesign\CmsBundle\Utils\SmoOpenGraphTrait;
-use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
+use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
+use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
 /**
  * @Gedmo\Tree(type="nested")
@@ -21,6 +22,7 @@ class CmsPage
     use SeoAwareTrait;
     use SmoOpenGraphTrait;
     use SmoTwitterTrait;
+    use TimestampableEntity;
 
     /**
      * @ORM\Id()
@@ -68,6 +70,13 @@ class CmsPage
      *
      */
     private $slug;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private ?string $breadcrumb = null;
 
     /**
      * @var string
@@ -790,6 +799,22 @@ class CmsPage
         }
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBreadcrumb(): ?string
+    {
+        return $this->breadcrumb;
+    }
+
+    /**
+     * @param string|null $breadcrumb
+     */
+    public function setBreadcrumb(?string $breadcrumb): void
+    {
+        $this->breadcrumb = $breadcrumb;
     }
 
 }

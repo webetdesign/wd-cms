@@ -5,6 +5,11 @@ namespace WebEtDesign\CmsBundle\Utils;
 use Doctrine\ORM\Mapping as ORM;
 use WebEtDesign\MediaBundle\Entity\Media;
 
+/**
+ * Trait SmoTwitterTrait
+ * @package WebEtDesign\CmsBundle\Utils
+ * @deprecated Use the trait in wd-seo-bundle
+ */
 trait SmoTwitterTrait
 {
     /**

@@ -4,6 +4,32 @@ parameters:
   cms.admin.cms_shared_block_listener.class: WebEtDesign\CmsBundle\EventListener\SharedBlockAdminListener
 
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  WebEtDesign\CmsBundle\:
+    resource: '../../*'
+    exclude:
+      - '../../DependencyInjection'
+      - '../../Entity'
+      - '../../Twig'
+      - '../../Sitemap'
+
+  # ===============================================
+  # REPOSITORY
+  # ===============================================
+
+  WebEtDesign\CmsBundle\Repository\:
+    resource: '../../Repository'
+    autowire: true
+    tags: [ 'doctrine.repository_service' ]
+
+
+  # ===============================================
+  # MISCELLANEOUS
+  # ===============================================
+
   WebEtDesign\CmsBundle\Collectors\CmsCollector:
     tags:
       - name: data_collector
@@ -113,18 +139,12 @@ services:
       - '@request_stack'
       - '@parameter_bag'
       - '@WebEtDesign\MediaBundle\Services\WDMediaService'
+      - '@WebEtDesign\CmsBundle\Services\WDDeclinationService'
     tags:
       - { name: twig.extension }
     public: true
 
-  # ===============================================
-  # REPOSITORY
-  # ===============================================
 
-  WebEtDesign\CmsBundle\Repository\:
-    resource: '../../Repository'
-    autowire: true
-    tags: [ 'doctrine.repository_service' ]
 
   WebEtDesign\CmsBundle\Controller\SitemapController:
     arguments:
