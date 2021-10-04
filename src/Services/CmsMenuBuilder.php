@@ -94,7 +94,6 @@ class CmsMenuBuilder
         } else {
             $menu = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy(['code' => $code]);
         }
-
         if (!$menu) {
             return $this->factory->createItem('root');
         }
