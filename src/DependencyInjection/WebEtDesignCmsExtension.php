@@ -59,6 +59,11 @@ class WebEtDesignCmsExtension extends Extension
         $container->setParameter('wd_cms.vars', $config['cms']['vars']);
 
         $container->setParameter('wd_cms.menu', $config['menu']);
+
+        $bundles = $container->getParameter('kernel.bundles');
+        if (isset($bundles['PrestaSitemapBundle'])) {
+            $loader->load('sitemap.yaml');
+        }
     }
 
     /**

@@ -25,6 +25,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('cms')->addDefaultsIfNotSet()
                     ->children()
+                        ->scalarNode('default_home_template')->defaultValue('home')->end()
                         ->scalarNode('multisite')->defaultValue(false)->end()
                         ->scalarNode('multilingual')->defaultValue(false)->end()
                         ->scalarNode('declination')->defaultValue(false)->end()

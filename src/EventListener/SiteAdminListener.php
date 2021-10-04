@@ -2,33 +2,37 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
-use WebEtDesign\CmsBundle\Entity\CmsContent;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Doctrine\ORM\EntityManager;
-use Sonata\AdminBundle\Event\PersistenceEvent;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class SiteAdminListener
 {
-    protected $router;
-    protected $fs;
-    protected $kernel;
-    protected $siteClass;
+    protected                     $router;
+    protected                     $fs;
+    protected                     $kernel;
+    protected                     $siteClass;
+    private ParameterBagInterface $parameterBag;
 
-    public function __construct(Router $router, Filesystem $fs, KernelInterface $kernel, $siteClass)
-    {
-        $this->router    = $router;
-        $this->fs        = $fs;
-        $this->kernel    = $kernel;
-        $this->siteClass = $siteClass;
+    public function __construct(
+        Router $router,
+        Filesystem $fs,
+        KernelInterface $kernel,
+        $siteClass,
+        ParameterBagInterface $parameterBag
+    ) {
+        $this->router       = $router;
+        $this->fs           = $fs;
+        $this->kernel       = $kernel;
+        $this->siteClass    = $siteClass;
+        $this->parameterBag = $parameterBag;
     }
 
     public function prePersist($event)
@@ -116,8 +120,10 @@ class SiteAdminListener
 
     private function createPage(EntityManager $em, CmsSite $site)
     {
+        $tmplName = $this->parameterBag->get('wd_cms.cms')['default_home_template'];
+
         $page = new CmsPage();
-        $page->setTemplate(!empty($site->getTemplateFilter()) ? $site->getTemplateFilter() . '_home' : 'home');
+        $page->setTemplate(!empty($site->getTemplateFilter()) ? ($site->getTemplateFilter() . '_' . $tmplName) : $tmplName);
         $page->setTitle('Homepage');
         $page->rootPage = true;
         $site->addPage($page);

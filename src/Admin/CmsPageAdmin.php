@@ -9,13 +9,10 @@ use Knp\Menu\ItemInterface as MenuItemInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Builder\FormContractorInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
-use Sonata\Form\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\CmsContentsType;
@@ -32,8 +29,8 @@ use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Form\Type\SecurityRolesType;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoOpenGraphAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
+use WebEtDesign\SeoBundle\Admin\SmoOpenGraphAdminTrait;
+use WebEtDesign\SeoBundle\Admin\SmoTwitterAdminTrait;
 
 class CmsPageAdmin extends AbstractAdmin
 {
@@ -268,10 +265,9 @@ class CmsPageAdmin extends AbstractAdmin
             $formMapper->tab('cms_page.tab.seo');// The tab call is optional
             $this->addGlobalVarsHelp($formMapper, $object, $this->globalVarsEnable);
             $formMapper->with('cms_page.tab.general', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
-                ->add('seo_title', null, ['label' => 'cms_page.form.seo_title.label'])
-                ->add('seo_description', TextareaType::class, ['label' => 'cms_page.form.seo_description.label', 'required' => false])
-                ->add('seo_keywords', null, ['label' => 'cms_page.form.seo_keywords.label'])
-                ->add('seo_breadcrumb', null, ['label' => 'cms_page.form.seo_breadcrumb.label'])
+                ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'])
+                ->add('seo_description', TextareaType::class, ['label' => 'wd_seo.form.seo_description.label', 'required' => false])
+                ->add('breadcrumb', null, ['required' => null, 'label' => 'cms_page.form.seo_breadcrumb.label'])
                 ->end();
             $this->addFormFieldSmoOpenGraph($formMapper);
             $this->addFormFieldSmoTwitter($formMapper);

@@ -8,6 +8,7 @@ use WebEtDesign\MediaBundle\Entity\Media;
 /**
  * Trait SmoOpenGraphTrait
  * @package WebEtDesign\CmsBundle\Utils
+ * @deprecated Use the trait in wd-seo-bundle
  */
 trait SmoOpenGraphTrait
 {

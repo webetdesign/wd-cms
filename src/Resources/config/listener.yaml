@@ -34,6 +34,7 @@ services:
       - '@filesystem'
       - '@kernel'
       - WebEtDesign\CmsBundle\Entity\CmsSite
+      - '@parameter_bag'
     tags:
       - { name: doctrine.event_listener, event: prePersist }
       - { name: doctrine.event_listener, event: postPersist }
