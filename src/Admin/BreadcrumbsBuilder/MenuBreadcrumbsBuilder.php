@@ -87,19 +87,19 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
         if ($childAdmin && $admin->hasSubject()) {
             $id = $admin->getRequest()->get($admin->getIdParameter());
 
-//            $menu = $menu->addChild(
-//                $admin->toString($admin->getSubject()),
-//                [
-//                    'uri' => $admin->hasRoute($this->config['child_admin_route']) && $admin->hasAccess($this->config['child_admin_route'], $admin->getSubject()) ?
-//                        $admin->generateUrl($this->config['child_admin_route'], ['id' => $id]) :
-//                        null,
-//                    'extras' => [
-//                        'translation_domain' => false,
-//                    ],
-//                ]
-//            );
+            //            $menu = $menu->addChild(
+            //                $admin->toString($admin->getSubject()),
+            //                [
+            //                    'uri' => $admin->hasRoute($this->config['child_admin_route']) && $admin->hasAccess($this->config['child_admin_route'], $admin->getSubject()) ?
+            //                        $admin->generateUrl($this->config['child_admin_route'], ['id' => $id]) :
+            //                        null,
+            //                    'extras' => [
+            //                        'translation_domain' => false,
+            //                    ],
+            //                ]
+            //            );
 
-//            $menu->setExtra('safe_label', false);
+            //            $menu->setExtra('safe_label', false);
 
             return $this->buildBreadcrumbs($childAdmin, $action, $menu);
         }
@@ -133,8 +133,8 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
                 ],
             ]);
         } else {
-            if (strpos($admin->getRequest()->get('_route'), '_tree') ||
-                strpos($admin->getRequest()->get('_route'), '_create')) {
+            if (strpos($admin->getRequest()->get('_route'), '_tree')
+                || strpos($admin->getRequest()->get('_route'), 'menu_create')) {
                 $site = $admin->getEntityManager()->getRepository(CmsSite::class)
                     ->find($admin->getRequest()->attributes->get("id"));
             } else {
