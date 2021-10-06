@@ -133,7 +133,8 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
                 ],
             ]);
         } else {
-            if (strpos($admin->getRequest()->get('_route'), '_tree')) {
+            if (strpos($admin->getRequest()->get('_route'), '_tree') ||
+                strpos($admin->getRequest()->get('_route'), '_create')) {
                 $site = $admin->getEntityManager()->getRepository(CmsSite::class)
                     ->find($admin->getRequest()->attributes->get("id"));
             } else {
