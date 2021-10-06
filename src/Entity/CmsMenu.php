@@ -201,7 +201,7 @@ class CmsMenu
     /**
      * @return CmsSite
      */
-    public function getSite(): CmsSite
+    public function getSite(): ?CmsSite
     {
         return $this->site;
     }
