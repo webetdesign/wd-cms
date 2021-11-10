@@ -101,8 +101,6 @@
     margin-left: auto !important;
 }
 
-.header_none {
-    .box-header {
-        display: none;
-    }
+.header_none + .box-header {
+    display : none;
 }

@@ -447,7 +447,7 @@
 .mx-auto {
   margin-left: auto !important; }
 
-.header_none .box-header {
+.header_none + .box-header {
   display: none; }
 #contents_collapse:first-child {
   border-top: 1px solid #dfdfdf; }
