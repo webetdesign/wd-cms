@@ -229,8 +229,8 @@ class CmsMenuBuilder
                 $this->buildNodes($menuItem, $children, $parentActive, $activeClass, $locale);
             }
 
-            if ($this->isChildActive($menuItem)) {
-                $liClass .= $activeClass;
+            if ($this->isChildActive($menuItem) && !preg_match('/active/', $liClass)) {
+                $liClass .= ' '.$activeClass;
             }
 
             $menuItem->setAttribute('class', $liClass);
