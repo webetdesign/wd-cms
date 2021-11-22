@@ -35,6 +35,10 @@ class SortableCollectionTransformer implements DataTransformerInterface
     {
         $rp = $this->em->getRepository($this->entity);
 
+        if ($value !== null && is_string($value)) {
+            $value = json_decode($value, true);
+        }
+
         $collection = [];
         if (is_array($value)) {
             foreach ($value as $data) {

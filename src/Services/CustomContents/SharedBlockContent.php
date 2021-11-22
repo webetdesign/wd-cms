@@ -76,6 +76,7 @@ class SharedBlockContent extends AbstractCustomContent
                     'parent' => $parent,
                 ]);
             } catch (Exception $e) {
+                dump($e);
                 return null;
             }
         }
