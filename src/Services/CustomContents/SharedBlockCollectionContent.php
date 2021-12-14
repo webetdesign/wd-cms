@@ -88,7 +88,11 @@ class SharedBlockCollectionContent extends AbstractCustomContent
 
         try {
             $html = "";
+            /** @var CmsSharedBlock $block */
             foreach ($blocks as $block) {
+                if (!$block->isActive()) {
+                    continue;
+                }
                 $template = $this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'];
                 $html     .= $this->twig->render($template, [
                     'block'  => $block,
