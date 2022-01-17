@@ -239,6 +239,7 @@ class CmsMenuBuilder
             $menuItem->setLabelAttribute('class', $linkClass);
 
             $menuItem->setExtra('icon_class', $item->getIconClass());
+            $menuItem->setExtra('information', $item->getInformation());
 
             if ($item->isBlank()) {
                 $menuItem->setLinkAttribute('target', '_blank');
