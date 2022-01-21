@@ -65,7 +65,7 @@ class SharedBlockContent extends AbstractCustomContent
                 break;
         }
 
-        $block = $this->getCallbackTransformer()->transform($content->getValue())['block'];
+        $block = $this->getCallbackTransformer()->transform($content->getValue())['block'] ?? null;
 
         if ($block) {
             try {
