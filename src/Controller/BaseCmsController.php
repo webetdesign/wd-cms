@@ -28,6 +28,8 @@ class BaseCmsController extends AbstractController
     /** @var AbstractCmsGlobalVars */
     protected AbstractCmsGlobalVars $globalVars;
 
+    protected ?Response $response;
+
     private $cmsConfig;
 
     public function setVarsObject(GlobalVarsInterface $object)
@@ -74,7 +76,11 @@ class BaseCmsController extends AbstractController
         $extension = $this->getExtension();
         $rootDir   = $extension && $extension !== 'html' ? $extension . '/' : '';
 
-        return $this->render($rootDir . $this->provider->getTemplate($page->getTemplate()), array_merge($params, $baseParams));
+        return $this->render(
+            $rootDir . $this->provider->getTemplate($page->getTemplate()),
+            array_merge($params, $baseParams),
+            $this->response
+        );
     }
 
     /**
