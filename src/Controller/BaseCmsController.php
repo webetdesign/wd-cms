@@ -28,7 +28,7 @@ class BaseCmsController extends AbstractController
     /** @var AbstractCmsGlobalVars */
     protected AbstractCmsGlobalVars $globalVars;
 
-    protected ?Response $response;
+    protected ?Response $response = null;
 
     private $cmsConfig;
 
@@ -79,7 +79,7 @@ class BaseCmsController extends AbstractController
         return $this->render(
             $rootDir . $this->provider->getTemplate($page->getTemplate()),
             array_merge($params, $baseParams),
-            $this->response
+            $this->response ?: null
         );
     }
 
