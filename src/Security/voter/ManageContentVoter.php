@@ -14,12 +14,12 @@ class ManageContentVoter extends Voter
 {
     const CAN_MANAGE_CONTENT = 'CAN_MANAGE_CONTENT';
 
-    protected function supports(string $attribute, $subject)
+    protected function supports(string $attribute, $subject): bool
     {
         return $attribute === self::CAN_MANAGE_CONTENT;
     }
 
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
