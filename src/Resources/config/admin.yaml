@@ -22,6 +22,7 @@ services:
       - WebEtDesign\CmsBundle\Entity\CmsPage
       - WebEtDesign\CmsBundle\Controller\Admin\CmsPageAdminController
       - '@doctrine.orm.default_entity_manager'
+      - '@service_container'
       - '%wd_cms.cms%'
       - '%wd_cms.vars%'
       - '@cms.page_provider'
