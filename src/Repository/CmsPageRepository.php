@@ -3,8 +3,9 @@
 namespace WebEtDesign\CmsBundle\Repository;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use LogicException;
+use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 
@@ -16,8 +17,18 @@ use WebEtDesign\CmsBundle\Entity\CmsSite;
  */
 class CmsPageRepository extends NestedTreeRepository
 {
-    public function __construct(EntityManagerInterface $manager)
+
+    public function __construct(ManagerRegistry $registry)
     {
+        $manager = $registry->getManagerForClass(CmsPage::class);
+
+        if ($manager === null) {
+            throw new LogicException(sprintf(
+                'Could not find the entity manager for class "%s". Check your Doctrine configuration to make sure it is configured to load this entity’s metadata.',
+                CmsPage::class
+            ));
+        }
+
         parent::__construct($manager, $manager->getClassMetadata(CmsPage::class));
     }
 

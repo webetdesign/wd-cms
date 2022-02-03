@@ -12,9 +12,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
-use Doctrine\ORM\PersistentCollection;
-use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsSiteRepository")
@@ -27,86 +27,94 @@ class CmsSite
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      *
-     * @var int
+     * @var int|null
      */
-    private $id;
+    private ?int $id = null;
+
+    /**
+     * @var string|null
+     *
+     * @Gedmo\Slug(fields={"label", "locale"})
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
+    private ?string $slug = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=false)
      *
-     * @var string
+     * @var string|null
      */
-    private $label;
+    private ?string $label = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * @var string
+     * @var string|null
      */
-    private $locale;
+    private ?string $locale = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * @var string
+     * @var string|null
      */
-    private $host;
+    private ?string $host = null;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : 0})
      *
      * @var boolean
      */
-    private $hostMultilingual = false;
+    private bool $hostMultilingual = false;
 
     /**
      * @ORM\Column(name="`default`", type="boolean", options={"default" : 0})
      *
      * @var boolean
      */
-    private $default;
+    private bool $default;
 
     /**
      * @var CmsPage[]|Collection|Selectable
      *
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="site", cascade={"persist", "remove"})
      */
-    private $pages;
+    private Collection $pages;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * @var string
+     * @var string|null
      */
-    private $flagIcon;
+    private ?string $flagIcon = null;
 
     /**
      * @var CmsPage[]|Collection|Selectable
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenu", mappedBy="site", cascade={"persist", "remove"})
      */
-    private $menus;
+    private Collection $menus;
 
     /**
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", mappedBy="site", cascade={"persist", "remove"})
      */
-    private $sharedBlocks;
+    private Collection $sharedBlocks;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean", options={"default": true})
      */
-    private $visible = true;
+    private bool $visible = true;
 
     /**
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $templateFilter;
+    private ?string $templateFilter = null;
 
-    public $initPage = true;
-    public $initMenu = true;
+    public bool $initPage = true;
+    public bool $initMenu = true;
 
     public function __construct()
     {
@@ -280,13 +288,6 @@ class CmsSite
         return $this;
     }
 
-    public function getSlug()
-    {
-        $slugify = new Slugify();
-
-        return $slugify->slugify($this->getLabel(), "_");
-    }
-
     public function getPages()
     {
         return $this->pages;
@@ -425,6 +426,24 @@ class CmsSite
     public function getMenus(): Collection
     {
         return $this->menus;
+    }
+
+    /**
+     * @param string|null $slug
+     * @return CmsSite
+     */
+    public function setSlug(?string $slug): CmsSite
+    {
+        $this->slug = $slug;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSlug(): ?string
+    {
+        return $this->slug;
     }
 
 }

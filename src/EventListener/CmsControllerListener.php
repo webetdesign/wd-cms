@@ -68,9 +68,9 @@ class CmsControllerListener
                     return new Response($content, 403);
                 });
             }
-            
-            $page   = $this->helper->getPage($request);
-            $locale = $this->helper->getLocale($request);
+
+            $page   = $this->helper->getPage();
+            $locale = $this->helper->getLocale();
             if (!empty($locale)) {
                 $request->setLocale($locale);
                 $controller->setLocale($locale);

@@ -123,12 +123,12 @@ class ExtraLoader implements LoaderInterface
         }
 
 
-        if ($this->cmsConfig['multisite']) {
-            $sitemap = new Route('/sitemap.xml', [
-                '_controller' => 'WebEtDesign\CmsBundle\Controller\SitemapController'
-            ]);
-            $routeCollection->add('sitemap', $sitemap);
-        }
+//        if ($this->cmsConfig['multisite']) {
+//            $sitemap = new Route('/sitemap.xml', [
+//                '_controller' => 'WebEtDesign\CmsBundle\Controller\SitemapController'
+//            ]);
+//            $routeCollection->add('sitemap', $sitemap);
+//        }
 
         return $routeCollection;
     }

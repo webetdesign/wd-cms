@@ -6,6 +6,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\MediaBundle\Form\Type\WDMediaType;
 
+/**
+ * Trait SmoTwitterAdminTrait
+ * @package WebEtDesign\CmsBundle\Utils
+ * @deprecated Use the trait in wd-seo-bundle
+ */
 trait SmoTwitterAdminTrait
 {
     public function addFormFieldSmoTwitter($formMapper)

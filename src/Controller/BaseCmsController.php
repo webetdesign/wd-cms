@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
@@ -12,20 +13,20 @@ use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class BaseCmsController extends AbstractController
 {
-    /** @var CmsPage */
-    protected $page;
+    /** @var CmsPage|null */
+    protected ?CmsPage $page;
 
     /** @var string */
-    protected $locale;
+    protected string $locale;
 
     /** @var boolean */
-    protected $granted;
+    protected bool $granted;
 
     /** @var TemplateProvider */
-    protected $provider;
+    protected TemplateProvider $provider;
 
     /** @var AbstractCmsGlobalVars */
-    protected $globalVars;
+    protected AbstractCmsGlobalVars $globalVars;
 
     private $cmsConfig;
 
@@ -60,7 +61,7 @@ class BaseCmsController extends AbstractController
         $this->provider = $provider;
     }
 
-    protected function defaultRender(array $params)
+    protected function defaultRender(array $params): Response
     {
         /** @var CmsPage $page */
         $page       = $this->getPage();
@@ -80,7 +81,7 @@ class BaseCmsController extends AbstractController
      * @param CmsPage $page
      * @return CmsPageDeclination|null
      */
-    public function getDeclination($page)
+    public function getDeclination(CmsPage $page): ?CmsPageDeclination
     {
         /** @var RequestStack $requestStack */
         $requestStack     = $this->get('request_stack');
@@ -102,7 +103,7 @@ class BaseCmsController extends AbstractController
     /**
      * @return string|null
      */
-    private function getExtension()
+    private function getExtension(): ?string
     {
         /** @var RequestStack $requestStack */
         $requestStack = $this->get('request_stack');
@@ -111,7 +112,7 @@ class BaseCmsController extends AbstractController
 
         preg_match('/\.([a-z]+)($|\?)/', $path, $extension);
 
-        return isset($extension[1]) ? $extension[1] : null;
+        return $extension[1] ?? null;
     }
 
     /**
@@ -134,7 +135,7 @@ class BaseCmsController extends AbstractController
     }
 
     /**
-     * @param CmsPage $page
+     * @param CmsPage|null $page
      * @return CmsController
      */
     public function setPage(?CmsPage $page): BaseCmsController
@@ -156,17 +157,14 @@ class BaseCmsController extends AbstractController
      * @param mixed $locale
      * @return self
      */
-    public function setLocale($locale)
+    public function setLocale($locale): self
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }

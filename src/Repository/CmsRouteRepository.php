@@ -2,9 +2,9 @@
 
 namespace WebEtDesign\CmsBundle\Repository;
 
-use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method CmsRoute|null find($id, $lockMode = null, $lockVersion = null)

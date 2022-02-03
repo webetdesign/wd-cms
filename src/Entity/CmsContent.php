@@ -58,11 +58,11 @@ class CmsContent
     private ?CmsPage $page = null;
 
     /**
-     * @var integer
+     * @var integer|null
      * @ORM\Column(type="integer", nullable=true)
      * @Gedmo\SortablePosition()
      */
-    private int $position = 0;
+    private ?int $position = null;
 
     /**
      * @var null|CmsSharedBlock
@@ -76,7 +76,7 @@ class CmsContent
      * @var boolean
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private bool $parent_heritance;
+    private ?bool $parent_heritance = null;
 
     /**
      * @var boolean

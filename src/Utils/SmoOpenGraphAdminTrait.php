@@ -7,6 +7,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\MediaBundle\Form\Type\WDMediaType;
 
+/**
+ * Trait SmoOpenGraphAdminTrait
+ * @package WebEtDesign\CmsBundle\Utils
+ * @deprecated Use the trait in wd-seo-bundle
+ */
 trait SmoOpenGraphAdminTrait
 {
     public function addFormFieldSmoOpenGraph($formMapper)

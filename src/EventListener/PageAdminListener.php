@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
-use App\Utils\ArrayUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Exception;

@@ -7,14 +7,11 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Twig\Environment;
 use Twig\TwigTest;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock;
-use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +26,7 @@ use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use WebEtDesign\CmsBundle\Services\WDDeclinationService;
 use WebEtDesign\MediaBundle\Entity\Media;
 use WebEtDesign\MediaBundle\Services\WDMediaService;
 
@@ -52,8 +50,9 @@ class CmsTwigExtension extends AbstractExtension
 
     protected $router;
 
-    protected              $customContents;
-    private WDMediaService $mediaService;
+    protected                    $customContents;
+    private WDMediaService       $mediaService;
+    private WDDeclinationService $declinationService;
 
     /**
      * @inheritDoc
@@ -67,7 +66,8 @@ class CmsTwigExtension extends AbstractExtension
         TemplateProvider $templateProvider,
         RequestStack $requestStack,
         ParameterBagInterface $parameterBag,
-        WDMediaService $mediaService
+        WDMediaService $mediaService,
+        WDDeclinationService $declinationService
     ) {
         $this->em                  = $entityManager;
         $this->router              = $router;
@@ -87,7 +87,8 @@ class CmsTwigExtension extends AbstractExtension
         if ($globalVarsDefinition['enable']) {
             $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
         }
-        $this->mediaService = $mediaService;
+        $this->mediaService       = $mediaService;
+        $this->declinationService = $declinationService;
     }
 
     public function getTests()
@@ -115,8 +116,10 @@ class CmsTwigExtension extends AbstractExtension
             new TwigFunction('cms_render_shared_block', [$this, 'getSharedBlock'],
                 ['is_safe' => ['html']]),
             new TwigFunction('cms_path', [$this, 'cmsPath']),
-            new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'], ['is_safe' => ['html']]),
-            new TwigFunction('cms_render_meta_locale_switch', [$this, 'renderMetaLocalSwitch'], ['is_safe' => ['html']]),
+            new TwigFunction('cms_render_locale_switch', [$this, 'renderLocaleSwitch'],
+                ['is_safe' => ['html']]),
+            new TwigFunction('cms_render_meta_locale_switch', [$this, 'renderMetaLocalSwitch'],
+                ['is_safe' => ['html']]),
             new TwigFunction('cms_render_seo_smo_value', [$this, 'renderSeoSmo']),
             new TwigFunction('cms_breadcrumb', [$this, 'breadcrumb']),
             new TwigFunction('route_exist', [$this, 'routeExist']),
@@ -127,41 +130,6 @@ class CmsTwigExtension extends AbstractExtension
     public function isInstanceOf($object, $class)
     {
         return $object instanceof $class;
-    }
-
-    private function getDeclination(CmsPage $page)
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        $path    = $request->getRequestUri();
-
-        $path             = preg_replace('(\?.*)', '', $path);
-        $withoutExtension = $this->pageExtension ? preg_replace('/\.([a-z]+)$/', '', $path) : false;
-
-        $declinations = $page->getDeclinations()->toArray();
-
-        uasort($declinations, function (CmsPageDeclination $a, CmsPageDeclination $b) {
-            return strlen($a->getPath()) < strlen($b->getPath());
-            return strlen($a->getPath()) < strlen($b->getPath());
-        });
-
-        /** @var CmsPageDeclination $declination */
-        foreach ($declinations as $declination) {
-            $dPath = $declination->getPath();
-
-            if ($this->configCms['multilingual'] && !empty($page->getSite()->getLocale())) {
-                $dPath = '/' . $page->getSite()->getLocale() . $dPath;
-            }
-
-            if (
-                preg_match('/^' . preg_quote($dPath, '/') . '/', $path) ||
-                preg_match('/^' . preg_quote($dPath, '/') . '/', $withoutExtension)
-            ) {
-                return $declination;
-                break;
-            }
-        }
-
-        return null;
     }
 
     private function retrieveContent($object, $content_code)
@@ -199,7 +167,7 @@ class CmsTwigExtension extends AbstractExtension
 
         if ($this->declination && $object instanceof CmsPage) {
             $content = null;
-            if ($declination = $this->getDeclination($object)) {
+            if ($declination = $this->declinationService->getDeclination($object)) {
                 $content = $this->retrieveContent($declination, $content_code);
                 if (!$content->getValue() && $defaultLangSite && $this->configCms['multilingual']) {
                     $technicName        = preg_replace('/^' . $declination->getLocale() . '_(.*)/',
@@ -357,7 +325,7 @@ class CmsTwigExtension extends AbstractExtension
                     }
 
                 } else {
-                    if(isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null) {
+                    if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null) {
                         $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
                         $routeParams[$param] = $request->get($param)->$getProperty();
 
@@ -404,12 +372,15 @@ class CmsTwigExtension extends AbstractExtension
         ]);
     }
 
+    /**
+     * @deprecated use SeoTwigExtension in wd-seo-bundle instead
+     */
     public function renderSeoSmo($object, $name, $default = null)
     {
         $method = 'get' . ucfirst($name);
 
         $value = null;
-        if ($object instanceof CmsPage && $this->declination && ($declination = $this->getDeclination($object))) {
+        if ($object instanceof CmsPage && $this->declination && ($declination = $this->declinationService->getDeclination($object))) {
             $value = $this->getSeoSmoValue($declination, $method);
             if (empty($value)) {
                 $value = $this->getSeoSmoValueFallbackParentPage($object, $method);

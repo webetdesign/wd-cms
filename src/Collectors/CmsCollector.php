@@ -46,7 +46,7 @@ class CmsCollector extends DataCollector
     public function collect(Request $request, Response $response, Throwable $exception = null)
     {
         /** @var CmsPage $page */
-        $page = $this->cmsHelper->getPage($request);
+        $page = $this->cmsHelper->getPage();
         if ($page) {
 
             try {

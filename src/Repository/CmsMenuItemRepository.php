@@ -2,12 +2,14 @@
 
 namespace WebEtDesign\CmsBundle\Repository;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use LogicException;
 use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 /**
  * @method CmsMenuItem|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,8 +20,17 @@ use WebEtDesign\CmsBundle\Entity\CmsPage;
 class CmsMenuItemRepository extends NestedTreeRepository
 {
 
-    public function __construct(EntityManagerInterface $manager)
+    public function __construct(ManagerRegistry $registry)
     {
+        $manager = $registry->getManagerForClass(CmsMenuItem::class);
+
+        if ($manager === null) {
+            throw new LogicException(sprintf(
+                'Could not find the entity manager for class "%s". Check your Doctrine configuration to make sure it is configured to load this entity’s metadata.',
+                CmsMenuItem::class
+            ));
+        }
+
         parent::__construct($manager, $manager->getClassMetadata(CmsMenuItem::class));
     }
 

@@ -109,6 +109,8 @@ final class PageBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
             $site = $admin->getEntityManager()->getRepository(CmsSite::class)
                 ->find($admin->getRequest()->attributes->get("id"));
 
+            dump($admin->getRequest()->attributes->get("id"));
+
             $menu = $this->createMenuItem(
                 $admin,
                 $menu,

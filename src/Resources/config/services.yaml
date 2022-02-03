@@ -11,14 +11,24 @@ services:
   WebEtDesign\CmsBundle\:
     resource: '../../*'
     exclude:
-      - '../../DependencyInjection/'
-      - '../../Controller/'
-      - '../../Entity/'
-      - '../../Tests/'
+      - '../../DependencyInjection'
+      - '../../Entity'
+      - '../../Twig'
+      - '../../Sitemap'
 
-  WebEtDesign\CmsBundle\Controller\:
-    resource: '../../Controller/*'
-    tags: [ 'controller.service_arguments' ]
+  # ===============================================
+  # REPOSITORY
+  # ===============================================
+
+  WebEtDesign\CmsBundle\Repository\:
+    resource: '../../Repository'
+    autowire: true
+    tags: [ 'doctrine.repository_service' ]
+
+
+  # ===============================================
+  # MISCELLANEOUS
+  # ===============================================
 
   WebEtDesign\CmsBundle\Collectors\CmsCollector:
     tags:
@@ -54,10 +64,20 @@ services:
       - '%wd_cms.cms%'
       - '%security.role_hierarchy.roles%'
 
-  cms.helper:
-    class: WebEtDesign\CmsBundle\Services\CmsHelper
-    arguments: [ '@doctrine.orm.entity_manager', '@cms.page_provider', '@twig', "@security.authorization_checker", '@security.role_hierarchy', '@security.token_storage' ]
+  WebEtDesign\CmsBundle\Services\CmsHelper:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@cms.page_provider'
+      - '@twig'
+      - "@security.authorization_checker"
+      - '@security.role_hierarchy'
+      - '@security.token_storage'
+      - '@parameter_bag'
+      - '@request_stack'
     public: true
+
+  cms.helper:
+    alias: WebEtDesign\CmsBundle\Services\CmsHelper
 
   # ===============================================
   # CMS provider
@@ -107,32 +127,26 @@ services:
   # TWIG EXTENSION
   # ===============================================
 
-  #  cms.twig.extension:
-  #    class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
-  #    arguments:
-  #      - '@doctrine.orm.entity_manager'
-  #      - '@router'
-  #      - '@service_container'
-  #      - '@twig'
-  #      - '@cms.page_provider'
-  #      - '@cms.block_provider'
-  #      - '@request_stack'
-  #      - '@parameter_bag'
-  #      - '@WebEtDesign\MediaBundle\Services\WDMediaService'
-  #    tags:
-  #      - { name: twig.extension }
-  #    public: true
+  cms.twig.extension:
+    class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@router'
+      - '@service_container'
+      - '@twig'
+      - '@cms.page_provider'
+      - '@cms.block_provider'
+      - '@request_stack'
+      - '@parameter_bag'
+      - '@WebEtDesign\MediaBundle\Services\WDMediaService'
+      - '@WebEtDesign\CmsBundle\Services\WDDeclinationService'
+    tags:
+      - { name: twig.extension }
+    public: true
 
-  # ===============================================
-  # REPOSITORY
-  # ===============================================
 
-  WebEtDesign\CmsBundle\Repository\:
-    resource: '../../Repository'
-    autowire: true
-    tags: [ 'doctrine.repository_service' ]
 
-#  WebEtDesign\CmsBundle\Controller\SitemapController:
-#    arguments:
-#      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
-#    tags: ['controller.service_arguments']
+  WebEtDesign\CmsBundle\Controller\SitemapController:
+    arguments:
+      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
+    tags: [ 'controller.service_arguments' ]

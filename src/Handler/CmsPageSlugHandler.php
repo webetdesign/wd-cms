@@ -4,9 +4,7 @@ namespace WebEtDesign\CmsBundle\Handler;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\ObjectManager;
 use Gedmo\Sluggable\Handler\SlugHandlerInterface;
-use Gedmo\Sluggable\Mapping\Event\SluggableAdapter;
 use Gedmo\Sluggable\SluggableListener;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 
@@ -15,9 +13,12 @@ use WebEtDesign\CmsBundle\Entity\CmsPage;
  */
 class CmsPageSlugHandler implements SlugHandlerInterface
 {
-    protected ObjectManager $om;
+    protected $om;
 
-    protected SluggableListener $sluggable;
+    /**
+     * @var SluggableListener
+     */
+    protected $sluggable;
 
     /**
      * Callable of original transliterator
@@ -27,12 +28,12 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      */
     private $originalTransliterator;
 
-    public function __construct(SluggableListener $sluggable)
+    public function __construct(\Gedmo\Sluggable\SluggableListener $sluggable)
     {
         $this->sluggable = $sluggable;
     }
 
-    public function postSlugBuild(SluggableAdapter $ea, array &$config, $object, &$slug)
+    public function postSlugBuild(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug)
     {
         $this->originalTransliterator = $this->sluggable->getTransliterator();
         $this->sluggable->setTransliterator([$this, 'transliterate']);
@@ -44,7 +45,7 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      * @param CmsPage $object
      * @return string
      */
-    public function transliterate($text, $separator, CmsPage $object)
+    public function transliterate($text, $separator, $object)
     {
         $slugify = new Slugify();
         $res    = $slugify->slugify($text);
@@ -68,7 +69,7 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      * is made whether or not the slug needs to be
      * recalculated
      *
-     * @param SluggableAdapter $ea
+     * @param \Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea
      * @param array $config
      * @param CmsPage $object
      * @param string $slug
@@ -76,7 +77,7 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      *
      * @return void
      */
-    public function onChangeDecision(SluggableAdapter $ea, array &$config, $object, &$slug, &$needToChangeSlug)
+    public function onChangeDecision(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug, &$needToChangeSlug)
     {
         $this->om         = $ea->getObjectManager();
         $needToChangeSlug = true;
@@ -85,14 +86,14 @@ class CmsPageSlugHandler implements SlugHandlerInterface
     /**
      * Callback for slug handlers on slug completion
      *
-     * @param SluggableAdapter $ea
+     * @param \Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea
      * @param array $config
      * @param object $object
      * @param string $slug
      *
      * @return void
      */
-    public function onSlugCompletion(SluggableAdapter $ea, array &$config, $object, &$slug)
+    public function onSlugCompletion(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug)
     {
     }
 

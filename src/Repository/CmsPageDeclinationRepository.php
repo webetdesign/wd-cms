@@ -2,9 +2,9 @@
 
 namespace WebEtDesign\CmsBundle\Repository;
 
-use Doctrine\Persistence\ManagerRegistry;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method CmsPageDeclination|null find($id, $lockMode = null, $lockVersion = null)
