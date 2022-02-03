@@ -55,7 +55,7 @@
         "twig/extensions": "^1.5",
         "twig/twig": "^1.34 || ^2.0",
         "webetdesign/wd-media-bundle": "dev-sf5",
-        "webetdesign/wd-seo-bundle": "^1.0"
+        "webetdesign/wd-seo-bundle": "1.*"
     },
     "require-dev": {
         "symfony/filesystem": "^5.4",
