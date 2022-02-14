@@ -31,7 +31,8 @@ services:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Pages }
     calls:
       - [setTranslationDomain, [ 'wd_cms' ] ]
-      - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/page:edit.html.twig']]
+      - [setTemplate, ['edit', '@@WebEtDesignCms/admin/page/edit.html.twig']]
+      - [setTemplate, ['tree', '@@WebEtDesignCms/admin/page/tree.html.twig']]
       - [addChild, ['@cms.admin.cms_page_declination', 'declination']]
     public: true
 

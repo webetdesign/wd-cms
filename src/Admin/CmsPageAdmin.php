@@ -73,7 +73,7 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected function configureActionButtons(array $buttonList, string $action, ?object $object = null): array
     {
-        $buttons           = parent::getActionButtons($action, $object);
+        $buttons           = parent::configureActionButtons($buttonList, $action, $object);
         $buttons['create'] = ['template' => '@WebEtDesignCms/admin/page/create_button.html.twig'];
 
         return $buttons;
@@ -266,7 +266,7 @@ class CmsPageAdmin extends AbstractAdmin
             $form->with('cms_page.tab.general', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
                 ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'])
                 ->add('seo_description', TextareaType::class, ['label' => 'wd_seo.form.seo_description.label', 'required' => false])
-                ->add('breadcrumb', null, ['required' => null, 'label' => 'cms_page.form.seo_breadcrumb.label'])
+                ->add('breadcrumb', null, ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'])
                 ->end();
             $this->addFormFieldSmoOpenGraph($form);
             $this->addFormFieldSmoTwitter($form);
