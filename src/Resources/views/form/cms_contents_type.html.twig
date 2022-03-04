@@ -24,7 +24,7 @@
                             {{ form_widget(item.active) }}
                         </div>
                         <div class="btn_arrow">
-                            <button type="button" class="class btn btn-default btn-sm collapsed" data-toggle="collapse" data-target="#collapse_{{ loop.index }}" aria-expanded="true" aria-controls="collapse_{{ loop.index }}">
+                            <button type="button" class="class btn btn-default btn-sm collapsed" data-toggle="collapse" data-target="#{{ form.vars.id }}_collapse_{{ loop.index }}" aria-expanded="true" aria-controls="collapse_{{ loop.index }}">
                                 <i class="glyphicon glyphicon-menu-up"></i>
                             </button>
                         </div>
