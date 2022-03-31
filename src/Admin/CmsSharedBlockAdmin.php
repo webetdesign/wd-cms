@@ -10,12 +10,17 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
+use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
 use WebEtDesign\CmsBundle\Form\BlockTemplateType;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 use WebEtDesign\CmsBundle\Form\CmsContentsType;
+use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
+use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
 use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use function count;
 use function in_array;
@@ -24,14 +29,23 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
 {
     protected ?bool                  $isMultisite;
     protected EntityManagerInterface $em;
-    private ?array                   $customFormThemes;
+    private SharedBlockFactory       $sharedBlockFactory;
+    private BlockFormThemesManager   $blockFormThemesManager;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManagerInterface $em, $cmsConfiguration, $customFormThemes)
-    {
-        $this->em          = $em;
-        $this->isMultisite = $cmsConfiguration['multisite'];
+    public function __construct(
+        string $code,
+        string $class,
+        string $baseControllerName,
+        EntityManagerInterface $em,
+        SharedBlockFactory $sharedBlockFactory,
+        ParameterBagInterface $parameterBag,
+        BlockFormThemesManager $blockFormThemesManager
+    ) {
         parent::__construct($code, $class, $baseControllerName);
-        $this->customFormThemes = $customFormThemes;
+        $this->em                     = $em;
+        $this->sharedBlockFactory     = $sharedBlockFactory;
+        $this->isMultisite            = $parameterBag->get('wd_cms.cms')['multisite'];
+        $this->blockFormThemesManager = $blockFormThemesManager;
     }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
@@ -74,8 +88,11 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
     }
 
-    protected function configureSideMenu(MenuItemInterface $menu, $action, AdminInterface $childAdmin = null)
-    {
+    protected function configureSideMenu(
+        MenuItemInterface $menu,
+        $action,
+        AdminInterface $childAdmin = null
+    ) {
         $admin = $this->isChild() ? $this->getParent() : $this;
 
         $id = $this->getRequest()->get('id');
@@ -87,7 +104,10 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
                     $active = $site->getId() == $id;
                     $menu->addChild(
                         $site->__toString(),
-                        ['uri' => $admin->generateUrl('list', ['id' => $site->getId()]), 'attributes' => ['class' => $active ? 'active' : ""]]
+                        [
+                            'uri'        => $admin->generateUrl('list', ['id' => $site->getId()]),
+                            'attributes' => ['class' => $active ? 'active' : ""]
+                        ]
                     );
                 }
             }
@@ -105,48 +125,58 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
             '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
             '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
-        ], $this->customFormThemes));
+            '@WebEtDesignCms/admin/form/cms_block.html.twig',
+        ], $this->blockFormThemesManager->getThemes()));
 
         if ($this->isCurrentRoute('create') && $this->getRequest()->get('id') !== null) {
             $site = $this->em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($this->getRequest()->get('id'));
             $object->setSite($site);
+        } else {
+            $site = $object->getSite();
         }
 
+        // tab Général
         $formMapper
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => 'header_none'])
-            ->add('site', null, [
-                'attr'  => ['style' => 'display:none;'],
+            ->add('site', EntityType::class, [
+                'class' => CmsSite::class,
+                'attr'  => [
+                    'style'               => 'display: none;',
+                    'data-sonata-select2' => false
+                ],
                 'label' => false
             ])
-            ->add('code', $this->isCurrentRoute('edit') && $roleAdmin ? TextType::class : HiddenType::class, [])
+            ->add('code',
+                $this->isCurrentRoute('edit') && $roleAdmin ? TextType::class : HiddenType::class,
+                [])
             ->add('label')
-            ->add('template', BlockTemplateType::class, ['label' => 'Modèle de block partagé'])
+            ->add('template', BlockTemplateType::class, [
+                'label'      => 'Modèle de block partagé',
+                'collection' => $site?->getTemplateFilter()
+            ]);
+
+        if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
+            $formMapper->add('active');
+        }
+
+        $formMapper
             ->end()// End form group
-            ->end()// End tab
+            ->end()// End tab général
         ;
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
             $formMapper->getFormBuilder()->setMethod('put');
 
-            $formMapper
-                ->tab('Général')// The tab call is optional
-                ->with('', ['box_class' => ''])
-                ->add('active')
-                ->end()
-                ->end();
             //region Contenus
             $formMapper->tab('Contenus');
             $formMapper
                 ->with('', ['box_class' => 'header_none', 'class' => 'col-xs-12'])
-                ->add('contents', CmsContentsType::class, [
-                    'label'        => false,
-                    'by_reference' => false,
-                    'role_admin'   => $roleAdmin,
+                ->add('contents', AdminCmsBlockCollectionType::class, [
+                    'templateFactory' => $this->sharedBlockFactory,
                 ])
                 ->end();
-            $formMapper
-                ->end();
+            $formMapper->end();
             //endregion
         }
     }
@@ -160,8 +190,11 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     /**
      * @inheritDoc
      */
-    public function configureActionButtons(array $list, string $action, ?object $object = null): array
-    {
+    public function configureActionButtons(
+        array $list,
+        string $action,
+        ?object $object = null
+    ): array {
         $list = [];
 
         if (in_array($action, ['tree', 'list'], true)
@@ -187,7 +220,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             && $this->hasRoute('history')
         ) {
             $list['history'] = [
-                 'template' => $this->getTemplateRegistry()->getTemplate('button_history'),
+                'template' => $this->getTemplateRegistry()->getTemplate('button_history'),
             ];
         }
 
@@ -197,7 +230,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             && $this->hasRoute('acl')
         ) {
             $list['acl'] = [
-                 'template' => $this->getTemplateRegistry()->getTemplate('button_acl'),
+                'template' => $this->getTemplateRegistry()->getTemplate('button_acl'),
             ];
         }
 
@@ -207,7 +240,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             && $this->hasRoute('show')
         ) {
             $list['show'] = [
-                 'template' => $this->getTemplateRegistry()->getTemplate('button_show'),
+                'template' => $this->getTemplateRegistry()->getTemplate('button_show'),
             ];
         }
 
@@ -216,7 +249,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             && $this->hasRoute('list')
         ) {
             $list['list'] = [
-                 'template' => $this->getTemplateRegistry()->getTemplate('button_list'),
+                'template' => $this->getTemplateRegistry()->getTemplate('button_list'),
             ];
         }
 

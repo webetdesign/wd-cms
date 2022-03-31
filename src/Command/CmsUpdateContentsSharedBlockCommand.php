@@ -9,8 +9,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
+use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
 use WebEtDesign\CmsBundle\Repository\CmsSharedBlockRepository;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsCommand
 {
@@ -19,11 +19,16 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
     /**
      * @var CmsSharedBlockRepository
      */
-    protected $sharedBlockRp;
+    protected CmsSharedBlockRepository $sharedBlockRp;
+    protected SharedBlockFactory       $sharedBlockFactory;
 
-    public function __construct(string $name = null, EntityManagerInterface $em, TemplateProvider $blockProvider)
-    {
-        parent::__construct($name, $em, $blockProvider);
+    public function __construct(
+        EntityManagerInterface $em,
+        SharedBlockFactory $blockProvider,
+        string $name = null,
+    ) {
+        parent::__construct($em, $name);
+        $this->sharedBlockFactory = $blockProvider;
     }
 
 
@@ -43,7 +48,7 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->templateProvider->getTemplateList());
+                $templates = array_values($this->sharedBlockFactory->getTemplateList());
 
                 foreach ($templates as $template) {
                     $this->processTemplate($template);
@@ -90,7 +95,7 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
         $this->io->title('Update sharedBlock ' . $block->getLabel());
 
         try {
-            $config = $this->templateProvider->getConfigurationFor($block->getTemplate());
+            $config = $this->sharedBlockFactory->get($block->getTemplate());
         } catch (Exception $e) {
             $this->io->error($e->getMessage());
             return false;
@@ -99,5 +104,12 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
         $this->processContent($block, $config);
 
         return true;
+    }
+
+    protected function selectTemplate(): string
+    {
+        $templates = $this->sharedBlockFactory->getTemplateChoices();
+
+        return $this->io->choice('Template', array_flip($templates));
     }
 }

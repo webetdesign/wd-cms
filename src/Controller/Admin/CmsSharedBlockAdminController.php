@@ -9,6 +9,7 @@ use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 final class CmsSharedBlockAdminController extends CRUDController
 {
@@ -61,14 +62,12 @@ final class CmsSharedBlockAdminController extends CRUDController
         // $template = $this->templateRegistry->getTemplate('list');
 
         return $this->renderWithExtraParams($template, [
-            'action'         => 'list',
-            'form'           => $formView,
-            'datagrid'       => $datagrid,
-            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
-            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
-                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
-                $this->admin->getExportFormats(),
-        ], null);
+            'action' => 'list',
+            'form' => $formView,
+            'datagrid' => $datagrid,
+            'csrf_token' => $this->getCsrfToken('sonata.batch'),
+            'export_formats' => $exportFormats ?? $this->admin->getExportFormats(),
+        ]);
     }
 
     /**
@@ -184,5 +183,4 @@ final class CmsSharedBlockAdminController extends CRUDController
             'objectId' => null,
         ], null);
     }
-
 }

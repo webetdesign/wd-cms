@@ -12,15 +12,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Twig_Environment;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
 
 class CmsHelper
 {
     private EntityManagerInterface $em;
-    private TemplateProvider       $provider;
+    private PageFactory            $pageFactory;
     private Environment            $twig;
     /** @var AuthorizationCheckerInterface */
     private AuthorizationCheckerInterface $authorizationChecker;
@@ -35,7 +33,7 @@ class CmsHelper
 
     /**
      * @param EntityManagerInterface $em
-     * @param TemplateProvider $provider
+     * @param PageFactory $pageFactory
      * @param Environment $twig
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param RoleHierarchyInterface $roleHierarchy
@@ -45,7 +43,7 @@ class CmsHelper
      */
     public function __construct(
         EntityManagerInterface $em,
-        TemplateProvider $provider,
+        PageFactory $pageFactory,
         Environment $twig,
         AuthorizationCheckerInterface $authorizationChecker,
         RoleHierarchyInterface $roleHierarchy,
@@ -54,7 +52,7 @@ class CmsHelper
         RequestStack $requestStack
     ) {
         $this->em                   = $em;
-        $this->provider             = $provider;
+        $this->pageFactory          = $pageFactory;
         $this->twig                 = $twig;
         $this->authorizationChecker = $authorizationChecker;
         $this->roleHierarchy        = $roleHierarchy;
@@ -71,36 +69,6 @@ class CmsHelper
             $this->page = $this->em->getRepository(CmsPage::class)->findByRouteName($request->attributes->get('_route'));
         }
         return $this->page;
-    }
-
-    /**
-     * @param array $params
-     * @return Response
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     * @deprecated since 1.2.0, use CmsController::defaultRender instead
-     */
-    public function getDefaultRender(array $params): Response
-    {
-        $request = $this->getRequest();
-
-        /** @var CmsPage $page */
-        $page = $this->getPage();
-
-        $request->setLocale($this->getLocale());
-
-        return new Response(
-            $this->twig->render(
-                $this->provider->getTemplate($page->getTemplate()),
-                array_merge(
-                    $params,
-                    [
-                        'page' => $page,
-                    ]
-                )
-            )
-        );
     }
 
     public function getLocale(): ?string
@@ -154,7 +122,7 @@ class CmsHelper
 
     protected function getBrowserLocale()
     {
-        $request = $this->getRequest();
+        $request        = $this->getRequest();
         $browserLocales = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 
         $locale = $request->getDefaultLocale();

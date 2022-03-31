@@ -2,20 +2,17 @@ services:
   cms.admin.cms_page_listener:
     class: '%cms.admin.cms_page_listener.class%'
     arguments:
-      - '@cms.page_provider'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
       - '@doctrine.orm.entity_manager'
       - '@router'
       - '@filesystem'
       - '@kernel'
-      - WebEtDesign\CmsBundle\Entity\CmsRoute
-      - '%wd_cms.cms%'
-      - '%wd_cms.custom_contents%'
+      - '@parameter_bag'
       - '@service_container'
     tags:
       - { name: doctrine.event_listener, event: prePersist }
       - { name: doctrine.event_listener, event: postPersist }
       - { name: doctrine.event_listener, event: postUpdate }
-      - { name: doctrine.event_listener, event: preRemove }
 
   cms.admin.cms_page_declination_listener:
     class: WebEtDesign\CmsBundle\EventListener\PageDeclinationAdminListener
@@ -57,12 +54,8 @@ services:
   cms.admin.cms_shared_block_listener:
     class: '%cms.admin.cms_shared_block_listener.class%'
     arguments:
-      - '@cms.block_provider'
+      - '@WebEtDesign\CmsBundle\Factory\SharedBlockFactory'
       - '@doctrine.orm.entity_manager'
-      - '@router'
-      - '@filesystem'
-      - '@kernel'
-      - WebEtDesign\CmsBundle\Entity\CmsRoute
     tags:
       - { name: kernel.event_listener, event: sonata.admin.event.persistence.pre_persist, method: buildSharedBlock }
 
@@ -79,7 +72,7 @@ services:
     class: WebEtDesign\CmsBundle\EventListener\CmsControllerListener
     arguments:
       - '@cms.helper'
-      - '@cms.page_provider'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
       - '@service_container'
       - '%wd_cms.vars%'
       - '%wd_cms.cms%'

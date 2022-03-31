@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
@@ -18,13 +19,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
     protected static $defaultName = 'cms:page:update-contents';
 
     protected CmsPageRepository $pageRp;
-
-
-    public function __construct(string $name = null, EntityManagerInterface $em, TemplateProvider $pageProvider)
-    {
-        parent::__construct($name, $em, $pageProvider);
-    }
-
+    private PageFactory         $pageFactory;
 
     protected function configure()
     {
@@ -35,14 +30,24 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
             ->addOption('page', '-p', InputOption::VALUE_REQUIRED, 'Page id');
     }
 
+    public function __construct(
+        EntityManagerInterface $em,
+        PageFactory $pageFactory,
+        string $name = null
+    ) {
+        parent::__construct($em, $name);
+        $this->pageFactory = $pageFactory;
+    }
+
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->init($input, $output);
-        $this->pageRp    = $this->em->getRepository(CmsPage::class);
+        $this->pageRp = $this->em->getRepository(CmsPage::class);
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->templateProvider->getTemplateList());
+                $templates = array_values($this->templateFactory->getTemplateList());
 
                 foreach ($templates as $template) {
                     $this->processTemplate($template);
@@ -89,7 +94,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
         $this->io->title('Update page ' . $page->getTitle());
 
         try {
-            $config = $this->templateProvider->getConfigurationFor($page->getTemplate());
+            $config = $this->pageFactory->get($page->getTemplate());
         } catch (Exception $e) {
             $this->io->error($e->getMessage());
             return false;
@@ -106,5 +111,12 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
         }
 
         return true;
+    }
+
+    protected function selectTemplate(): string
+    {
+        $templates = $this->pageFactory->getTemplateChoices();
+
+        return $this->io->choice('Template', array_flip($templates));
     }
 }

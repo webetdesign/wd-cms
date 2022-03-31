@@ -54,11 +54,11 @@ class RouteAdminListener
     {
         $cacheDir = $this->kernel->getCacheDir();
 
-        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
-            $className = $this->router->getOption($option);
-            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
-            $this->fs->remove($cacheFile);
-        }
+//        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
+//            $className = $this->router->getOption($option);
+//            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
+//            $this->fs->remove($cacheFile);
+//        }
 
         $this->router->warmUp($cacheDir);
     }

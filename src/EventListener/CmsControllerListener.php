@@ -20,32 +20,42 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Controller\BaseCmsController;
 use WebEtDesign\CmsBundle\Controller\CmsController;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\CmsBundle\Services\CmsHelper;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class CmsControllerListener
 {
 
-    protected $helper;
-    protected $globalVars;
-    protected $provider;
-    protected $cmsConfig;
-    protected $environment;
+    protected CmsHelper                $helper;
+    protected TemplateFactoryInterface $templateFactory;
+    protected Environment              $twig;
+    protected                          $globalVars;
+    protected                          $cmsConfig;
 
     /**
      * CmsControllerListener constructor.
      * @param CmsHelper $cmsHelper
-     * @param TemplateProvider $provider
+     * @param TemplateFactoryInterface $templateFactory
      * @param Container $container
      * @param $globalVarsDefinition
+     * @param $cmsConfig
+     * @param Environment $environment
      * @throws \Exception
      */
-    public function __construct(CmsHelper $cmsHelper, TemplateProvider $provider, Container $container, $globalVarsDefinition, $cmsConfig, Environment $environment)
-    {
-        $this->helper = $cmsHelper;
-        $this->provider = $provider;
-        $this->cmsConfig = $cmsConfig;
-        $this->environment = $environment;
+    public function __construct(
+        CmsHelper $cmsHelper,
+        TemplateFactoryInterface $templateFactory,
+        Container $container,
+        $globalVarsDefinition,
+        $cmsConfig,
+        Environment $environment
+    ) {
+        $this->helper          = $cmsHelper;
+        $this->templateFactory = $templateFactory;
+        $this->cmsConfig       = $cmsConfig;
+        $this->twig            = $environment;
         if ($globalVarsDefinition['enable']) {
             $this->globalVars = $container->get($globalVarsDefinition['global_service']);
             $this->globalVars->setDelimiter($globalVarsDefinition['delimiter']);
@@ -62,9 +72,9 @@ class CmsControllerListener
 
         if ($controller instanceof BaseCmsController) {
 
-            if(!$this->helper->isGranted($request)){
-                $event->setController(function() {
-                    $content = $this->environment->render('@WebEtDesignCms/page/page_access_denied.html.twig');
+            if (!$this->helper->isGranted()) {
+                $event->setController(function () {
+                    $content = $this->twig->render('@WebEtDesignCms/page/page_access_denied.html.twig');
                     return new Response($content, 403);
                 });
             }
@@ -78,8 +88,8 @@ class CmsControllerListener
             $controller->setPage($page);
 
 
-            $controller->setGranted($this->helper->isGranted($request));
-            $controller->setProvider($this->provider);
+            $controller->setGranted($this->helper->isGranted());
+            $controller->setTemplateFactory($this->templateFactory);
             $controller->setCmsConfig($this->cmsConfig);
 
             if ($this->globalVars) {

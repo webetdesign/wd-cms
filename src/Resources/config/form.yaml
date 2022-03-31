@@ -16,18 +16,6 @@ services:
     tags:
       - { name: form.type }
 
-  WebEtDesign\CmsBundle\Form\PageTemplateType:
-    arguments:
-      - '@cms.page_provider'
-    tags:
-      - { name: form.type }
-
-  WebEtDesign\CmsBundle\Form\BlockTemplateType:
-    arguments:
-      - '@cms.block_provider'
-    tags:
-      - { name: form.type }
-
   WebEtDesign\CmsBundle\Form\MultilingualType:
     arguments:
       - '@doctrine.orm.default_entity_manager'

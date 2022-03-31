@@ -13,13 +13,24 @@ use Sonata\Doctrine\Mapper\Builder\ColumnDefinitionBuilder;
 use Sonata\Doctrine\Mapper\Builder\OptionsBuilder;
 use Sonata\Doctrine\Mapper\DoctrineCollector;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
+use WebEtDesign\CmsBundle\Attribute\AsCmsPageTemplate;
+use WebEtDesign\CmsBundle\Attribute\AsCmsSharedBlock;
+use WebEtDesign\CmsBundle\DependencyInjection\Compiler\BlockPass;
 use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
+use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
+use WebEtDesign\CmsBundle\Factory\BlockFactory;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
 
 class WebEtDesignCmsExtension extends Extension
 {
@@ -53,17 +64,74 @@ class WebEtDesignCmsExtension extends Extension
         $container->setParameter('wd_cms.templates', $config['pages']);
         $container->setParameter('wd_cms.shared_block', $config['sharedBlock']);
         $container->setParameter('wd_cms.custom_contents', $config['customContents']);
-        $container->setParameter('wd_cms.custom_contents_form_themes',
-            $config['customContentsFormThemes']);
 
         $container->setParameter('wd_cms.vars', $config['cms']['vars']);
 
         $container->setParameter('wd_cms.menu', $config['menu']);
 
+        $container->getDefinition(BlockFormThemesManager::class)
+            ->addMethodCall('addThemes', [$config['customContentsFormThemes']]);
+
         $bundles = $container->getParameter('kernel.bundles');
         if (isset($bundles['PrestaSitemapBundle'])) {
             $loader->load('sitemap.yaml');
         }
+
+        if (method_exists($container, 'registerAttributeForAutoconfiguration')) {
+            $container->registerAttributeForAutoconfiguration(AsCmsBlock::class,
+                static function (ChildDefinition $definition, AsCmsBlock $attribute) {
+                    $definition->addTag('wd_cms.block', array_filter([
+                        'key'       => $attribute->name,
+                        'formTheme' => $attribute->formTheme
+                    ]));
+                }
+            );
+
+            $container->registerAttributeForAutoconfiguration(AsCmsPageTemplate::class,
+                static function (ChildDefinition $definition, AsCmsPageTemplate $attribute) {
+                    $definition->addTag('wd_cms.page_template', array_filter([
+                        'key' => $attribute->code,
+                    ]));
+                }
+            );
+
+            $container->registerAttributeForAutoconfiguration(AsCmsSharedBlock::class,
+                static function (ChildDefinition $definition, AsCmsSharedBlock $attribute) {
+                    $definition->addTag('wd_cms.shared_block', array_filter([
+                        'key' => $attribute->code,
+                    ]));
+                }
+            );
+        }
+
+
+        //        $blockConfigs = [];
+        //        foreach ($config['pages'] as $pageCode => $page) {
+        //            foreach ($page['contents'] as $content) {
+        //                $blockConfigs[$pageCode . '_' . $content['code']] = $content;
+        //                if (!empty($content['block'])) {
+        //                    $this->getBlockConfigsOfBlock($blockConfigs, $content, $pageCode . '_' . $content['code']);
+        //                }
+        //            }
+        //        }
+
+        $container->getDefinition(BlockFactory::class)->setArguments([
+            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.block', 'key', null,
+                true)),
+            []
+        ]);
+
+        $container->getDefinition(PageFactory::class)->setArguments([
+            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.page_template', 'key',
+                null, true)),
+            []
+        ]);
+
+        $container->getDefinition(SharedBlockFactory::class)->setArguments([
+            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.shared_block', 'key',
+                null, true)),
+            []
+        ]);
     }
 
     /**
@@ -97,5 +165,4 @@ class WebEtDesignCmsExtension extends Extension
                 $config['admin']['configuration']['entity']['route']);
         }
     }
-
 }

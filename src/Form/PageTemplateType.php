@@ -2,7 +2,9 @@
 
 namespace WebEtDesign\CmsBundle\Form;
 
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,32 +17,36 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PageTemplateType extends AbstractType
 {
-    private $provider;
 
-    public function __construct(TemplateProvider $provider)
+    public function __construct(private PageFactory $templateFactory) {}
+
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->provider = $provider;
+        $choices = [];
+        foreach ($this->templateFactory->getTemplateList($options['collection']) as $value => $tpl) {
+            $choices[$tpl->getLabel()] = $value;
+        }
+
+        $builder->add('tpl', ChoiceType::class, [
+            'label'        => false,
+            'choices'      => $choices,
+        ]);
+
+        $builder->addModelTransformer(new CallbackTransformer(
+            function ($value) {
+                return ['tpl' => $value];
+            },
+            function ($value) {
+                return $value['tpl'] ?? null;
+            }
+        ));
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'choices' => $this->provider->getTemplateList(),
-            ]
-        );
+        $resolver->setDefaults([
+            'collection' => null,
+        ]);
     }
 
-    public function getParent()
-    {
-        return ChoiceType::class;
-    }
-
-    /**
-     * @return TemplateProvider
-     */
-    public function getProvider(): TemplateProvider
-    {
-        return $this->provider;
-    }
 }

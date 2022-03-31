@@ -7,12 +7,12 @@ namespace WebEtDesign\CmsBundle\Command;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use WebEtDesign\CmsBundle\CmsTemplate\TemplateInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 abstract class AbstractCmsUpdateContentsCommand extends Command
 {
@@ -22,13 +22,12 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
 
     protected CmsContentRepository $contentRp;
 
-    protected TemplateProvider $templateProvider;
-
-    public function __construct(string $name = null, EntityManagerInterface $em, TemplateProvider $templateProvider)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        string $name = null
+    ) {
         parent::__construct($name);
-        $this->em               = $em;
-        $this->templateProvider = $templateProvider;
+        $this->em = $em;
     }
 
     protected function init($input, $output)
@@ -37,22 +36,15 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
         $this->io        = new SymfonyStyle($input, $output);
     }
 
-    protected function selectTemplate(): string
+    protected function processContent($object, TemplateInterface $config)
     {
-        $templates = $this->templateProvider->getTemplateList();
-
-        return $this->io->choice('Template', array_flip($templates));
-    }
-
-    protected function processContent($object, $config)
-    {
-        $contentConf = [];
-        foreach ($config['contents'] as $content) {
-            $contentConf[$content['code']] = $content;
+        foreach ($config->getBlocks() as $block) {
+            $contentConf[$block->getCode()] = $block;
         }
-        $codes = array_keys($contentConf);
 
-        if(count($codes) == 0){
+        $codes = array_keys($contentConf ?? []);
+
+        if (count($codes) == 0) {
             return true;
         }
 
@@ -67,23 +59,18 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
 
         /** @var CmsContent $in */
         foreach ($ins as $in) {
-            if(!isset($contentConf[$in->getCode()])){
+            if (!isset($contentConf[$in->getCode()])) {
                 $this->em->remove($in);
                 continue;
             }
             $conf          = $contentConf[$in->getCode()];
             $contentDone[] = $in->getCode();
             $in->setPosition(array_search($in->getCode(), $codes));
-            if (isset($conf['label'])) {
-                $in->setLabel($conf['label']);
-            }
-            if (isset($conf['help'])) {
-                $in->setHelp($conf['help']);
-            }
+            $in->setLabel($conf->getLabel());
 
-            if ($in->getType() !== $conf['type']) {
+            if ($in->getType() !== $conf->getType()) {
                 $in->setValue(null);
-                $in->setType($conf['type']);
+                $in->setType($conf->getType());
             }
             $this->em->persist($in);
         }
@@ -93,7 +80,8 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
             $content = new CmsContent();
             $content->setPosition(array_search($code, $codes));
             $content->setCode($code);
-            $content->setType($conf['type']);
+            $content->setLabel($conf->getLabel());
+            $content->setType($conf->getType());
             if ($object instanceof CmsPage) {
                 $content->setPage($object);
             }
@@ -102,14 +90,6 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
             }
             if ($object instanceof CmsSharedBlock) {
                 $content->setSharedBlockParent($object);
-            }
-            if (isset($conf['label'])) {
-                $content->setLabel($conf['label']);
-            } else {
-                $content->setLabel($code);
-            }
-            if (isset($conf['help'])) {
-                $content->setHelp($conf['help']);
             }
 
             $this->em->persist($content);

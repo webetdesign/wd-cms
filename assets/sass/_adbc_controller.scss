@@ -1,0 +1,24 @@
+[data-controller="adbc"] {
+  [data-adbc-target="item"]:first-child {
+    [data-adbc-target="arrowUp"] {
+      display : none;
+    }
+  }
+
+  [data-adbc-target="item"]:last-child {
+    [data-adbc-target="arrowDown"] {
+      display : none;
+    }
+  }
+
+  .box-header {
+    display    : flex;
+
+    border-top : solid 2px #2e8dd0;
+    align-items: center;
+
+    .actions {
+      margin-left: auto;
+    }
+  }
+}

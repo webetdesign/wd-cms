@@ -13,6 +13,7 @@ use Sonata\AdminBundle\Show\ShowMapper;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
+use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
 use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\CmsBundle\Utils\SmoOpenGraphAdminTrait;
@@ -34,7 +35,6 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         '_sort_order' => 'ASC',
         '_sort_by'    => 'position',
     ];
-    private ?array    $customFormThemes;
 
     public function __construct(
         string $code,
@@ -43,14 +43,13 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         EntityManager $em,
         $pageConfig,
         $globalVarsDefinition,
-        $customFormThemes
+        private BlockFormThemesManager $blockFormThemesManager
     ) {
         $this->em               = $em;
         $this->pageConfig       = $pageConfig;
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
 
         parent::__construct($code, $class, $baseControllerName);
-        $this->customFormThemes = $customFormThemes;
     }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
@@ -86,7 +85,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
             '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
             '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
-        ], $this->customFormThemes));
+        ], $this->blockFormThemesManager->getThemes()));
 
         /** @var CmsPageDeclination $object */
         $object = $this->getSubject();

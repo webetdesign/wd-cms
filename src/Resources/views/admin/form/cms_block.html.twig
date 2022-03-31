@@ -1,0 +1,58 @@
+{% block cms_contents_collection_row %}
+    <div class="panel-group" id="contents_collapse" role="tablist" aria-multiselectable="true">
+        {{ form_widget(form) }}
+    </div>
+{% endblock %}
+
+{% block admin_cms_block_row %}
+    {% set block = form.vars.block is defined ?  form.vars.block : null %}
+    {% if block %}
+
+        <div class="panel">
+            <div class="panel-heading" role="tab" id="heading_{{ block.code }}">
+                <div class="align-left">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse"
+                           href="#{{ form.vars.id }}_collapse_{{ block.code }}"
+                           aria-expanded="true"
+                           aria-controls="{{ form.vars.id }}_collapse_{{ block.code }}">
+                            {{ block.label }}
+                        </a>
+                        {% if block.help is not empty %}
+                            <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ block.help }}"></i>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="align-right">
+                    {% if is_granted('ROLE_ADMIN_CMS') %}
+                        <div class="info">
+                            <code>{{ block.code }}</code>
+                        </div>
+                    {% endif %}
+                    <div class="enable">
+                        {{ form_widget(form.active) }}
+                    </div>
+                    <div class="btn_arrow">
+                        <button type="button" class="class btn btn-default btn-sm collapsed" data-toggle="collapse" data-target="#collapse_{{ block.code }}" aria-expanded="true" aria-controls="collapse_{{ block.code }}">
+                            <i class="glyphicon glyphicon-menu-up"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="{{ form.vars.id }}_collapse_{{ block.code }}" class="panel-collapse collapse {% if block.open %} in{% endif %}" role="tabpanel" aria-labelledby="{{ form.vars.id }}_heading_{{ block.code }}">
+                <div class="panel-body">
+                    {% if form.parent_heritance is defined %}
+                        <div class="inherit">
+                            {{ form_widget(form.parent_heritance) }}
+                        </div>
+                    {% endif %}
+                    {% if form.value is defined %}
+                        {{ form_row(form.value) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+

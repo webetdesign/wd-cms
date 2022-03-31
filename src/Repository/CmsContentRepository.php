@@ -25,7 +25,7 @@ class CmsContentRepository extends ServiceEntityRepository
         parent::__construct($registry, CmsContent::class);
     }
 
-    public function findOneByObjectAndContentCodeAndType($object, $contentCode, $type = [])
+    public function findOneByObjectAndContentCodeAndType($object, $contentCode)
     {
         $qb = $this->createQueryBuilder('c');
 
@@ -46,11 +46,6 @@ class CmsContentRepository extends ServiceEntityRepository
         }
 
         $qb->setParameter('code', $contentCode);
-
-        if (sizeof($type) > 0) {
-            $qb->andWhere($qb->expr()->in('c.type', ':type'))
-                ->setParameter('type', $type);
-        }
 
         $qb->setMaxResults(1);
 

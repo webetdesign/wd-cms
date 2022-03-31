@@ -8,8 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class BaseCmsController extends AbstractController
 {
@@ -22,11 +22,10 @@ class BaseCmsController extends AbstractController
     /** @var boolean */
     protected bool $granted;
 
-    /** @var TemplateProvider */
-    protected TemplateProvider $provider;
-
     /** @var AbstractCmsGlobalVars */
     protected AbstractCmsGlobalVars $globalVars;
+
+    protected PageFactory $templateFactory;
 
     private $cmsConfig;
 
@@ -45,21 +44,6 @@ class BaseCmsController extends AbstractController
         $this->globalVars = $globalVars;
     }
 
-    /**
-     * @return TemplateProvider
-     */
-    public function getProvider(): TemplateProvider
-    {
-        return $this->provider;
-    }
-
-    /**
-     * @param TemplateProvider $provider
-     */
-    public function setProvider(TemplateProvider $provider): void
-    {
-        $this->provider = $provider;
-    }
 
     protected function defaultRender(array $params): Response
     {
@@ -71,10 +55,9 @@ class BaseCmsController extends AbstractController
             $baseParams['declination'] = $this->getDeclination($page);
         }
 
-        $extension = $this->getExtension();
-        $rootDir   = $extension && $extension !== 'html' ? $extension . '/' : '';
+        $templateConfig = $this->templateFactory->get($page->getTemplate());
 
-        return $this->render($rootDir . $this->provider->getTemplate($page->getTemplate()), array_merge($params, $baseParams));
+        return $this->render($templateConfig->getTemplate(), array_merge($params, $baseParams));
     }
 
     /**
@@ -132,6 +115,24 @@ class BaseCmsController extends AbstractController
         $this->granted = $granted;
 
         return $this;
+
+    }
+    /**
+     * @param PageFactory $templateFactory
+     * @return BaseCmsController
+     */
+    public function setTemplateFactory(PageFactory $templateFactory): BaseCmsController
+    {
+        $this->templateFactory = $templateFactory;
+        return $this;
+    }
+
+    /**
+     * @return PageFactory
+     */
+    public function getTemplateFactory(): PageFactory
+    {
+        return $this->templateFactory;
     }
 
     /**

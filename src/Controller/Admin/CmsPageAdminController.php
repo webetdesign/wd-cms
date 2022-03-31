@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
+use Sonata\AdminBundle\Admin\Pool;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\LockException;
 use Sonata\AdminBundle\Exception\ModelManagerException;
@@ -33,18 +34,24 @@ class CmsPageAdminController extends CRUDController
     private RequestStack            $requestStack;
     private CmsPageDeclinationAdmin $declinationAdmin;
     private PageBreadcrumbsBuilder  $pageBreadcrumbsBuilder;
+    private Pool                    $pool;
 
     /**
      * @param RequestStack $requestStack
+     * @param CmsPageDeclinationAdmin $declinationAdmin
+     * @param PageBreadcrumbsBuilder $pageBreadcrumbsBuilder
+     * @param Pool $pool
      */
     public function __construct(
         RequestStack $requestStack,
         CmsPageDeclinationAdmin $declinationAdmin,
-        PageBreadcrumbsBuilder $pageBreadcrumbsBuilder
+        PageBreadcrumbsBuilder $pageBreadcrumbsBuilder,
+        Pool $pool,
     ) {
         $this->requestStack           = $requestStack;
         $this->declinationAdmin       = $declinationAdmin;
         $this->pageBreadcrumbsBuilder = $pageBreadcrumbsBuilder;
+        $this->pool                   = $pool;
     }
 
     protected function preList(Request $request): ?Response
@@ -112,7 +119,7 @@ class CmsPageAdminController extends CRUDController
                 if (!$defaultSite) {
                     $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
-                    return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                    return $this->redirect($this->pool->getAdminByAdminCode('cms.admin.cms_site')->generateUrl('list'));
                 }
 
                 $id = $defaultSite->getId();
@@ -161,16 +168,17 @@ class CmsPageAdminController extends CRUDController
         $formView = $datagrid->getForm()->createView();
 
 
-        return $this->renderWithExtraParams($this->admin->getTemplateRegistry()->getTemplate('tree'), [
-            'action'           => 'tree',
-            'declinationAdmin' => $this->declinationAdmin,
-            'form'             => $formView,
-            'datagrid'         => $datagrid,
-            'csrf_token'       => $this->getCsrfToken('sonata.batch'),
-//            //            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
-//            //                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
-//            //                $this->admin->getExportFormats(),
-        ], null);
+        return $this->renderWithExtraParams($this->admin->getTemplateRegistry()->getTemplate('tree'),
+            [
+                'action'           => 'tree',
+                'declinationAdmin' => $this->declinationAdmin,
+                'form'             => $formView,
+                'datagrid'         => $datagrid,
+                'csrf_token'       => $this->getCsrfToken('sonata.batch'),
+                //            //            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
+                //            //                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
+                //            //                $this->admin->getExportFormats(),
+            ], null);
     }
 
     /**
@@ -183,7 +191,7 @@ class CmsPageAdminController extends CRUDController
         if ($this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault() == null) {
             $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
-            return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+            return $this->redirect($this->pool->getAdminByAdminCode('cms.admin.cms_site')->generateUrl('list'));
         }
 
         if (!$request->get('filter')) {

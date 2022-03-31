@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsRouteInterface;
+use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
@@ -20,16 +21,18 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
     protected CmsPageRepository $pageRp;
 
-    protected ?array $configCms;
+    protected ?array                   $configCms;
+    protected TemplateFactoryInterface $pageFactory;
 
     public function __construct(
-        string $name = null,
         EntityManagerInterface $em,
-        TemplateProvider $pageProvider,
-        array $configCms
+        TemplateFactoryInterface $pageFactory,
+        array $configCms,
+        string $name = null
     ) {
-        parent::__construct($name, $em, $pageProvider);
-        $this->configCms = $configCms;
+        parent::__construct($em, $name);
+        $this->configCms   = $configCms;
+        $this->pageFactory = $pageFactory;
     }
 
 
@@ -49,7 +52,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->templateProvider->getTemplateList());
+                $templates = array_values($this->pageFactory->getTemplateList());
 
                 foreach ($templates as $template) {
                     $this->processTemplate($template);
@@ -118,20 +121,23 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
     {
         $route = $page->getRoute();
 
-        if(!empty($config['controller']) && strlen($config['controller']) > 0 && !empty($config['action']) & strlen($config['action']) > 0){
+        if (!empty($config['controller']) && strlen($config['controller']) > 0 && !empty($config['action']) & strlen($config['action']) > 0) {
             $route->setController($config['controller'] . '::' . $config['action']);
 
         }
-        if(!empty($config['methods']) && count($config['methods']) > 0){
+        if (!empty($config['methods']) && count($config['methods']) > 0) {
             $route->setMethods($config['methods']);
         }
 
         if (!empty($config['route'])) {
             $defaultName = $config['route'];
             if ($this->configCms['multilingual']) {
-                $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(), $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId());
+                $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(),
+                    $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(),
+                    $page->getId());
             } else {
-                $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s', $page->getId());
+                $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s',
+                    $page->getId());
             }
 
             // Pour éviter le problème de doublon de route
@@ -214,5 +220,12 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         }
 
         return $cmsRoute;
+    }
+
+    protected function selectTemplate(): string
+    {
+        $templates = $this->pageFactory->getTemplateChoices();
+
+        return $this->io->choice('Template', array_flip($templates));
     }
 }

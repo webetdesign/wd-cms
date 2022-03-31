@@ -93,12 +93,6 @@ class CmsContent
      */
     private ?CmsPageDeclination $declination = null;
 
-    /**
-     * @var null|string
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private ?string $help = null;
-
     public bool $collapseOpen = false;
 
     public function __toString()
@@ -281,25 +275,6 @@ class CmsContent
     public function getDeclination()
     {
         return $this->declination;
-    }
-
-    /**
-     * @param string $help
-     * @return CmsContent
-     */
-    public function setHelp(?string $help): CmsContent
-    {
-        $this->help = $help;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHelp(): ?string
-    {
-        return $this->help;
     }
 
     /**

@@ -30,6 +30,11 @@ services:
   # MISCELLANEOUS
   # ===============================================
 
+  WebEtDesign\CmsBundle\EventListener\CmsBlockResizeFormListener:
+    autoconfigure: false
+  WebEtDesign\CmsBundle\EventListener\CmsDynamicBlockResizeFormListener:
+    autoconfigure: false
+
   WebEtDesign\CmsBundle\Collectors\CmsCollector:
     tags:
       - name: data_collector
@@ -67,7 +72,7 @@ services:
   WebEtDesign\CmsBundle\Services\CmsHelper:
     arguments:
       - '@doctrine.orm.entity_manager'
-      - '@cms.page_provider'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
       - '@twig'
       - "@security.authorization_checker"
       - '@security.role_hierarchy'
@@ -134,12 +139,13 @@ services:
       - '@router'
       - '@service_container'
       - '@twig'
-      - '@cms.page_provider'
-      - '@cms.block_provider'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
+      - '@WebEtDesign\CmsBundle\Factory\SharedBlockFactory'
       - '@request_stack'
       - '@parameter_bag'
       - '@WebEtDesign\MediaBundle\Services\WDMediaService'
       - '@WebEtDesign\CmsBundle\Services\WDDeclinationService'
+      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
     tags:
       - { name: twig.extension }
     public: true

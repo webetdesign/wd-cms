@@ -4,6 +4,8 @@
 @import "menu";
 @import "crud-button";
 @import "menu_icon_type";
+@import "adbc_controller";
+
 .spinbox {
     height: 120px;
 
@@ -102,7 +104,7 @@
 }
 
 .header_none {
-    .box-header {
+    >.box-header {
         display: none;
     }
 }

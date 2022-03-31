@@ -25,8 +25,9 @@ services:
       - '@service_container'
       - '%wd_cms.cms%'
       - '%wd_cms.vars%'
-      - '@cms.page_provider'
-      - '%wd_cms.custom_contents_form_themes%'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
+      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
+      - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Pages }
     calls:
@@ -95,13 +96,14 @@ services:
       - WebEtDesign\CmsBundle\Entity\CmsSharedBlock
       - WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController
       - '@doctrine.orm.default_entity_manager'
-      - '%wd_cms.cms%'
-      - '%wd_cms.custom_contents_form_themes%'
+      - '@WebEtDesign\CmsBundle\Factory\SharedBlockFactory'
+      - '@parameter_bag'
+      - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Blocs partagés }
     calls:
       - [ setTranslationDomain, [ 'wd_cms' ] ]
-      - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
+#      - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/sharedBlock/actionButtons/button_create.html.twig']]
 
     public: true
@@ -124,7 +126,7 @@ services:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.templates%'
       - '%wd_cms.vars%'
-      - '%wd_cms.custom_contents_form_themes%'
+      - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
       - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
     calls:

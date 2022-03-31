@@ -4,7 +4,6 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -14,14 +13,15 @@ use Sonata\AdminBundle\Builder\FormContractorInterface;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
-use Sonata\DoctrineORMAdminBundle\Datagrid\ProxyQuery;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
-use WebEtDesign\CmsBundle\Form\CmsContentsType;
+use WebEtDesign\CmsBundle\Factory\BlockFactory;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Form\MultilingualType;
 use WebEtDesign\CmsBundle\Form\PageTemplateType;
@@ -33,7 +33,7 @@ use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Form\Type\SecurityRolesType;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
 use WebEtDesign\SeoBundle\Admin\SmoOpenGraphAdminTrait;
 use WebEtDesign\SeoBundle\Admin\SmoTwitterAdminTrait;
@@ -48,9 +48,10 @@ class CmsPageAdmin extends AbstractAdmin
     protected mixed $multisite;
     protected mixed $declination;
 
-    protected array $datagridValues = [];
-    protected mixed $globalVarsEnable;
+    protected array                   $datagridValues = [];
+    protected mixed                   $globalVarsEnable;
     protected FormContractorInterface $customFormContractor;
+    protected PageFactory             $pageFactory;
 
     public function __construct(
         string $code,
@@ -60,8 +61,9 @@ class CmsPageAdmin extends AbstractAdmin
         private ContainerInterface $container,
         private $cmsConfig,
         $globalVarsDefinition,
-        private TemplateProvider $pageProvider,
-        private $customFormThemes
+        PageFactory $pageFactory,
+        private BlockFactory $blockFactory,
+        private BlockFormThemesManager $blockFormThemesManager,
     ) {
         $this->multisite        = $cmsConfig['multisite'];
         $this->multilingual     = $cmsConfig['multilingual'];
@@ -69,10 +71,14 @@ class CmsPageAdmin extends AbstractAdmin
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
 
         parent::__construct($code, $class, $baseControllerName);
+        $this->pageFactory = $pageFactory;
     }
 
-    protected function configureActionButtons(array $buttonList, string $action, ?object $object = null): array
-    {
+    protected function configureActionButtons(
+        array $buttonList,
+        string $action,
+        ?object $object = null
+    ): array {
         $buttons           = parent::configureActionButtons($buttonList, $action, $object);
         $buttons['create'] = ['template' => '@WebEtDesignCms/admin/page/create_button.html.twig'];
 
@@ -169,10 +175,10 @@ class CmsPageAdmin extends AbstractAdmin
                 null,
                 [
                     'actions' => [
-                        'show'   => [],
-                        'edit'   => [],
-                        'delete' => [],
-                        'create' => ['template' => '@WebEtDesignCms/admin/page/list_action_add.html.twig'],
+                        'show'      => [],
+                        'edit'      => [],
+                        'delete'    => [],
+                        'create'    => ['template' => '@WebEtDesignCms/admin/page/list_action_add.html.twig'],
                         'duplicate' => ['template' => '@WebEtDesignCms/admin/page/list_action_duplicate.html.twig']
                     ],
                 ]
@@ -201,7 +207,8 @@ class CmsPageAdmin extends AbstractAdmin
             '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
             '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
             '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
-        ], $this->customFormThemes));
+            "@WebEtDesignCms/admin/form/cms_block.html.twig",
+        ], $this->blockFormThemesManager->getThemes()));
 
         //region Général
         $form
@@ -210,18 +217,11 @@ class CmsPageAdmin extends AbstractAdmin
 
         $form
             ->add('title', null, ['label' => 'cms_page.form.title.label']);
-        if (empty($site->getTemplateFilter())) {
-            $form
-                ->add('template', PageTemplateType::class, [
-                    'label' => 'cms_page.form.template.label',
-                ]);
-        } else {
-            $form
-                ->add('template', PageTemplateType::class, [
-                    'label'   => 'cms_page.form.template.label',
-                    'choices' => $this->pageProvider->getTemplateList($site->getTemplateFilter())
-                ]);
-        }
+        $form
+            ->add('template', PageTemplateType::class, [
+                'label'      => 'cms_page.form.template.label',
+                'collection' => $site->getTemplateFilter()
+            ]);
         $form
             ->add('site', EntityType::class, [
                 'class' => CmsSite::class,
@@ -256,17 +256,20 @@ class CmsPageAdmin extends AbstractAdmin
                 ->with('', ['box_class' => ''])
                 ->add('active', null, ['label' => 'cms_page.form.active.label']);
 
-            $form->end();// End form group
-            $form->end();// End tab
+            $form->end();                  // End form group
+            $form->end();                  // End tab
             //endregion
 
             //region SEO
             $form->tab('cms_page.tab.seo');// The tab call is optional
             $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable);
-            $form->with('cms_page.tab.general', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
+            $form->with('cms_page.tab.general',
+                ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
                 ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'])
-                ->add('seo_description', TextareaType::class, ['label' => 'wd_seo.form.seo_description.label', 'required' => false])
-                ->add('breadcrumb', null, ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'])
+                ->add('seo_description', TextareaType::class,
+                    ['label' => 'wd_seo.form.seo_description.label', 'required' => false])
+                ->add('breadcrumb', null,
+                    ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'])
                 ->end();
             $this->addFormFieldSmoOpenGraph($form);
             $this->addFormFieldSmoTwitter($form);
@@ -280,10 +283,8 @@ class CmsPageAdmin extends AbstractAdmin
                     'box_class' => 'header_none',
                     'class'     => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'
                 ])
-                ->add('contents', CmsContentsType::class, [
-                    'label'        => false,
-                    'by_reference' => false,
-                    'role_admin'   => $roleAdmin,
+                ->add('contents', AdminCmsBlockCollectionType::class, [
+                    'templateFactory' => $this->pageFactory,
                 ])
                 ->end();
             $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable, true);

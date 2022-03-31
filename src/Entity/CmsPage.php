@@ -29,20 +29,20 @@ class CmsPage
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @var string
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
-    private $title;
+    private string $title = '';
 
     /**
      * @var string | null
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $template;
+    private ?string $template = '';
 
     /**
      *
@@ -51,7 +51,7 @@ class CmsPage
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="page", cascade={"persist", "remove"})
      * @ORM\OrderBy({"position" = "ASC"})
      */
-    private $contents;
+    private PersistentCollection|ArrayCollection $contents;
 
     /**
      * @var null | CmsRouteInterface
@@ -59,17 +59,17 @@ class CmsPage
      * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsRoute", inversedBy="page", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="route_id", referencedColumnName="id", onDelete="CASCADE"))
      */
-    private $route;
+    private ?CmsRouteInterface $route = null;
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="string", length=255, nullable=false)
      * @Gedmo\Slug(handlers={
      *      @Gedmo\SlugHandler(class="WebEtDesign\CmsBundle\Handler\CmsPageSlugHandler")
      * }, fields={"title"}, unique=false)
      *
      */
-    private $slug;
+    private ?string $slug = null;
 
     /**
      * @var string|null
@@ -79,39 +79,18 @@ class CmsPage
     private ?string $breadcrumb = null;
 
     /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
-    private $class_association;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
-    private $query_association;
-
-    /**
-     * @var int
-     * @ORM\Column(type="integer", nullable=true)
-     *
-     */
-    private $association;
-
-    /**
      * @var boolean
      *
      * @ORM\Column(type="boolean", options={"default" = 0})
      */
-    private $active;
+    private bool $active = false;
 
     /**
      * @var array
      *
      * @ORM\Column(type="array", nullable=true)
      */
-    private $roles;
+    private array $roles;
 
     /** @var Collection
      * @ORM\ManyToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage")
@@ -120,21 +99,21 @@ class CmsPage
      *      inverseJoinColumns={@ORM\JoinColumn(name="associated_page_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      */
-    private $crossSitePages;
+    private Collection $crossSitePages;
 
-    private $referencePage;
+    private mixed $referencePage;
 
     /**
-     * @var Collection
+     * @var ArrayCollection|Collection
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", mappedBy="page", cascade={"persist", "remove"})
      */
-    private $declinations;
+    private Collection|ArrayCollection $declinations;
 
     /**
-     * @var Collection|null
+     * @var ArrayCollection|Collection
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="page")
      */
-    private $menuItems;
+    private Collection|ArrayCollection $menuItems;
 
     /**
      * @var CmsSite
@@ -142,63 +121,63 @@ class CmsPage
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="pages")
      * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    private $site;
+    private CmsSite $site;
 
     /**
      * @Gedmo\TreeLeft
      * @ORM\Column(name="lft", type="integer")
      */
-    private $lft;
+    private ?int $lft = null;
 
     /**
      * @Gedmo\TreeLevel
      * @ORM\Column(name="lvl", type="integer")
      */
-    private $lvl;
+    private ?int $lvl = null;
 
     /**
      * @Gedmo\TreeRight
      * @ORM\Column(name="rgt", type="integer")
      */
-    private $rgt;
+    private ?int $rgt = null;
 
     /**
      * @Gedmo\TreeRoot
      * @ORM\ManyToOne(targetEntity="CmsPage")
      * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
      */
-    private $root;
+    private ?CmsPage $root = null;
 
     /**
      * @Gedmo\TreeParent
      * @ORM\ManyToOne(targetEntity="CmsPage", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      */
-    private $parent;
+    private ?CmsPage $parent = null;
 
     /**
-     * @var CmsPage[]|Collection
+     * @var ArrayCollection|Collection
      * @ORM\OneToMany(targetEntity="CmsPage", mappedBy="parent", cascade={"remove"})
      */
-    private $children;
+    private Collection|ArrayCollection $children;
 
-    private $moveMode;
+    private ?string $moveMode = null;
 
-    private $moveTarget;
+    private mixed $moveTarget = null;
 
-    public $rootPage = false;
+    public bool $rootPage = false;
 
     /**
      * Set at true tu disable the creation of contents in listener, used in page import context
      * @var bool
      */
-    public $dontImportContent = false;
+    public bool $dontImportContent = false;
 
     /**
      * Set at false tu disable the creation of route in listener
      * @var bool
      */
-    public $initRoute = true;
+    public bool $initRoute = true;
 
     public $indexedContent = null;
 
@@ -228,54 +207,6 @@ class CmsPage
         $criteria = Criteria::create()->orderBy(['lft' => 'ASC']);
 
         return $this->children->matching($criteria);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getClassAssociation()
-    {
-        return $this->class_association;
-    }
-
-    /**
-     * @param mixed $class_association
-     */
-    public function setClassAssociation($class_association)
-    {
-        $this->class_association = $class_association;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getQueryAssociation()
-    {
-        return $this->query_association;
-    }
-
-    /**
-     * @param mixed $query_association
-     */
-    public function setQueryAssociation($query_association)
-    {
-        $this->query_association = $query_association;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAssociation()
-    {
-        return $this->association;
-    }
-
-    /**
-     * @param mixed $association
-     */
-    public function setAssociation($association)
-    {
-        $this->association = $association;
     }
 
     /**

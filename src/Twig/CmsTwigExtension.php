@@ -3,7 +3,6 @@
 namespace WebEtDesign\CmsBundle\Twig;
 
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -13,7 +12,6 @@ use Twig\Environment;
 use Twig\TwigTest;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -24,8 +22,11 @@ use Twig\TwigFunction;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
+use WebEtDesign\CmsBundle\Factory\BlockFactory;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
+use WebEtDesign\CmsBundle\Form\Transformer\CmsBlockTransformer;
 use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use WebEtDesign\CmsBundle\Services\WDDeclinationService;
 use WebEtDesign\MediaBundle\Entity\Media;
 use WebEtDesign\MediaBundle\Services\WDMediaService;
@@ -38,13 +39,13 @@ class CmsTwigExtension extends AbstractExtension
     protected $declination;
     protected $requestStack;
     /** @var AbstractCmsGlobalVars */
-    protected $globalVars;
-    protected $globalVarsEnable;
-    protected $pageProvider;
-    protected $pageExtension;
-    private   $sharedBlockProvider;
-    private   $twig;
-    private   $container;
+    protected                  $globalVars;
+    protected                  $globalVarsEnable;
+    protected PageFactory      $templateFactory;
+    protected                  $pageExtension;
+    private SharedBlockFactory $sharedBlockProvider;
+    private                    $twig;
+    private                    $container;
 
     private $em;
 
@@ -53,6 +54,7 @@ class CmsTwigExtension extends AbstractExtension
     protected                    $customContents;
     private WDMediaService       $mediaService;
     private WDDeclinationService $declinationService;
+    private BlockFactory         $blockFactory;
 
     /**
      * @inheritDoc
@@ -62,19 +64,20 @@ class CmsTwigExtension extends AbstractExtension
         RouterInterface $router,
         ContainerInterface $container,
         Environment $twig,
-        TemplateProvider $pageProvider,
-        TemplateProvider $templateProvider,
+        PageFactory $templateFactory,
+        SharedBlockFactory $sharedBlockFactory,
         RequestStack $requestStack,
         ParameterBagInterface $parameterBag,
         WDMediaService $mediaService,
-        WDDeclinationService $declinationService
+        WDDeclinationService $declinationService,
+        BlockFactory $blockFactory
     ) {
         $this->em                  = $entityManager;
         $this->router              = $router;
         $this->container           = $container;
         $this->twig                = $twig;
-        $this->pageProvider        = $pageProvider;
-        $this->sharedBlockProvider = $templateProvider;
+        $this->templateFactory     = $templateFactory;
+        $this->sharedBlockProvider = $sharedBlockFactory;
         $this->requestStack        = $requestStack;
 
         $this->pageExtension  = $parameterBag->get('wd_cms.cms.page_extension');
@@ -89,6 +92,7 @@ class CmsTwigExtension extends AbstractExtension
         }
         $this->mediaService       = $mediaService;
         $this->declinationService = $declinationService;
+        $this->blockFactory       = $blockFactory;
     }
 
     public function getTests()
@@ -138,13 +142,7 @@ class CmsTwigExtension extends AbstractExtension
         $content = $this->em->getRepository(CmsContent::class)
             ->findOneByObjectAndContentCodeAndType(
                 $object,
-                $content_code,
-                array_merge([
-                    CmsContentTypeEnum::TEXT,
-                    CmsContentTypeEnum::TEXTAREA,
-                    CmsContentTypeEnum::WYSIWYG,
-                    CmsContentTypeEnum::CHECKBOX,
-                ], array_keys($this->customContents))
+                $content_code
             );
         return $content;
     }
@@ -229,20 +227,21 @@ class CmsTwigExtension extends AbstractExtension
             return null;
         }
 
-        if (in_array($content->getType(), array_keys($this->customContents))) {
-            if ((!$content->getValue() || $content->getValue() === '[]') && $defaultPage) {
-                $content = $this->retrieveContent($defaultPage, $content_code);
-            }
+        $template = $this->templateFactory->get($object->getTemplate());
 
-            $contentService = $this->container->get($this->customContents[$content->getType()]['service']);
-            return $contentService->render($content);
+        $block = $this->blockFactory->get($template->getBlock($content->getCode()));
+
+        $transformer = $block->getModelTransformer() ?: new CmsBlockTransformer($this->em);
+
+        $value = $transformer->transform($content->getValue(), true);
+
+        if ($block->getTemplate()) {
+            $value = $this->twig->render($block->getTemplate(), $value);
         }
 
-        if ($content->getType() === CmsContentTypeEnum::CHECKBOX) {
-            return filter_var($content->getValue(), FILTER_VALIDATE_BOOLEAN);
+        if ($this->globalVarsEnable) {
+            $this->globalVars->replaceVars($value);
         }
-
-        $value = $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
 
         if (!$value && $defaultLangSite && $defaultPage) {
             $content = $this->retrieveContent($defaultPage, $content_code);
@@ -277,7 +276,9 @@ class CmsTwigExtension extends AbstractExtension
             return null;
         }
 
-        return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'],
+        $config = $this->sharedBlockProvider->get($block->getTemplate());
+
+        return $this->twig->render($config->getTemplate(),
             [
                 'block' => $block
             ]);
@@ -309,7 +310,7 @@ class CmsTwigExtension extends AbstractExtension
             }
             preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
             $routeParams  = [];
-            $paramsConfig = $this->pageProvider->getConfigurationFor($page->getTemplate())['params'];
+            $paramsConfig = $this->templateFactory->getConfigurationFor($page->getTemplate())['params'];
             foreach ($params[1] as $param) {
                 if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null &&
                     is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class)) {
