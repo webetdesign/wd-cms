@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use function count;
@@ -30,7 +31,10 @@ final class CmsMenuItemAdminController extends CRUDController
      * CmsMenuItemAdminController constructor.
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(
+        RequestStack $requestStack,
+        protected MenuBreadcrumbsBuilder $menuBreadcrumbsBuilder
+    )
     {
         $this->requestStack = $requestStack;
     }
@@ -345,8 +349,7 @@ final class CmsMenuItemAdminController extends CRUDController
     protected function addRenderExtraParams(array $parameters = []): array
     {
         if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
-            $parameters['breadcrumbs_builder'] = $this
-                ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder');
+            $parameters['breadcrumbs_builder'] = $this->menuBreadcrumbsBuilder;
         }
 
         $parameters['admin'] = $parameters['admin'] ?? $this->admin;

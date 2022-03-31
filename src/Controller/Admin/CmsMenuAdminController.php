@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
@@ -30,8 +31,10 @@ class CmsMenuAdminController extends CRUDController
      * CmsMenuAdminController constructor.
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        protected MenuBreadcrumbsBuilder $menuBreadcrumbsBuilder
+    ) {
         $this->requestStack = $requestStack;
     }
 
@@ -61,16 +64,18 @@ class CmsMenuAdminController extends CRUDController
         }
 
         if ($request->isXmlHttpRequest()) {
-            return $this->renderWithExtraParams('@WebEtDesignCms/admin/nestedTreeMoveAction/moveForm.html.twig', [
+            return $this->renderWithExtraParams('@WebEtDesignCms/admin/nestedTreeMoveAction/moveForm.html.twig',
+                [
+                    'form'   => $form->createView(),
+                    'object' => $object
+                ]);
+        }
+
+        return $this->renderWithExtraParams('@WebEtDesignCms/admin/nestedTreeMoveAction/move.html.twig',
+            [
                 'form'   => $form->createView(),
                 'object' => $object
             ]);
-        }
-
-        return $this->renderWithExtraParams('@WebEtDesignCms/admin/nestedTreeMoveAction/move.html.twig', [
-            'form'   => $form->createView(),
-            'object' => $object
-        ]);
     }
 
     public function generateFromPageAction($id = null)
@@ -85,10 +90,14 @@ class CmsMenuAdminController extends CRUDController
         $pages    = $em->getRepository('WebEtDesignCmsBundle:CmsPage')->getPagesBySite($site);
         $rootPage = $site->getRootPage();
 
-        $menu = $em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy(['site' => $site, 'type' => CmsMenuTypeEnum::PAGE_ARBO]);
+        $menu = $em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy([
+            'site' => $site,
+            'type' => CmsMenuTypeEnum::PAGE_ARBO
+        ]);
 
         if ($menu) {
-            $this->addFlash('warning', 'Un menu de type arborescence existe déjà pour ce site, vous ne pouvez pas en créer d\'autres');
+            $this->addFlash('warning',
+                'Un menu de type arborescence existe déjà pour ce site, vous ne pouvez pas en créer d\'autres');
             $this->redirectToList();
         } else {
             $menu = new CmsMenu();
@@ -204,11 +213,11 @@ class CmsMenuAdminController extends CRUDController
 
     public function listAction($id = null): Response
     {
-        $request  = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
 
         if ($id === null) {
-            if($session->get('admin_current_site_id')) {
+            if ($session->get('admin_current_site_id')) {
                 $id = $session->get('admin_current_site_id');
             } else {
                 $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
@@ -241,7 +250,7 @@ class CmsMenuAdminController extends CRUDController
             $site = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
         }
 
-        $request  = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
         // the key used to lookup the template
         $templateKey = 'edit';
 
@@ -347,7 +356,7 @@ class CmsMenuAdminController extends CRUDController
         // set the theme for the current Admin Form
         $this->setFormTheme($formView, $this->admin->getFormTheme());
 
-         $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
+        $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
             'action'   => 'create',
@@ -421,28 +430,32 @@ class CmsMenuAdminController extends CRUDController
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $cmsReop->persistAsFirstChildOf($submittedObject, $submittedObject->getMoveTarget());
+                    $cmsReop->persistAsFirstChildOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $cmsReop->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsLastChildOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $cmsReop->persistAsLastChildOf($submittedObject, $submittedObject->getMoveTarget());
+                    $cmsReop->persistAsLastChildOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $cmsReop->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsNextSiblingOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $cmsReop->persistAsNextSiblingOf($submittedObject, $submittedObject->getMoveTarget());
+                    $cmsReop->persistAsNextSiblingOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $cmsReop->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsPrevSiblingOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $cmsReop->persistAsPrevSiblingOf($submittedObject, $submittedObject->getMoveTarget());
+                    $cmsReop->persistAsPrevSiblingOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $cmsReop->persistAsPrevSibling($submittedObject);
                 }
@@ -458,11 +471,10 @@ class CmsMenuAdminController extends CRUDController
     protected function addRenderExtraParams(array $parameters = []): array
     {
         if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
-            $parameters['breadcrumbs_builder'] = $this
-                ->get('WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder');
+            $parameters['breadcrumbs_builder'] = $this->menuBreadcrumbsBuilder;
         }
 
-        $parameters['admin'] = $parameters['admin'] ?? $this->admin;
+        $parameters['admin']         = $parameters['admin'] ?? $this->admin;
         $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
         // NEXT_MAJOR: Remove next line.
         $parameters['admin_pool'] = $this->get('sonata.admin.pool');
