@@ -16,6 +16,20 @@ services:
       - '../../Twig'
       - '../../Sitemap'
 
+  WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockContent:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@cms.block_provider'
+      - '@twig'
+    public: true
+
+  WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockCollectionContent:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@cms.block_provider'
+      - '@twig'
+    public: true
+
   # ===============================================
   # REPOSITORY
   # ===============================================

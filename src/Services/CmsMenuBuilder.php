@@ -229,8 +229,8 @@ class CmsMenuBuilder
                 $this->buildNodes($menuItem, $children, $parentActive, $activeClass, $locale);
             }
 
-            if ($this->isChildActive($menuItem)) {
-                $liClass .= $activeClass;
+            if ($this->isChildActive($menuItem) && !preg_match('/active/', $liClass)) {
+                $liClass .= ' '.$activeClass;
             }
 
             $menuItem->setAttribute('class', $liClass);
@@ -239,6 +239,7 @@ class CmsMenuBuilder
             $menuItem->setLabelAttribute('class', $linkClass);
 
             $menuItem->setExtra('icon_class', $item->getIconClass());
+            $menuItem->setExtra('information', $item->getInformation());
 
             if ($item->isBlank()) {
                 $menuItem->setLinkAttribute('target', '_blank');

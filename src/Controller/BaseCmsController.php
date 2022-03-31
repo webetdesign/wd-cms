@@ -27,6 +27,8 @@ class BaseCmsController extends AbstractController
 
     protected PageFactory $templateFactory;
 
+    protected ?Response $response = null;
+
     private $cmsConfig;
 
     public function setVarsObject(GlobalVarsInterface $object)
@@ -57,7 +59,11 @@ class BaseCmsController extends AbstractController
 
         $templateConfig = $this->templateFactory->get($page->getTemplate());
 
-        return $this->render($templateConfig->getTemplate(), array_merge($params, $baseParams));
+        return $this->render(
+            $templateConfig->getTemplate(),
+            array_merge($params, $baseParams),
+            $this->response ?: null
+        );
     }
 
     /**
@@ -92,6 +98,10 @@ class BaseCmsController extends AbstractController
         $requestStack = $this->get('request_stack');
         $request      = $requestStack->getCurrentRequest();
         $path         = $request->getRequestUri();
+
+        if ($path === '/index.php') {
+            return null;
+        }
 
         preg_match('/\.([a-z]+)($|\?)/', $path, $extension);
 

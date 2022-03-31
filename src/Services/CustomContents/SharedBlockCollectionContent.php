@@ -6,18 +6,24 @@ namespace WebEtDesign\CmsBundle\Services\CustomContents;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
+use WebEtDesign\CmsBundle\EventListener\JsonFormListener;
 use WebEtDesign\CmsBundle\Form\CustomContents\SharedBlockContentType;
+use WebEtDesign\CmsBundle\Form\CustomContents\SortableEntityType;
 use WebEtDesign\CmsBundle\Form\CustomContents\Transformer\SharedBlockContentTransformer;
+use WebEtDesign\CmsBundle\Form\CustomContents\Transformer\SortableCollectionTransformer;
+use WebEtDesign\CmsBundle\Form\SortableCollectionType;
 use WebEtDesign\CmsBundle\Services\AbstractCustomContent;
 use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
-class SharedBlockContent extends AbstractCustomContent
+class SharedBlockCollectionContent extends AbstractCustomContent
 {
 
-    const NAME = 'SHARED_BLOCK';
+    const NAME = 'SHARED_BLOCK_COLLECTION';
 
     private EntityManagerInterface $em;
     private TemplateProvider       $sharedBlockProvider;
@@ -35,17 +41,29 @@ class SharedBlockContent extends AbstractCustomContent
 
     function getFormType(): string
     {
-        return SharedBlockContentType::class;
+        return SortableCollectionType::class;
     }
 
     function getFormOptions(): array
     {
-        return [];
+        return [
+            'entry_type'    => SortableEntityType::class,
+            'entry_options' => [
+                'entity_class' => CmsSharedBlock::class
+            ],
+            'allow_add'     => true,
+            'allow_delete'  => true
+        ];
     }
 
     function getCallbackTransformer(): DataTransformerInterface
     {
-        return new SharedBlockContentTransformer($this->em);
+        return new SortableCollectionTransformer($this->em, CmsSharedBlock::class);
+    }
+
+    public function getEventSubscriber(): EventSubscriberInterface
+    {
+        return new JsonFormListener();
     }
 
     function render(CmsContent $content): ?string
@@ -65,20 +83,26 @@ class SharedBlockContent extends AbstractCustomContent
                 break;
         }
 
-        $block = $this->getCallbackTransformer()->transform($content->getValue())['block'] ?? null;
+        $blocks = array_map(fn($item) => $item->entity,
+            $this->getCallbackTransformer()->transform($content->getValue()));
 
-        if ($block) {
-            try {
+        try {
+            $html = "";
+            /** @var CmsSharedBlock $block */
+            foreach ($blocks as $block) {
+                if (!$block->isActive()) {
+                    continue;
+                }
                 $template = $this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'];
-
-                return $this->twig->render($template, [
-                    'block' => $block,
+                $html     .= $this->twig->render($template, [
+                    'block'  => $block,
                     'parent' => $parent,
                 ]);
-            } catch (Exception $e) {
-                dump($e);
-                return null;
             }
+
+            return $html;
+        } catch (Exception $e) {
+            return null;
         }
 
         return null;

@@ -272,7 +272,7 @@ class CmsTwigExtension extends AbstractExtension
 
     public function renderSharedBlock(?CmsSharedBlock $block)
     {
-        if (!$block) {
+        if (!$block || $block && !$block->isActive()) {
             return null;
         }
 
@@ -397,7 +397,7 @@ class CmsTwigExtension extends AbstractExtension
         $value = !empty($value) ? $value : $default;
 
         if ($value instanceof Media) {
-            return $this->mediaService->getImagePath($value, 'default', 'xl');
+            return $value;
         }
 
         if ($this->globalVarsEnable) {
