@@ -53,6 +53,9 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
             $config = $this->cmsblock->getAvailableBlock($value['disc']);
+            if(!$config) {
+               continue;
+            }
             $opts = array_merge($this->options, [
                 'label'        => '#' . $name . ' | ' . $config->getLabel(),
                 'block_config' => $config

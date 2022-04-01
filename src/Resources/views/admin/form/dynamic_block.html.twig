@@ -3,21 +3,22 @@
     {% for key, form in prototypes %}
         {% set rows = rows|merge({(key): form_row(form)}) %}
     {% endfor %}
-    data-adbc-prototypes-value="{{ rows|json_encode|e('html_attr') }}"
+    data-cms-adbc-prototypes-value="{{ rows|json_encode|e('html_attr') }}"
 {% endmacro %}
 
 {% block admin_cms_dynamic_block_collection_row %}
-    <div data-controller="adbc" {{ _self.prototypes_row_attr(form.vars.prototypes) }}>
-        <div class="box-group" id="{{ form.vars.id }}_accordion" data-adbc-target="collection">
+    <div data-controller="cms-adbc" {{ _self.prototypes_row_attr(form.vars.prototypes) }}>
+        <div class="box-group" id="{{ form.vars.id }}_accordion" data-cms-adbc-target="collection">
             {{ form_widget(form) }}
         </div>
-        <div class="form-inline">
+        <div class="block-selector-container form-inline">
             <div class="form-group">
                 {{ form_widget(form.vars.block_selector) }}
             </div>
-            <button type="button" data-action="click->adbc#add" class="btn btn-primary">
+            <button type="button" data-action="click->cms-adbc#add" class="btn btn-primary">
                 <i class="fa fa-plus"></i></button>
         </div>
+
     </div>
 {% endblock %}
 
@@ -28,7 +29,7 @@
 {% endblock %}
 
 {% block admin_cms_dynamic_block_loader_row %}
-    <div class="panel box" data-adbc-target="item">
+    <div class="panel box" data-cms-adbc-target="item">
         <div class="box-header with-border">
             <h4 class="box-title">
                 <a data-toggle="collapse" data-parent="#{{ form.parent.vars.id }}_accordion" href="#{{ form.vars.id }}_collapse" aria-expanded="true" class="">
@@ -36,12 +37,12 @@
                 </a>
             </h4>
             <div class="actions">
-                <button type="button" class="btn btn-danger" data-action="click->adbc#del">
-                    <i class="fa fa-trash"></i></button>
-                <button type="button" class="btn btn-default" data-action="click->adbc#moveUp" data-adbc-target="arrowUp">
+                <button type="button" class="btn btn-default" data-action="click->cms-adbc#moveUp" data-cms-adbc-target="arrowUp">
                     <i class="fa fa-arrow-up"></i></button>
-                <button type="button" class="btn btn-default" data-action="click->adbc#moveDown" data-adbc-target="arrowDown">
+                <button type="button" class="btn btn-default" data-action="click->cms-adbc#moveDown" data-cms-adbc-target="arrowDown">
                     <i class="fa fa-arrow-down"></i></button>
+                <button type="button" class="btn btn-danger" data-action="click->cms-adbc#del">
+                    <i class="fa fa-trash"></i></button>
             </div>
         </div>
         <div id="{{ form.vars.id }}_collapse" class="panel-collapse collapse" style="">

@@ -4,7 +4,11 @@ namespace WebEtDesign\CmsBundle\CmsBlock;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Twig\Environment;
 use WebEtDesign\CmsBundle\DependencyInjection\Models\BlockDefinition;
+use WebEtDesign\CmsBundle\Entity\CmsContent;
+use WebEtDesign\CmsBundle\Factory\BlockFactory;
+use WebEtDesign\CmsBundle\Form\Transformer\CmsBlockTransformer;
 
 abstract class AbstractBlock implements BlockInterface
 {
@@ -22,9 +26,11 @@ abstract class AbstractBlock implements BlockInterface
 
     protected string $formType = TextType::class;
 
+    protected ?DataTransformerInterface $modelTransformer;
+
     protected array $formOptions = [
         'required' => false,
-        'label'    => false,
+//        'label'    => false,
     ];
 
     protected ?string $formTheme = null;
@@ -37,9 +43,21 @@ abstract class AbstractBlock implements BlockInterface
 
     protected bool $compound = false;
 
-    public function getModelTransformer(): ?DataTransformerInterface
+    protected ?Environment $twig = null;
+
+    protected BlockFactory $factory;
+
+    public function render(CmsContent $content)
     {
-        return null;
+        $transformer = $this->getModelTransformer();
+
+        $value = $transformer->transform($content->getValue(), true);
+
+        if (!empty($this->getTemplate())) {
+            $value = $this->getTwig()->render($this->getTemplate(), $value);
+        }
+
+        return $value;
     }
 
     /**
@@ -267,5 +285,56 @@ abstract class AbstractBlock implements BlockInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param Environment|null $twig
+     * @return AbstractBlock
+     */
+    public function setTwig(?Environment $twig): AbstractBlock
+    {
+        $this->twig = $twig;
+        return $this;
+    }
+
+    /**
+     * @return Environment|null
+     */
+    public function getTwig(): ?Environment
+    {
+        return $this->twig;
+    }
+
+    /**
+     * @param DataTransformerInterface|null $modelTransformer
+     * @return AbstractBlock
+     */
+    public function setModelTransformer(?DataTransformerInterface $modelTransformer): AbstractBlock
+    {
+        $this->modelTransformer = $modelTransformer;
+        return $this;
+    }
+
+    public function getModelTransformer(): ?DataTransformerInterface
+    {
+        return $this->modelTransformer;
+    }
+
+    /**
+     * @param BlockFactory $factory
+     * @return AbstractBlock
+     */
+    public function setFactory(BlockFactory $factory): AbstractBlock
+    {
+        $this->factory = $factory;
+        return $this;
+    }
+
+    /**
+     * @return BlockFactory
+     */
+    public function getFactory(): BlockFactory
+    {
+        return $this->factory;
     }
 }

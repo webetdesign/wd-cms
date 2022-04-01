@@ -48,7 +48,7 @@ class CmsBlockTransformer implements DataTransformerInterface
             $value = $this->reverseTransformObject($value);
         }
 
-        if ($value && is_array($value)) {
+        if (is_array($value)) {
             return json_encode($value);
         }
 

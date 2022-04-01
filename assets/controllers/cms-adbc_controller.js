@@ -12,23 +12,30 @@ import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
   static values = {
     prototypes: String,
-    prototypeName: {type: String, default: '__name__'}
-  }
+    prototypeName: {
+      type: String,
+      default: '__name__'
+    }
+  };
 
-  static targets = [ "collection", 'item', 'blockSelector', 'positionField' ]
+  static targets = ['collection', 'item', 'blockSelector', 'positionField'];
 
 
   connect() {
     this.number = this.itemTargets.length;
     this.prototypes = JSON.parse(this.prototypesValue);
-    console.log(this.prototypes.title);
   }
 
   add(e) {
     e.preventDefault();
-    const proto = this.prototypes[this.blockSelectorTarget.value].replaceAll(this.prototypeNameValue, this.number)
+    if (this.blockSelectorTarget.value === null || this.blockSelectorTarget.value === '') return;
 
-    this.collectionTarget.insertAdjacentHTML('beforeend', proto);;
+    const proto = this.prototypes[this.blockSelectorTarget.value]
+      .replaceAll(this.prototypeNameValue + 'label__', 'Nouveau block')
+      .replaceAll(this.prototypeNameValue, this.number);
+
+    this.collectionTarget.insertAdjacentHTML('beforeend', proto);
+    ;
 
     Admin.setup_select2(this.collectionTarget);
     Admin.setup_icheck(this.collectionTarget);
@@ -38,12 +45,12 @@ export default class extends Controller {
 
   del(e) {
     e.preventDefault();
-    const item = e.currentTarget.closest('[data-adbc-target="item"]')
+    const item = e.currentTarget.closest('[data-cms-adbc-target="item"]');
     item.remove();
   }
 
   moveUp(e) {
-    const line = e.currentTarget.closest('[data-adbc-target="item"]');
+    const line = e.currentTarget.closest('[data-cms-adbc-target="item"]');
     const previousLine = line.previousElementSibling;
     this.persistCkEditorDataBeforeMove(line);
     previousLine.insertAdjacentElement('beforebegin', line);
@@ -51,7 +58,7 @@ export default class extends Controller {
   }
 
   moveDown(e) {
-    const line = e.currentTarget.closest('[data-adbc-target="item"]');
+    const line = e.currentTarget.closest('[data-cms-adbc-target="item"]');
     const nextLine = line.nextElementSibling;
     this.persistCkEditorDataBeforeMove(line);
     nextLine.insertAdjacentElement('afterend', line);
@@ -60,16 +67,16 @@ export default class extends Controller {
 
   computePosition() {
     this.itemTargets.forEach((item, key) => {
-      const linePosition = item.querySelector('[data-adbc-target="positionField"]');
+      const linePosition = item.querySelector('[data-cms-adbc-target="positionField"]');
       linePosition.value = key;
-    })
+    });
   }
 
   persistCkEditorDataBeforeMove(line) {
     line.querySelectorAll('[data-controller="ckeditor"]')
       .forEach(item => {
-        let textarea_id = item.querySelector("textarea").id;
-        item.querySelector("textarea").value = CKEDITOR.instances[textarea_id].getData();
+        let textarea_id = item.querySelector('textarea').id;
+        item.querySelector('textarea').value = CKEDITOR.instances[textarea_id].getData();
       });
   }
 }

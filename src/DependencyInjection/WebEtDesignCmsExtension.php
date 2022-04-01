@@ -10,9 +10,7 @@ namespace WebEtDesign\CmsBundle\DependencyInjection;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Sonata\Doctrine\Mapper\Builder\ColumnDefinitionBuilder;
-use Sonata\Doctrine\Mapper\Builder\OptionsBuilder;
 use Sonata\Doctrine\Mapper\DoctrineCollector;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -23,9 +21,7 @@ use Symfony\Component\Config\FileLocator;
 use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
 use WebEtDesign\CmsBundle\Attribute\AsCmsPageTemplate;
 use WebEtDesign\CmsBundle\Attribute\AsCmsSharedBlock;
-use WebEtDesign\CmsBundle\DependencyInjection\Compiler\BlockPass;
 use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
-use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
 use WebEtDesign\CmsBundle\Factory\BlockFactory;
@@ -104,21 +100,8 @@ class WebEtDesignCmsExtension extends Extension
             );
         }
 
-
-        //        $blockConfigs = [];
-        //        foreach ($config['pages'] as $pageCode => $page) {
-        //            foreach ($page['contents'] as $content) {
-        //                $blockConfigs[$pageCode . '_' . $content['code']] = $content;
-        //                if (!empty($content['block'])) {
-        //                    $this->getBlockConfigsOfBlock($blockConfigs, $content, $pageCode . '_' . $content['code']);
-        //                }
-        //            }
-        //        }
-
         $container->getDefinition(BlockFactory::class)->setArguments([
-            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.block', 'key', null,
-                true)),
-            []
+            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.block', 'key', null, true)),
         ]);
 
         $container->getDefinition(PageFactory::class)->setArguments([

@@ -14,7 +14,6 @@ class WysiwygBlock extends AbstractBlock
 
     protected array $formOptions = [
         'required'    => false,
-        'label'       => false,
         'config_name' => 'default',
     ];
 }

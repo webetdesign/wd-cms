@@ -231,16 +231,10 @@ class CmsTwigExtension extends AbstractExtension
 
         $block = $this->blockFactory->get($template->getBlock($content->getCode()));
 
-        $transformer = $block->getModelTransformer() ?: new CmsBlockTransformer($this->em);
-
-        $value = $transformer->transform($content->getValue(), true);
-
-        if ($block->getTemplate()) {
-            $value = $this->twig->render($block->getTemplate(), $value);
-        }
+        $value = $block->render($content);
 
         if ($this->globalVarsEnable) {
-            $this->globalVars->replaceVars($value);
+            $this->globalVars->replaceVars($content);
         }
 
         if (!$value && $defaultLangSite && $defaultPage) {

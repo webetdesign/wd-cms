@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Form\Content\Dynamic;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,7 +19,7 @@ class DynamicBlockLoaderType extends AbstractType
         $builder->add('position', HiddenType::class, [
             'data' => $builder->getName(),
             'attr' => [
-                'data-adbc-target' => 'positionField',
+                'data-cms-adbc-target' => 'positionField',
                 'data-index'       => $builder->getName(),
             ]
         ]);

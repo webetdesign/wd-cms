@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Form\Content\Dynamic;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -44,8 +45,8 @@ class DynamicBlockCollectionType extends AbstractType
             $blockSelector = $builder->create('block_selector', ChoiceType::class, [
                 'choices' => $availableBlocks,
                 'attr'    => [
-                    'mapped'           => false,
-                    'data-adbc-target' => 'blockSelector'
+                    'mapped'               => false,
+                    'data-cms-adbc-target' => 'blockSelector'
                 ]
             ]);
             $builder->setAttribute('block_selector', $blockSelector->getForm());
@@ -63,6 +64,22 @@ class DynamicBlockCollectionType extends AbstractType
 
         $builder->addEventSubscriber(new JsonFormListener());
         $builder->addEventSubscriber($resizeListener);
+
+        $builder->addModelTransformer(new CallbackTransformer(
+            function ($value) {
+                return $value;
+            },
+            function ($value) {
+                if (is_array($value)) {
+                    usort($value, fn($a, $b) => $a['position'] > $b['position']);
+                    $value = array_map(function ($item) {
+                        unset($item['position']);
+                        return $item;
+                    }, $value);
+                }
+                return $value;
+            }
+        ));
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options)
@@ -98,7 +115,7 @@ class DynamicBlockCollectionType extends AbstractType
             'entry_type'    => DynamicBlockLoaderType::class,
             'entry_options' => [
                 'required' => false,
-//                'label' => false,
+                //                'label' => false,
             ],
             'allow_add'     => true,
             'allow_delete'  => true,

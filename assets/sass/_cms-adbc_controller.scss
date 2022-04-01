@@ -1,0 +1,31 @@
+[data-controller="cms-adbc"] {
+  [data-cms-adbc-target="item"]:first-child {
+    [data-cms-adbc-target="arrowUp"] {
+      display : none;
+    }
+  }
+
+  [data-cms-adbc-target="item"]:last-child {
+    [data-cms-adbc-target="arrowDown"] {
+      display : none;
+    }
+  }
+
+  .box-header {
+    display    : flex;
+
+    border-top : solid 2px #2e8dd0;
+    align-items: center;
+
+    .actions {
+      margin-left: auto;
+    }
+  }
+
+  .block-selector-container {
+    margin-top: 10px;
+    .form-group {
+      width: 300px;
+    }
+  }
+}

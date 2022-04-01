@@ -44,6 +44,12 @@ services:
   # MISCELLANEOUS
   # ===============================================
 
+  WebEtDesign\CmsBundle\Factory\BlockFactory:
+    autoconfigure: false
+    arguments:
+      twig: '@twig'
+      em: '@doctrine.orm.entity_manager'
+
   WebEtDesign\CmsBundle\EventListener\CmsBlockResizeFormListener:
     autoconfigure: false
   WebEtDesign\CmsBundle\EventListener\CmsDynamicBlockResizeFormListener:

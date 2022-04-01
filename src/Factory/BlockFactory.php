@@ -2,19 +2,24 @@
 
 namespace WebEtDesign\CmsBundle\Factory;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Twig\Environment;
 use WebEtDesign\CmsBundle\CmsBlock\AbstractBlock;
 use WebEtDesign\CmsBundle\DependencyInjection\Models\BlockDefinition;
+use WebEtDesign\CmsBundle\Form\Transformer\CmsBlockTransformer;
 
 class BlockFactory
 {
-    private ServiceLocator $blocks;
-    private array          $configs;
+    private ServiceLocator         $blocks;
+    private Environment            $twig;
+    private EntityManagerInterface $em;
 
-    public function __construct(ServiceLocator $blocks, array $configs)
+    public function __construct(ServiceLocator $blocks, Environment $twig, EntityManagerInterface $em)
     {
-        $this->blocks  = $blocks;
-        $this->configs = $configs;
+        $this->blocks = $blocks;
+        $this->twig = $twig;
+        $this->em = $em;
     }
 
     public function get(BlockDefinition $config): AbstractBlock
@@ -42,21 +47,18 @@ class BlockFactory
 
         $block->setBlocks($config->getBlocks());
 
-        $block->setTemplate($config->getTemplate());
+        $block->setModelTransformer(new CmsBlockTransformer($this->em));
+
+        if (!empty($config->getTemplate())) {
+            $block->setTemplate($config->getTemplate());
+            $block->setTwig($this->twig);
+        }
 
         $block->setAvailableBlocks($config->getAvailableBlocks());
 
+        $block->setFactory($this);
+
         return $block;
-    }
-
-    protected function getConfig($name): array
-    {
-        if (!isset($this->configs[$name])) {
-            throw new \InvalidArgumentException(sprintf('Unknown block config "%s". The registered block configs are: %s',
-                $name, implode(', ', array_keys($this->configs))));
-        };
-
-        return $this->configs[$name];
     }
 
     protected function getServices(string $name): AbstractBlock
@@ -70,10 +72,20 @@ class BlockFactory
     }
 
     /**
-     * @return array
+     * @param Environment $twig
+     * @return BlockFactory
      */
-    public function getFormThemes(): array
+    public function setTwig(Environment $twig): BlockFactory
     {
-        return $this->formThemes;
+        $this->twig = $twig;
+        return $this;
+    }
+
+    /**
+     * @return Environment
+     */
+    public function getTwig(): Environment
+    {
+        return $this->twig;
     }
 }
