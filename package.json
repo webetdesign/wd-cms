@@ -36,7 +36,7 @@
     "chart.js": "^2.8.0",
     "jquery": "^3.3.1",
     "jquery-ui": "^1.12.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "query-string": "^6.4.0",
     "javascript-api-utils": "github:googleanalytics/javascript-api-utils#0.6.0"
   }
