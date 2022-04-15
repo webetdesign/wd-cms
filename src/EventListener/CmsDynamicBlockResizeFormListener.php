@@ -6,13 +6,16 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use WebEtDesign\CmsBundle\CmsBlock\DynamicBlock;
+use WebEtDesign\CmsBundle\CmsBlock\AbstractBlock;
+use WebEtDesign\CmsBundle\DependencyInjection\Models\BlockDefinition;
+use WebEtDesign\CmsBundle\Factory\BlockFactory;
 
 class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 {
 
     public function __construct(
-        private DynamicBlock $cmsblock,
+        private BlockFactory $blockFactory,
+        private BlockDefinition $blockDefinition,
         string $type,
         array $options = [],
         bool $allowAdd = false,
@@ -34,6 +37,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 
     public function preSetData(FormEvent $event)
     {
+        $block = $this->blockFactory->get($this->blockDefinition);
         $form = $event->getForm();
         $data = $event->getData();
 
@@ -50,11 +54,10 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
             $form->remove($name);
         }
 
-        // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            $config = $this->cmsblock->getAvailableBlock($value['disc']);
-            if(!$config) {
-               continue;
+            $config = $block->getAvailableBlock($value['disc']);
+            if ($config === null) {
+                continue;
             }
             $opts = array_merge($this->options, [
                 'label'        => '#' . $name . ' | ' . $config->getLabel(),
@@ -64,10 +67,12 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
                 'property_path' => '[' . $name . ']',
             ], $opts));
         }
+
     }
 
     public function preSubmit(FormEvent $event)
     {
+        $block = $this->blockFactory->get($this->blockDefinition);
         $form = $event->getForm();
         $data = $event->getData();
 
@@ -96,8 +101,8 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
                     continue;
                 }
                 $form->remove($name);
-                $config = $this->cmsblock->getAvailableBlock($value['disc']);
-                $opts = array_merge($this->options, [
+                $config = $block->getAvailableBlock($value['disc']);
+                $opts   = array_merge($this->options, [
                     'label'        => '#' . $name . ' | ' . $config->getLabel(),
                     'block_config' => $config
                 ]);

@@ -214,12 +214,12 @@ class CmsTwigExtension extends AbstractExtension
     }
 
     /**
-     * @param CmsPage|CmsSharedBlock $object
+     * @param CmsPage|CmsPageDeclination|CmsSharedBlock $object
      * @param $content_code
      * @return string|null
      * @throws Exception
      */
-    public function cmsRenderContent($object, $content_code)
+    public function cmsRenderContent($object, $content_code, ?array $context = null)
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 
@@ -229,9 +229,10 @@ class CmsTwigExtension extends AbstractExtension
 
         $template = $this->templateFactory->get($object->getTemplate());
 
+
         $block = $this->blockFactory->get($template->getBlock($content->getCode()));
 
-        $value = $block->render($content);
+        $value = $block->render($content->getValue(), $context);
 
         if ($this->globalVarsEnable) {
             $this->globalVars->replaceVars($content);

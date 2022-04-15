@@ -5,13 +5,13 @@ namespace WebEtDesign\CmsBundle\DependencyInjection\Models;
 class BlockDefinition
 {
 
-    protected bool    $open            = false;
-    protected ?string $help            = null;
-    protected array   $formOptions     = [];
-    protected array   $settings        = [];
-    protected array   $blocks          = [];
-    protected array   $availableBlocks = [];
-    protected ?string $template        = null;
+    protected bool             $open            = false;
+    protected ?string          $help            = null;
+    protected array            $formOptions     = [];
+    protected array            $settings        = [];
+    protected array            $blocks          = [];
+    protected array            $availableBlocks = [];
+    protected null|string|bool $template        = null;
 
     public function __construct(
         protected string $code,
@@ -140,19 +140,19 @@ class BlockDefinition
     }
 
     /**
-     * @param string|null $template
+     * @param null|string|bool $template
      * @return BlockDefinition
      */
-    public function setTemplate(?string $template): BlockDefinition
+    public function setTemplate(null|string|bool $template): BlockDefinition
     {
         $this->template = $template;
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return null|string|bool
      */
-    public function getTemplate(): ?string
+    public function getTemplate(): null|string|bool
     {
         return $this->template;
     }

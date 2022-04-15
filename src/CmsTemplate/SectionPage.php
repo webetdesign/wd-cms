@@ -2,9 +2,9 @@
 
 namespace WebEtDesign\CmsBundle\CmsTemplate;
 
-use WebEtDesign\CmsBundle\Attribute\AsCmsPageTemplate;
+use WebEtDesign\CmsBundle\Attribute\AsCmsPage;
 
-#[AsCmsPageTemplate(code: self::code)]
+#[AsCmsPage(code: self::code)]
 class SectionPage extends AbstractPage
 {
     const code = 'ADMIN_SECTION';

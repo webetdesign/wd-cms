@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
-use WebEtDesign\CmsBundle\Attribute\AsCmsPageTemplate;
+use WebEtDesign\CmsBundle\Attribute\AsCmsPage;
 use WebEtDesign\CmsBundle\Attribute\AsCmsSharedBlock;
 use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
@@ -83,8 +83,8 @@ class WebEtDesignCmsExtension extends Extension
                 }
             );
 
-            $container->registerAttributeForAutoconfiguration(AsCmsPageTemplate::class,
-                static function (ChildDefinition $definition, AsCmsPageTemplate $attribute) {
+            $container->registerAttributeForAutoconfiguration(AsCmsPage::class,
+                static function (ChildDefinition $definition, AsCmsPage $attribute) {
                     $definition->addTag('wd_cms.page_template', array_filter([
                         'key' => $attribute->code,
                     ]));

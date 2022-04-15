@@ -3,19 +3,41 @@
 namespace WebEtDesign\CmsBundle\CmsBlock;
 
 use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
-use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlocksType;
+use WebEtDesign\CmsBundle\Form\Content\BlocksBlockType;
 
 #[AsCmsBlock(name: self::code)]
 class BlocksBlock extends AbstractBlock
 {
     public const code = 'BLOCKS';
 
-    protected string $formType = AdminCmsBlocksType::class;
+    protected string $formType = BlocksBlockType::class;
 
     protected array $formOptions = [
-        'base_block' => true,
+        'base_block_config' => true,
     ];
 
-    protected bool $compound = true;
+    public function render($value, ?array $context = null)
+    {
+        $transformer = $this->getModelTransformer();
+
+        $values = $transformer->transform($value, true);
+
+        $blocks = [];
+        foreach ($values as $key => $blockData) {
+            $block = $this->getFactory()->get($this->getBlock($key));
+
+            $blocks[$key] = $block->render($blockData, $context);
+        }
+
+        if (!empty($this->getTemplate())) {
+            if (empty($context)) {
+                $context = [];
+            }
+            $context = array_merge($context, $blocks);
+            return $this->getTwig()->render($this->getTemplate(), $context);
+        }
+
+        return $blocks;
+    }
 
 }

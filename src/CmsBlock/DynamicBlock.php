@@ -3,7 +3,6 @@
 namespace WebEtDesign\CmsBundle\CmsBlock;
 
 use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
-use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Form\Content\Dynamic\DynamicBlockCollectionType;
 
 #[AsCmsBlock(name: self::code, formTheme: '@WebEtDesignCms/admin/form/dynamic_block.html.twig')]
@@ -14,25 +13,37 @@ class DynamicBlock extends AbstractBlock
     protected string $formType = DynamicBlockCollectionType::class;
 
     protected array $formOptions = [
-        'base_block' => true,
+        'base_block_config' => true,
     ];
 
-    public function render(CmsContent $content)
+    public function render($value, ?array $context = null)
     {
         $transformer = $this->getModelTransformer();
 
-        $values = $transformer->transform($content->getValue(), true);
+        $values = $transformer->transform($value, true);
 
         $blocks = [];
-        foreach ($values as $blockData) {
-            $blocks[$blockData['disc']] = $blockData['value'];
+        foreach ($values as $key => $blockData) {
+            $block = $this->getFactory()->get($this->getAvailableBlock($blockData['disc']));
+
+            $context['block_loop'] = [
+                'index' => $key,
+                'first' => $key === 0,
+                'last'  => $key === array_key_last($values)
+            ];
+
+            $blocks[$key . '_' . $blockData['disc']] = $block->render($blockData['value'], $context);
         }
 
+
         if (!empty($this->getTemplate())) {
-            return $this->getTwig()->render($this->getTemplate(), $blocks);
+            if (empty($context)) {
+                $context = [];
+            }
+            $context['blocks'] = $blocks;
+            return $this->getTwig()->render($this->getTemplate(), $context);
         }
 
         return $blocks;
     }
-
 }

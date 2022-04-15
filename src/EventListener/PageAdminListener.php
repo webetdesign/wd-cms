@@ -165,8 +165,8 @@ class PageAdminListener
 
         $CmsRoute->setName($routeName);
 
-        if ($config->getController()) {
-            $CmsRoute->setController($config->getController());
+        if (!empty($route->getController())) {
+            $CmsRoute->setController($route->getController());
         }
 
         if ($route->getPath()) {
@@ -176,7 +176,7 @@ class PageAdminListener
         }
 
 
-        $CmsRoute->setMethods($config->getMethods());
+        $CmsRoute->setMethods($route->getMethods());
         $CmsRoute->setPath($path);
         $CmsRoute->setDefaults(json_encode($defaults));
         $CmsRoute->setRequirements(json_encode($requirements));

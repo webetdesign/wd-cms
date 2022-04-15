@@ -12,30 +12,40 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\CmsBundle\EventListener\CmsDynamicBlockResizeFormListener;
 use WebEtDesign\CmsBundle\EventListener\JsonFormListener;
+use WebEtDesign\CmsBundle\Factory\BlockFactory;
 
 class DynamicBlockCollectionType extends AbstractType
 {
+    public function __construct(private BlockFactory $blockFactory) { }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['allow_add'] && $options['prototype']) {
-            $prototypeOptions = array_replace([
-                'required' => $options['required'],
-                'label'    => $options['prototype_name'] . 'label__',
-            ], $options['entry_options']);
+        if ($options['base_block_config']) {
+            $block = $this->blockFactory->get($options['base_block_config']);
+        }
 
-            if (null !== $options['prototype_data']) {
-                $prototypeOptions['data'] = $options['prototype_data'];
-            }
-
-            $prototypes = [];
+        if ($options['allow_add'] && $options['prototype'] && $block) {
+            $prototypes     = [];
+            $prototypeNames = [];
 
             $availableBlocks = [];
-            foreach ($options['base_block']->getAvailableBlocks() as $config) {
+            foreach ($block->getAvailableBlocks() as $config) {
+                $prototypeNames[$config->getCode()]   = '_:' . $config->getCode() . ':_';
                 $availableBlocks[$config->getLabel()] = $config->getCode();
 
+                $prototypeOptions = array_replace([
+                    'required' => $options['required'],
+                    'label'    => $prototypeNames[$config->getCode()] . 'label__',
+                ], $options['entry_options']);
+
+                if (null !== $options['prototype_data']) {
+                    $prototypeOptions['data'] = $options['prototype_data'];
+                }
+
                 $prototypeOptions = array_merge($prototypeOptions, ['block_config' => $config]);
-                $prototype        = $builder->create(
-                    $options['prototype_name'],
+
+                $prototype = $builder->create(
+                    $prototypeNames[$config->getCode()],
                     $options['entry_type'],
                     $prototypeOptions);
 
@@ -49,12 +59,15 @@ class DynamicBlockCollectionType extends AbstractType
                     'data-cms-adbc-target' => 'blockSelector'
                 ]
             ]);
+
             $builder->setAttribute('block_selector', $blockSelector->getForm());
             $builder->setAttribute('prototypes', $prototypes);
+            $builder->setAttribute('prototypeNames', $prototypeNames);
         }
 
         $resizeListener = new CmsDynamicBlockResizeFormListener(
-            $options['base_block'],
+            $this->blockFactory,
+            $options['base_block_config'],
             $options['entry_type'],
             $options['entry_options'],
             $options['allow_add'],
@@ -101,6 +114,9 @@ class DynamicBlockCollectionType extends AbstractType
             $prototype                    = $form->getConfig()->getAttribute('block_selector');
             $view->vars['block_selector'] = $prototype->setParent($form)->createView($view);
         }
+        if ($form->getConfig()->hasAttribute('prototypeNames')) {
+            $view->vars['prototypeNames'] = $form->getConfig()->getAttribute('prototypeNames');
+        }
     }
 
 
@@ -121,7 +137,7 @@ class DynamicBlockCollectionType extends AbstractType
             'allow_delete'  => true,
         ]);
 
-        $resolver->setRequired(['base_block']);
+        $resolver->setRequired('base_block_config');
     }
 
     public function getBlockPrefix(): string

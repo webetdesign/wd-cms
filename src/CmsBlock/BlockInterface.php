@@ -16,6 +16,8 @@ interface BlockInterface
 
     public function getLabel(): ?string;
 
+    public function setLabel(?string $label): BlockInterface;
+
     public function getTemplate(): ?string;
 
     public function setTemplate(?string $template): BlockInterface;
@@ -47,10 +49,6 @@ interface BlockInterface
     public function setBlocks(array $blocks): BlockInterface;
 
     public function getBlocks(): array;
-
-    public function setCompound(bool $compound): BlockInterface;
-
-    public function isCompound(): bool;
 
     public function setAvailableBlocks(array $availableBlocks): BlockInterface;
 

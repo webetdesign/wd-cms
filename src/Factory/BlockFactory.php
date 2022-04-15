@@ -29,7 +29,7 @@ class BlockFactory
 
     protected function mount(BlockDefinition $config): AbstractBlock
     {
-        $block = $this->getServices($config->getType());
+        $block = clone $this->getServices($config->getType());
 
         if (!empty($config->getHelp())) {
             $block->setHelp($config->getHelp());
@@ -50,9 +50,13 @@ class BlockFactory
         $block->setModelTransformer(new CmsBlockTransformer($this->em));
 
         if (!empty($config->getTemplate())) {
-            $block->setTemplate($config->getTemplate());
-            $block->setTwig($this->twig);
+            $block->setTemplate($config->getTemplate() );
         }
+        if ($config->getTemplate() === false) {
+            $block->setTemplate(null);
+        }
+
+        $block->setTwig($this->twig);
 
         $block->setAvailableBlocks($config->getAvailableBlocks());
 

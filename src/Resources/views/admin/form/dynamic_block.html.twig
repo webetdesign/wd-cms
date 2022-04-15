@@ -1,40 +1,45 @@
-{% macro prototypes_row_attr(prototypes) %}
+{% macro prototypes_row_attr(prototypes, prototypeNames) %}
     {% set rows = {} %}
     {% for key, form in prototypes %}
         {% set rows = rows|merge({(key): form_row(form)}) %}
     {% endfor %}
+
+    {% set names = {} %}
+    {% for key, name in prototypeNames %}
+        {% set names = names|merge({(key): name}) %}
+    {% endfor %}
     data-cms-adbc-prototypes-value="{{ rows|json_encode|e('html_attr') }}"
+    data-cms-adbc-prototype-names-value="{{ names|json_encode|e('html_attr') }}"
 {% endmacro %}
 
 {% block admin_cms_dynamic_block_collection_row %}
-    <div data-controller="cms-adbc" {{ _self.prototypes_row_attr(form.vars.prototypes) }}>
+    <div data-controller="cms-adbc" {{ allow_add ? _self.prototypes_row_attr(form.vars.prototypes, form.vars.prototypeNames) : '' }}>
         <div class="box-group" id="{{ form.vars.id }}_accordion" data-cms-adbc-target="collection">
             {{ form_widget(form) }}
         </div>
-        <div class="block-selector-container form-inline">
-            <div class="form-group">
-                {{ form_widget(form.vars.block_selector) }}
+        {% if allow_add %}
+            <div class="block-selector-container form-inline">
+                <div class="form-group">
+                    {{ form_widget(form.vars.block_selector) }}
+                </div>
+                <button type="button" data-action="click->cms-adbc#add" class="btn btn-primary">
+                    <i class="fa fa-plus"></i></button>
             </div>
-            <button type="button" data-action="click->cms-adbc#add" class="btn btn-primary">
-                <i class="fa fa-plus"></i></button>
-        </div>
-
+        {% endif %}
     </div>
 {% endblock %}
 
-{% block admin_cms_dynamic_block_collection_widget %}
-    {% for child in form %}
-        {{ form_row(child) }}
-    {% endfor %}
-{% endblock %}
-
 {% block admin_cms_dynamic_block_loader_row %}
+    {% set unique_key = form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name %}
     <div class="panel box" data-cms-adbc-target="item">
         <div class="box-header with-border">
-            <h4 class="box-title">
-                <a data-toggle="collapse" data-parent="#{{ form.parent.vars.id }}_accordion" href="#{{ form.vars.id }}_collapse" aria-expanded="true" class="">
-                    {{ form_label(form) }}
+            <h4 class="box-title cursor-pointer ">
+                <a data-toggle="collapse" href="#{{ unique_key }}_collapse">
+                    {{- block('form_label') -}}
                 </a>
+                {% if block_config and block_config.help is not empty %}
+                    <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ block_config.help }}"></i>
+                {% endif %}
             </h4>
             <div class="actions">
                 <button type="button" class="btn btn-default" data-action="click->cms-adbc#moveUp" data-cms-adbc-target="arrowUp">
@@ -45,10 +50,34 @@
                     <i class="fa fa-trash"></i></button>
             </div>
         </div>
-        <div id="{{ form.vars.id }}_collapse" class="panel-collapse collapse" style="">
+        <div id="{{ unique_key }}_collapse" class="panel-collapse collapse {% if block_config and block_config.open %} in {% endif %}">
             <div class="box-body">
-                {{ form_widget(form) }}
+                {{- block('form_widget') -}}
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block cms_blocks_block_row %}
+    {% for child in form.children %}
+        {% set config = block_configs[child.vars.name] %}
+        {% set unique_key = form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code %}
+        <div class="panel box">
+            <div class="box-header with-border">
+                <h4 class="box-title">
+                    <a data-toggle="collapse" href="#{{ unique_key }}_collapse">
+                        {{ form_label(child) }}
+                    </a>
+                    {% if config and config.help is not empty %}
+                        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ config.help }}"></i>
+                    {% endif %}
+                </h4>
+            </div>
+            <div id="{{ unique_key }}_collapse" class="panel-collapse collapse {% if config and config.open %} in {% endif %}">
+                <div class="box-body">
+                    {{ form_row(child) }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

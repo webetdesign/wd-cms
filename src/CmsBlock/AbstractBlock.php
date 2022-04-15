@@ -6,9 +6,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\DependencyInjection\Models\BlockDefinition;
-use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Factory\BlockFactory;
-use WebEtDesign\CmsBundle\Form\Transformer\CmsBlockTransformer;
 
 abstract class AbstractBlock implements BlockInterface
 {
@@ -30,7 +28,6 @@ abstract class AbstractBlock implements BlockInterface
 
     protected array $formOptions = [
         'required' => false,
-//        'label'    => false,
     ];
 
     protected ?string $formTheme = null;
@@ -41,19 +38,26 @@ abstract class AbstractBlock implements BlockInterface
 
     protected array $availableBlocks = [];
 
-    protected bool $compound = false;
-
     protected ?Environment $twig = null;
 
     protected BlockFactory $factory;
 
-    public function render(CmsContent $content)
+    public function render($value, ?array $context = null)
     {
         $transformer = $this->getModelTransformer();
 
-        $value = $transformer->transform($content->getValue(), true);
+        $value = $transformer->transform($value, true);
 
         if (!empty($this->getTemplate())) {
+            if (is_object($value)) {
+                $value = ['object' => $value];
+            }
+            if (!empty($this->getSettings())) {
+                $value = array_merge($value, ['settings' => $this->getSettings()]);
+            }
+            if (!empty($context)) {
+                $value = array_merge($value, $context);
+            }
             $value = $this->getTwig()->render($this->getTemplate(), $value);
         }
 
@@ -233,29 +237,22 @@ abstract class AbstractBlock implements BlockInterface
     }
 
     /**
-     * @return array
+     * @return BlockDefinition[]
      */
     public function getBlocks(): array
     {
         return $this->blocks;
     }
 
-    /**
-     * @param bool $compound
-     * @return AbstractBlock
-     */
-    public function setCompound(bool $compound): AbstractBlock
+    public function getBlock(string $code): ?BlockDefinition
     {
-        $this->compound = $compound;
-        return $this;
-    }
+        foreach ($this->getBlocks() as $block) {
+            if ($block->getCode() === $code) {
+                return $block;
+            }
+        }
 
-    /**
-     * @return bool
-     */
-    public function isCompound(): bool
-    {
-        return $this->compound;
+        return null;
     }
 
     /**

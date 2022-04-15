@@ -7,104 +7,104 @@
 @import "cms-adbc_controller";
 
 .spinbox {
-    height: 120px;
+  height : 120px;
 
-    .spinner {
-        width: 80px;
-        height: 80px;
+  .spinner {
+    width         : 80px;
+    height        : 80px;
 
-        border: 2px solid #c7c7c7;
-        border-top: 3px solid #337ab7;
-        border-radius: 100%;
+    border        : 2px solid #c7c7c7;
+    border-top    : 3px solid #337ab7;
+    border-radius : 100%;
 
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
+    position      : absolute;
+    top           : 0;
+    bottom        : 0;
+    left          : 0;
+    right         : 0;
+    margin        : auto;
 
-        animation: spin 1s infinite linear;
-    }
+    animation     : spin 1s infinite linear;
+  }
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from {
+    transform : rotate(0deg);
+  }
+  to {
+    transform : rotate(360deg);
+  }
 }
 
 .skin-black .main-header > .logo {
-    text-align: left;
+  text-align : left;
 }
 
 .logo img {
-    max-width: 100%;
+  max-width : 100%;
 }
 
 .shadow-sm {
-    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important
+  box-shadow : 0 .125rem .25rem rgba(0, 0, 0, .075) !important
 }
 
 .shadow {
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important
+  box-shadow : 0 .5rem 1rem rgba(0, 0, 0, .15) !important
 }
 
 .shadow-lg {
-    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+  box-shadow : 0 1rem 3rem rgba(0, 0, 0, .175) !important;
 }
 
 .p-4 {
-    padding: 1.5rem !important
+  padding : 1.5rem !important
 }
 
 .m-1 {
-    margin: 0.1rem !important
+  margin : 0.1rem !important
 }
 
 .px-4 {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
+  padding-left  : 1.5rem !important;
+  padding-right : 1.5rem !important;
 
 }
 
 .mt-5 {
-    margin-top: 2rem
+  margin-top : 2rem
 }
 
 .mt-4 {
-    margin-top: 1.5rem
+  margin-top : 1.5rem
 }
 
 .my-5 {
-    margin-top: 2rem;
-    margin-bottom: 2rem
+  margin-top    : 2rem;
+  margin-bottom : 2rem
 }
 
 .mx-5 {
-    margin-top: 2rem;
-    margin-bottom: 2rem
+  margin-top    : 2rem;
+  margin-bottom : 2rem
 }
 
 .text-center {
-    text-align: center;
+  text-align : center;
 }
 
 .mr-auto,
 .mx-auto {
-    margin-right: auto !important;
+  margin-right : auto !important;
 }
 
 .ml-auto,
 .mx-auto {
-    margin-left: auto !important;
+  margin-left : auto !important;
 }
 
 .header_none {
-    >.box-header {
-        display: none;
-    }
+  > .box-header {
+    display : none;
+  }
 }

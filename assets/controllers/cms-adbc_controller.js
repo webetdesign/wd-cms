@@ -12,10 +12,7 @@ import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
   static values = {
     prototypes: String,
-    prototypeName: {
-      type: String,
-      default: '__name__'
-    }
+    prototypeNames: String,
   };
 
   static targets = ['collection', 'item', 'blockSelector', 'positionField'];
@@ -23,7 +20,13 @@ export default class extends Controller {
 
   connect() {
     this.number = this.itemTargets.length;
-    this.prototypes = JSON.parse(this.prototypesValue);
+    if (this.prototypesValue !== undefined && this.prototypesValue !== '') {
+      this.prototypes = JSON.parse(this.prototypesValue);
+    }
+
+    if (this.prototypeNamesValue !== undefined && this.prototypeNamesValue !== '') {
+      this.prototypeNames = JSON.parse(this.prototypeNamesValue);
+    }
   }
 
   add(e) {
@@ -31,11 +34,10 @@ export default class extends Controller {
     if (this.blockSelectorTarget.value === null || this.blockSelectorTarget.value === '') return;
 
     const proto = this.prototypes[this.blockSelectorTarget.value]
-      .replaceAll(this.prototypeNameValue + 'label__', 'Nouveau block')
-      .replaceAll(this.prototypeNameValue, this.number);
+      .replaceAll(this.prototypeNames[this.blockSelectorTarget.value] + 'label__', 'Nouveau block')
+      .replaceAll(this.prototypeNames[this.blockSelectorTarget.value], this.number);
 
     this.collectionTarget.insertAdjacentHTML('beforeend', proto);
-    ;
 
     Admin.setup_select2(this.collectionTarget);
     Admin.setup_icheck(this.collectionTarget);

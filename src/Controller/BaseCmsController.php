@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
@@ -64,6 +65,15 @@ class BaseCmsController extends AbstractController
             array_merge($params, $baseParams),
             $this->response ?: null
         );
+    }
+
+    public function addEsiHeaders($ttl)
+    {
+        $this->response = new Response();
+        $this->response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
+        $this->response->setMaxAge($ttl);
+        $this->response->setSharedMaxAge($ttl);
+        $this->response->setPublic();
     }
 
     /**

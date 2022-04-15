@@ -10,20 +10,12 @@ abstract class AbstractPage implements TemplateInterface, PageInterface
 {
     public bool       $section    = false;
     protected ?string $template   = null;
-    protected ?string $controller = null;
     protected ?string $label      = null;
     protected ?string $code       = null;
 
     public function getLabel(): string
     {
         return $this->label ?: $this->code;
-    }
-
-    public function getMethods(): array
-    {
-        return [
-            Request::METHOD_GET
-        ];
     }
 
     /**
@@ -65,21 +57,6 @@ abstract class AbstractPage implements TemplateInterface, PageInterface
     public function getTemplate(): ?string
     {
         return $this->template;
-    }
-
-    /**
-     * @param string|null $controller
-     * @return AbstractPage
-     */
-    public function setController(?string $controller): AbstractPage
-    {
-        $this->controller = $controller;
-        return $this;
-    }
-
-    public function getController(): ?string
-    {
-        return $this->controller;
     }
 
     public function getCollections(): ?array

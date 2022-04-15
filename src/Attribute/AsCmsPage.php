@@ -5,7 +5,7 @@ namespace WebEtDesign\CmsBundle\Attribute;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-class AsCmsPageTemplate
+class AsCmsPage
 {
     public function __construct(
         public string $code,

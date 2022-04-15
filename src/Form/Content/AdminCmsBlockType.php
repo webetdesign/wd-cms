@@ -17,7 +17,6 @@ class AdminCmsBlockType extends AbstractType
 {
 
     public function __construct(
-        private EntityManagerInterface $em,
         private BlockFactory $blockFactory
     ) {
     }
@@ -31,20 +30,16 @@ class AdminCmsBlockType extends AbstractType
         if ($options['config']) {
             $block = $this->blockFactory->get($options['config']);
 
-            $options = $block->getFormOptions();
-            if (isset($options['base_block']) && $options['base_block']) {
-                $options['base_block'] = $block;
+            $opts = $block->getFormOptions();
+            if (isset($opts['base_block_config']) && $opts['base_block_config']) {
+                $opts['base_block_config'] = $options['config'];
             }
 
-            $builder->add('value', $block->getFormType(), $options);
+            $builder->add('value', $block->getFormType(), $opts);
             $builder->get('value')
                 ->addModelTransformer(
-                    $block->getModelTransformer() ?: new CmsBlockTransformer($this->em)
+                    $block->getModelTransformer()
                 );
-
-            if ($block->isCompound()) {
-                $builder->get('value')->addEventSubscriber(new JsonFormListener());
-            }
         }
     }
 
@@ -52,6 +47,7 @@ class AdminCmsBlockType extends AbstractType
     {
         if ($options['config']) {
             $block               = $this->blockFactory->get($options['config']);
+            $view->vars['block_code'] = $block->getCode();
             $view->vars['block'] = $block;
         }
 

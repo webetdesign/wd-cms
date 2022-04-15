@@ -91,7 +91,7 @@ class CmsBlockTransformer implements DataTransformerInterface
         return $array;
     }
 
-    private function reverseTransformArray(mixed $value)
+    private function reverseTransformArray(mixed $value): array
     {
         $array = [];
         foreach ($value as $index => $item) {
