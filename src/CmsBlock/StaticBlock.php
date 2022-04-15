@@ -6,7 +6,7 @@ use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
 use WebEtDesign\CmsBundle\Form\Content\BlocksBlockType;
 
 #[AsCmsBlock(name: self::code)]
-class BlocksBlock extends AbstractBlock
+class StaticBlock extends AbstractBlock
 {
     public const code = 'BLOCKS';
 

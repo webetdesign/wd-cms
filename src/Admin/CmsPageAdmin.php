@@ -222,15 +222,12 @@ class CmsPageAdmin extends AbstractAdmin
                 'label'      => 'cms_page.form.template.label',
                 'collection' => $site->getTemplateFilter()
             ]);
-        $form
-            ->add('site', EntityType::class, [
-                'class' => CmsSite::class,
-                'data'  => $site,
-                'attr'  => [
-                    'style' => 'display: none '
-                ],
-                'label' => false,
-            ]);
+
+        $form->add('site', HiddenType::class);
+        $form->get('site')->addModelTransformer(new CallbackTransformer(
+            fn($value) => $value?->getId(),
+            fn($value) => $value ? $this->getEntityManager()->find(CmsSite::class, $value) : null,
+        ));
 
         if ($object->getId() === null) {
             $form

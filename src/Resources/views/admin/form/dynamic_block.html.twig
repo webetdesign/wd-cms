@@ -13,7 +13,7 @@
 {% endmacro %}
 
 {% block admin_cms_dynamic_block_collection_row %}
-    <div data-controller="cms-adbc" {{ allow_add ? _self.prototypes_row_attr(form.vars.prototypes, form.vars.prototypeNames) : '' }}>
+    <div data-controller="cms-adbc" {{ allow_add ? _self.prototypes_row_attr(form.vars.prototypes, form.vars.prototypeNames) : '' }} data-cms-adbc-max-value="{{ max }}">
         <div class="box-group" id="{{ form.vars.id }}_accordion" data-cms-adbc-target="collection">
             {{ form_widget(form) }}
         </div>
@@ -22,7 +22,10 @@
                 <div class="form-group">
                     {{ form_widget(form.vars.block_selector) }}
                 </div>
-                <button type="button" data-action="click->cms-adbc#add" class="btn btn-primary">
+                <button type="button" data-action="click->cms-adbc#add"
+                        class="btn btn-primary" data-cms-adbc-target="addButton"
+                        {% if max > 0 and form.vars.value|length == max%} disabled {%endif%}
+                >
                     <i class="fa fa-plus"></i></button>
             </div>
         {% endif %}

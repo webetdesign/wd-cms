@@ -13,9 +13,10 @@ export default class extends Controller {
   static values = {
     prototypes: String,
     prototypeNames: String,
+    max: Number,
   };
 
-  static targets = ['collection', 'item', 'blockSelector', 'positionField'];
+  static targets = ['collection', 'item', 'blockSelector', 'positionField', 'addButton'];
 
 
   connect() {
@@ -49,6 +50,8 @@ export default class extends Controller {
     e.preventDefault();
     const item = e.currentTarget.closest('[data-cms-adbc-target="item"]');
     item.remove();
+
+    this.toggleAddButton();
   }
 
   moveUp(e) {
@@ -72,6 +75,16 @@ export default class extends Controller {
       const linePosition = item.querySelector('[data-cms-adbc-target="positionField"]');
       linePosition.value = key;
     });
+
+    this.toggleAddButton();
+  }
+
+  toggleAddButton() {
+    if (this.maxValue > 0 && this.maxValue === this.itemTargets.length) {
+      this.addButtonTarget.setAttribute('disabled', 'disabled');
+    } else {
+      this.addButtonTarget.removeAttribute('disabled');
+    }
   }
 
   persistCkEditorDataBeforeMove(line) {

@@ -100,6 +100,7 @@ class DynamicBlockCollectionType extends AbstractType
         $view->vars = array_replace($view->vars, [
             'allow_add'    => $options['allow_add'],
             'allow_delete' => $options['allow_delete'],
+            'max'          => $options['max'],
         ]);
 
         if ($form->getConfig()->hasAttribute('prototypes')) {
@@ -135,6 +136,7 @@ class DynamicBlockCollectionType extends AbstractType
             ],
             'allow_add'     => true,
             'allow_delete'  => true,
+            'max'           => null,
         ]);
 
         $resolver->setRequired('base_block_config');
