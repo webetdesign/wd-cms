@@ -1,7 +1,8 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {% if collector.data is defined and collector.data is not empty and collector.data is not null %}
+    {% if collector.data is defined and collector.data is not empty and collector.data is not null
+        and collector.data.serviceRC is defined and collector.data.serviceRC is not empty %}
 
         {% set icon %}
             {# this is the content displayed as a panel in the toolbar #}
