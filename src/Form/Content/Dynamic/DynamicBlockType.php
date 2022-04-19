@@ -63,7 +63,7 @@ class DynamicBlockType extends AbstractType
         ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'admin_cms_dynamic_block';
     }

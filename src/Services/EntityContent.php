@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Services;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
@@ -38,7 +39,11 @@ class EntityContent extends AbstractCustomContent
         return EntityType::class;
     }
 
-    public function getFormOptions(): array
+    #[ArrayShape(['class'           => "",
+                  'required'        => "false",
+                  'auto_initialize' => "false",
+                  'multiple'        => ""
+    ])] public function getFormOptions(): array
     {
         return [
             'class'           => $this->entity,

@@ -20,12 +20,9 @@ class CmsRouteParamsType extends AbstractType
     /**
      * @var EntityManagerInterface
      */
-    protected $em;
-    private   $cmsConfig;
+    protected EntityManagerInterface $em;
+    private array                    $cmsConfig;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct(EntityManagerInterface $em, $cmsConfig)
     {
         $this->em        = $em;
@@ -54,7 +51,8 @@ class CmsRouteParamsType extends AbstractType
                 'class'        => $param['entity'],
                 'choice_value' => function ($entity = null) use ($param, $locale) {
                     $getter = 'get' . ucfirst($param['property']);
-                    if ($this->cmsConfig['multilingual'] == true && is_subclass_of($entity, TranslatableInterface::class)) {
+                    if ($this->cmsConfig['multilingual'] && is_subclass_of($entity,
+                            TranslatableInterface::class)) {
                         return $entity ? $entity->translate($locale)->$getter() : '';
                     } else {
                         return $entity ? $entity->$getter() : '';
@@ -100,10 +98,12 @@ class CmsRouteParamsType extends AbstractType
                     foreach ($values as $name => $value) {
                         $param = $config['params'][$name] ?? null;
                         if ($param && isset($param['entity']) && isset($param['property'])) {
-                            if ($this->cmsConfig['multilingual'] == true && is_subclass_of($param['entity'], TranslatableInterface::class)) {
-                                $method = 'findOneBy'.ucfirst($param['property']);
+                            if ($this->cmsConfig['multilingual'] && is_subclass_of($param['entity'],
+                                    TranslatableInterface::class)) {
+                                $method = 'findOneBy' . ucfirst($param['property']);
                                 $locale = $object->getPage()->getSite()->getLocale();
-                                $entity = $this->em->getRepository($param['entity'])->$method($value, $locale);
+                                $entity = $this->em->getRepository($param['entity'])->$method($value,
+                                    $locale);
                             } else {
                                 $entity = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
                             }
@@ -119,7 +119,8 @@ class CmsRouteParamsType extends AbstractType
                     if ($param && isset($param['property'])) {
                         $getter = 'get' . ucfirst($param['property']);
                         if (method_exists($value, $getter)) {
-                            if ($this->cmsConfig['multilingual'] == true && is_subclass_of($value, TranslatableInterface::class)) {
+                            if ($this->cmsConfig['multilingual'] && is_subclass_of($value,
+                                    TranslatableInterface::class)) {
                                 $values[$name] = $value->translate($locale)->$getter();
                             } else {
                                 $values[$name] = $value->$getter();
@@ -145,7 +146,7 @@ class CmsRouteParamsType extends AbstractType
     /**
      * @inheritDoc
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'cms_route_params';
     }

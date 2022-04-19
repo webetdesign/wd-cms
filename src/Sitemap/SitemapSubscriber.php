@@ -4,7 +4,7 @@
 namespace WebEtDesign\CmsBundle\Sitemap;
 
 
-use Doctrine\ORM\EntityManagerInterface;
+use JetBrains\PhpStorm\ArrayShape;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
 use Presta\SitemapBundle\Service\UrlContainerInterface;
 use Presta\SitemapBundle\Sitemap\Url\GoogleMultilangUrlDecorator;
@@ -14,7 +14,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class SitemapSubscriber implements EventSubscriberInterface
 {
@@ -41,6 +40,7 @@ class SitemapSubscriber implements EventSubscriberInterface
         $this->parameterBag      = $parameterBag;
     }
 
+    #[ArrayShape([SitemapPopulateEvent::ON_SITEMAP_POPULATE => "string"])]
     public static function getSubscribedEvents(): array
     {
         return [

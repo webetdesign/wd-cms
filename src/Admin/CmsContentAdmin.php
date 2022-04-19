@@ -20,15 +20,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\CallbackTransformer;
 use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use WebEtDesign\CmsBundle\Services\AbstractCustomContent;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
     protected EntityManager $em;
     protected ?array $customContents;
     protected Container $container;
-    private TemplateProvider $blockProvider;
-    private TemplateProvider $pageProvider;
 
     /**
      * CmsContentAdmin constructor.
@@ -38,8 +35,6 @@ final class CmsContentAdmin extends AbstractAdmin
      * @param EntityManager $em
      * @param $contentTypeOption
      * @param Container $container
-     * @param TemplateProvider $blockProvider
-     * @param TemplateProvider $pageProvider
      */
     public function __construct(
         string $code,
@@ -48,14 +43,10 @@ final class CmsContentAdmin extends AbstractAdmin
         EntityManager $em,
         $contentTypeOption,
         Container $container,
-        TemplateProvider $blockProvider,
-        TemplateProvider $pageProvider
     ) {
         $this->em             = $em;
         $this->customContents = $contentTypeOption;
         $this->container      = $container;
-        $this->blockProvider  = $blockProvider;
-        $this->pageProvider   = $pageProvider;
 
         parent::__construct($code, $class, $baseControllerName);
     }
@@ -134,17 +125,17 @@ final class CmsContentAdmin extends AbstractAdmin
         }
 
 
-        if ($subject->getPage()) {
-            $configs = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
-        } elseif ($subject->getDeclination() && $subject->getDeclination()->getPage()->getTemplate()) {
-            $configs = $this->pageProvider->getConfigurationFor($subject->getDeclination()->getPage()->getTemplate());
-        } elseif ($subject->getSharedBlockParent() && $subject->getSharedBlockParent()->getTemplate()) {
-            $configs = $this->blockProvider->getConfigurationFor($subject->getSharedBlockParent()->getTemplate());
-        }else{
+//        if ($subject->getPage()) {
+//            $configs = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
+//        } elseif ($subject->getDeclination() && $subject->getDeclination()->getPage()->getTemplate()) {
+//            $configs = $this->pageProvider->getConfigurationFor($subject->getDeclination()->getPage()->getTemplate());
+//        } elseif ($subject->getSharedBlockParent() && $subject->getSharedBlockParent()->getTemplate()) {
+//            $configs = $this->blockProvider->getConfigurationFor($subject->getSharedBlockParent()->getTemplate());
+//        }else{
             $configs = [
                 'contents' => []
             ];
-        }
+//        }
 
         if ($this->canInheritFromParent($subject)) {
             $formMapper->add('parent_heritance', null, [
@@ -256,7 +247,7 @@ final class CmsContentAdmin extends AbstractAdmin
     {
     }
 
-    protected function getContentTypeChoices()
+    protected function getContentTypeChoices(): array
     {
         $customs = [];
         foreach ($this->customContents as $customContent => $configuration) {
@@ -266,7 +257,7 @@ final class CmsContentAdmin extends AbstractAdmin
         return array_merge(CmsContentTypeEnum::getChoices(), $customs);
     }
 
-    private function canInheritFromParent(CmsContent $content)
+    private function canInheritFromParent(CmsContent $content): bool
     {
         if ($content->getPage() && $content->getPage()->getParent() && $content->getPage()->getParent()->getContent($content->getCode())) {
             return true;

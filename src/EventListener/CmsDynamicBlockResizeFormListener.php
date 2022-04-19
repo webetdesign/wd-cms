@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
@@ -25,7 +26,11 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
         parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
     }
 
-    public static function getSubscribedEvents()
+    #[ArrayShape([
+        FormEvents::PRE_SET_DATA => "string",
+        FormEvents::PRE_SUBMIT   => "string",
+        FormEvents::SUBMIT       => "array"
+    ])] public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',

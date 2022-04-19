@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection RegExpRedundantEscape */
 
 namespace WebEtDesign\CmsBundle\Entity;
 
@@ -18,15 +18,15 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
-    private $name;
+    private ?string $name = null;
 
 
     /**
@@ -34,15 +34,15 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\Column(type="array", nullable=false)
      *
      */
-    private $methods = [];
+    private array $methods = [];
 
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
-    private $path;
+    private ?string $path = null;
 
 
     /**
@@ -50,39 +50,36 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
-    private $controller;
+    private ?string $controller = null;
 
     /**
      * @var CmsPage
      *
      * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="route", cascade={"remove"})
      */
-    private $page;
+    private CmsPage $page;
 
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="text", nullable=true)
      *
      */
-    private $defaults;
+    private ?string $defaults = null;
 
     /**
-     * @var string
+     * @var string|null
      * @ORM\Column(type="text", nullable=true)
      *
      */
-    private $requirements;
+    private ?string $requirements = null;
 
-    /**
-     * @inheritDoc
-     */
     public function __toString()
     {
         return (string) $this->getName();
     }
 
-    public function isDynamic()
+    public function isDynamic(): bool
     {
         return (bool) preg_match('/\{.*\}/', $this->getPath());
     }
@@ -135,7 +132,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @return CmsPage
+     * @return CmsPage|null
      */
     public function getPage(): ?CmsPage
     {
@@ -143,7 +140,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @param CmsPage $page
+     * @param CmsPage|null $page
      */
     public function setPage(?CmsPage $page): void
     {
@@ -151,7 +148,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getController(): ?string
     {
@@ -159,7 +156,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @param string $controller
+     * @param string|null $controller
      */
     public function setController(?string $controller): void
     {
@@ -167,7 +164,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDefaults(): ?string
     {
@@ -175,7 +172,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @param string $defaults
+     * @param string|null $defaults
      * @return self
      */
     public function setDefaults(?string $defaults): self
@@ -185,7 +182,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRequirements(): ?string
     {
@@ -193,7 +190,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @param string $requirements
+     * @param string|null $requirements
      * @return self
      */
     public function setRequirements(?string $requirements): self

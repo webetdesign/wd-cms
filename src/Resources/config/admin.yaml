@@ -46,8 +46,6 @@ services:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.custom_contents%'
       - '@service_container'
-      - '@cms.block_provider'
-      - '@cms.page_provider'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Contents, show_in_dashboard: false }
     calls:
@@ -61,7 +59,6 @@ services:
       - WebEtDesign\CmsBundle\Entity\CmsMenu
       - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController
       - '@doctrine.orm.default_entity_manager'
-      - '@cms.page_provider'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Menus }
     calls:
@@ -79,7 +76,6 @@ services:
       - WebEtDesign\CmsBundle\Entity\CmsMenuItem
       - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuItemAdminController
       - '@doctrine.orm.default_entity_manager'
-      - '@cms.page_provider'
       - '%wd_cms.menu%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false }

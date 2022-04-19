@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\TwigTest;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
@@ -95,7 +96,7 @@ class CmsTwigExtension extends AbstractExtension
         $this->blockFactory       = $blockFactory;
     }
 
-    public function getTests()
+    public function getTests(): array
     {
         return [
             new TwigTest('instanceOf', [$this, 'isInstanceOf'])
@@ -131,12 +132,12 @@ class CmsTwigExtension extends AbstractExtension
         ];
     }
 
-    public function isInstanceOf($object, $class)
+    public function isInstanceOf($object, $class): bool
     {
         return $object instanceof $class;
     }
 
-    private function retrieveContent($object, $content_code)
+    private function retrieveContent($object, $content_code): CmsContent
     {
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
@@ -229,7 +230,6 @@ class CmsTwigExtension extends AbstractExtension
 
         $template = $this->templateFactory->get($object->getTemplate());
 
-
         $block = $this->blockFactory->get($template->getBlock($content->getCode()));
 
         $value = $block->render($content->getValue(), $context);
@@ -287,7 +287,7 @@ class CmsTwigExtension extends AbstractExtension
 
         try {
             return $this->router->generate(($prefix ?? null) . $route, $params,
-                $absoluteUrl ? UrlGenerator::ABSOLUTE_URL : UrlGenerator::ABSOLUTE_PATH);
+                $absoluteUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH);
         } catch (RouteNotFoundException $e) {
             return '#404(route:' . $route . ')';
         }

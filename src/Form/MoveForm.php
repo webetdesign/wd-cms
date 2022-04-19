@@ -82,7 +82,7 @@ class MoveForm extends AbstractType
 
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'wd_cms_move_form';
     }

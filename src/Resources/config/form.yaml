@@ -26,7 +26,7 @@ services:
 
   WebEtDesign\CmsBundle\Form\GlobalVarsType:
     arguments:
-      - '@cms.page_provider'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
       - '@service_container'
       - '%wd_cms.vars%'
     tags:

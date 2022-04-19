@@ -22,11 +22,9 @@ use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Form\Type\MenuIconType;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 final class CmsMenuItemAdmin extends AbstractAdmin
 {
-    protected TemplateProvider $pageProvider;
     protected EntityManagerInterface $em;
     private   ?array $configMenu;
 
@@ -38,11 +36,9 @@ final class CmsMenuItemAdmin extends AbstractAdmin
         $class,
         $baseControllerName,
         EntityManagerInterface $em,
-        TemplateProvider $pageProvider,
         $configMenu
     ) {
         $this->em           = $em;
-        $this->pageProvider = $pageProvider;
 
         parent::__construct($code, $class, $baseControllerName);
         $this->configMenu = $configMenu;

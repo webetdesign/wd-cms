@@ -12,7 +12,6 @@ use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 {

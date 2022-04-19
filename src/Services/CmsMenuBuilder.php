@@ -178,8 +178,7 @@ class CmsMenuBuilder
                                     try {
                                         $menuItem->setUri($this->router->generate($route->getName() . $anchor,
                                             $params));
-                                    } catch (InvalidParameterException $exception) {
-                                    } catch (RouteNotFoundException $exception) {
+                                    } catch (InvalidParameterException|RouteNotFoundException $exception) {
                                     }
                                 } else {
                                     try {
@@ -229,7 +228,7 @@ class CmsMenuBuilder
                 $this->buildNodes($menuItem, $children, $parentActive, $activeClass, $locale);
             }
 
-            if ($this->isChildActive($menuItem) && !preg_match('/active/', $liClass)) {
+            if ($this->isChildActive($menuItem) && !str_contains($liClass, 'active')) {
                 $liClass .= ' '.$activeClass;
             }
 
@@ -251,7 +250,7 @@ class CmsMenuBuilder
     {
         $active = false;
         $class  = $item->getAttribute('class');
-        if (preg_match('/active/', $class)) {
+        if (str_contains($class, 'active')) {
             $active = true;
         }
         foreach ($item->getChildren() as $child) {
@@ -261,7 +260,7 @@ class CmsMenuBuilder
                 }
             } else {
                 $class = $child->getAttribute('class');
-                if (preg_match('/active/', $class)) {
+                if (str_contains($class, 'active')) {
                     $active = true;
                 }
             }

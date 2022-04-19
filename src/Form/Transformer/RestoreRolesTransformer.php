@@ -22,12 +22,12 @@ class RestoreRolesTransformer implements DataTransformerInterface
     /**
      * @var array|null
      */
-    protected $originalRoles = null;
+    protected ?array $originalRoles = null;
 
     /**
      * @var EditableRolesBuilder|null
      */
-    protected $rolesBuilder = null;
+    protected ?EditableRolesBuilder $rolesBuilder = null;
 
     public function __construct(EditableRolesBuilder $rolesBuilder)
     {
@@ -42,7 +42,7 @@ class RestoreRolesTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return $value;
@@ -58,7 +58,7 @@ class RestoreRolesTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($selectedRoles)
+    public function reverseTransform($selectedRoles): array
     {
         if (null === $this->originalRoles) {
             throw new \RuntimeException('Invalid state, originalRoles array is not set');

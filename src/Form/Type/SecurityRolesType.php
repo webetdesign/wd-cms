@@ -21,7 +21,7 @@ class SecurityRolesType extends AbstractType
     /**
      * @var EditableRolesBuilder
      */
-    protected $rolesBuilder;
+    protected EditableRolesBuilder $rolesBuilder;
 
     public function __construct(EditableRolesBuilder $rolesBuilder)
     {
@@ -31,7 +31,7 @@ class SecurityRolesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /*
          * The form shows only roles that the current user can edit for the targeted user. Now we still need to persist
@@ -43,16 +43,16 @@ class SecurityRolesType extends AbstractType
         $transformer = new RestoreRolesTransformer($this->rolesBuilder);
 
         // GET METHOD
-        $formBuilder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event) use ($transformer): void {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event) use ($transformer): void {
             $transformer->setOriginalRoles($event->getData());
         });
 
         // POST METHOD
-        $formBuilder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use ($transformer): void {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use ($transformer): void {
             $transformer->setOriginalRoles($event->getForm()->getData());
         });
 
-        $formBuilder->addModelTransformer($transformer);
+        $builder->addModelTransformer($transformer);
     }
 
     /**
@@ -127,7 +127,7 @@ class SecurityRolesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
@@ -135,7 +135,7 @@ class SecurityRolesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'sonata_security_roles';
     }

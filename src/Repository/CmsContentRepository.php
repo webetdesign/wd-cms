@@ -120,14 +120,14 @@ class CmsContentRepository extends ServiceEntityRepository
 
         if ($exist) {
             $block = $list[$exist];
-            if ($block['parent_heritance'] == false) {
+            if (!$block['parent_heritance']) {
                 return $block['cid'];
             } else {
                 return $this->search($list, $block['pid']);
             }
         } else {
             foreach ($list as $block) {
-                if ($block['parent_heritance'] == false) {
+                if (!$block['parent_heritance']) {
                     return $block['cid'];
                 }
             }

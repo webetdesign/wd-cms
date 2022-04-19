@@ -16,20 +16,6 @@ services:
       - '../../Twig'
       - '../../Sitemap'
 
-  WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockContent:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@cms.block_provider'
-      - '@twig'
-    public: true
-
-  WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockCollectionContent:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@cms.block_provider'
-      - '@twig'
-    public: true
-
   # ===============================================
   # REPOSITORY
   # ===============================================
@@ -61,10 +47,13 @@ services:
         template: '@WebEtDesignCms/collectors/template.html.twig'
         id: 'cms.collector'
     arguments:
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
+      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
       - '@cms.helper'
-      - '@cms.page_provider'
-      - '@cms.admin.cms_page'
-      - '@cms.admin.cms_page_declination'
+      - '@sonata.admin.pool'
+      - '@twig'
+      - '@twig.profile'
+      - '@WebEtDesign\CmsBundle\Repository\CmsContentRepository'
       - '%wd_cms.cms%'
 
   cms.routing_loader:
@@ -103,23 +92,6 @@ services:
 
   cms.helper:
     alias: WebEtDesign\CmsBundle\Services\CmsHelper
-
-  # ===============================================
-  # CMS provider
-  # ===============================================
-
-  WebEtDesign\CmsBundle\Services\TemplateProvider:
-    arguments:
-      $config: '%wd_cms.templates%'
-
-  cms.page_provider:
-    alias: WebEtDesign\CmsBundle\Services\TemplateProvider
-    public: true
-
-  cms.block_provider:
-    class: WebEtDesign\CmsBundle\Services\TemplateProvider
-    arguments:
-      $config: '%wd_cms.shared_block%'
 
   # ===============================================
   # Menu

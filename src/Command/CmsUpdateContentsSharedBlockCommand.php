@@ -90,7 +90,7 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
         }
     }
 
-    private function resetSharedBlock(?CmsSharedBlock $block)
+    private function resetSharedBlock(?CmsSharedBlock $block): void
     {
         $this->io->title('Update sharedBlock ' . $block->getLabel());
 
@@ -98,12 +98,10 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
             $config = $this->sharedBlockFactory->get($block->getTemplate());
         } catch (Exception $e) {
             $this->io->error($e->getMessage());
-            return false;
+            return;
         }
 
         $this->processContent($block, $config);
-
-        return true;
     }
 
     protected function selectTemplate(): string

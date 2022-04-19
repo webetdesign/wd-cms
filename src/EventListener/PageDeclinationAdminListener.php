@@ -67,7 +67,7 @@ class PageDeclinationAdminListener
     }
 
     private function generateTechnicName(CmsPageDeclination $declination) {
-        
+
         $technicName = $declination->getPage()->getRoute()->getName();
         $values = json_decode($declination->getParams(), true);
         $route = $declination->getPage()->getRoute();
@@ -76,7 +76,7 @@ class PageDeclinationAdminListener
         foreach ($values as $name => $value) {
             $param = $config['params'][$name] ?? null;
             if ($param && isset($param['entity']) && isset($param['property'])) {
-                if ($this->cmsConfig['multilingual'] == true && is_subclass_of($param['entity'], TranslatableInterface::class)) {
+                if ($this->cmsConfig['multilingual'] && is_subclass_of($param['entity'], TranslatableInterface::class)) {
                     $method = 'findOneBy' . ucfirst($param['property']);
                     $locale = $declination->getPage()->getSite()->getLocale();
                     $entity = $this->em->getRepository($param['entity'])->$method($value, $locale);
@@ -90,7 +90,7 @@ class PageDeclinationAdminListener
                 $values[$name] = $entity ?? null;
             }
         }
-        
+
         return $technicName;
     }
 }

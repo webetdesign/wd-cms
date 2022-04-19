@@ -14,13 +14,11 @@ use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Knp\Menu\ItemInterface as MenuItemInterface;
 use function in_array;
 
 final class CmsMenuAdmin extends AbstractAdmin
 {
-    protected TemplateProvider $pageProvider;
     private   EntityManager $em;
 
     /**
@@ -29,17 +27,14 @@ final class CmsMenuAdmin extends AbstractAdmin
      * @param string $class
      * @param string $baseControllerName
      * @param EntityManager $em
-     * @param TemplateProvider $pageProvider
      */
     public function __construct(
         string $code,
         string $class,
         string $baseControllerName,
         EntityManager $em,
-        TemplateProvider $pageProvider
     ) {
         $this->em           = $em;
-        $this->pageProvider = $pageProvider;
         parent::__construct($code, $class, $baseControllerName);
     }
 
@@ -49,7 +44,7 @@ final class CmsMenuAdmin extends AbstractAdmin
     public function configureActionButtons(array $list, string $action, ?object $object = null): array
     {
 
-        if (in_array($action, ['tree'], true)
+        if ($action === 'tree'
             && $this->getChild('cms.admin.cms_menu_item')->hasRoute('create')
         ) {
             $list['addItem'] = [
@@ -57,7 +52,7 @@ final class CmsMenuAdmin extends AbstractAdmin
             ];
         }
 
-        if (in_array($action, ['tree'], true)
+        if ($action === 'tree'
             && $this->getChild('cms.admin.cms_menu_item')->hasRoute('create')
         ) {
             $list['editMenu'] = [
@@ -65,7 +60,7 @@ final class CmsMenuAdmin extends AbstractAdmin
             ];
         }
 
-        if (in_array($action, ['tree'], true)
+        if ($action === 'tree'
             && $this->hasRoute('generateFromPage') && $this->isGranted(ManageContentVoter::CAN_MANAGE_CONTENT)
         ) {
             $list['generateFromPage'] = [

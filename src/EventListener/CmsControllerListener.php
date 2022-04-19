@@ -10,20 +10,12 @@ namespace WebEtDesign\CmsBundle\EventListener;
 
 
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
-use Symfony\Component\HttpKernel\Event\KernelEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Controller\BaseCmsController;
-use WebEtDesign\CmsBundle\Controller\CmsController;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\CmsBundle\Services\CmsHelper;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 class CmsControllerListener
 {

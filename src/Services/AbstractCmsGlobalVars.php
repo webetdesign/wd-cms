@@ -8,6 +8,7 @@
 
 namespace WebEtDesign\CmsBundle\Services;
 
+use JetBrains\PhpStorm\ArrayShape;
 use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
 
@@ -96,7 +97,7 @@ class AbstractCmsGlobalVars implements GlobalVarsInterface
         return $this->delimiter;
     }
 
-    public function getDelimiters()
+    #[ArrayShape(['s' => "string", 'e' => "string"])] public function getDelimiters()
     {
         switch ($this->delimiter) {
             case CmsGlobalVarsDelimiterEnum::DOUBLE_UNDERSCORE:

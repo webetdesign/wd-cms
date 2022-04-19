@@ -10,6 +10,7 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -21,7 +22,7 @@ use Symfony\Component\Form\FormEvents;
  */
 class JsonFormListener implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    #[ArrayShape([FormEvents::PRE_SET_DATA => "array"])] public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => ['preSetData', 100],

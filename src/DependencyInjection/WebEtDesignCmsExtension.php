@@ -9,6 +9,7 @@
 namespace WebEtDesign\CmsBundle\DependencyInjection;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Sonata\Doctrine\Mapper\Builder\ColumnDefinitionBuilder;
 use Sonata\Doctrine\Mapper\DoctrineCollector;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -42,7 +43,6 @@ class WebEtDesignCmsExtension extends Extension
         $loader->load('services.yaml');
         $loader->load('admin.yaml');
         $loader->load('command.yaml');
-        $loader->load('customContent.yaml');
         $loader->load('listener.yaml');
         $loader->load('menu.yaml');
         $loader->load('form.yaml');
@@ -127,7 +127,7 @@ class WebEtDesignCmsExtension extends Extension
         $container->setParameter('wd_cms.admin.content.user', $config['class']['user']);
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'web_et_design_cms';
     }
@@ -137,7 +137,7 @@ class WebEtDesignCmsExtension extends Extension
         $collector = DoctrineCollector::getInstance();
 
         $collector->addInheritanceType(AbstractCmsRoute::class,
-            ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE);
+            ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE);
         $collector->addDiscriminator(AbstractCmsRoute::class, 'base', CmsRoute::class);
         $collector->addDiscriminatorColumn(AbstractCmsRoute::class,
             ColumnDefinitionBuilder::create()

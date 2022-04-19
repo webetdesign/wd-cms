@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use JetBrains\PhpStorm\ArrayShape;
 use stdClass;
 
 /**
@@ -231,7 +232,9 @@ class CmsMenuItem
         $this->setMoveTarget($values['moveTarget']);
     }
 
-    public function getPosition()
+    #[ArrayShape(['moveMode'   => "null|String",
+                  'moveTarget' => "null|\WebEtDesign\CmsBundle\Entity\CmsMenuItem"
+    ])] public function getPosition()
     {
         return [
             'moveMode' => $this->getMoveMode(),
@@ -527,15 +530,13 @@ class CmsMenuItem
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSite()
+    public function getSite(): CmsSite
     {
-        $this->getMenu()->getSite();
+        return $this->getMenu()->getSite();
     }
 
-    public function getSlug(){
+    public function getSlug(): string
+    {
         $slugify = new Slugify();
         return $slugify->slugify($this->getName(), "_");
     }

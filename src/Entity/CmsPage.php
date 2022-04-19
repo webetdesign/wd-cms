@@ -9,6 +9,7 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use JetBrains\PhpStorm\ArrayShape;
 use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
 use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
@@ -187,7 +188,7 @@ class CmsPage
         $this->setMoveTarget($values['moveTarget']);
     }
 
-    public function getPosition()
+    #[ArrayShape(['moveMode' => "mixed|null|string", 'moveTarget' => "mixed|null"])] public function getPosition()
     {
         return [
             'moveMode' => $this->getMoveMode(),

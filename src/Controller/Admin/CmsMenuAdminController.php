@@ -78,73 +78,7 @@ class CmsMenuAdminController extends CRUDController
             ]);
     }
 
-    public function generateFromPageAction($id = null)
-    {
-        $em = $this->getDoctrine()->getManager();
-        /** @var CmsSite $site */
-        if ($id == null) {
-            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-        } else {
-            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
-        }
-        $pages    = $em->getRepository('WebEtDesignCmsBundle:CmsPage')->getPagesBySite($site);
-        $rootPage = $site->getRootPage();
-
-        $menu = $em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy([
-            'site' => $site,
-            'type' => CmsMenuTypeEnum::PAGE_ARBO
-        ]);
-
-        if ($menu) {
-            $this->addFlash('warning',
-                'Un menu de type arborescence existe déjà pour ce site, vous ne pouvez pas en créer d\'autres');
-            $this->redirectToList();
-        } else {
-            $menu = new CmsMenu();
-            $menu->setLabel($site->getLabel());
-            $menu->setCode((!empty($site->getTemplateFilter()) ? $site->getTemplateFilter() . '_' : "") . 'main_arbo');
-            $menu->setType(CmsMenuTypeEnum::PAGE_ARBO);
-            $menu->setSite($site);
-            $menu->initRoot = false;
-            $em->persist($menu);
-        }
-
-        $root = new CmsMenuItem();
-        $root->setName('root ' . $menu->getSite() . " " . $menu->getCode());
-        $root->setMenu($menu);
-        $em->persist($root);
-
-
-        $items = [];
-        /** @var CmsPage $page */
-        foreach ($pages as $page) {
-            if ($page->getLvl() === 0) {
-                continue;
-            }
-            $items[$page->getId()] = new CmsMenuItem();
-            $items[$page->getId()]->setMenu($menu);
-
-            $items[$page->getId()]->setIsVisible($page->isActive());
-            $items[$page->getId()]->setLinkType(CmsMenuLinkTypeEnum::CMS_PAGE);
-            $items[$page->getId()]->setPage($page);
-
-            $items[$page->getId()]->setName($page->getTitle());
-            if ($page->getParent()->getId() === $rootPage->getId()) {
-                $items[$page->getId()]->setParent($root);
-            } else {
-                $items[$page->getId()]->setParent($items[$page->getParent()->getId()]);
-            }
-
-            $em->persist($items[$page->getId()]);
-
-        }
-        $em->flush();
-
-        return $this->redirectToList();
-
-    }
-
-    public function treeAction($id)
+    public function treeAction($id): RedirectResponse|Response
     {
         $em       = $this->getDoctrine();
         $datagrid = $this->admin->getDatagrid();

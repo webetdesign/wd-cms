@@ -1,18 +1,4 @@
 services:
-  WebEtDesign\CmsBundle\Command\CmsMigrationArboCommand:
-    arguments:
-      - ~
-      - '@doctrine.orm.default_entity_manager'
-    tags:
-      - { name: 'console.command', command: 'cms:migration-arbo' }
-
-  WebEtDesign\CmsBundle\Command\CmsGenerateContentsPositionCommand:
-    arguments:
-      - ~
-      - '@doctrine.orm.default_entity_manager'
-    tags:
-      - { name: 'console.command', command: 'cms:gen-contents-position' }
-
   WebEtDesign\CmsBundle\Command\CmsUpdatePageParamsCommand:
     arguments:
       - '@doctrine.orm.default_entity_manager'

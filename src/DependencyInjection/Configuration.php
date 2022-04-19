@@ -16,7 +16,7 @@ use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('web_et_design_cms');
         $rootNode = $treeBuilder->getRootNode();
@@ -121,7 +121,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('pages')->setDeprecated()
+                ->arrayNode('pages')->setDeprecated('WdCms', '3.0.0', 'web_et_design_cms.pages is deprecated')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()
@@ -197,7 +197,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('sharedBlock')->setDeprecated()
+                ->arrayNode('sharedBlock')->setDeprecated('WdCms', '3.0.0', 'web_et_design_cms.sharedBlock is deprecated')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()
@@ -217,7 +217,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('customContents')->setDeprecated()
+                ->arrayNode('customContents')->setDeprecated('WdCms', '3.0.0', 'web_et_design_cms.customContents is deprecated')
                     ->useAttributeAsKey('code')
                     ->arrayPrototype()
                         ->children()

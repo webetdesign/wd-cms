@@ -20,7 +20,7 @@ class CmsBlockTransformer implements DataTransformerInterface
         $this->em = $em;
     }
 
-    public function transform($value, $deep = false)
+    public function transform($value, $deep = false): mixed
     {
         $this->deep = $deep;
         if (is_string($value) && is_array(json_decode($value, true))) {
@@ -38,7 +38,7 @@ class CmsBlockTransformer implements DataTransformerInterface
         return $value;
     }
 
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (is_array($value)) {
             $value = $this->reverseTransformArray($value);

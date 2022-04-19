@@ -97,7 +97,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
 
         $id = $this->getRequest()->get('id');
 
-        if (!$childAdmin && in_array($action, ['list'])) {
+        if (!$childAdmin && $action == 'list') {
             $sites = $this->em->getRepository(CmsSite::class)->findAll();
             if (sizeof($sites) > 1) {
                 foreach ($sites as $site) {

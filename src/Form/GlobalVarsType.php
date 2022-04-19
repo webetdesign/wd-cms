@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 
 /**
  * Class TemplateType
@@ -19,18 +19,16 @@ use WebEtDesign\CmsBundle\Services\TemplateProvider;
 class GlobalVarsType extends AbstractType
 {
     protected $globalVars;
-    protected $pageProvider;
 
-    public function __construct(TemplateProvider $pageProvider, Container $container, $globalVarsDefinition)
+    public function __construct(private TemplateFactoryInterface $templateFactory, Container $container, $globalVarsDefinition)
     {
-        $this->pageProvider = $pageProvider;
         $this->globalVars   = $container->get($globalVarsDefinition['global_service']);
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $page = $options['page'];
-        $config = $this->pageProvider->getConfigurationFor($page->getTemplate());
+        $config = $this->templateFactory->get($page->getTemplate());
         $objectVars = !empty($config['entityVars']) ? $config['entityVars']::getAvailableVars() : [];
         $d = $this->globalVars->getDelimiters();
 
@@ -54,12 +52,12 @@ class GlobalVarsType extends AbstractType
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'cms_global_vars';
     }
 
-    public function getParent()
+    public function getParent(): string
     {
         return TextType::class;
     }

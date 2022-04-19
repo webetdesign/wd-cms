@@ -243,21 +243,11 @@ class CmsSite
     }
 
     /**
-     * @param string $flagIcon
+     * @param string|null $flagIcon
      */
     public function setFlagIcon(?string $flagIcon): void
     {
         $this->flagIcon = $flagIcon;
-    }
-
-    public function getMenuArbo()
-    {
-        $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq('type', CmsMenuTypeEnum::PAGE_ARBO));
-
-        $menus = $this->menus->matching($criteria);
-
-        return $menus[0] ?? null;
     }
 
     public function getMenu()

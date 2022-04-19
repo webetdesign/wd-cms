@@ -48,7 +48,7 @@
         var items = document.querySelectorAll('.nested_move_item');
         items.forEach(function (item) {
           item.addEventListener('click', function () {
-            var radio = item.querySelector('input[type="radio"');
+            var radio = item.querySelector('input[type="radio"]');
             if (!radio.attributes.hasOwnProperty('disabled')) {
               document.querySelector('label[for="{{ form.moveTarget.vars.id }}"]').innerText = item.querySelector('label').dataset.labelText
             }

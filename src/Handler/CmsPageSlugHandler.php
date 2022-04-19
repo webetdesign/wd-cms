@@ -18,7 +18,7 @@ class CmsPageSlugHandler implements SlugHandlerInterface
     /**
      * @var SluggableListener
      */
-    protected $sluggable;
+    protected SluggableListener $sluggable;
 
     /**
      * Callable of original transliterator
@@ -33,7 +33,7 @@ class CmsPageSlugHandler implements SlugHandlerInterface
         $this->sluggable = $sluggable;
     }
 
-    public function postSlugBuild(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug)
+    public function postSlugBuild(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug): void
     {
         $this->originalTransliterator = $this->sluggable->getTransliterator();
         $this->sluggable->setTransliterator([$this, 'transliterate']);
@@ -45,7 +45,7 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      * @param CmsPage $object
      * @return string
      */
-    public function transliterate($text, $separator, $object)
+    public function transliterate($text, $separator, $object): string
     {
         $slugify = new Slugify();
         $res    = $slugify->slugify($text);
@@ -77,7 +77,7 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      *
      * @return void
      */
-    public function onChangeDecision(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug, &$needToChangeSlug)
+    public function onChangeDecision(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug, &$needToChangeSlug): void
     {
         $this->om         = $ea->getObjectManager();
         $needToChangeSlug = true;
@@ -93,14 +93,14 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      *
      * @return void
      */
-    public function onSlugCompletion(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug)
+    public function onSlugCompletion(\Gedmo\Sluggable\Mapping\Event\SluggableAdapter $ea, array &$config, $object, &$slug): void
     {
     }
 
     /**
      * @return boolean whether or not this handler has already urlized the slug
      */
-    public function handlesUrlization()
+    public function handlesUrlization(): bool
     {
         return true;
     }
@@ -111,7 +111,7 @@ class CmsPageSlugHandler implements SlugHandlerInterface
      * @param array $options
      * @param ClassMetadata $meta
      */
-    public static function validate(array $options, ClassMetadata $meta)
+    public static function validate(array $options, ClassMetadata $meta): void
     {
     }
 }

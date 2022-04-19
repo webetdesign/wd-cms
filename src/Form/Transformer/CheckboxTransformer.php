@@ -7,7 +7,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class CheckboxTransformer implements DataTransformerInterface
 {
 
-    public function transform($value)
+    public function transform($value): bool
     {
         return filter_var($value, FILTER_VALIDATE_BOOL);
     }

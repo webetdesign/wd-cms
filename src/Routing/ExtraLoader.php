@@ -3,7 +3,6 @@
 namespace WebEtDesign\CmsBundle\Routing;
 
 use Exception;
-use PDOException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Doctrine\ORM\EntityManager;
@@ -14,12 +13,14 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ExtraLoader implements LoaderInterface
 {
-    protected $loaded = false;
+    protected bool $loaded = false;
 
-    protected $em = null;
+    protected ?EntityManager $em = null;
 
-    protected $parameterBag = null;
-    private   $cmsConfig;
+    protected ?ContainerBagInterface $parameterBag = null;
+    private ?array                   $cmsConfig;
+
+    protected ?LoaderResolverInterface $resolver;
 
     /**
      * ExtraLoader constructor.
@@ -36,7 +37,7 @@ class ExtraLoader implements LoaderInterface
         $this->cmsConfig    = $cmsConfig;
     }
 
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): RouteCollection
     {
         try {
             $con = $this->em->getConnection();
@@ -123,29 +124,28 @@ class ExtraLoader implements LoaderInterface
         }
 
 
-//        if ($this->cmsConfig['multisite']) {
-//            $sitemap = new Route('/sitemap.xml', [
-//                '_controller' => 'WebEtDesign\CmsBundle\Controller\SitemapController'
-//            ]);
-//            $routeCollection->add('sitemap', $sitemap);
-//        }
+        //        if ($this->cmsConfig['multisite']) {
+        //            $sitemap = new Route('/sitemap.xml', [
+        //                '_controller' => 'WebEtDesign\CmsBundle\Controller\SitemapController'
+        //            ]);
+        //            $routeCollection->add('sitemap', $sitemap);
+        //        }
 
         return $routeCollection;
     }
 
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return 'cms' === $type;
     }
 
-    public function getResolver()
+    public function getResolver(): ?LoaderResolverInterface
     {
-        // needed, but can be blank, unless you want to load other resources
-        // and if you do, using the Loader base class is easier (see below)
+        return $this->resolver;
     }
 
     public function setResolver(LoaderResolverInterface $resolver)
     {
-        // same as above
+        $this->resolver = $resolver;
     }
 }
