@@ -16,13 +16,13 @@ use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
 use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoOpenGraphAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
+use WebEtDesign\SeoBundle\Admin\SmoOpenGraphAdminTrait;
+use WebEtDesign\SeoBundle\Admin\SmoTwitterAdminTrait;
 
 final class CmsPageDeclinationAdmin extends AbstractAdmin
 {
-    use SmoTwitterAdminTrait;
     use SmoOpenGraphAdminTrait;
+    use SmoTwitterAdminTrait;
     use GlobalVarsAdminTrait;
 
     protected EntityManager $em;

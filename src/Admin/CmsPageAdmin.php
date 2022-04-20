@@ -213,7 +213,7 @@ class CmsPageAdmin extends AbstractAdmin
         //region Général
         $form
             ->tab('cms_page.tab.general')// The tab call is optional
-            ->with('', ['box_class' => '']);
+            ->with('', ['box_class' => 'header_none']);
 
         $form
             ->add('title', null, ['label' => 'cms_page.form.title.label']);
@@ -261,12 +261,12 @@ class CmsPageAdmin extends AbstractAdmin
             $form->tab('cms_page.tab.seo');// The tab call is optional
             $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable);
             $form->with('cms_page.tab.general',
-                ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
+                ['class' => 'col-xs-12 col-md-4', 'box_class' => '', 'translation_domain' => 'wd_seo'])
                 ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'])
                 ->add('seo_description', TextareaType::class,
                     ['label' => 'wd_seo.form.seo_description.label', 'required' => false])
                 ->add('breadcrumb', null,
-                    ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'])
+                    ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'], ['translation_domain' => $this->getTranslationDomain()])
                 ->end();
             $this->addFormFieldSmoOpenGraph($form);
             $this->addFormFieldSmoTwitter($form);

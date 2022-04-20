@@ -10,12 +10,12 @@ persistAsPrevSiblingOf: 'Déplacer avant :'
 'Cms Shared Block List': Blocs partagés
 'Cms Site List': Sites
 
-cms_page.tab.general: Général
-cms_page.tab.seo: Référencement naturel
-cms_page.tab.content: Gestion des contenus
-cms_page.tab.route: Route
-cms_page.tab.security: Sécurité
-cms_page.tab.multilingual: MultiLingue
+form.group_cms_page_tab_general: Général
+form.group_cms_page_tab_seo: Référencement naturel
+form.group_cms_page_tab_content: Gestion des contenus
+form.group_cms_page_tab_route: Route
+form.group_cms_page_tab_security: Sécurité
+form.group_cms_page_tab_multilingual: MultiLingue
 
 cms_page.form.title.label: Titre de la page dans l'interface d'administration
 cms_page.form.template.label: Modèle de page

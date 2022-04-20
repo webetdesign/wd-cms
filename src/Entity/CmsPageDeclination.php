@@ -4,9 +4,9 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
-use WebEtDesign\CmsBundle\Utils\SmoOpenGraphTrait;
-use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
 use Doctrine\ORM\Mapping as ORM;
+use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
+use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
 
 /**
@@ -25,55 +25,55 @@ class CmsPageDeclination
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var CmsPage
+     * @var CmsPage|null
      *
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="declinations")
      * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    private $page;
+    private ?CmsPage $page = null;
 
     /**
      * @var string
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
-    private $title;
+    private string $title = '';
 
     /**
      * @var string
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
-    private $technic_name;
+    private string $technic_name = '';
 
     /**
      * @var string
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
-    private $locale;
+    private string $locale = '';
 
     /**
      * @var ArrayCollection|PersistentCollection
      *
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="declination", cascade={"remove", "persist"})
      */
-    private $contents;
+    private PersistentCollection|ArrayCollection $contents;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean", length=255, nullable=false, options={"default": false})
      */
-    private $active = false;
+    private bool $active = false;
 
     /**
      * @var string
      * @ORM\Column(type="text", length=255, nullable=false)
      */
-    private $params = '[]';
+    private string $params = '[]';
 
     /**
      * @inheritDoc
@@ -92,7 +92,7 @@ class CmsPageDeclination
         return (string)$this->getTitle();
     }
 
-    public function getPath()
+    public function getPath(): array|string|null
     {
         $params = json_decode($this->getParams(), true);
         $pagePath = $this->getPage()->getRoute()->getPath();
@@ -120,9 +120,9 @@ class CmsPageDeclination
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getContents()
+    public function getContents(): ArrayCollection|PersistentCollection
     {
         return $this->contents;
     }
@@ -178,16 +178,16 @@ class CmsPageDeclination
      * @param mixed $page
      * @return CmsPageDeclination
      */
-    public function setPage($page)
+    public function setPage($page): static
     {
         $this->page = $page;
         return $this;
     }
 
     /**
-     * @return CmsPage
+     * @return CmsPage|null
      */
-    public function getPage()
+    public function getPage(): ?CmsPage
     {
         return $this->page;
     }
@@ -196,7 +196,7 @@ class CmsPageDeclination
      * @param string $params
      * @return CmsPageDeclination
      */
-    public function setParams($params)
+    public function setParams($params): static
     {
         $this->params = $params;
         return $this;

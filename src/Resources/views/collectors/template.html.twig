@@ -73,106 +73,111 @@
 
 {% block menu %}
     {# This left-hand menu appears when using the full-screen profiler. #}
-    <span class="label">
-        <span class="icon"><img src="{{ asset('bundles/webetdesigncms/img/logo-compact-2.svg') }}"></span>
-        <strong>CMS</strong>
-    </span>
+    {% if collector.data is defined and collector.data is not empty and collector.data is not null
+        and collector.data.serviceRC is defined and collector.data.serviceRC is not empty %}
+        <span class="label">
+            <span class="icon"><img src="{{ asset('bundles/webetdesigncms/img/logo-compact-2.svg') }}"></span>
+            <strong>CMS</strong>
+        </span>
+    {% endif %}
 {% endblock %}
 
 {% block panel %}
-    <h2>CMS ::
-        <a href="{{ collector.data.serviceRC.fileName|file_link(1) }}">{{ collector.data.serviceRC.className }}</a>
-    </h2>
+    {% if collector.data is defined and collector.data is not empty and collector.data is not null
+        and collector.data.serviceRC is defined and collector.data.serviceRC is not empty %}
+        <h2>CMS ::
+            <a href="{{ collector.data.serviceRC.fileName|file_link(1) }}">{{ collector.data.serviceRC.className }}</a>
+        </h2>
 
-    <table>
-        <tr>
-            <th>code</th>
-            <td>{{ collector.data.service.code }}</td>
-        </tr>
+        <table>
+            <tr>
+                <th>code</th>
+                <td>{{ collector.data.service.code }}</td>
+            </tr>
 
-        <tr>
-            <th>label</th>
-            <td>{{ collector.data.service.label }}</td>
-        </tr>
+            <tr>
+                <th>label</th>
+                <td>{{ collector.data.service.label }}</td>
+            </tr>
 
-        <tr>
-            <th>template</th>
-            <td>
-                {%- set template = collector.data.service.template -%}
-                {%- set file = collector.templatePaths[template]|default(false) -%}
-                {%- set link = file ? file|file_link(1) : false -%}
-                <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
-                {% if link %}
-                    <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
-                    <div>
-                        <a class="text-muted" href="{{ link }}" title="{{ file }}">
-                            {{ file|file_relative|default(file) }}
-                        </a>
+            <tr>
+                <th>template</th>
+                <td>
+                    {%- set template = collector.data.service.template -%}
+                    {%- set file = collector.templatePaths[template]|default(false) -%}
+                    {%- set link = file ? file|file_link(1) : false -%}
+                    <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+                    {% if link %}
+                        <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
+                        <div>
+                            <a class="text-muted" href="{{ link }}" title="{{ file }}">
+                                {{ file|file_relative|default(file) }}
+                            </a>
+                        </div>
+                    {% else %}
+                        {{ template }}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+        <h2>Blocks</h2>
+
+        <div class="sf-tabs">
+            {% for block in collector.blocks %}
+                <div class="tab">
+                    <div class="tab-title">
+                        {{ block.config.code }}
                     </div>
-                {% else %}
-                    {{ template }}
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-
-    <h2>Blocks</h2>
-
-    <div class="sf-tabs">
-        {% for block in collector.blocks %}
-            <div class="tab">
-                <div class="tab-title">
-                    {{ block.config.code }}
+                    <div class="tab-content">
+                        <h3>
+                            Block :
+                            <a href="{{ block.serviceRC.fileName|file_link(1) }}">{{ block.serviceRC.className }}</a>
+                        </h3>
+                        <table>
+                            <tr>
+                                <th>code</th>
+                                <td>{{ block.config.code }}</td>
+                            </tr>
+                            <tr>
+                                <th>label</th>
+                                <td>{{ block.config.label }}</td>
+                            </tr>
+                            <tr>
+                                <th>template</th>
+                                <td>
+                                    {%- set template = block.config.template -%}
+                                    {%- set file = collector.templatePaths[template]|default(false) -%}
+                                    {%- set link = file ? file|file_link(1) : false -%}
+                                    <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+                                    {% if link %}
+                                        <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
+                                        <div>
+                                            <a class="text-muted" href="{{ link }}" title="{{ file }}">
+                                                {{ file|file_relative|default(file) }}
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        {{ template }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>settings</th>
+                                <td>
+                                    {{ dump(block.config.settings) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>value</th>
+                                <td>
+                                    {{ dump(block.value) }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
-                <div class="tab-content">
-                    <h3>
-                        Block :
-                        <a href="{{ block.serviceRC.fileName|file_link(1) }}">{{ block.serviceRC.className }}</a>
-                    </h3>
-                    <table>
-                        <tr>
-                            <th>code</th>
-                            <td>{{ block.config.code }}</td>
-                        </tr>
-                        <tr>
-                            <th>label</th>
-                            <td>{{ block.config.label }}</td>
-                        </tr>
-                        <tr>
-                            <th>template</th>
-                            <td>
-                                {%- set template = block.config.template -%}
-                                {%- set file = collector.templatePaths[template]|default(false) -%}
-                                {%- set link = file ? file|file_link(1) : false -%}
-                                <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
-                                {% if link %}
-                                    <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
-                                    <div>
-                                        <a class="text-muted" href="{{ link }}" title="{{ file }}">
-                                            {{ file|file_relative|default(file) }}
-                                        </a>
-                                    </div>
-                                {% else %}
-                                    {{ template }}
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>settings</th>
-                            <td>
-                                {{ dump(block.config.settings) }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>value</th>
-                            <td>
-                                {{ dump(block.value) }}
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endblock %}

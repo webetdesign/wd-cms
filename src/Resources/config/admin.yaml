@@ -29,7 +29,7 @@ services:
       - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
       - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Pages }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Pages, label_translator_strategy: sonata.admin.label.strategy.underscore }
     calls:
       - [setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['edit', '@@WebEtDesignCms/admin/page/edit.html.twig']]
