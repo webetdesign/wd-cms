@@ -35,7 +35,7 @@ class SiteAdminListener
         $this->parameterBag = $parameterBag;
     }
 
-    public function prePersist($event)
+    public function prePersist($event): void
     {
         $em = $event->getEntityManager();
         /** @var CmsSite $site */
@@ -54,7 +54,7 @@ class SiteAdminListener
         }
     }
 
-    public function postUpdate($event)
+    public function postUpdate($event): void
     {
         $site = $event->getObject();
 
@@ -77,15 +77,15 @@ class SiteAdminListener
     }
 
     // remove cache routing file and warmup cache
-    protected function warmUpRouteCache()
+    protected function warmUpRouteCache(): void
     {
         $cacheDir = $this->kernel->getCacheDir();
 
-//        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
-//            $className = $this->router->getOption($option);
-//            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
-//            $this->fs->remove($cacheFile);
-//        }
+        foreach (['matcher_class', 'generator_class'] as $option) {
+            $className = $this->router->getOption($option);
+            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
+            $this->fs->remove($cacheFile);
+        }
 
         $this->router->warmUp($cacheDir);
     }
@@ -95,7 +95,7 @@ class SiteAdminListener
      * @param CmsSite $site
      * @throws \Doctrine\ORM\ORMException
      */
-    private function createMenu(EntityManager $em, CmsSite $site)
+    private function createMenu(EntityManager $em, CmsSite $site): void
     {
         $menu = new CmsMenu();
         $menu->setLabel('Menu principal')
@@ -118,13 +118,14 @@ class SiteAdminListener
         $em->persist($homepage);
     }
 
-    private function createPage(EntityManager $em, CmsSite $site)
+    private function createPage(EntityManager $em, CmsSite $site): void
     {
         $tmplName = $this->parameterBag->get('wd_cms.cms')['default_home_template'];
 
         $page = new CmsPage();
         $page->setTemplate(!empty($site->getTemplateFilter()) ? ($site->getTemplateFilter() . '_' . $tmplName) : $tmplName);
         $page->setTitle('Homepage');
+        $page->setActive(true);
         $page->rootPage = true;
         $site->addPage($page);
 

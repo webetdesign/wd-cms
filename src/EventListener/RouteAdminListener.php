@@ -38,7 +38,7 @@ class RouteAdminListener
         $this->kernel    = $kernel;
     }
 
-    public function postUpdate($event)
+    public function postUpdate($event): void
     {
         $route = $event->getObject();
 
@@ -50,15 +50,15 @@ class RouteAdminListener
     }
 
 
-    protected function warmUpRouteCache()
+    protected function warmUpRouteCache(): void
     {
         $cacheDir = $this->kernel->getCacheDir();
 
-//        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
-//            $className = $this->router->getOption($option);
-//            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
-//            $this->fs->remove($cacheFile);
-//        }
+        foreach (['matcher_class', 'generator_class'] as $option) {
+            $className = $this->router->getOption($option);
+            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
+            $this->fs->remove($cacheFile);
+        }
 
         $this->router->warmUp($cacheDir);
     }

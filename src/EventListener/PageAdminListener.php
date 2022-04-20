@@ -48,7 +48,7 @@ class PageAdminListener
     }
 
     // create page form template configuration
-    public function prePersist($event)
+    public function prePersist($event): void
     {
         $page = $event->getObject();
 
@@ -72,7 +72,7 @@ class PageAdminListener
     }
 
     // create route from template configuration
-    public function postPersist($event)
+    public function postPersist($event): void
     {
         $page = $event->getObject();
 
@@ -92,7 +92,7 @@ class PageAdminListener
     }
 
     // clear cache routing on update
-    public function postUpdate($event)
+    public function postUpdate($event): void
     {
         $page = $event->getObject();
 
@@ -116,20 +116,20 @@ class PageAdminListener
     }
 
     // remove cache routing file and warmup cache
-    protected function warmUpRouteCache()
+    protected function warmUpRouteCache(): void
     {
         $cacheDir = $this->kernel->getCacheDir();
 
-        //        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
-        //            $className = $this->router->getOption($option);
-        //            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
-        //            $this->fs->remove($cacheFile);
-        //        }
+        foreach (['matcher_class', 'generator_class'] as $option) {
+            $className = $this->router->getOption($option);
+            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
+            $this->fs->remove($cacheFile);
+        }
 
         $this->router->warmUp($cacheDir);
     }
 
-    protected function createRoute(AbstractPage $config, CmsPage $page)
+    protected function createRoute(AbstractPage $config, CmsPage $page): void
     {
         $paramString  = '';
         $defaults     = [];
@@ -190,7 +190,7 @@ class PageAdminListener
         $this->em->flush();
     }
 
-    protected function moveItems(EntityManager $em, $submittedObject)
+    protected function moveItems(EntityManager $em, $submittedObject): void
     {
         $cmsRepo = $em->getRepository(CmsMenuItem::class);
 

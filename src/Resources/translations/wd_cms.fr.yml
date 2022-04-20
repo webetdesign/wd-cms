@@ -9,6 +9,7 @@ persistAsPrevSiblingOf: 'Déplacer avant :'
 'Cms Menu Item Tree': Menus
 'Cms Shared Block List': Blocs partagés
 'Cms Site List': Sites
+breadcrumb.link_cms_page_list: Arborescence de pages
 
 form.group_cms_page_tab_general: Général
 form.group_cms_page_tab_seo: Référencement naturel
