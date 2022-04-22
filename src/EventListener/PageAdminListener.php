@@ -166,7 +166,9 @@ class PageAdminListener
         $CmsRoute->setName($routeName);
 
         if (!empty($route->getController())) {
-            $CmsRoute->setController($route->getController());
+            $controller = $route->getController();
+            $controller .= '::' . (!empty($route->getAction()) ? $route->getAction() : '__invoke');
+            $CmsRoute->setController($controller);
         }
 
         if ($route->getPath()) {

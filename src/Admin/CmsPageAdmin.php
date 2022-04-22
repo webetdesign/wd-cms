@@ -250,7 +250,7 @@ class CmsPageAdmin extends AbstractAdmin
             //region Général - additional
             $form
                 ->tab('cms_page.tab.general')// The tab call is optional
-                ->with('', ['box_class' => ''])
+                ->with('', ['box_class' => 'header_none'])
                 ->add('active', null, ['label' => 'cms_page.form.active.label']);
 
             $form->end();                  // End form group

@@ -9,6 +9,7 @@ class RouteDefinition
     protected ?string $path       = null;
     protected ?string $name       = null;
     protected ?string $controller = null;
+    protected ?string $action     = null;
     protected array   $attributes = [];
     protected array   $methods    = [Request::METHOD_GET];
 
@@ -105,5 +106,23 @@ class RouteDefinition
     public function getController(): ?string
     {
         return $this->controller;
+    }
+
+    /**
+     * @param string|null $action
+     * @return RouteDefinition
+     */
+    public function setAction(?string $action): RouteDefinition
+    {
+        $this->action = $action;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAction(): ?string
+    {
+        return $this->action;
     }
 }
