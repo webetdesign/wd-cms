@@ -137,6 +137,10 @@ class PageAdminListener
 
         $route = $config->getRoute();
 
+        if (!$route) {
+            return;
+        }
+
         foreach ($route->getAttributes() as $attribute) {
             $paramString                         .= "/{" . $attribute->getName() . "}";
             $defaults[$attribute->getName()]     = $attribute->getDefault();

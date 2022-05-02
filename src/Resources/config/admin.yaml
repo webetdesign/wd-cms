@@ -1,11 +1,19 @@
 services:
   cms.admin.cms_site:
     class: WebEtDesign\CmsBundle\Admin\CmsSiteAdmin
-    arguments: [~, WebEtDesign\CmsBundle\Entity\CmsSite, WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController, '%wd_cms.cms%']
+    arguments:
+      - ~
+      - WebEtDesign\CmsBundle\Entity\CmsSite
+      - '@doctrine.orm.entity_manager'
+      - WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController
+      - '%wd_cms.cms%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: Sites}
     calls:
       - [ setTranslationDomain, [ 'wd_cms' ] ]
+      - [ addChild, [ '@cms.admin.cms_page', 'site' ] ]
+      - [ addChild, [ '@cms.admin.cms_shared_block', 'site' ] ]
+      - [ addChild, [ '@cms.admin.cms_menu', 'site' ] ]
     public: true
 
   cms.admin.cms_route:
@@ -60,12 +68,12 @@ services:
       - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController
       - '@doctrine.orm.default_entity_manager'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Menus }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Menus, label_translator_strategy: sonata.admin.label.strategy.underscore }
     calls:
-      - [setTranslationDomain, ['wd_cms']]
+      - [setTranslationDomain, ['CmsMenuAdmin']]
       #      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/menu/actionButtons/button_create.html.twig']]
-      - [setTemplate, ['edit', 'WebEtDesignCmsBundle:admin/menu:edit.html.twig']]
+      - [setTemplate, ['edit', '@@WebEtDesignCms/admin/menu/edit.html.twig']]
       - [addChild, ['@cms.admin.cms_menu_item', 'menu']]
     public: true
 
@@ -78,9 +86,9 @@ services:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.menu%'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false, label_translator_strategy: sonata.admin.label.strategy.underscore }
     calls:
-      - [ setTranslationDomain, [ 'wd_cms' ] ]
+      - [ setTranslationDomain, [ 'CmsMenuItemAdmin' ] ]
       - [setTemplate, ['edit', '@@WebEtDesignCms/admin/menuItem/edit.html.twig']]
     public: true
 
@@ -96,9 +104,9 @@ services:
       - '@parameter_bag'
       - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Blocs partagés }
+      - { name: sonata.admin, manager_type: orm, group: CMS, label: Blocs partagés, label_translator_strategy: sonata.admin.label.strategy.underscore }
     calls:
-      - [ setTranslationDomain, [ 'wd_cms' ] ]
+      - [ setTranslationDomain, [ 'CmsSharedBlockAdmin' ] ]
 #      - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
       - [setTemplate, ['button_create', '@@WebEtDesignCms/admin/sharedBlock/actionButtons/button_create.html.twig']]
 

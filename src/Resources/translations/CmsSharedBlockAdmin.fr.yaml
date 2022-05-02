@@ -1,0 +1,18 @@
+
+breadcrumb.link_cms_shared_block_list: Bloc partagé
+breadcrumb.link_cms_shared_block_create: Création
+
+form.group_général: Général
+form.group_contenus: Contenus
+
+form.label_code: Code
+form.label_label: label
+form.label_template: Modèle
+form.label_active: Actif
+
+list.label_id: Id
+list.label_code: Code
+list.label_label: Nom
+list.label_template: Modèle
+list.label_active: Actif
+list.label__actions: Actions

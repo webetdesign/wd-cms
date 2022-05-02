@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Knp\Menu\ItemInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 
 final class CmsSiteAdmin extends AbstractAdmin
@@ -17,20 +21,26 @@ final class CmsSiteAdmin extends AbstractAdmin
     protected ?bool $isMultilingual;
     protected ?bool $isMultisite;
 
-    protected function configureRoutes(RouteCollectionInterface $collection): void
-    {
-        $collection->remove('export');
-    }
-
     /**
      * @inheritDoc
      */
-    public function __construct(string $code, string $class, string $baseControllerName, $cmsConfig)
-    {
+    public function __construct(
+        string $code,
+        string $class,
+        private EntityManagerInterface $em,
+        string $baseControllerName,
+        $cmsConfig
+    ) {
         $this->isMultisite    = $cmsConfig['multisite'];
         $this->isMultilingual = $cmsConfig['multilingual'];
 
         parent::__construct($code, $class, $baseControllerName);
+    }
+
+    protected function configureRoutes(RouteCollectionInterface $collection): void
+    {
+        $collection->remove('export');
+        $collection->remove('show');
     }
 
 
@@ -42,6 +52,85 @@ final class CmsSiteAdmin extends AbstractAdmin
             ->add('locale')
             ->add('host');
     }
+
+    protected function configureTabMenu(
+        ItemInterface $menu,
+        string $action,
+        ?AdminInterface $childAdmin = null
+    ): void {
+        $admin = $this->isChild() ? $this->getParent() : $this;
+
+        switch (true) {
+            case $childAdmin instanceof CmsPageAdmin:
+                $routeName = 'cms.admin.cms_page.tree';
+                break;
+            case $childAdmin instanceof CmsSharedBlockAdmin:
+                $routeName = 'cms.admin.cms_shared_block.list';
+                break;
+            case $childAdmin instanceof CmsMenuAdmin:
+                $routeName = 'cms.admin.cms_menu.tree';
+                break;
+            default:
+                return;
+        }
+
+
+        if ($action == 'list' || $action == 'tree') {
+            $groups = [];
+
+            foreach ($this->em->getRepository(CmsSite::class)->findAll() as $site) {
+                $key = !empty($site->getTemplateFilter()) ? $site->getTemplateFilter() : 'standalone';
+                if (!isset($groups)) {
+                    $groups[$key] = [];
+                }
+                $groups[$key][] = $site;
+            }
+
+
+            $activeId = $this->getRequest()->attributes->get('id');
+            if (sizeof($groups) > 1) {
+                foreach ($groups as $k => $sites) {
+                    if ( sizeof($sites) === 1 || $k === 'standalone') {
+                        foreach ($sites as $site) {
+                            $active = $site->getId() == $activeId;
+
+                            $menu->addChild(
+                                $site->__toString(),
+                                [
+                                    'uri'        => $admin->generateUrl($routeName, ['id' => $site->getId()]),
+                                    'attributes' => ['class' => $active ? 'active' : ""]
+                                ]
+                            );
+                        }
+
+                    } else {
+
+                        $child   = $menu->addChild($sites[0]->getLabel());
+                        $classes = 'dropdown ';
+
+                        foreach ($sites as $site) {
+                            $active = $site->getId() == $activeId;
+
+                            if ($active) {
+                                $classes .= 'active';
+                            }
+
+                            $child->addChild(
+                                $site->__toString(),
+                                [
+                                    'uri'        => $admin->generateUrl($routeName, ['id' => $site->getId()]),
+                                    'attributes' => ['class' => $active ? 'active' : ""]
+                                ]
+                            );
+                        }
+                        $child->setAttribute('dropdown', true);
+                        $child->setAttribute('class', $classes);
+                    }
+                }
+            }
+        }
+    }
+
 
     protected function configureListFields(ListMapper $listMapper): void
     {
@@ -63,9 +152,17 @@ final class CmsSiteAdmin extends AbstractAdmin
         $listMapper
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
-                    'show'   => [],
                     'edit'   => [],
                     'delete' => [],
+                    'pages'  => [
+                        'template' => '@WebEtDesignCms/admin/site/list__action_pages.html.twig'
+                    ],
+                    'shared_blocks'  => [
+                        'template' => '@WebEtDesignCms/admin/site/list__action_shared_blocks.html.twig'
+                    ],
+                    'menus'  => [
+                        'template' => '@WebEtDesignCms/admin/site/list__action_menus.html.twig'
+                    ],
                 ],
             ]);
 
@@ -93,7 +190,7 @@ final class CmsSiteAdmin extends AbstractAdmin
                         sans prefix : monsite.fr <br> avec prefix : monsite.com/fr"
                 ])
                 ->add('flagIcon', null, [
-                    'help' =>  "<a href='https://www.countryflags.io' target='_blank'>Code du drapeau</a> ex: fr => <img src='https://www.countryflags.io/fr/flat/32.png' alt='fr'>"
+                    'help' => "<a href='https://www.countryflags.io' target='_blank'>Code du drapeau</a> ex: fr => <img src='https://www.countryflags.io/fr/flat/32.png' alt='fr'>"
                 ]);
         }
     }

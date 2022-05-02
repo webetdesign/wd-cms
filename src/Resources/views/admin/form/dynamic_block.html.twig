@@ -14,8 +14,8 @@
 
 {% block admin_cms_dynamic_block_collection_row %}
     <div data-controller="cms-adbc" {{ allow_add ? _self.prototypes_row_attr(form.vars.prototypes, form.vars.prototypeNames) : '' }} data-cms-adbc-max-value="{{ max }}">
-        <div class="box-group" id="{{ form.vars.id }}_accordion" data-cms-adbc-target="collection">
-            {{ form_widget(form) }}
+        <div class="box-group" id="{{ form.vars.id }}_accordion">
+            {{ form_widget(form, {attr: { 'data-cms-adbc-target': 'collection' }}) }}
         </div>
         {% if allow_add %}
             <div class="block-selector-container form-inline">
@@ -64,7 +64,7 @@
 {% block cms_blocks_block_row %}
     {% for child in form.children %}
         {% set config = block_configs[child.vars.name] %}
-        {% set unique_key = form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code %}
+        {% set unique_key = form.vars.unique_block_prefix ~ '_' ~ form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code %}
         <div class="panel box">
             <div class="box-header with-border">
                 <h4 class="box-title">

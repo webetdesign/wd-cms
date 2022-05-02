@@ -32,11 +32,16 @@ class CmsSiteRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    public function findOther($site)
+    public function findOther($site, $templateFilter = null)
     {
         $qb = $this->createQueryBuilder('s')
             ->where('s <> :site')
             ->setParameter('site', $site);
+
+        if ($templateFilter) {
+            $qb->andWhere('s.templateFilter = :templateFilter')
+                ->setParameter('templateFilter', $templateFilter);
+        }
 
         return $qb->getQuery()->getResult();
     }

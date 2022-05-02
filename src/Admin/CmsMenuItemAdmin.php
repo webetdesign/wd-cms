@@ -26,7 +26,7 @@ use WebEtDesign\CmsBundle\Form\Type\MenuIconType;
 final class CmsMenuItemAdmin extends AbstractAdmin
 {
     protected EntityManagerInterface $em;
-    private   ?array $configMenu;
+    private ?array                   $configMenu;
 
     /**
      * @inheritDoc
@@ -38,7 +38,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
         EntityManagerInterface $em,
         $configMenu
     ) {
-        $this->em           = $em;
+        $this->em = $em;
 
         parent::__construct($code, $class, $baseControllerName);
         $this->configMenu = $configMenu;
@@ -48,7 +48,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
     protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection->add('move', 'move/{itemId}');
-        //        $collection->remove('list');
+        $collection->remove('show');
     }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
@@ -107,10 +107,10 @@ final class CmsMenuItemAdmin extends AbstractAdmin
 
         $formMapper
             ->tab('General')
-            ->with('', ['box_class' => ''])
+            ->with('', ['box_class' => 'header_none'])
             ->add('name')
             ->add('information', TextType::class, [
-                'label' => 'Informations',
+                'label'    => 'Informations',
                 'required' => false
             ])
             ->add('isVisible', null, ['label' => 'Actif']);
@@ -137,7 +137,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
         if ($object && $object->getId() != null) {
             $formMapper
                 ->tab('Lien')
-                ->with('', ['box_class' => ''])
+                ->with('', ['box_class' => 'header_none'])
                 ->add('linkType', ChoiceType::class, [
                     'choices'  => CmsMenuLinkTypeEnum::getChoices(),
                     'label'    => 'Type de lien',
@@ -215,11 +215,10 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             // fin tab lien
             $formMapper
                 ->tab('Avancé')
-                ->with('', ['box_class' => '']);
+                ->with('', ['box_class' => 'header_none']);
 
             $formMapper
                 ->add('blank', null, ['label' => 'Nouvelle fenetre'])
-
                 ->add('liClass', null, [
                     'label'    => 'item class (li)',
                     'required' => false,
@@ -243,7 +242,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                         "uniquement si l'utilisateur n'est pas connecté" => 'ONLY_LOGOUT'
                     ],
                     'label'   => 'Visible',
-                    'help' =>  "Permet de dynamiser le menu si l'utilisateur est connecté ou non"
+                    'help'    => "Permet de dynamiser le menu si l'utilisateur est connecté ou non"
                 ])
                 ->add('role');
 

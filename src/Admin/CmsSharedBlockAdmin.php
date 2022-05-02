@@ -81,37 +81,9 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
     {
         $collection
             ->remove('export')
+            ->remove('show')
             ->add('createRootNode', 'initRoot')
-            ->add('move', 'move')
-            ->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
-
-        $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
-    }
-
-    protected function configureSideMenu(
-        MenuItemInterface $menu,
-        $action,
-        AdminInterface $childAdmin = null
-    ) {
-        $admin = $this->isChild() ? $this->getParent() : $this;
-
-        $id = $this->getRequest()->get('id');
-
-        if (!$childAdmin && $action == 'list') {
-            $sites = $this->em->getRepository(CmsSite::class)->findAll();
-            if (sizeof($sites) > 1) {
-                foreach ($sites as $site) {
-                    $active = $site->getId() == $id;
-                    $menu->addChild(
-                        $site->__toString(),
-                        [
-                            'uri'        => $admin->generateUrl('list', ['id' => $site->getId()]),
-                            'attributes' => ['class' => $active ? 'active' : ""]
-                        ]
-                    );
-                }
-            }
-        }
+            ->add('move', 'move');
     }
 
     protected function configureFormFields(FormMapper $formMapper): void
@@ -179,12 +151,6 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             $formMapper->end();
             //endregion
         }
-    }
-
-    protected function configureShowFields(ShowMapper $showMapper): void
-    {
-        $showMapper
-            ->add('id');
     }
 
     /**

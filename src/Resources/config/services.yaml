@@ -97,9 +97,9 @@ services:
   # Menu
   # ===============================================
 
-  WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder:
-    autowire: true
-    public: true
+#  WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder:
+#    autowire: true
+#    public: true
 
   WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder:
     autowire: true

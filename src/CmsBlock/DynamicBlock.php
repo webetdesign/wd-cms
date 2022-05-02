@@ -13,6 +13,7 @@ class DynamicBlock extends AbstractBlock
     protected string $formType = DynamicBlockCollectionType::class;
 
     protected array $formOptions = [
+        'required'          => false,
         'base_block_config' => true,
     ];
 
@@ -32,7 +33,8 @@ class DynamicBlock extends AbstractBlock
                 'last'  => $key === array_key_last($values)
             ];
 
-            $blocks[$key . '_' . $blockData['disc']] = $block->render($blockData['value'], $context);
+            $blocks[$key . '_' . $blockData['disc']] = $block->render($blockData['value'],
+                $context);
         }
 
 

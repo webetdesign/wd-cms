@@ -72,6 +72,20 @@ class CmsPageRepository extends NestedTreeRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function getBuilderByCollections(?array $collections = null)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.lft', 'ASC');
+
+        if (!empty($collections)) {
+            $qb->join('p.site', 's');
+            $qb->andWhere($qb->expr()->in('s.templateFilter', ':templateFilter'))
+                ->setParameter('templateFilter', $collections);
+        }
+
+        return $qb;
+    }
+
     // /**
     //  * @return CmsPage[] Returns an array of CmsPage objects
     //  */

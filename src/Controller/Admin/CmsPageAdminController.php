@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Controller\Admin;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
@@ -11,6 +12,7 @@ use Sonata\AdminBundle\Admin\Pool;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\LockException;
 use Sonata\AdminBundle\Exception\ModelManagerException;
+use Sonata\AdminBundle\Form\Type\Operator\ContainsOperatorType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,7 +20,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder;
 use WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -33,25 +34,24 @@ class CmsPageAdminController extends CRUDController
 
     private RequestStack            $requestStack;
     private CmsPageDeclinationAdmin $declinationAdmin;
-    private PageBreadcrumbsBuilder  $pageBreadcrumbsBuilder;
     private Pool                    $pool;
+    private EntityManagerInterface  $em;
 
     /**
      * @param RequestStack $requestStack
      * @param CmsPageDeclinationAdmin $declinationAdmin
-     * @param PageBreadcrumbsBuilder $pageBreadcrumbsBuilder
      * @param Pool $pool
      */
     public function __construct(
         RequestStack $requestStack,
         CmsPageDeclinationAdmin $declinationAdmin,
-        PageBreadcrumbsBuilder $pageBreadcrumbsBuilder,
         Pool $pool,
+        EntityManagerInterface $entityManager,
     ) {
         $this->requestStack           = $requestStack;
         $this->declinationAdmin       = $declinationAdmin;
-        $this->pageBreadcrumbsBuilder = $pageBreadcrumbsBuilder;
         $this->pool                   = $pool;
+        $this->em                     = $entityManager;
     }
 
     protected function preList(Request $request): ?Response
@@ -107,33 +107,16 @@ class CmsPageAdminController extends CRUDController
 
     public function treeAction($id = null)
     {
+
         $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
-        /** @var EntityManagerInterface $em */
-        $em = $this->getDoctrine();
-        if ($id === null) {
-            if ($session->get('admin_current_site_id')) {
-                $id = $session->get('admin_current_site_id');
-            } else {
-                $defaultSite = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-                if (!$defaultSite) {
-                    $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
-
-                    return $this->redirect($this->pool->getAdminByAdminCode('cms.admin.cms_site')->generateUrl('list'));
-                }
-
-                $id = $defaultSite->getId();
-            }
-            $request->attributes->set('id', $id);
-        }
 
         $datagrid = $this->admin->getDatagrid();
 
         if ($id) {
             $session->set('admin_current_site_id', $id);
-            $datagrid->setValue('site', null, $id);
 
-            $rp = $em->getRepository('WebEtDesignCmsBundle:CmsPage');
+            $rp = $this->em->getRepository('WebEtDesignCmsBundle:CmsPage');
             $qb = $rp->createQueryBuilder('p');
 
             $qb
@@ -186,55 +169,38 @@ class CmsPageAdminController extends CRUDController
      */
     public function listAction(Request $request): Response
     {
-        $id = $request->get($this->admin->getIdParameter(), null);
-
-        if ($this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault() == null) {
+        $defaultSite = $this->em->getRepository(CmsSite::class)->getDefault();
+        if ($defaultSite === null) {
             $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
-
             return $this->redirect($this->pool->getAdminByAdminCode('cms.admin.cms_site')->generateUrl('list'));
         }
 
-        if (!$request->get('filter')) {
-            return new RedirectResponse($this->admin->generateUrl('tree'));
+        try {
+            $parent = $this->admin->getParent();
+        } catch (LogicException $e) {
+            $parent = null;
         }
 
-        $this->admin->checkAccess('list');
+        $session = $request->getSession();
 
-        $preResponse = $this->preList($request);
-        if (null !== $preResponse) {
-            return $preResponse;
+        if (!$parent) {
+            $site = null;
+            if ($session->get('admin_current_site_id')) {
+                $id = $session->get('admin_current_site_id');
+                $site = $this->em->find(CmsSite::class, $id);
+            }
+
+            if ($site === null) {
+                $site = $defaultSite;
+            }
+        } else {
+            $site = $this->admin->getParent()->getSubject();
         }
 
-        if ($listMode = $request->get('_list_mode')) {
-            $this->admin->setListMode($listMode);
-        }
+        $siteAdmin = $this->pool->getAdminByClass(CmsSite::class);
+        $url = $siteAdmin->generateUrl('cms.admin.cms_page.tree', ['id' => $site->getId()]);
 
-        $datagrid = $this->admin->getDatagrid();
-
-        if ($id) {
-            $datagrid->setValue('site', null, $id);
-        }
-
-        $formView = $datagrid->getForm()->createView();
-
-        // set the theme for the current Admin Form
-        $twig = $this->get('twig');
-        $twig->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFilterTheme());
-
-        // NEXT_MAJOR: Remove this line and use commented line below it instead
-        $template = $this->admin->getTemplateRegistry()->getTemplate('list');
-
-        // $template = $this->templateRegistry->getTemplate('list');
-
-        return $this->renderWithExtraParams($template, [
-            'action'         => 'list',
-            'form'           => $formView,
-            'datagrid'       => $datagrid,
-            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
-            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
-                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
-                $this->admin->getExportFormats(),
-        ], null);
+        return $this->redirect($url);
     }
 
     /**
@@ -629,21 +595,6 @@ class CmsPageAdminController extends CRUDController
     public function redirectToTree()
     {
         return $this->redirect($this->admin->generateUrl('tree'));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function addRenderExtraParams(array $parameters = []): array
-    {
-        if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
-            $parameters['breadcrumbs_builder'] = $this->pageBreadcrumbsBuilder;
-        }
-
-        $parameters['admin']         = $parameters['admin'] ?? $this->admin;
-        $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
-
-        return $parameters;
     }
 
     public function duplicateAction()

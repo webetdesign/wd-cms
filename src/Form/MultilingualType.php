@@ -40,7 +40,7 @@ class MultilingualType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $site        = $options['site'];
-        $this->sites = $this->em->getRepository($this->siteClass)->findOther($site);
+        $this->sites = $this->em->getRepository($this->siteClass)->findOther($site, $options['templateFilter']);
 
         /** @var CmsSite $s */
         foreach ($this->sites as $s) {
@@ -73,9 +73,10 @@ class MultilingualType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'page'     => null,
-                'site'     => null,
-                'compound' => true
+                'page'           => null,
+                'site'           => null,
+                'compound'       => true,
+                'templateFilter' => null
             ]
         );
     }

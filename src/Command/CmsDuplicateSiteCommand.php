@@ -97,6 +97,7 @@ class CmsDuplicateSiteCommand extends Command
             $newSite->setHost($site->getHost());
             $newSite->setHostMultilingual($site->isHostMultilingual());
             $newSite->setDefault(false);
+            $newSite->setTemplateFilter($site->getTemplateFilter());
 
             $label = $io->ask('Label', $site->getLabel());
             $newSite->setLabel($label);
@@ -109,6 +110,8 @@ class CmsDuplicateSiteCommand extends Command
 
 
         $this->duplicate($site, $newSite, $doClean);
+
+        return 0;
     }
 
     /**

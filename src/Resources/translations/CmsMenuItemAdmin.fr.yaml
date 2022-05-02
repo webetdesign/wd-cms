@@ -1,0 +1,13 @@
+
+breadcrumb.link_cms_menu_item_list: Arborescences
+breadcrumb.link_cms_menu_item_create: Création
+
+form.group_general: Général
+form.group_lien: Lien
+form.group_avancé: Options avancé
+
+form.label_code: Code
+form.label_name: Nom
+form.label_label: label
+
+form.label_role: Rôle

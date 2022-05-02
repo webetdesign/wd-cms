@@ -78,13 +78,10 @@ final class CmsMenuAdmin extends AbstractAdmin
     {
         $collection
             ->add('createRootNode', 'initRoot')
-            ->add('move', 'move/{id}');
+            ->add('move', 'move/{childId}');
 
-        $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
-        $collection->add('tree', 'tree/{id}', ['id' => null], ['id' => '\d*']);
-        $collection->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
-        $collection->add('generateFromPage', 'generateFromPage/{id}', ['id' => null],
-            ['id' => '\d*']);
+        $collection->add('tree', 'tree');
+        $collection->remove('show');
 
     }
 

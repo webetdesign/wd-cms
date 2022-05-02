@@ -2,10 +2,13 @@
 
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
+use Sonata\AdminBundle\Admin\Pool;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -33,7 +36,8 @@ class CmsMenuAdminController extends CRUDController
      */
     public function __construct(
         RequestStack $requestStack,
-        protected MenuBreadcrumbsBuilder $menuBreadcrumbsBuilder
+        protected EntityManagerInterface $em,
+        protected Pool $pool
     ) {
         $this->requestStack = $requestStack;
     }
@@ -145,28 +149,40 @@ class CmsMenuAdminController extends CRUDController
         ], null);
     }
 
-    public function listAction($id = null): Response
+    public function listAction(Request $request): Response
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $session = $request->getSession();
-
-        if ($id === null) {
-            if ($session->get('admin_current_site_id')) {
-                $id = $session->get('admin_current_site_id');
-            } else {
-                $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-                if (!$defaultSite) {
-                    $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
-
-                    return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
-                }
-
-                $id = $defaultSite->getId();
-            }
-            $request->attributes->set('id', $id);
+        $defaultSite = $this->em->getRepository(CmsSite::class)->getDefault();
+        if ($defaultSite === null) {
+            $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+            return $this->redirect($this->pool->getAdminByAdminCode('cms.admin.cms_site')->generateUrl('list'));
         }
 
-        return $this->redirect($this->admin->generateUrl('tree', ['id' => $id]));
+        try {
+            $parent = $this->admin->getParent();
+        } catch (LogicException $e) {
+            $parent = null;
+        }
+
+        $session = $request->getSession();
+
+        if (!$parent) {
+            $site = null;
+            if ($session->get('admin_current_site_id')) {
+                $id = $session->get('admin_current_site_id');
+                $site = $this->em->find(CmsSite::class, $id);
+            }
+
+            if ($site === null) {
+                $site = $defaultSite;
+            }
+        } else {
+            $site = $this->admin->getParent()->getSubject();
+        }
+
+        $siteAdmin = $this->pool->getAdminByClass(CmsSite::class);
+        $url = $siteAdmin->generateUrl('cms.admin.cms_menu.tree', ['id' => $site->getId()]);
+
+        return $this->redirect($url);
     }
 
     /**
@@ -397,23 +413,6 @@ class CmsMenuAdminController extends CRUDController
         }
 
         $this->getDoctrine()->getManager()->flush();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function addRenderExtraParams(array $parameters = []): array
-    {
-        if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
-            $parameters['breadcrumbs_builder'] = $this->menuBreadcrumbsBuilder;
-        }
-
-        $parameters['admin']         = $parameters['admin'] ?? $this->admin;
-        $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
-        // NEXT_MAJOR: Remove next line.
-        $parameters['admin_pool'] = $this->get('sonata.admin.pool');
-
-        return $parameters;
     }
 
 }

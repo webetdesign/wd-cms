@@ -13,7 +13,6 @@ use Sonata\AdminBundle\Builder\FormContractorInterface;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -87,58 +86,61 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected function configureRoutes(RouteCollection|RouteCollectionInterface $collection): void
     {
-        $collection->add('move', 'move/{id}');
+        $collection->add('move', 'move/{childId}');
         $collection->add('test', 'test');
-        $collection->add('list', 'list/{id}', ['id' => null], ['id' => '\d*']);
-        $collection->add('tree', 'tree/{id}', ['id' => null], ['id' => '\d*']);
-        $collection->add('create', 'create/{id}', ['id' => null], ['id' => '\d*']);
-        $collection->add('duplicate', 'duplicate/{id}', ['id' => null], ['id' => '\d*']);
+        $collection->add('list', 'list', ['id' => null], ['id' => '\d*']);
+        $collection->add('tree', 'tree', ['id' => null], ['id' => '\d*']);
+        $collection->add('create', 'create', ['id' => null], ['id' => '\d*']);
+        $collection->add('duplicate', 'duplicate/{childId}', ['id' => null], ['id' => '\d*']);
 
         parent::configureRoutes($collection);
     }
 
-    protected function configureSideMenu(
-        MenuItemInterface $menu,
-        $action,
-        AdminInterface $childAdmin = null
-    ) {
-        $admin   = $this->isChild() ? $this->getParent() : $this;
-        $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
-
-        $id = $this->getRequest()->get('id');
-
-        if (!$childAdmin && $action == 'tree') {
-            $sites = $this->em->getRepository(CmsSite::class)->findAll();
-            if (sizeof($sites) > 1) {
-                foreach ($sites as $site) {
-                    $active = $site->getId() == $this->getRequest()->attributes->get('id');
-                    $menu->addChild(
-                        $site->__toString(),
-                        [
-                            'uri'        => $admin->generateUrl('tree', ['id' => $site->getId()]),
-                            'attributes' => ['class' => $active ? 'active' : ""]
-                        ]
-                    );
-                }
-            }
-        }
-
-        if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
-            return;
-        }
-
-        if ($this->declination && $subject->getId() != null && $subject->getRoute() && $subject->getRoute()->isDynamic()) {
-            $menu->addChild(
-                'Page',
-                ['uri' => $admin->generateUrl('edit', ['id' => $id])]
-            );
-
-            $menu->addChild(
-                'Déclinaison',
-                ['uri' => $admin->generateUrl('cms.admin.cms_page_declination.list', ['id' => $id])]
-            );
-        }
-    }
+    //    protected function configureTabMenu(
+    //        MenuItemInterface $menu,
+    //        string $action,
+    //        ?AdminInterface $childAdmin = null
+    //    ): void {
+    //        $admin   = $this->isChild() ? $this->getParent() : $this;
+    //        $subject = $this->isChild() ? $this->getParent()->getSubject() : $this->getSubject();
+    //
+    //
+    //        dump('la');
+    //
+    //        $id = $this->getRequest()->get('id');
+    //
+    //        if (!$childAdmin && $action == 'tree') {
+    //            $sites = $this->em->getRepository(CmsSite::class)->findAll();
+    //            if (sizeof($sites) > 1) {
+    //                foreach ($sites as $site) {
+    //                    $active = $site->getId() == $this->getRequest()->attributes->get('id');
+    //                    $menu->addChild(
+    //                        $site->__toString(),
+    //                        [
+    //                            'uri'        => $admin->generateUrl('tree', ['id' => $site->getId()]),
+    //                            'attributes' => ['class' => $active ? 'active' : ""]
+    //                        ]
+    //                    );
+    //                }
+    //            }
+    //        }
+    //
+    //        if (!$childAdmin && !in_array($action, ['edit', 'show'])) {
+    //            return;
+    //        }
+    //
+    //        if ($this->declination && $subject->getId() != null && $subject->getRoute() && $subject->getRoute()->isDynamic()) {
+    //            $menu->addChild(
+    //                'Page',
+    //                ['uri' => $admin->generateUrl('edit', ['id' => $id])]
+    //            );
+    //
+    //            $menu->addChild(
+    //                'Déclinaison',
+    //                ['uri' => $admin->generateUrl('cms.admin.cms_page_declination.list', ['id' => $id])]
+    //            );
+    //        }
+    //    }
 
     protected function configureDatagridFilters(DatagridMapper $filter): void
     {
@@ -261,12 +263,16 @@ class CmsPageAdmin extends AbstractAdmin
             $form->tab('cms_page.tab.seo');// The tab call is optional
             $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable);
             $form->with('cms_page.tab.general',
-                ['class' => 'col-xs-12 col-md-4', 'box_class' => '', 'translation_domain' => 'wd_seo'])
+                ['class'              => 'col-xs-12 col-md-4',
+                 'box_class'          => '',
+                 'translation_domain' => 'wd_seo'
+                ])
                 ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'])
                 ->add('seo_description', TextareaType::class,
                     ['label' => 'wd_seo.form.seo_description.label', 'required' => false])
                 ->add('breadcrumb', null,
-                    ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'], ['translation_domain' => $this->getTranslationDomain()])
+                    ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'],
+                    ['translation_domain' => $this->getTranslationDomain()])
                 ->end();
             $this->addFormFieldSmoOpenGraph($form);
             $this->addFormFieldSmoTwitter($form);
@@ -348,13 +354,14 @@ class CmsPageAdmin extends AbstractAdmin
             if ($this->multilingual) {
                 //region MultiLingue
                 $form->tab('cms_page.tab.multilingual')
-                    ->with('', ['box_class' => '']);
+                    ->with('', ['box_class' => 'header_none']);
 
                 if ($object->getRoot()->getSite()) {
                     $form->add('crossSitePages', MultilingualType::class, [
-                        'site'  => $object->getRoot()->getSite(),
-                        'page'  => $object,
-                        'label' => 'cms_page.form.cross_site_pages.label',
+                        'site'           => $object->getRoot()->getSite(),
+                        'page'           => $object,
+                        'label'          => 'cms_page.form.cross_site_pages.label',
+                        'templateFilter' => $site->getTemplateFilter(),
                     ]);
 
                     $form->getFormBuilder()->get('crossSitePages')->addModelTransformer(new CallbackTransformer(

@@ -26,9 +26,9 @@ file that was distributed with this source code.
                     {% endif %}
                     <a class="label label-default pull-right" data-toggle="tooltip" title="Editer" href="{{ admin.generateObjectUrl('edit', page) }}"><i class="fa fa-pencil"></i></a>
                     {% if not page.rootPage %}
-                        <a href="{{ admin.generateObjectUrl('duplicate', page) }}" class="label label-default pull-right" title="+">
-                            <i class="fa fa-copy" aria-hidden="true"></i>
-                        </a>
+{#                        <a href="{{ admin.generateObjectUrl('duplicate', page) }}" class="label label-default pull-right" title="+">#}
+{#                            <i class="fa fa-copy" aria-hidden="true"></i>#}
+{#                        </a>#}
                     {% endif %}
                     <span class="label label-{% if page.isActive %}success{% else %}danger{% endif %} pull-right">Active</span>
                     {% if page.declinations.count > 0 %}
