@@ -15,6 +15,7 @@ use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsRouteInterface;
 use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
+use function Symfony\Component\String\u;
 
 class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 {
@@ -127,13 +128,11 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         $route->setMethods($routeConfig->getMethods());
 
         $defaultName = $routeConfig->getName();
-        if ($this->configCms['multilingual']) {
-            $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(),
-                $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(),
-                $page->getId());
-        } else {
-            $routeName = $defaultName ?: sprintf('cms_route_%s', $page->getId());
-        }
+        $routeName = sprintf('%s%s%s',
+            $this->configCms['multilingual'] ? $page->getSite()->getLocale() . '_' : '',
+            !empty($page->getSite()->getTemplateFilter()) ? u($page->getSite()->getTemplateFilter())->snake() . '_' : '',
+            !empty($defaultName) ? $defaultName : sprintf('cms_route_%s', $page->getId())
+        );
 
         // Pour éviter le problème de doublon de route
         $exists = $this->em->getRepository(CmsRoute::class)->findSameRoute($route, $routeName);
