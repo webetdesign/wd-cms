@@ -63,8 +63,11 @@ class ExtraLoader implements LoaderInterface
             if ($cmsSite) {
                 $langPrefix = !empty($cmsSite->getLocale()) && !$cmsSite->isHostMultilingual() ? '/' . $cmsSite->getLocale() : null;
                 $host       = !empty($cmsSite->getHost()) ? $cmsSite->getHost() : null;
-                if (isset($_ENV['LOCAL_PREFIX']) && !empty($_ENV['LOCAL_PREFIX'])) {
-                    $host = 'local-' . $host;
+                if (isset($_ENV['MULTISITE_LOCALHOST'])
+                    && filter_var($_ENV['MULTISITE_LOCALHOST'], FILTER_VALIDATE_BOOLEAN)
+                    && !empty($cmsSite->getLocalhost()))
+                {
+                    $host = $cmsSite->getLocalhost();
                 }
             }
 

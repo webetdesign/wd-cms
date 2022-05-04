@@ -90,14 +90,15 @@ final class CmsSiteAdmin extends AbstractAdmin
             $activeId = $this->getRequest()->attributes->get('id');
             if (sizeof($groups) > 1) {
                 foreach ($groups as $k => $sites) {
-                    if ( sizeof($sites) === 1 || $k === 'standalone') {
+                    if (sizeof($sites) === 1 || $k === 'standalone') {
                         foreach ($sites as $site) {
                             $active = $site->getId() == $activeId;
 
                             $menu->addChild(
                                 $site->__toString(),
                                 [
-                                    'uri'        => $admin->generateUrl($routeName, ['id' => $site->getId()]),
+                                    'uri'        => $admin->generateUrl($routeName,
+                                        ['id' => $site->getId()]),
                                     'attributes' => ['class' => $active ? 'active' : ""]
                                 ]
                             );
@@ -118,7 +119,8 @@ final class CmsSiteAdmin extends AbstractAdmin
                             $child->addChild(
                                 $site->__toString(),
                                 [
-                                    'uri'        => $admin->generateUrl($routeName, ['id' => $site->getId()]),
+                                    'uri'        => $admin->generateUrl($routeName,
+                                        ['id' => $site->getId()]),
                                     'attributes' => ['class' => $active ? 'active' : ""]
                                 ]
                             );
@@ -141,7 +143,11 @@ final class CmsSiteAdmin extends AbstractAdmin
         $listMapper
             ->add('id')
             ->add('label')
-            ->add('host')
+            ->add('host', null, [
+                'template'            => '@WebEtDesignCms/admin/site/list__host_field.html.twig',
+                'MULTISITE_LOCALHOST' => isset($_ENV['MULTISITE_LOCALHOST'])
+                    && filter_var($_ENV['MULTISITE_LOCALHOST'], FILTER_VALIDATE_BOOLEAN)
+            ])
             ->add('visible')
             ->add('default');
         if ($this->isMultilingual) {
@@ -152,15 +158,15 @@ final class CmsSiteAdmin extends AbstractAdmin
         $listMapper
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
-                    'edit'   => [],
-                    'delete' => [],
-                    'pages'  => [
+                    'edit'          => [],
+                    'delete'        => [],
+                    'pages'         => [
                         'template' => '@WebEtDesignCms/admin/site/list__action_pages.html.twig'
                     ],
-                    'shared_blocks'  => [
+                    'shared_blocks' => [
                         'template' => '@WebEtDesignCms/admin/site/list__action_shared_blocks.html.twig'
                     ],
-                    'menus'  => [
+                    'menus'         => [
                         'template' => '@WebEtDesignCms/admin/site/list__action_menus.html.twig'
                     ],
                 ],
@@ -172,11 +178,20 @@ final class CmsSiteAdmin extends AbstractAdmin
     {
         $formMapper
             ->add('label')
-            ->add('host')
             ->add('default', null, [
                 'help' => "Site associé par défaut lorsque l'on crée une page"
             ]);
         if ($this->isMultisite) {
+            $MULTISITE_LOCALHOST = isset($_ENV['MULTISITE_LOCALHOST'])
+                && filter_var($_ENV['MULTISITE_LOCALHOST'], FILTER_VALIDATE_BOOLEAN);
+
+            $formMapper->add('host', null, [
+                'attr' => $MULTISITE_LOCALHOST ? ['disabled' => 'disabled'] : []
+            ]);
+            if ($MULTISITE_LOCALHOST) {
+                $formMapper->add('localhost');
+            }
+
             $formMapper->add('templateFilter', null, [
                 'help' => 'Technique'
             ]);

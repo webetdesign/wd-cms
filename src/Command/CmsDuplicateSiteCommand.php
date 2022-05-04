@@ -95,6 +95,7 @@ class CmsDuplicateSiteCommand extends Command
             $newSite = new CmsSite();
             $newSite->setLocale($newLocale);
             $newSite->setHost($site->getHost());
+            $newSite->setLocalhost($site->getLocalhost());
             $newSite->setHostMultilingual($site->isHostMultilingual());
             $newSite->setDefault(false);
             $newSite->setTemplateFilter($site->getTemplateFilter());

@@ -61,6 +61,13 @@ class CmsSite
     private ?string $host = null;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @var string|null
+     */
+    private ?string $localhost = null;
+
+    /**
      * @ORM\Column(type="boolean", options={"default" : 0})
      *
      * @var boolean
@@ -434,6 +441,24 @@ class CmsSite
     public function getSlug(): ?string
     {
         return $this->slug;
+    }
+
+    /**
+     * @param string|null $localhost
+     * @return CmsSite
+     */
+    public function setLocalhost(?string $localhost): CmsSite
+    {
+        $this->localhost = $localhost;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLocalhost(): ?string
+    {
+        return $this->localhost;
     }
 
 }

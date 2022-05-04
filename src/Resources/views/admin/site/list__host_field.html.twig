@@ -1,0 +1,8 @@
+<td>
+    {% if field_description.options.MULTISITE_LOCALHOST is same as true %}
+        <span class="text-muted">{{ value }}</span> <br>
+        {{ object.localhost }}
+    {% else %}
+        {{ value }}
+    {% endif %}
+</td>
