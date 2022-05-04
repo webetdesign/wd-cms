@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
+use function Symfony\Component\String\u;
 
 class PageAdminListener
 {
@@ -149,16 +150,11 @@ class PageAdminListener
 
         $defaultName = $route->getName();
 
-        // hydrate route
-        $CmsRoute = new $this->routeClass();
-        if ($this->configCms['multilingual']) {
-            $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(),
-                $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(),
-                $page->getId());
-        } else {
-            $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s',
-                $page->getId());
-        }
+        $routeName = sprintf('%s%s%s',
+            $this->configCms['multilingual'] ? $page->getSite()->getLocale() . '_' : '',
+            !empty($page->getSite()->getTemplateFilter()) ? u($page->getSite()->getTemplateFilter())->snake() . '_' : '',
+            !empty($defaultName) ? $defaultName : sprintf('cms_route_%s', $page->getId())
+        );
 
         // Pour éviter le problème de doublon de route
         $exists = $this->em->getRepository(CmsRoute::class)->findBy(['name' => $routeName]);
@@ -167,6 +163,8 @@ class PageAdminListener
             $routeName .= '_' . uniqid();
         }
 
+        // hydrate route
+        $CmsRoute = new $this->routeClass();
         $CmsRoute->setName($routeName);
 
         if (!empty($route->getController())) {
