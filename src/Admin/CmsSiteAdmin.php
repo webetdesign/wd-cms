@@ -185,11 +185,10 @@ final class CmsSiteAdmin extends AbstractAdmin
             $MULTISITE_LOCALHOST = isset($_ENV['MULTISITE_LOCALHOST'])
                 && filter_var($_ENV['MULTISITE_LOCALHOST'], FILTER_VALIDATE_BOOLEAN);
 
-            $formMapper->add('host', null, [
-                'attr' => $MULTISITE_LOCALHOST ? ['disabled' => 'disabled'] : []
-            ]);
             if ($MULTISITE_LOCALHOST) {
                 $formMapper->add('localhost');
+            } else {
+                $formMapper->add('host');
             }
 
             $formMapper->add('templateFilter', null, [
