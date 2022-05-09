@@ -1,5 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
+import 'bootstrap';
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 let toggleSubItems = (item)=>{
@@ -64,6 +65,7 @@ let createSearchbar = () => {
 };
 
 document.addEventListener("DOMContentLoaded",function(){
+  let moveLock = false;
   const treeItems = document.querySelectorAll('.page-tree__item');
   const treeMove = document.querySelectorAll('.treeMoveAction');
   const declinations = document.querySelectorAll('.declination-toggle');
@@ -91,9 +93,15 @@ document.addEventListener("DOMContentLoaded",function(){
   treeMove.forEach(item => {
     item.addEventListener('click', e => {
       e.preventDefault();
+      if (moveLock) return;
+      moveLock = true;
+      const icon = item.querySelector('i')
+      icon.className = 'fa fa-spinner fa-spin';
 
       axios.get(item.href)
         .then(response => {
+          moveLock = false;
+          icon.className = 'fa fa-arrows';
           modal.querySelector('.modal-title').innerText = 'Déplacé ' + response.data.label;
           modal.querySelector('.modal-body').innerHTML = response.data.modalContent;
 
