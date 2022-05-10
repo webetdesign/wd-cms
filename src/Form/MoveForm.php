@@ -74,7 +74,7 @@ class MoveForm extends AbstractType
                     return str_repeat('—', $lvl) . ' ' . $object->__toString();
                 },
                 'choice_attr'   => function ($choice, $key, $value) {
-                    return ['data-root' => $choice->isRoot()];
+                    return ['data-custom-properties' => $choice->isRoot() ? 1 : 0];
                 },
                 'label'         => false,
                 'required'      => true,

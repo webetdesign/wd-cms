@@ -34,6 +34,7 @@
     "moment": "^2.24.0",
     "query-string": "^6.4.0",
     "bootstrap": "^3.4.1",
-    "javascript-api-utils": "github:googleanalytics/javascript-api-utils#0.6.0"
+    "javascript-api-utils": "github:googleanalytics/javascript-api-utils#0.6.0",
+    "choices.js": "^10.1.0"
   }
 }

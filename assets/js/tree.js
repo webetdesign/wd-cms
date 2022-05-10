@@ -1,101 +1,115 @@
 import axios from 'axios';
 import _ from 'lodash';
-import 'bootstrap';
+import 'bootstrap/js/modal';
+import Choices from 'choices.js';
+
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-let toggleSubItems = (item)=>{
+let toggleSubItems = (item) => {
   item.classList.toggle('is-toggled');
 
   let storageItems = JSON.parse(localStorage.getItem('adminMenuClosed'));
-  if(storageItems === null){
+  if (storageItems === null) {
     storageItems = [];
   }
   const id = item.getAttribute('data-id');
-  if (!item.classList.contains('is-toggled')){
+  if (!item.classList.contains('is-toggled')) {
     if (!storageItems.includes(id)) {
-      storageItems.push(id)
+      storageItems.push(id);
     }
-  }else {
-    storageItems.splice( storageItems.indexOf(id), 1 );
+  } else {
+    storageItems.splice(storageItems.indexOf(id), 1);
   }
 
   localStorage.setItem('adminMenuClosed', JSON.stringify(storageItems));
 };
 
-let searchTree = function(){
+let searchTree = function () {
   document.querySelector('.js-search-result').innerHTML = '';
   const input = document.querySelector('#treeSearch');
-  if (input.value.length > 2){
-    document.querySelector('.pages-box').classList.add('hidden');
-   const searchValue = input.value.toLowerCase();
-  let results = [];
-   const slugTxt = document.querySelectorAll('.text-muted, .page-tree__item__edit');
-   slugTxt.forEach(slug => {
-     const cleanSlug = slug.innerHTML.toLowerCase();
-     if(cleanSlug.includes(searchValue)){
+  if (input.value.length > 2) {
+    document.querySelector('.pages-box')
+      .classList
+      .add('hidden');
+    const searchValue = input.value.toLowerCase();
+    let results = [];
+    const slugTxt = document.querySelectorAll('.text-muted, .page-tree__item__edit');
+    slugTxt.forEach(slug => {
+      const cleanSlug = slug.innerHTML.toLowerCase();
+      if (cleanSlug.includes(searchValue)) {
         let div = slug.parentNode.cloneNode(true);
         div.classList.add('page-tree__item');
-        if (div.querySelector('.declinations')){
-          div.querySelector('.declinations').remove();
+        if (div.querySelector('.declinations')) {
+          div.querySelector('.declinations')
+            .remove();
         }
         results.push(div);
-     }
-   })
+      }
+    });
     const unique = Array.from(new Set(results.map(a => a.innerText)))
       .map(innerText => {
-        return results.find(a => a.innerText === innerText)
-      })
+        return results.find(a => a.innerText === innerText);
+      });
 
     unique.forEach(result => {
-     document.querySelector('.js-search-result').append(result);
-   })
-    document.querySelector('.js-search-result').classList.remove('hidden');
+      document.querySelector('.js-search-result')
+        .append(result);
+    });
+    document.querySelector('.js-search-result')
+      .classList
+      .remove('hidden');
 
-  }else{
-    document.querySelector('.js-search-result').classList.add('hidden');
-    document.querySelector('.pages-box').classList.remove('hidden');
+  } else {
+    document.querySelector('.js-search-result')
+      .classList
+      .add('hidden');
+    document.querySelector('.pages-box')
+      .classList
+      .remove('hidden');
   }
 };
 
 let createSearchbar = () => {
-    const sb = document.querySelector('#treeSearch');
-    if (sb !== null) {
-      sb.addEventListener('input', _.debounce(()=>{searchTree()},300));
-    }
+  const sb = document.querySelector('#treeSearch');
+  if (sb !== null) {
+    sb.addEventListener('input', _.debounce(() => {
+      searchTree();
+    }, 300));
+  }
 };
 
-document.addEventListener("DOMContentLoaded",function(){
+document.addEventListener('DOMContentLoaded', function () {
   let moveLock = false;
   const treeItems = document.querySelectorAll('.page-tree__item');
   const treeMove = document.querySelectorAll('.treeMoveAction');
   const declinations = document.querySelectorAll('.declination-toggle');
   const modal = document.querySelector('#tree_move_modal');
   let storageItems = JSON.parse(localStorage.getItem('adminMenuClosed'));
-  if (storageItems == null ) {
+  if (storageItems == null) {
     storageItems = [];
   }
   createSearchbar();
   treeItems.forEach(item => {
     const id = item.getAttribute('data-id');
-    if (storageItems.includes(id)){
+    if (storageItems.includes(id)) {
       toggleSubItems(item);
     }
     const next = item.nextElementSibling;
-    if(next !== null && next.tagName === 'UL'){
+    if (next !== null && next.tagName === 'UL') {
       const caret = item.querySelector('.fa-caret-right');
-      if (caret){
-        caret.addEventListener('click', e =>{
+      if (caret) {
+        caret.addEventListener('click', e => {
           toggleSubItems(item);
-        })
+        });
       }
     }
-  })
+  });
   treeMove.forEach(item => {
     item.addEventListener('click', e => {
       e.preventDefault();
       if (moveLock) return;
       moveLock = true;
-      const icon = item.querySelector('i')
+      const icon = item.querySelector('i');
       icon.className = 'fa fa-spinner fa-spin';
 
       axios.get(item.href)
@@ -105,21 +119,33 @@ document.addEventListener("DOMContentLoaded",function(){
           modal.querySelector('.modal-title').innerText = 'Déplacé ' + response.data.label;
           modal.querySelector('.modal-body').innerHTML = response.data.modalContent;
 
-          let script = modal.querySelector('.modal-body').querySelector('script');
-          eval(script.innerText);
-
-          Admin.setup_select2(modal);
-
-          $(modal).modal('show');
-        })
+          let script = modal.querySelector('.modal-body')
+            .querySelector('script');
 
 
-    })
-  })
-  declinations.forEach( item => {
+
+          //TODO: Uncomment lines bellow when choicejs will be fixed.
+          // https://github.com/Choices-js/Choices/pull/1001
+
+          // const choices = new Choices(modal.querySelector('select'), {
+          //   allowHTML: true,
+          //   shouldSort: false,
+          //   fuseOptions: {
+          //     includeScore: false
+          //   },
+          // });
+
+          $(modal)
+            .modal('show');
+        });
+
+
+    });
+  });
+  declinations.forEach(item => {
     item.addEventListener('click', e => {
       const declination = item.parentNode.querySelector('.declinations');
       declination.classList.toggle('oppened');
-    })
-  })
+    });
+  });
 });
