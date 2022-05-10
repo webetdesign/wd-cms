@@ -25,8 +25,12 @@ class StaticBlock extends AbstractBlock
         $blocks = [];
         foreach ($values as $key => $blockData) {
             $block = $this->getFactory()->get($this->getBlock($key));
+            if ($blockData == null) {
+                $blocks[$key] = null;
+            } else {
+                $blocks[$key] = $block->render($blockData, $context);
 
-            $blocks[$key] = $block->render($blockData, $context);
+            }
         }
 
         if (!empty($this->getTemplate())) {
