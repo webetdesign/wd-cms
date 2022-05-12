@@ -120,7 +120,7 @@ final class CmsMenuItemAdminController extends CRUDController
             $newObject->setMoveTarget($target);
             $newObject->setMoveMode('persistAsLastChildOf');
         } else {
-            $menu = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu')->find($request->get('id'));
+            $menu = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu')->find($request->get('childId'));
             $newObject->setMoveTarget($menu->getRoot());
         }
 
