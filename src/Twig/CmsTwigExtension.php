@@ -41,10 +41,10 @@ class CmsTwigExtension extends AbstractExtension
     protected $requestStack;
     /** @var AbstractCmsGlobalVars */
     protected                  $globalVars;
-    protected                  $globalVarsEnable;
-    protected PageFactory      $templateFactory;
-    protected                  $pageExtension;
-    private SharedBlockFactory $sharedBlockProvider;
+    protected             $globalVarsEnable;
+    protected PageFactory $pageFactory;
+    protected             $pageExtension;
+    private SharedBlockFactory $sharedBlockFactory;
     private                    $twig;
     private                    $container;
 
@@ -77,8 +77,8 @@ class CmsTwigExtension extends AbstractExtension
         $this->router              = $router;
         $this->container           = $container;
         $this->twig                = $twig;
-        $this->templateFactory     = $templateFactory;
-        $this->sharedBlockProvider = $sharedBlockFactory;
+        $this->pageFactory     = $templateFactory;
+        $this->sharedBlockFactory = $sharedBlockFactory;
         $this->requestStack        = $requestStack;
 
         $this->pageExtension  = $parameterBag->get('wd_cms.cms.page_extension');
@@ -228,7 +228,11 @@ class CmsTwigExtension extends AbstractExtension
             return null;
         }
 
-        $template = $this->templateFactory->get($object->getTemplate());
+        if ($object instanceof CmsSharedBlock) {
+            $template = $this->sharedBlockFactory->get($object->getTemplate());
+        } else {
+            $template = $this->pageFactory->get($object->getTemplate());
+        }
 
         $block = $this->blockFactory->get($template->getBlock($content->getCode()));
 
@@ -271,7 +275,7 @@ class CmsTwigExtension extends AbstractExtension
             return null;
         }
 
-        $config = $this->sharedBlockProvider->get($block->getTemplate());
+        $config = $this->sharedBlockFactory->get($block->getTemplate());
 
         return $this->twig->render($config->getTemplate(),
             [
@@ -305,7 +309,7 @@ class CmsTwigExtension extends AbstractExtension
             }
             preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
             $routeParams  = [];
-            $paramsConfig = $this->templateFactory->getConfigurationFor($page->getTemplate())['params'];
+            $paramsConfig = $this->pageFactory->getConfigurationFor($page->getTemplate())['params'];
             foreach ($params[1] as $param) {
                 if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null &&
                     is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class)) {
