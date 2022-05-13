@@ -12,14 +12,16 @@ use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 
 class AdminCmsBlockCollectionType extends AbstractType
 {
-    public function __construct(private BlockFactory $blockFactory) { }
+    public function __construct(private BlockFactory $blockFactory)
+    {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['allow_add'] && $options['prototype']) {
             $prototypeOptions = array_replace([
                 'required' => $options['required'],
-                'label' => $options['prototype_name'].'label__',
+                'label' => $options['prototype_name'] . 'label__',
             ], $options['entry_options']);
 
             if (null !== $options['prototype_data']) {
@@ -30,7 +32,7 @@ class AdminCmsBlockCollectionType extends AbstractType
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
-        $resizeListener = new CmsBlockResizeFormListener(
+        $resizeListener =  $options['listener'] ?? new CmsBlockResizeFormListener(
             $options['templateFactory'],
             $this->blockFactory,
             $options['entry_type'],
@@ -52,12 +54,13 @@ class AdminCmsBlockCollectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'entry_type'    => AdminCmsBlockType::class,
+            'entry_type' => AdminCmsBlockType::class,
             'entry_options' => [],
-            'allow_add'     => false,
-            'allow_delete'  => false,
-            'by_reference'  => false,
-            'block_prefix'  => 'cms_contents_collection'
+            'listener' => null,
+            'allow_add' => false,
+            'allow_delete' => false,
+            'by_reference' => false,
+            'block_prefix' => 'cms_contents_collection'
         ]);
 
         $resolver->setRequired(['templateFactory']);
