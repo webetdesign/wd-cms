@@ -60,11 +60,11 @@ class CmsPageAdminController extends CRUDController
         return null;
     }
 
-    public function moveAction(Request $request, $id)
+    public function moveAction(Request $request, $childId)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $object = $em->getRepository(CmsPage::class)->find($id);
+        $object = $em->getRepository(CmsPage::class)->find($childId);
 
         $object->setMoveTarget($object->getRoot());
 
