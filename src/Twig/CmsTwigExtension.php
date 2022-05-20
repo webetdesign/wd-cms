@@ -138,7 +138,7 @@ class CmsTwigExtension extends AbstractExtension
         return $object instanceof $class;
     }
 
-    private function retrieveContent($object, $content_code): CmsContent
+    private function retrieveContent($object, $content_code): ?CmsContent
     {
         /** @var CmsContent $content */
         $content = $this->em->getRepository(CmsContent::class)
@@ -337,8 +337,6 @@ class CmsTwigExtension extends AbstractExtension
                     }
                 }
             }
-
-            dump($p->getRoute()->getName(), $routeParams);
 
             try {
                 $path = $this->router->generate($p->getRoute()->getName(), $routeParams);
