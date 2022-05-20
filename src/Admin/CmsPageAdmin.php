@@ -252,8 +252,12 @@ class CmsPageAdmin extends AbstractAdmin
             //region Général - additional
             $form
                 ->tab('cms_page.tab.general')// The tab call is optional
-                ->with('', ['box_class' => 'header_none'])
-                ->add('active', null, ['label' => 'cms_page.form.active.label']);
+                ->with('', ['box_class' => 'header_none']);
+
+            if ($object->getRoute() !== null) {
+                $form
+                    ->add('active', null, ['label' => 'cms_page.form.active.label']);
+            }
 
             $form->end();                  // End form group
             $form->end();                  // End tab
@@ -263,9 +267,10 @@ class CmsPageAdmin extends AbstractAdmin
             $form->tab('cms_page.tab.seo');// The tab call is optional
             $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable);
             $form->with('cms_page.tab.general',
-                ['class'              => 'col-xs-12 col-md-4',
-                 'box_class'          => '',
-                 'translation_domain' => 'wd_seo'
+                [
+                    'class'              => 'col-xs-12 col-md-4',
+                    'box_class'          => '',
+                    'translation_domain' => 'wd_seo'
                 ])
                 ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'])
                 ->add('seo_description', TextareaType::class,
@@ -280,19 +285,21 @@ class CmsPageAdmin extends AbstractAdmin
             //endregion
 
             //region Contenus
-            $form->tab('cms_page.tab.content');
-            $form
-                ->with('', [
-                    'box_class' => 'header_none',
-                    'class'     => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'
-                ])
-                ->add('contents', AdminCmsBlockCollectionType::class, [
-                    'templateFactory' => $this->pageFactory,
-                ])
-                ->end();
-            $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable, true);
-            $form
-                ->end();
+            if (count($object->getContents()) > 0) {
+                $form->tab('cms_page.tab.content');
+                $form
+                    ->with('', [
+                        'box_class' => 'header_none',
+                        'class'     => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'
+                    ])
+                    ->add('contents', AdminCmsBlockCollectionType::class, [
+                        'templateFactory' => $this->pageFactory,
+                    ])
+                    ->end();
+                $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable, true);
+                $form
+                    ->end();
+            }
             //endregion
 
             if ($object->getRoute() != null) {

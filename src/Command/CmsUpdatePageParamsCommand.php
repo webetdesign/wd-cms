@@ -57,7 +57,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
                 $templates = array_values($this->pageFactory->getTemplateList());
 
                 foreach ($templates as $template) {
-                    $this->processTemplate($template);
+                    $this->processTemplate($template->getCode());
                 }
                 $this->io->success('Done');
             }

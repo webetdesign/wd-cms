@@ -26,7 +26,8 @@ abstract class AbstractTemplateFactory implements TemplateFactoryInterface
         $tpls = [];
         foreach ($this->serviceLocator->getProvidedServices() as $key => $id) {
             $tpl = $this->getServices($key);
-            if ($tpl && ($tpl->getCollections() === null || in_array($collection, $tpl->getCollections()))) {
+            if ($tpl && ($tpl->getCollections() === null || $collection === null || in_array($collection,
+                        $tpl->getCollections()))) {
                 $tpls[$key] = $tpl;
             }
         }
@@ -39,8 +40,18 @@ abstract class AbstractTemplateFactory implements TemplateFactoryInterface
         $tpls = [];
         foreach ($this->serviceLocator->getProvidedServices() as $key => $id) {
             $tpl = $this->getServices($key);
-            if ($tpl && ($tpl->getCollections() === null || $collection === null || in_array($collection, $tpl->getCollections()))) {
-                $tpls[$tpl->getLabel()] = $key;
+            if ($tpl &&
+                ($tpl->getCollections() === null ||
+                    $collection === null ||
+                    in_array($collection, $tpl->getCollections())
+                )
+            ) {
+
+                if (!empty($tpl->getCollections())) {
+                    $collString = implode(', ', $tpl->getCollections()) . ' — ';
+                }
+
+                $tpls[($collString ?? null) . $tpl->getLabel()] = $key;
             }
         }
 

@@ -46,10 +46,10 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->templateFactory->getTemplateList());
+                $templates = array_values($this->pageFactory->getTemplateList());
 
                 foreach ($templates as $template) {
-                    $this->processTemplate($template);
+                    $this->processTemplate($template->getCode());
                 }
                 $this->io->success('Done');
                 return 0;

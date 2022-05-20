@@ -49,9 +49,8 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
                 $templates = array_values($this->sharedBlockFactory->getTemplateList());
-
                 foreach ($templates as $template) {
-                    $this->processTemplate($template);
+                    $this->processTemplate($template->getCode());
                 }
                 $this->io->success('Done');
                 return 0;

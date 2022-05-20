@@ -16,6 +16,11 @@ file that was distributed with this source code.
                 <div class="page-tree__item is-toggled" data-id="{{ page.id }}">
                     {% if page.children|length > 0  and page.parent %}<i class="fa fa-caret-right"></i>{% endif %}
                     <i class="fa page-tree__item__is-hybrid fa-{% if page.isHybrid %}gears{% else %}code{% endif %}"></i>
+
+                    {% if page.route != null and not page.route.isDynamic %}
+                        <a class="label label-default pull-right" data-toggle="tooltip" title="Aller" target="_blank" href="{{ cms_path(page.route.name)}}"><i class="fa fa-share"></i></a>
+                    {% endif %}
+
                     {% if page.lvl != 0 %}
                         <a class="label label-default pull-right treeMoveAction" data-toggle="tooltip" title="Déplacer" href="{{ admin.generateObjectUrl('move', page) }}"><i class="fa fa-arrows"></i></a>
                     {% endif %}
@@ -30,7 +35,9 @@ file that was distributed with this source code.
 {#                            <i class="fa fa-copy" aria-hidden="true"></i>#}
 {#                        </a>#}
                     {% endif %}
-                    <span class="label label-{% if page.isActive %}success{% else %}danger{% endif %} pull-right">Active</span>
+                    {% if page.route != null %}
+                        <span class="label label-{% if page.isActive %}success{% else %}danger{% endif %} pull-right">Active</span>
+                    {% endif %}
                     {% if page.declinations.count > 0 %}
                         <span class="label label-primary pull-right declination-toggle">voir {{ page.declinations.count > 1 ? "les "~page.declinations.count : "la" }}  {{ page.declinations.count > 1 ? 'déclinaisons' : "déclinaison" }}</span>
                     {% endif %}
