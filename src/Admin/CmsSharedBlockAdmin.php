@@ -8,6 +8,7 @@ use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Form\Type\ModelHiddenType;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -111,14 +112,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         $formMapper
             ->tab('Général')// The tab call is optional
             ->with('', ['box_class' => 'header_none'])
-            ->add('site', EntityType::class, [
-                'class' => CmsSite::class,
-                'attr'  => [
-                    'style'               => 'display: none;',
-                    'data-sonata-select2' => false
-                ],
-                'label' => false
-            ])
+            ->add('site', ModelHiddenType::class)
             ->add('code',
                 $this->isCurrentRoute('edit') && $roleAdmin ? TextType::class : HiddenType::class,
                 [])
