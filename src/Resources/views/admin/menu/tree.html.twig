@@ -41,7 +41,7 @@ file that was distributed with this source code.
                 <div class="page-tree__item is-menu">
 {#                    {% if item.lvl > 1 %}<i class="fa fa-caret-right"></i>{% endif %}#}
                     <i class="fa page-tree__item__is-hybrid fa-{{ icon }}"></i>
-                    <a class="page-tree__item__edit" href="{{ admin.generateUrl('cms.admin.cms_menu_item.edit', {id: item.site.id, childId: item.menu.id, childChildId: item.id}) }}">
+                    <a class="page-tree__item__edit" href="{{ admin.generateUrl('cms.admin.cms_menu_item.edit', {'childId': item.menu.id, 'childChildId': item.id}) }}">
                         {{ item.name }}
                     </a>
                     <i class="text-muted">{{ item.information }}</i>
