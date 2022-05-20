@@ -23,6 +23,10 @@ class DynamicBlock extends AbstractBlock
 
         $values = $transformer->transform($value, true);
 
+        if (null === $values) {
+            return null;
+        }
+
         $blocks = [];
         foreach ($values as $key => $blockData) {
             $block = $this->getFactory()->get($this->getAvailableBlock($blockData['disc']));
