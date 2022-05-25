@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Form;
 
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use WebEtDesign\CmsBundle\Factory\PageFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PageTemplateType extends AbstractType
 {
 
-    public function __construct(private PageFactory $templateFactory) {}
+    public function __construct(private PageFactory $templateFactory) { }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -28,8 +29,12 @@ class PageTemplateType extends AbstractType
         }
 
         $builder->add('tpl', ChoiceType::class, [
-            'label'        => false,
-            'choices'      => $choices,
+            'required'    => false,
+            'label'       => false,
+            'choices'     => $choices,
+            'constraints' => [
+                new NotBlank(),
+            ]
         ]);
 
         $builder->addModelTransformer(new CallbackTransformer(
