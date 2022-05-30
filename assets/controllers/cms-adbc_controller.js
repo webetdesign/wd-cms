@@ -30,13 +30,38 @@ export default class extends Controller {
     }
   }
 
+  findParentProtoypeNames(el, values = {}) {
+    const parentEl = el.parentElement.closest('[data-controller="cms-adbc"]');
+    if (parentEl) {
+      const item = el.closest('[data-cms-adbc-target="item"]');
+      const parentApp = this.application.getControllerForElementAndIdentifier(parentEl, 'cms-adbc');
+      const index = parentApp.itemTargets.indexOf(item);
+      values[index] = [
+        ...Object.values(parentApp.prototypeNames)
+      ];
+      this.findParentProtoypeNames(parentEl, values);
+    }
+
+    return values;
+  }
+
   add(e) {
     e.preventDefault();
     if (this.blockSelectorTarget.value === null || this.blockSelectorTarget.value === '') return;
 
-    const proto = this.prototypes[this.blockSelectorTarget.value]
+
+    let proto = this.prototypes[this.blockSelectorTarget.value]
       .replaceAll(this.prototypeNames[this.blockSelectorTarget.value] + 'label__', 'Nouveau block')
       .replaceAll(this.prototypeNames[this.blockSelectorTarget.value], this.number);
+
+    const parentProtoypeNames = this.findParentProtoypeNames(this.element);
+
+
+    for (const [number, names] of Object.entries(parentProtoypeNames)) {
+      names.forEach(name => {
+        proto = proto.replaceAll(name, number);
+      });
+    }
 
     this.collectionTarget.insertAdjacentHTML('beforeend', proto);
 

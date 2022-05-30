@@ -33,7 +33,7 @@
 {% endblock %}
 
 {% block admin_cms_dynamic_block_loader_row %}
-    {% set unique_key = form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name %}
+    {% set unique_key = form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ random() %}
     <div class="panel box" data-cms-adbc-target="item">
         <div class="box-header with-border">
             <h4 class="box-title cursor-pointer ">
@@ -64,7 +64,7 @@
 {% block cms_blocks_block_row %}
     {% for child in form.children %}
         {% set config = block_configs[child.vars.name] %}
-        {% set unique_key = form.vars.unique_block_prefix ~ '_' ~ form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code %}
+        {% set unique_key = form.vars.unique_block_prefix ~ '_' ~ form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code ~ '_' ~ random() %}
         <div class="panel box">
             <div class="box-header with-border">
                 <h4 class="box-title">
