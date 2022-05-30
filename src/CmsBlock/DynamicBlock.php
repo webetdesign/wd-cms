@@ -30,6 +30,9 @@ class DynamicBlock extends AbstractBlock
         $blocks = [];
         foreach ($values as $key => $blockData) {
             $config = $this->getAvailableBlock($blockData['disc']);
+            if (!$config) {
+                continue;
+            }
             $block = $this->getFactory()->get($config);
 
             $context['block_loop'] = [

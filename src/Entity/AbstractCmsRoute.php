@@ -55,7 +55,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     /**
      * @var CmsPage
      *
-     * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="route", cascade={"remove"})
+     * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="route")
      */
     private CmsPage $page;
 

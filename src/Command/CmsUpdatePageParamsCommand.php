@@ -141,7 +141,9 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
             $routeName .= '_' . uniqid();
         }
 
-        $route->setName($routeName);
+        if ($routeConfig->getName() !== null) {
+            $route->setName($routeName);
+        }
     }
 
     private function updateParams(CmsRouteInterface $cmsRoute, PageInterface $config)
