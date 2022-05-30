@@ -24,7 +24,7 @@
                 </div>
                 <button type="button" data-action="click->cms-adbc#add"
                         class="btn btn-primary" data-cms-adbc-target="addButton"
-                        {% if max > 0 and form.vars.value|length == max%} disabled {%endif%}
+                        {% if max > 0 and form.vars.value|length == max %} disabled {% endif %}
                 >
                     <i class="fa fa-plus"></i></button>
             </div>
@@ -64,23 +64,27 @@
 {% block cms_blocks_block_row %}
     {% for child in form.children %}
         {% set config = block_configs[child.vars.name] %}
-        {% set unique_key = form.vars.unique_block_prefix ~ '_' ~ form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code ~ '_' ~ random() %}
-        <div class="panel box">
-            <div class="box-header with-border">
-                <h4 class="box-title">
-                    <a data-toggle="collapse" href="#{{ unique_key }}_collapse">
-                        {{ form_label(child) }}
-                    </a>
-                    {% if config and config.help is not empty %}
-                        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ config.help }}"></i>
-                    {% endif %}
-                </h4>
-            </div>
-            <div id="{{ unique_key }}_collapse" class="panel-collapse collapse {% if config and config.open %} in {% endif %}">
-                <div class="box-body">
-                    {{ form_row(child) }}
+        {% if config.type == 'DYNAMIC' %}
+            {% set unique_key = form.vars.unique_block_prefix ~ '_' ~ form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code ~ '_' ~ random() %}
+            <div class="panel box">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        <a data-toggle="collapse" href="#{{ unique_key }}_collapse">
+                            {{ form_label(child) }}
+                        </a>
+                        {% if config and config.help is not empty %}
+                            <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ config.help }}"></i>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div id="{{ unique_key }}_collapse" class="panel-collapse collapse {% if config and config.open %} in {% endif %}">
+                    <div class="box-body">
+                        {{ form_row(child) }}
+                    </div>
                 </div>
             </div>
-        </div>
+        {% else %}
+            {{ form_row(child) }}
+        {% endif %}
     {% endfor %}
 {% endblock %}
