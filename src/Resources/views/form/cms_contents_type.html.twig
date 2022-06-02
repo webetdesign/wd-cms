@@ -1,7 +1,7 @@
 {% block cms_contents_widget %}
     <div class="panel-group" id="contents_collapse" role="tablist" aria-multiselectable="true">
         {% for item in form.children %}
-            {{ dump(item) }}
+{#            {{ dump(item) }}#}
             <div class="panel">
                 <div class="panel-heading" role="tab" id="heading_{{ loop.index }}">
                     <div class="align-left">
