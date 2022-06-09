@@ -43,8 +43,8 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
     public function preSetData(FormEvent $event)
     {
         $block = $this->blockFactory->get($this->blockDefinition);
-        $form = $event->getForm();
-        $data = $event->getData();
+        $form  = $event->getForm();
+        $data  = $event->getData();
 
         if (null === $data) {
             $data = [];
@@ -78,8 +78,8 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
     public function preSubmit(FormEvent $event)
     {
         $block = $this->blockFactory->get($this->blockDefinition);
-        $form = $event->getForm();
-        $data = $event->getData();
+        $form  = $event->getForm();
+        $data  = $event->getData();
 
         if (!\is_array($data)) {
             $data = [];
