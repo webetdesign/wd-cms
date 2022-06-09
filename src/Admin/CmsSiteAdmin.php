@@ -13,6 +13,8 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Component\Routing\RouterInterface;
+use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 
@@ -27,6 +29,7 @@ final class CmsSiteAdmin extends AbstractAdmin
     public function __construct(
         string $code,
         string $class,
+        protected RouterInterface $router,
         private EntityManagerInterface $em,
         string $baseControllerName,
         $cmsConfig
@@ -130,6 +133,16 @@ final class CmsSiteAdmin extends AbstractAdmin
                     }
                 }
             }
+        }
+
+        if ($childAdmin instanceof CmsPageAdmin && $action == 'edit') {
+            $route = $this->router->generate('admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_list', [
+                'id' => $this->getSubject()->getId(),
+                'childId' => 9
+            ]);
+            $menu->addChild('Déclinaison',[
+                'uri' => $route,
+            ]);
         }
     }
 

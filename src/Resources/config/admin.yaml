@@ -4,6 +4,7 @@ services:
     arguments:
       - ~
       - WebEtDesign\CmsBundle\Entity\CmsSite
+      - '@Symfony\Component\Routing\RouterInterface'
       - '@doctrine.orm.entity_manager'
       - WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController
       - '%wd_cms.cms%'
@@ -42,7 +43,7 @@ services:
       - [setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['edit', '@@WebEtDesignCms/admin/page/edit.html.twig']]
       - [setTemplate, ['tree', '@@WebEtDesignCms/admin/page/tree.html.twig']]
-      - [addChild, ['@cms.admin.cms_page_declination', 'declination']]
+      - [addChild, ['@cms.admin.cms_page_declination', 'page']]
     public: true
 
   cms.admin.cms_content:
