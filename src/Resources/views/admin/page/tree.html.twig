@@ -51,7 +51,13 @@ file that was distributed with this source code.
                                     <li>
                                         <div>
                                         <i class="fa fa-copy"></i>
-                                        <a class="page-tree__item__edit" href="{{ declinationAdmin.generateObjectUrl('edit', declination) }}">{{ declination.title }}</a>
+                                        <a class="page-tree__item__edit" href="{{ path('admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_edit', {
+                                            'id': declination.page.site.id,
+                                            'childId': declination.page.id,
+                                            'childChildId': declination.id
+                                        }) }}">
+                                            {{ declination.title }}
+                                        </a>
                                         {% if page.route != null %}
                                             <i class="text-muted">{% if page.site.locale is not empty and not page.site.hostMultilingual %}/{{ page.site.locale }}{% endif %}{{ declination.path }}</i>
                                         {% endif %}
