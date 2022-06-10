@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\CmsBlock;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
 use WebEtDesign\CmsBundle\Form\Content\Dynamic\DynamicBlockCollectionType;
 
@@ -16,6 +17,15 @@ class DynamicBlock extends AbstractBlock
         'required'          => false,
         'base_block_config' => true,
     ];
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefaults([
+            'use_accordion' => true,
+        ]);
+    }
 
     public function render($value, ?array $context = null)
     {

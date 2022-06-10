@@ -11,15 +11,18 @@ use WebEtDesign\CmsBundle\Form\Transformer\CmsBlockTransformer;
 
 class BlockFactory
 {
-    private ServiceLocator         $blocks;
-    private Environment            $twig;
+    private ServiceLocator $blocks;
+    private Environment $twig;
     private EntityManagerInterface $em;
 
-    public function __construct(ServiceLocator $blocks, Environment $twig, EntityManagerInterface $em)
-    {
+    public function __construct(
+        ServiceLocator $blocks,
+        Environment $twig,
+        EntityManagerInterface $em
+    ) {
         $this->blocks = $blocks;
-        $this->twig = $twig;
-        $this->em = $em;
+        $this->twig   = $twig;
+        $this->em     = $em;
     }
 
     public function get(BlockDefinition $config): AbstractBlock
@@ -45,12 +48,14 @@ class BlockFactory
 
         $block->setFormOptions(array_merge($block->getFormOptions(), $config->getFormOptions()));
 
+        $block->setOptions($config->getOptions());
+
         $block->setBlocks($config->getBlocks());
 
         $block->setModelTransformer(new CmsBlockTransformer($this->em));
 
         if (!empty($config->getTemplate())) {
-            $block->setTemplate($config->getTemplate() );
+            $block->setTemplate($config->getTemplate());
         }
         if ($config->getTemplate() === false) {
             $block->setTemplate(null);

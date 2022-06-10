@@ -12,6 +12,7 @@ class BlockDefinition
     protected array            $blocks          = [];
     protected array            $availableBlocks = [];
     protected null|string|bool $template        = null;
+    protected array            $options         = [];
 
     public function __construct(
         protected string $code,
@@ -173,5 +174,23 @@ class BlockDefinition
     {
         $this->availableBlocks = $availableBlocks;
         return $this;
+    }
+
+    /**
+     * @param array $options
+     * @return BlockDefinition
+     */
+    public function setOptions(array $options): BlockDefinition
+    {
+        $this->options = $options;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }
