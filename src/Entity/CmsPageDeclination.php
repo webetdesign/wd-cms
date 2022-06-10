@@ -50,11 +50,11 @@ class CmsPageDeclination
     private string $technic_name = '';
 
     /**
-     * @var string
+     * @var ?string
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
-    private string $locale = '';
+    private ?string $locale = null;
 
     /**
      * @var ArrayCollection|PersistentCollection

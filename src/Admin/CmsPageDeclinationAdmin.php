@@ -9,10 +9,13 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
+use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
 use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
 use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
@@ -43,6 +46,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         EntityManager $em,
         $pageConfig,
         $globalVarsDefinition,
+        protected PageFactory $pageFactory,
         private BlockFormThemesManager $blockFormThemesManager
     ) {
         $this->em               = $em;
@@ -51,6 +55,12 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         parent::__construct($code, $class, $baseControllerName);
     }
+
+    protected function configureRoutes(RouteCollectionInterface $collection): void
+    {
+        $collection->remove('show');
+    }
+
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
@@ -70,7 +80,6 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             ->add('title')
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
-                    'show'   => [],
                     'edit'   => [],
                     'delete' => [],
                 ],
@@ -85,6 +94,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             '@WebEtDesignCms/form/cms_contents_type.html.twig',
             '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
             '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
+            "@WebEtDesignCms/admin/form/cms_block.html.twig",
         ], $this->blockFormThemesManager->getThemes()));
 
         /** @var CmsPageDeclination $object */
@@ -92,19 +102,20 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         if (!$object) { //For Batch action delete
             return;
         }
-        $route  = $object->getPage()->getRoute();
-        $config = $this->pageConfig[$object->getPage()->getTemplate()];
+        $route = $object->getPage()->getRoute();
+
+        $pageConfig = $this->pageFactory->get($object->getPage()->getTemplate());
 
         //region Général
         $formMapper
             ->tab('Général')// The tab call is optional
-            ->with('', ['box_class' => '']);
+            ->with('', ['box_class' => 'header_none']);
 
         $formMapper
             ->add('title', null, ['label' => 'Title']);
 
         $formMapper->add('params', CmsRouteParamsType::class, [
-            'config' => $config,
+            'config' => $pageConfig,
             'route'  => $route,
             'object' => $object,
             'label'  => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
@@ -114,7 +125,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
             ->end()// End form group
             ->end()// End tab
         ;
-        //endregion
+        // endregion
 
         //region SEO
         $formMapper->tab('SEO');// The tab call is optional
@@ -133,11 +144,12 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         //region Contenus
         $formMapper->tab('Contenus');
         $formMapper
-            ->with('', ['box_class' => 'header_none', 'class' => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'])
-            ->add('contents', CmsContentsType::class, [
-                'label'        => false,
-                'by_reference' => false,
-                'role_admin'   => $this->isGranted(ManageContentVoter::CAN_MANAGE_CONTENT),
+            ->with('', [
+                'box_class' => 'header_none',
+                'class'     => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'
+            ])
+            ->add('contents', AdminCmsBlockCollectionType::class, [
+                'templateFactory' => $this->pageFactory,
             ])
             ->end();
         $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable, true);
@@ -146,26 +158,5 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         //endregion
     }
 
-    protected function configureShowFields(ShowMapper $showMapper): void
-    {
-        $showMapper
-            ->add('id')
-            ->add('title')
-            ->add('seo_title')
-            ->add('seo_description')
-            ->add('seo_keywords')
-            ->add('fb_title')
-            ->add('fb_type')
-            ->add('fb_url')
-            ->add('fb_image')
-            ->add('fb_description')
-            ->add('fb_site_name')
-            ->add('fb_admins')
-            ->add('twitter_card')
-            ->add('twitter_site')
-            ->add('twitter_title')
-            ->add('twitter_description')
-            ->add('twitter_creator')
-            ->add('twitter_image');
-    }
+
 }

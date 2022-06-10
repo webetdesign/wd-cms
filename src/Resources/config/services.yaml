@@ -54,6 +54,7 @@ services:
       - '@twig'
       - '@twig.profile'
       - '@WebEtDesign\CmsBundle\Repository\CmsContentRepository'
+      - '@Symfony\Component\Routing\RouterInterface'
       - '%wd_cms.cms%'
 
   cms.routing_loader:

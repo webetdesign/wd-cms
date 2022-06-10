@@ -131,6 +131,7 @@ services:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.templates%'
       - '%wd_cms.vars%'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
       - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
       - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
