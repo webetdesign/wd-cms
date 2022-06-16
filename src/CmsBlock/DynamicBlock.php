@@ -62,6 +62,9 @@ class DynamicBlock extends AbstractBlock
             if (empty($context)) {
                 $context = [];
             }
+            if (!empty($this->getSettings())) {
+                $context = array_merge($context, ['settings' => $this->getSettings()]);
+            }
             $context['blocks'] = $blocks;
             return $this->getTwig()->render($this->getTemplate(), $context);
         }
