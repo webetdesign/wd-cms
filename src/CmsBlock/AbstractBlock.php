@@ -58,9 +58,15 @@ abstract class AbstractBlock implements BlockInterface
             if (!empty($this->getSettings())) {
                 $value = array_merge($value, ['settings' => $this->getSettings()]);
             }
-            if (!empty($context)) {
-                $value = array_merge($value, $context);
+
+            if (is_array($value)){
+                if (!empty($context)) {
+                    $value = array_merge($value, $context);
+                }
+            }else{
+                $value = ['value'=>$value];
             }
+
             $value = $this->getTwig()->render($this->getTemplate(), $value);
         }
 
