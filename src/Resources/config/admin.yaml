@@ -85,6 +85,7 @@ services:
       - WebEtDesign\CmsBundle\Entity\CmsMenuItem
       - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuItemAdminController
       - '@doctrine.orm.default_entity_manager'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
       - '%wd_cms.menu%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false, label_translator_strategy: sonata.admin.label.strategy.underscore }

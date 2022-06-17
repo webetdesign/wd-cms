@@ -19,6 +19,7 @@ use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Form\Type\MenuIconType;
@@ -27,6 +28,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
 {
     protected EntityManagerInterface $em;
     private ?array                   $configMenu;
+    private PageFactory              $pageFactory;
 
     /**
      * @inheritDoc
@@ -36,12 +38,14 @@ final class CmsMenuItemAdmin extends AbstractAdmin
         $class,
         $baseControllerName,
         EntityManagerInterface $em,
+        PageFactory $pageFactory,
         $configMenu
     ) {
         $this->em = $em;
 
         parent::__construct($code, $class, $baseControllerName);
         $this->configMenu = $configMenu;
+        $this->pageFactory = $pageFactory;
     }
 
 
@@ -275,7 +279,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
     {
 
         try {
-            $config = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
+            $config = $this->pageFactory->get($subject->getPage()->getTemplate());
         } catch (Exception $e) {
             $config = null;
         }
