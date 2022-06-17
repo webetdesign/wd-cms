@@ -29,6 +29,7 @@ use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
 use WebEtDesign\CmsBundle\Form\Transformer\CmsBlockTransformer;
 use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
+use WebEtDesign\CmsBundle\Services\CmsHelper;
 use WebEtDesign\CmsBundle\Services\WDDeclinationService;
 use WebEtDesign\MediaBundle\Entity\Media;
 use WebEtDesign\MediaBundle\Services\WDMediaService;
@@ -42,9 +43,9 @@ class CmsTwigExtension extends AbstractExtension
     protected $requestStack;
     /** @var AbstractCmsGlobalVars */
     protected                  $globalVars;
-    protected             $globalVarsEnable;
-    protected PageFactory $pageFactory;
-    protected             $pageExtension;
+    protected                  $globalVarsEnable;
+    protected PageFactory      $pageFactory;
+    protected                  $pageExtension;
     private SharedBlockFactory $sharedBlockFactory;
     private                    $twig;
     private                    $container;
@@ -57,6 +58,7 @@ class CmsTwigExtension extends AbstractExtension
     private WDMediaService       $mediaService;
     private WDDeclinationService $declinationService;
     private BlockFactory         $blockFactory;
+    private CmsHelper            $cmsHelper;
 
     /**
      * @inheritDoc
@@ -72,15 +74,16 @@ class CmsTwigExtension extends AbstractExtension
         ParameterBagInterface $parameterBag,
         WDMediaService $mediaService,
         WDDeclinationService $declinationService,
-        BlockFactory $blockFactory
+        BlockFactory $blockFactory,
+        CmsHelper $cmsHelper
     ) {
-        $this->em                  = $entityManager;
-        $this->router              = $router;
-        $this->container           = $container;
-        $this->twig                = $twig;
-        $this->pageFactory     = $templateFactory;
+        $this->em                 = $entityManager;
+        $this->router             = $router;
+        $this->container          = $container;
+        $this->twig               = $twig;
+        $this->pageFactory        = $templateFactory;
         $this->sharedBlockFactory = $sharedBlockFactory;
-        $this->requestStack        = $requestStack;
+        $this->requestStack       = $requestStack;
 
         $this->pageExtension  = $parameterBag->get('wd_cms.cms.page_extension');
         $this->declination    = $parameterBag->get('wd_cms.cms.declination');
@@ -95,6 +98,7 @@ class CmsTwigExtension extends AbstractExtension
         $this->mediaService       = $mediaService;
         $this->declinationService = $declinationService;
         $this->blockFactory       = $blockFactory;
+        $this->cmsHelper          = $cmsHelper;
     }
 
     public function getTests(): array
@@ -251,26 +255,22 @@ class CmsTwigExtension extends AbstractExtension
         return $value;
     }
 
-    public function getSharedBlock($code, $object = null)
+    public function getSharedBlock($code, $context = [])
     {
         if ($this->configCms['multilingual']) {
-            if (!$object) {
-                throw new HttpException('500',
-                    'A CmsPage or CmsSharedBlock must be passed as the second parameter of the `cms_render_shared_block` twig function, null given');
-            }
-
+            $page = $this->cmsHelper->getPage();
             $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy([
                 'code' => $code,
-                'site' => $object->getSite()
+                'site' => $page->getSite()
             ]);
         } else {
             $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code]);
         }
 
-        return $this->renderSharedBlock($block);
+        return $this->renderSharedBlock($block, $context);
     }
 
-    public function renderSharedBlock(?CmsSharedBlock $block)
+    public function renderSharedBlock(?CmsSharedBlock $block, $context = [])
     {
         if (!$block || $block && !$block->isActive()) {
             return null;
@@ -279,9 +279,7 @@ class CmsTwigExtension extends AbstractExtension
         $config = $this->sharedBlockFactory->get($block->getTemplate());
 
         return $this->twig->render($config->getTemplate(),
-            [
-                'block' => $block
-            ]);
+            array_merge(['block' => $block, 'page' => $this->cmsHelper->getPage()], $context));
     }
 
     public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
@@ -311,12 +309,13 @@ class CmsTwigExtension extends AbstractExtension
             preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
 
             /** @var PageInterface $pageConfig */
-            $pageConfig = $this->pageFactory->get($page->getTemplate());
+            $pageConfig  = $this->pageFactory->get($page->getTemplate());
             $routeConfig = $pageConfig->getRoute();
 
-            $routeParams  = [];
+            $routeParams = [];
             foreach ($routeConfig->getAttributes() as $attribute) {
-                if ($attribute->getEntityClass() !== null && is_subclass_of($attribute->getEntityClass(), TranslatableInterface::class)) {
+                if ($attribute->getEntityClass() !== null && is_subclass_of($attribute->getEntityClass(),
+                        TranslatableInterface::class)) {
                     $repoMethod = 'findOneBy' . ucfirst($attribute->getEntityProperty() ?: 'id');
                     $criterion  = $request->get('_route_params')[$attribute->getName()] ?? null;
 
@@ -324,13 +323,13 @@ class CmsTwigExtension extends AbstractExtension
                         ->$repoMethod($criterion, $page->getSite()->getLocale());
 
                     if ($object) {
-                        $getProperty         = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                        $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
                         $routeParams[$attribute->getName()] = $object->translate($p->getSite()->getLocale())->$getProperty();
                     }
 
                 } else {
                     if ($attribute->getEntityClass() !== null) {
-                        $getProperty         = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                        $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
                         $routeParams[$attribute->getName()] = $request->get($attribute->getName())->$getProperty();
                     } else {
                         $routeParams[$attribute->getName()] = $request->get($attribute->getName());

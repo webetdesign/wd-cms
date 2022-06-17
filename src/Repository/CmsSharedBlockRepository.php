@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -39,32 +40,16 @@ class CmsSharedBlockRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    // /**
-    //  * @return CmsSharedBlock[] Returns an array of CmsSharedBlock objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getBuilderByCollections(?array $collections = null): QueryBuilder
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $qb = $this->createQueryBuilder('sb');
 
-    /*
-    public function findOneBySomeField($value): ?CmsSharedBlock
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if (!empty($collections)) {
+            $qb->join('sb.site', 's');
+            $qb->andWhere($qb->expr()->in('s.templateFilter', ':templateFilter'))
+                ->setParameter('templateFilter', $collections);
+        }
+
+        return $qb;
     }
-    */
 }

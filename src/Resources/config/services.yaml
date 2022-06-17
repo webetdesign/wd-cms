@@ -138,6 +138,7 @@ services:
       - '@WebEtDesign\MediaBundle\Services\WDMediaService'
       - '@WebEtDesign\CmsBundle\Services\WDDeclinationService'
       - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
+      - '@WebEtDesign\CmsBundle\Services\CmsHelper'
     tags:
       - { name: twig.extension }
     public: true
