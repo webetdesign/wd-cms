@@ -40,10 +40,13 @@ class BlocksBlockType extends AbstractType
     {
         $block = $this->blockFactory->get($options['base_block_config']);
         $configs = [];
+        $blocks = [];
         foreach ($block->getBlocks() as $blockDefinition) {
             $configs[$blockDefinition->getCode()] = $blockDefinition;
+            $blocks[$blockDefinition->getCode()] = $this->blockFactory->get($blockDefinition);
         }
 
+        $view->vars['blocks'] = $blocks;
         $view->vars['block_configs'] = $configs;
     }
 

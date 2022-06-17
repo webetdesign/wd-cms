@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Throwable;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -36,6 +37,7 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
     private Profile              $profile;
     private BlockFactory         $blockFactory;
     private CmsContentRepository $cmsContentRepository;
+    private RouterInterface      $router;
 
     public function __construct(
         PageFactory $pageFactory,
@@ -45,6 +47,7 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
         Environment $twig,
         Profile $profile,
         CmsContentRepository $cmsContentRepository,
+        RouterInterface $router,
         $cmsConfig
     ) {
         $this->pageFactory             = $pageFactory;
@@ -56,6 +59,7 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
         $this->profile                 = $profile;
         $this->blockFactory            = $blockFactory;
         $this->cmsContentRepository    = $cmsContentRepository;
+        $this->router                  = $router;
     }
 
     /**
@@ -79,10 +83,10 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
             if ($this->cmsConfig['declination'] && ($declination = $this->getDeclination($page,
                     $request))) {
                 $isDeclination      = true;
-                $editDeclinationUrl = $this->cmsPageAdmin->generateUrl('cms.admin.cms_page_declination.edit',
-                    ['id' => $page->getId(), 'childId' => $declination->getId()]);
-                $addDeclinationUrl  = $this->cmsPageAdmin->generateUrl('cms.admin.cms_page_declination.create',
-                    ['id' => $page->getId()]);
+                $editDeclinationUrl = $this->router->generate('admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_edit',
+                    ['id' => $page->getSite()->getId(), 'childId' => $page->getId(), 'childChildId' => $declination->getId()]);
+                $addDeclinationUrl  = $this->router->generate('admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_create',
+                    ['id' => $page->getSite()->getId(), 'childId' => $page->getId()]);
             }
             $editUrl = $this->cmsPageAdmin->generateUrl('edit', ['id' => $page->getId()]);
 
@@ -109,9 +113,9 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
                 $value = $transformer->transform($content->getValue(), true);
 
                 $blocks[] = [
-                    'config' => [
-                        'code' => $block->getCode(),
-                        'label' => $block->getLabel(),
+                    'config'    => [
+                        'code'     => $block->getCode(),
+                        'label'    => $block->getLabel(),
                         'template' => $block->getTemplate(),
                         'settings' => $block->getSettings(),
                     ],

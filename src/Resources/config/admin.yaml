@@ -4,6 +4,7 @@ services:
     arguments:
       - ~
       - WebEtDesign\CmsBundle\Entity\CmsSite
+      - '@Symfony\Component\Routing\RouterInterface'
       - '@doctrine.orm.entity_manager'
       - WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController
       - '%wd_cms.cms%'
@@ -42,7 +43,7 @@ services:
       - [setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['edit', '@@WebEtDesignCms/admin/page/edit.html.twig']]
       - [setTemplate, ['tree', '@@WebEtDesignCms/admin/page/tree.html.twig']]
-      - [addChild, ['@cms.admin.cms_page_declination', 'declination']]
+      - [addChild, ['@cms.admin.cms_page_declination', 'page']]
     public: true
 
   cms.admin.cms_content:
@@ -84,6 +85,7 @@ services:
       - WebEtDesign\CmsBundle\Entity\CmsMenuItem
       - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuItemAdminController
       - '@doctrine.orm.default_entity_manager'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
       - '%wd_cms.menu%'
     tags:
       - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false, label_translator_strategy: sonata.admin.label.strategy.underscore }
@@ -130,6 +132,7 @@ services:
       - '@doctrine.orm.default_entity_manager'
       - '%wd_cms.templates%'
       - '%wd_cms.vars%'
+      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
       - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
       - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }

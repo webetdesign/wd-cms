@@ -13,6 +13,8 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Component\Routing\RouterInterface;
+use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 
 
@@ -20,6 +22,7 @@ final class CmsSiteAdmin extends AbstractAdmin
 {
     protected ?bool $isMultilingual;
     protected ?bool $isMultisite;
+    private         $cmsConfig;
 
     /**
      * @inheritDoc
@@ -27,6 +30,7 @@ final class CmsSiteAdmin extends AbstractAdmin
     public function __construct(
         string $code,
         string $class,
+        protected RouterInterface $router,
         private EntityManagerInterface $em,
         string $baseControllerName,
         $cmsConfig
@@ -35,6 +39,7 @@ final class CmsSiteAdmin extends AbstractAdmin
         $this->isMultilingual = $cmsConfig['multilingual'];
 
         parent::__construct($code, $class, $baseControllerName);
+        $this->cmsConfig = $cmsConfig;
     }
 
     protected function configureRoutes(RouteCollectionInterface $collection): void
@@ -131,6 +136,65 @@ final class CmsSiteAdmin extends AbstractAdmin
                 }
             }
         }
+
+        if ($this->cmsConfig['declination'] && $childAdmin instanceof CmsPageAdmin) {
+            $requestRouteName = $this->getRequest()->get('_route');
+
+            // Sonata ne gérant pas le troisième niveau d'admin test sur les routeNames directement
+
+            if ('admin_webetdesign_cms_cmssite_cmspage_edit' === $requestRouteName) {
+                $site = $this->getSubject();
+                /** @var CmsPage $page */
+                $page  = $childAdmin->getSubject();
+                $route = $page->getRoute();
+
+                if ($route && $route->isDynamic()) {
+                    $menu->addChild('Page : ' . $page->getTitle(), [
+                        'uri'        => $admin->generateUrl('cms.admin.cms_page.edit', [
+                            'id'      => $site->getId(),
+                            'childId' => $childAdmin->getSubject()->getId(),
+                        ]),
+                        'attributes' => ['class' => 'active']
+                    ]);
+
+                    $menu->addChild('Déclinaisons', [
+                        'uri' => $this->router->generate('admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_list',
+                            [
+                                'id'      => $site->getId(),
+                                'childId' => $childAdmin->getSubject()->getId(),
+                            ]),
+                    ]);
+                }
+            }
+
+            if (in_array($requestRouteName, [
+                'admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_list',
+                'admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_create',
+                'admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_edit',
+                'admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_show'
+            ])) {
+                $site = $this->getSubject();
+                /** @var CmsPage $page */
+                $page = $childAdmin->getSubject();
+                $menu->addChild('Page : ' . $page->getTitle(), [
+                    'uri' => $admin->generateUrl('cms.admin.cms_page.edit', [
+                        'id'      => $site->getId(),
+                        'childId' => $childAdmin->getSubject()->getId(),
+                    ]),
+                ]);
+
+                $menu->addChild('Déclinaisons', [
+                    'uri'        => $this->router->generate('admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_list',
+                        [
+                            'id'      => $site->getId(),
+                            'childId' => $childAdmin->getSubject()->getId(),
+                        ]),
+                    'attributes' => ['class' => $requestRouteName === 'admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_list' ? 'active' : '']
+                ]);
+            }
+        }
+
+
     }
 
 

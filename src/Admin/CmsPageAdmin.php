@@ -86,6 +86,7 @@ class CmsPageAdmin extends AbstractAdmin
 
     protected function configureRoutes(RouteCollection|RouteCollectionInterface $collection): void
     {
+        $collection->remove('show');
         $collection->add('move', 'move/{childId}');
         $collection->add('test', 'test');
         $collection->add('list', 'list', ['id' => null], ['id' => '\d*']);

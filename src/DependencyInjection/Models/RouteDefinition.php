@@ -43,6 +43,20 @@ class RouteDefinition
     }
 
     /**
+     * @param $name
+     * @return ?RouteAttributeDefinition
+     */
+    public function getAttribute($name): ?RouteAttributeDefinition
+    {
+        foreach ($this->attributes as $attribute) {
+            if ($attribute->getName() === $name) {
+                return $attribute;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @param string|null $path
      * @return RouteDefinition
      */

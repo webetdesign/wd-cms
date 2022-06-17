@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\CmsBlock;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\DependencyInjection\Models\BlockDefinition;
 use WebEtDesign\CmsBundle\Factory\BlockFactory;
@@ -42,6 +43,8 @@ abstract class AbstractBlock implements BlockInterface
 
     protected BlockFactory $factory;
 
+    protected array $options = [];
+
     public function render($value, ?array $context = null)
     {
         $transformer = $this->getModelTransformer();
@@ -55,9 +58,15 @@ abstract class AbstractBlock implements BlockInterface
             if (!empty($this->getSettings())) {
                 $value = array_merge($value, ['settings' => $this->getSettings()]);
             }
-            if (!empty($context)) {
-                $value = array_merge($value, $context);
+
+            if (is_array($value)){
+                if (!empty($context)) {
+                    $value = array_merge($value, $context);
+                }
+            }else{
+                $value = ['value'=>$value];
             }
+
             $value = $this->getTwig()->render($this->getTemplate(), $value);
         }
 
@@ -333,5 +342,36 @@ abstract class AbstractBlock implements BlockInterface
     public function getFactory(): BlockFactory
     {
         return $this->factory;
+    }
+
+    /**
+     * @param array $options
+     * @return AbstractBlock
+     */
+    public function setOptions(array $options): AbstractBlock
+    {
+        $resolver = new OptionsResolver();
+
+        $this->configureOptions($resolver);
+
+        $this->options = $resolver->resolve($options);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'use_accordion'         => false,
+            'new_row_on_next_block' => false,
+        ]);
     }
 }

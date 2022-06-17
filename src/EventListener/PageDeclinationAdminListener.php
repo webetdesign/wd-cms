@@ -4,22 +4,24 @@ namespace WebEtDesign\CmsBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
+use WebEtDesign\CmsBundle\CmsTemplate\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use Doctrine\ORM\EntityManager;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
 
 class PageDeclinationAdminListener
 {
-    protected $em;
-    protected $pageConfig;
-    private   $cmsConfig;
+    protected           $em;
+    protected           $pageConfig;
+    private             $cmsConfig;
+    private PageFactory $pageFactory;
 
-    public function __construct(EntityManager $em, $pageConfig, $cmsConfig)
+    public function __construct(EntityManager $em, PageFactory $pageFactory, $cmsConfig)
     {
         $this->em = $em;
-        $this->pageConfig = $pageConfig;
         $this->cmsConfig = $cmsConfig;
-
+        $this->pageFactory = $pageFactory;
     }
 
     public function prePersist($event)
@@ -70,18 +72,18 @@ class PageDeclinationAdminListener
 
         $technicName = $declination->getPage()->getRoute()->getName();
         $values = json_decode($declination->getParams(), true);
-        $route = $declination->getPage()->getRoute();
-        $config = $this->pageConfig[$declination->getPage()->getTemplate()];
+        /** @var PageInterface $config */
+        $config = $this->pageFactory->get($declination->getPage()->getTemplate());
 
         foreach ($values as $name => $value) {
-            $param = $config['params'][$name] ?? null;
-            if ($param && isset($param['entity']) && isset($param['property'])) {
-                if ($this->cmsConfig['multilingual'] && is_subclass_of($param['entity'], TranslatableInterface::class)) {
-                    $method = 'findOneBy' . ucfirst($param['property']);
+            $attribute = $config->getRoute()->getAttribute($name);
+            if ($attribute && !empty($attribute->getEntityClass())) {
+                if ($this->cmsConfig['multilingual'] && is_subclass_of($attribute->getEntityClass(), TranslatableInterface::class)) {
+                    $method = 'findOneBy' . ucfirst(!empty($attribute->getEntityProperty()) ? $attribute->getEntityProperty() : 'id');
                     $locale = $declination->getPage()->getSite()->getLocale();
-                    $entity = $this->em->getRepository($param['entity'])->$method($value, $locale);
+                    $entity = $this->em->getRepository($attribute->getEntityClass())->$method($value, $locale);
                 } else {
-                    $entity = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
+                    $entity = $this->em->getRepository($attribute->getEntityClass())->findOneBy(['id' => $value]);
                 }
 
                 if ($entity) {
