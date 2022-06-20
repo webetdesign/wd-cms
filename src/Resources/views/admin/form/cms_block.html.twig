@@ -49,18 +49,20 @@
                  aria-labelledby="{{ form.vars.id }}_heading_{{ block.code }}">
                 <div class="panel-body">
                     <div class="row">
-                        {% if form.parent_heritance is defined %}
-                            <div class="inherit">
-                                {{ form_widget(form.parent_heritance) }}
-                            </div>
-                        {% endif %}
-                        {% if form.value is defined %}
-                            {{ form_row(form.value) }}
-                        {% elseif form.translations is defined %}
-                            {{ form_row(form.translations) }}
-                        {% elseif form.media is defined %}
-                            {{ form_row(form.media) }}
-                        {% endif %}
+                        <div class="col-md-12">
+                            {% if form.parent_heritance is defined %}
+                                <div class="inherit">
+                                    {{ form_widget(form.parent_heritance) }}
+                                </div>
+                            {% endif %}
+                            {% if form.value is defined %}
+                                {{ form_row(form.value) }}
+                            {% elseif form.translations is defined %}
+                                {{ form_row(form.translations) }}
+                            {% elseif form.media is defined %}
+                                {{ form_row(form.media) }}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

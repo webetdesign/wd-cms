@@ -67,7 +67,6 @@
         {% set block = blocks[child.vars.name] %}
         {% if block.options['use_accordion'] ?? false %}
             {% set unique_key = form.vars.unique_block_prefix ~ '_' ~ form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code ~ '_' ~ random() %}
-            <div class="col-md-12">
                 <div class="panel box" style="margin-bottom: 10px;">
                     <div class="box-header with-border">
                         <h4 class="box-title">
@@ -85,7 +84,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
         {% else %}
             {{ form_row(child) }}
         {% endif %}
