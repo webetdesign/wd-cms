@@ -103,10 +103,13 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
                 'type'               => isset($isDeclination) ? 'Declination' : null
             ];
 
-
             $blocks = [];
             foreach ($this->cmsContentRepository->findBy(['page' => $this->data['page']]) as $content) {
-                $block       = $this->blockFactory->get($this->data['service']->getBlock($content->getCode()));
+                $config  = $this->data['service']->getBlock($content->getCode());
+                if (!$config) {
+                    continue;
+                }
+                $block       = $this->blockFactory->get($config);
                 $blockRC     = new ReflectionClass($block);
                 $transformer = $block->getModelTransformer();
 
