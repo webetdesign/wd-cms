@@ -33,6 +33,8 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
     protected $configCms;
 
+    protected $routes = [];
+
     public function __construct(
         string $name = null,
         EntityManagerInterface $em,
@@ -57,6 +59,10 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
     {
         $this->init($input, $output);
         $this->pageRp = $this->em->getRepository(CmsPage::class);
+
+        foreach ($this->em->getRepository(CmsRoute::class)->findAll() as $route) {
+            $this->routes[$route->getName()] = $route->getId();
+        }
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
@@ -137,7 +143,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
             $route->setMethods($config['methods']);
         }
 
-        if (!empty($config['route'])) {
+        if (!empty($config['route']) && $config['refresh_route']) {
             $defaultName = $config['route'];
             if ($this->configCms['multilingual']) {
                 $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(), $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId());
@@ -145,14 +151,13 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
                 $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s', $page->getId());
             }
 
-            // Pour éviter le problème de doublon de route
-            $exists = $this->em->getRepository(CmsRoute::class)->findSameRoute($route, $routeName);
-
-            if (is_array($exists) && count($exists) > 0) {
+            if (array_key_exists($routeName, $this->routes) && $this->routes[$routeName] !== $route->getId()) {
                 $routeName .= '_' . uniqid();
             }
 
             $route->setName($routeName);
+
+            $this->routes[$routeName] = $route->getId();
         }
 
         return $route;

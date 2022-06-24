@@ -143,6 +143,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('route')->defaultValue(null)->end()
                             ->scalarNode('path')->defaultValue(null)->end()
+                            ->scalarNode('refresh_route')->defaultValue(true)->end()
                             ->scalarNode('action')
                                 ->defaultValue('index')
 //                                ->treatNullLike('index')
