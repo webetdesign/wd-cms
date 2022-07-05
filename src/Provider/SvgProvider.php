@@ -2,7 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Provider;
 
-use Sonata\CoreBundle\Validator\ErrorElement;
+use Sonata\Form\Validator\ErrorElement;
 use Sonata\MediaBundle\Provider\FileProvider;
 use Gaufrette\Filesystem;
 use Sonata\AdminBundle\Form\FormMapper;
@@ -10,7 +10,6 @@ use Sonata\MediaBundle\CDN\CDNInterface;
 use Sonata\MediaBundle\Generator\GeneratorInterface;
 use Sonata\MediaBundle\Metadata\MetadataBuilderInterface;
 use Sonata\MediaBundle\Model\MediaInterface;
-use Sonata\MediaBundle\Provider\MediaProviderInterface;
 use Sonata\MediaBundle\Provider\Metadata;
 use Sonata\MediaBundle\Thumbnail\ThumbnailInterface;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
