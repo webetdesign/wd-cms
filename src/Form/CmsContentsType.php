@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CmsContentsType extends CollectionType
+class CmsContentsType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -24,6 +24,11 @@ class CmsContentsType extends CollectionType
     {
         parent::configureOptions($resolver);
         $resolver->setDefault('role_admin', false);
+    }
+
+    public function getParent()
+    {
+        return CollectionType::class;
     }
 
 
