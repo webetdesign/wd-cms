@@ -23,15 +23,10 @@ class PageTemplateType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $choices = [];
-        foreach ($this->templateFactory->getTemplateList($options['collection']) as $value => $tpl) {
-            $choices[$tpl->getLabel()] = $value;
-        }
-
         $builder->add('tpl', ChoiceType::class, [
             'required'    => false,
             'label'       => false,
-            'choices'     => $choices,
+            'choices'     => $this->templateFactory->getTemplateChoices($options['collection']),
             'constraints' => [
                 new NotBlank(),
             ]

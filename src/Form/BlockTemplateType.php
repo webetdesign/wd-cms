@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Form;
 
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -17,18 +18,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BlockTemplateType extends AbstractType
 {
-    public function __construct(private SharedBlockFactory $sharedBlockFactory) {}
+    public function __construct(private SharedBlockFactory $sharedBlockFactory) { }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $choices = [];
-        foreach ($this->sharedBlockFactory->getTemplateList($options['collection']) as $value => $tpl) {
-            $choices[$tpl->getLabel()] = $value;
-        }
-
         $builder->add('tpl', ChoiceType::class, [
-            'label'        => false,
-            'choices'      => $choices,
+            'required'    => false,
+            'label'       => false,
+            'choices'     => $this->sharedBlockFactory->getTemplateChoices($options['collection']),
+            'constraints' => [
+                new NotBlank(),
+            ]
         ]);
 
         $builder->addModelTransformer(new CallbackTransformer(

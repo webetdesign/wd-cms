@@ -19,7 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
+use WebEtDesign\CmsBundle\Attribute\AsCmsConfiguration;
 use WebEtDesign\CmsBundle\Attribute\AsCmsPage;
 use WebEtDesign\CmsBundle\Attribute\AsCmsSharedBlock;
 use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
@@ -96,6 +98,12 @@ class WebEtDesignCmsExtension extends Extension
                     $definition->addTag('wd_cms.shared_block', array_filter([
                         'key' => $attribute->code,
                     ]));
+                }
+            );
+
+            $container->registerAttributeForAutoconfiguration(AsCmsConfiguration::class,
+                static function (ChildDefinition $definition, AsCmsConfiguration $attribute) {
+                    $definition->addTag('wd_cms.configuration');
                 }
             );
         }

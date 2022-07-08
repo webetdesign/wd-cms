@@ -4,11 +4,15 @@ namespace WebEtDesign\CmsBundle\Factory;
 
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use WebEtDesign\CmsBundle\CmsTemplate\TemplateInterface;
+use WebEtDesign\CmsBundle\Services\CmsConfigurationInterface;
+use WebEtDesign\UserBundle\CMS\Pages\LoginPage;
+use WebEtDesign\UserBundle\CMS\Pages\ResetPasswordPage;
 
 abstract class AbstractTemplateFactory implements TemplateFactoryInterface
 {
-    protected ServiceLocator $serviceLocator;
-    protected array          $configs;
+    protected ServiceLocator             $serviceLocator;
+    protected array                      $configs;
+    protected ?CmsConfigurationInterface $configuration = null;
 
     public function __construct(ServiceLocator $templates, array $configs)
     {
@@ -39,9 +43,15 @@ abstract class AbstractTemplateFactory implements TemplateFactoryInterface
     {
         $tpls = [];
         foreach ($this->serviceLocator->getProvidedServices() as $key => $id) {
+            if ($id === ResetPasswordPage::class) {
+                dump($this->isDisabled($id, $key));
+            }
             $tpl = $this->getServices($key);
-            if ($tpl &&
-                ($tpl->getCollections() === null ||
+            if (
+                $tpl &&
+                !$this->isDisabled($id, $key) &&
+                (
+                    $tpl->getCollections() === null ||
                     $collection === null ||
                     in_array($collection, $tpl->getCollections())
                 )
@@ -55,6 +65,28 @@ abstract class AbstractTemplateFactory implements TemplateFactoryInterface
             }
         }
 
+        ksort($tpls);
+
         return $tpls;
+    }
+
+    /**
+     * @param CmsConfigurationInterface|null $configuration
+     * @return self
+     */
+    public function setConfiguration(?CmsConfigurationInterface $configuration
+    ): self {
+        $this->configuration = $configuration;
+        return $this;
+    }
+
+    private function isDisabled($id, $code): bool
+    {
+        if ($this->configuration === null) {
+            return false;
+        }
+
+        return in_array($id, $this->configuration->getDisabledTemplate()) ||
+            in_array($code, $this->configuration->getDisabledTemplate());
     }
 }

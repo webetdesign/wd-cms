@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use WebEtDesign\CmsBundle\DependencyInjection\Compiler\BlockPass;
+use WebEtDesign\CmsBundle\DependencyInjection\Compiler\ConfigurationPass;
 use WebEtDesign\CmsBundle\DependencyInjection\Compiler\PageTemplatePass;
 use WebEtDesign\CmsBundle\DependencyInjection\Compiler\SharedBlockPass;
 
@@ -20,6 +21,7 @@ class WebEtDesignCmsBundle extends Bundle
         $container->addCompilerPass(new BlockPass());
         $container->addCompilerPass(new PageTemplatePass());
         $container->addCompilerPass(new SharedBlockPass());
+        $container->addCompilerPass(new ConfigurationPass());
     }
 
 }
