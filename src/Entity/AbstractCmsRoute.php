@@ -53,11 +53,11 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     private ?string $controller = null;
 
     /**
-     * @var CmsPage
+     * @var CmsPage|null
      *
      * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="route")
      */
-    private CmsPage $page;
+    private ?CmsPage $page = null;
 
 
     /**
