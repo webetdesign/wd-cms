@@ -371,6 +371,8 @@ abstract class AbstractBlock implements BlockInterface
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'use_row'               => false,
+            'row_col_class'         => null,
             'use_accordion'         => false,
             'new_row_on_next_block' => false,
         ]);

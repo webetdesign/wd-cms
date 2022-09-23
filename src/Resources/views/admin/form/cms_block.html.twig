@@ -56,7 +56,13 @@
                                 </div>
                             {% endif %}
                             {% if form.value is defined %}
-                                {{ form_row(form.value) }}
+                                {% if block.options.use_row %}
+                                    <div class="row">
+                                        {{ form_row(form.value) }}
+                                    </div>
+                                {% else %}
+                                    {{ form_row(form.value) }}
+                                {% endif %}
                             {% elseif form.translations is defined %}
                                 {{ form_row(form.translations) }}
                             {% elseif form.media is defined %}
