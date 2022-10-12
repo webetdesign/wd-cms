@@ -108,12 +108,6 @@ class ExtraLoader implements LoaderInterface
                     $defaults['extension'] = '';
                 }
             }
-
-            $pageConfig = $this->pageFactory->get($cmsRoute->getPage()->getTemplate());
-            $routeDefnition = $pageConfig->getRoute();
-            if ($routeDefnition !== null) {
-               $routeDefnition->getPriority();
-            }
             
             $route = new Route($pattern, $defaults, $requirements ?? []);
             if (!empty($host)) {
@@ -122,11 +116,16 @@ class ExtraLoader implements LoaderInterface
             $route->setMethods($cmsRoute->getMethods());
             
             $priority = 0;
-            $pageConfig = $this->pageFactory->get($cmsRoute->getPage()->getTemplate());
-            $routeDefnition = $pageConfig->getRoute();
-            if ($routeDefnition !== null) {
-                $priority = $routeDefnition->getPriority();
+            try {
+                $pageConfig = $this->pageFactory->get($cmsRoute->getPage()->getTemplate());
+                $routeDefnition = $pageConfig->getRoute();
+                if ($routeDefnition !== null) {
+                    $priority = $routeDefnition->getPriority();
+                } 
+            }catch (Exception $e){
+                
             }
+            
             
             preg_match_all('/\{(\w+)\}/', $cmsRoute->getPath(), $matches);
             $routes [] = [
