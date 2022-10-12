@@ -49,10 +49,10 @@
 {% endif %}
 
 {% if object is defined and cms_render_seo_smo_value(object, 'ogImage') is not empty and cms_render_seo_smo_value(object, 'ogImage')|wd_media_path() is not empty %}
-    <meta property="og:image" content="{{ absolute_url(cms_render_seo_smo_value(object, 'ogImage')|wd_media_path()) }}">
+    <meta property="og:image" content="{{ absolute_url(cms_render_seo_smo_value(object, 'ogImage')) }}">
 {% else %}
     {% if cms_render_seo_smo_value(page, 'ogImage')|wd_media_path() is not empty %}
-        <meta property="og:image" content="{{ absolute_url(cms_render_seo_smo_value(page, 'ogImage')|wd_media_path()) }}">
+        <meta property="og:image" content="{{ absolute_url(cms_render_seo_smo_value(page, 'ogImage')) }}">
     {% endif %}
 {% endif %}
 

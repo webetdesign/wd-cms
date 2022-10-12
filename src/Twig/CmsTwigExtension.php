@@ -398,7 +398,7 @@ class CmsTwigExtension extends AbstractExtension
         $value = !empty($value) ? $value : $default;
 
         if ($value instanceof Media) {
-            return $value;
+            return $this->mediaService->getImagePath($value, 'default', 'xl');
         }
 
         if ($this->globalVarsEnable) {
