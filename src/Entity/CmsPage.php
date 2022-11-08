@@ -124,7 +124,7 @@ class CmsPage
     #[ORM\ManyToMany(targetEntity: CmsPage::class)]
     #[ORM\JoinTable(name: "cms__page_has_page")]
     #[ORM\JoinColumn(name: "page_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    #[ORM\JoinColumn(name: "associated_page_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\InverseJoinColumn(name: "associated_page_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private Collection $crossSitePages;
 
     private mixed $referencePage;
