@@ -8,16 +8,20 @@ use Doctrine\Common\Collections\Collection;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use JetBrains\PhpStorm\ArrayShape;
 use stdClass;
+use WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository;
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository")
  * @ORM\Table(name="cms__menu_item")
  * @Gedmo\Tree(type="nested")
  */
+#[ORM\Entity(repositoryClass: CmsMenuItemRepository::class)]
+#[ORM\Table(name: "cms__menu_item")]
 class CmsMenuItem
 {
     /**
@@ -25,6 +29,9 @@ class CmsMenuItem
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
      */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(type: Types::INTEGER)]
     private $id;
 
     /**
@@ -32,6 +39,7 @@ class CmsMenuItem
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     private $name;
 
     /**
@@ -39,6 +47,7 @@ class CmsMenuItem
      *
      * @var ?string
      */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private $information;
 
     /**
@@ -46,6 +55,7 @@ class CmsMenuItem
      * @ORM\Column(type="string", length=255, nullable=true, name="link_type")
      *
      */
+    #[ORM\Column(name: "link_type", type: Types::STRING, length: 255, nullable: true)]
     private $linkType;
 
     /**
@@ -53,6 +63,7 @@ class CmsMenuItem
      * @ORM\Column(type="string", length=255, nullable=true, name="link_value")
      *
      */
+    #[ORM\Column(name: "link_value",type: Types::STRING, length: 255, nullable: true)]
     private $linkValue;
 
     /**
@@ -60,12 +71,15 @@ class CmsMenuItem
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="menuItems")
      * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="SET NULL")
      */
+    #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: "menuItems")]
+    #[ORM\JoinColumn(name: "page_id", referencedColumnName: "id", onDelete: "SET NULL")]
     private $page;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean", nullable=false, name="is_visible", options={"default": true})
      */
+    #[ORM\Column(name: "is_visible", type: Types::BOOLEAN, nullable: false, options: ["default" => true])]
     private $isVisible = true;
 
     /**
@@ -74,6 +88,8 @@ class CmsMenuItem
      * @ORM\Column(type="integer", nullable=false)
      *
      */
+    #[Gedmo\TreeLevel]
+    #[ORM\Column(type: Types::INTEGER, nullable: false)]
     private $lvl;
 
     /**
@@ -82,6 +98,8 @@ class CmsMenuItem
      * @ORM\Column(type="integer", nullable=false)
      *
      */
+    #[Gedmo\TreeLeft]
+    #[ORM\Column(type: Types::INTEGER,nullable: false)]
     private $lft;
 
     /**
@@ -90,6 +108,8 @@ class CmsMenuItem
      * @ORM\Column(type="integer", nullable=false)
      *
      */
+    #[Gedmo\TreeRight]
+    #[ORM\Column(type: Types::INTEGER, nullable: false)]
     private $rgt;
 
     /**
@@ -97,6 +117,9 @@ class CmsMenuItem
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem")
      * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
      */
+    #[Gedmo\TreeRoot]
+    #[ORM\ManyToOne(targetEntity: CmsMenuItem::class)]
+    #[ORM\JoinColumn(name: "tree_root", referencedColumnName: "id", onDelete: "CASCADE")]
     private $root;
 
     /**
@@ -104,6 +127,9 @@ class CmsMenuItem
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      */
+    #[Gedmo\TreeParent]
+    #[ORM\ManyToOne(targetEntity: CmsMenuItem::class, inversedBy: "children")]
+    #[ORM\JoinColumn(name: "parent_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private $parent;
 
     /**
@@ -111,36 +137,43 @@ class CmsMenuItem
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="parent")
      * @ORM\OrderBy({"lft" = "ASC"})
      */
+    #[ORM\OneToMany(mappedBy: "parent", targetEntity: CmsMenuItem::class)]
+    #[ORM\OrderBy(["lft" => "ASC"])]
     private $children;
 
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: Types::STRING,nullable: true)]
     private $liClass;
 
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: Types::STRING, nullable: true)]
     private $ulClass;
 
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: Types::STRING,nullable: true)]
     private $linkClass;
 
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: Types::STRING,nullable: true)]
     private $iconClass;
 
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: Types::STRING,nullable: true)]
     private $connected;
 
     /**
@@ -148,6 +181,7 @@ class CmsMenuItem
      * @ORM\Column(type="string", nullable=true)
      *
      */
+    #[ORM\Column(type: Types::STRING,nullable: true)]
     private $role;
 
     /**
@@ -164,6 +198,7 @@ class CmsMenuItem
      * @var null|string
      * @ORM\Column(type="text", nullable=true)
      */
+    #[ORM\Column(type: Types::TEXT,nullable: true)]
     private $params;
 
     /**
@@ -171,18 +206,22 @@ class CmsMenuItem
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenu", inversedBy="children", cascade={"persist"})
      * @ORM\JoinColumn(name="menu_id", referencedColumnName="id")
      */
+    #[ORM\ManyToOne(targetEntity: CmsMenu::class, inversedBy: "children", cascade: ["persist"])]
+    #[ORM\JoinColumn(name: "menu_id", referencedColumnName: "id")]
     private $menu;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: Types::BOOLEAN)]
     private $blank = 0;
 
     /**
      * @var string
      * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: Types::STRING,nullable: true)]
     protected $anchor;
 
     public function __construct()

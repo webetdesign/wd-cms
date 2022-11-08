@@ -6,14 +6,20 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
+use Doctrine\DBAL\Schema\UniqueConstraint;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
+use WebEtDesign\CmsBundle\Repository\CmsMenuRepository;
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsMenuRepository")
  * @ORM\Table(name="cms__menu", uniqueConstraints={@ORM\UniqueConstraint(name="code_idx", columns={"code", "site_id"})})
  */
+#[ORM\Entity(repositoryClass: CmsMenuRepository::class)]
+#[ORM\Table(name: "cms__menu")]
+#[ORM\UniqueConstraint(name: "code_idx", columns: ["code", "site_id"])]
 class CmsMenu
 {
     /**
@@ -23,6 +29,9 @@ class CmsMenu
      *
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
     private $id;
 
     /**
@@ -30,6 +39,7 @@ class CmsMenu
      *
      * @var string
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     private $label;
 
     /**
@@ -37,6 +47,7 @@ class CmsMenu
      *
      * @var string
      */
+    #[ORM\Column(type: Types::STRING, length: 128, nullable: false)]
     private $code;
 
     /**
@@ -44,12 +55,14 @@ class CmsMenu
      *
      * @var string
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $type;
 
     /**
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="menu", cascade={"persist", "remove"})
      * @var CmsMenuItem[]|Collection|Selectable
      */
+    #[ORM\OneToMany(mappedBy: "menu", targetEntity: CmsMenuItem::class, cascade: ["persist", "remove"])]
     private $children;
 
     /**
@@ -57,6 +70,8 @@ class CmsMenu
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="menus")
      * @ORM\JoinColumn(name="site_id", referencedColumnName="id")
      */
+    #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: "menus")]
+    #[ORM\JoinColumn(name: "site_id", referencedColumnName: "id")]
     private $site;
 
     public $initRoot = true;
