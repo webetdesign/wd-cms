@@ -2,8 +2,10 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
+use WebEtDesign\CmsBundle\Repository\CmsRouteRepository;
 
 
 /**
@@ -11,6 +13,10 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsRouteRepository")
  * @ORM\Table(name="cms__route")
  */
+#[UniqueEntity('path')]
+#[ORM\Entity(repositoryClass: CmsRouteRepository::class)]
+#[ORM\Table(name: "cms__route")]
+
 abstract class AbstractCmsRoute implements CmsRouteInterface
 {
     /**
@@ -18,6 +24,9 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
      */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
 
@@ -26,6 +35,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     private ?string $name = null;
 
 
@@ -34,6 +44,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\Column(type="array", nullable=false)
      *
      */
+    #[ORM\Column(type: Types::ARRAY, nullable: false)]
     private array $methods = [];
 
 
@@ -42,6 +53,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     private ?string $path = null;
 
 
@@ -50,6 +62,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $controller = null;
 
     /**
@@ -57,6 +70,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      *
      * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="route")
      */
+    #[ORM\OneToOne(mappedBy: 'route', targetEntity: CmsPage::class, cascade: ["remove"])]
     private ?CmsPage $page = null;
 
 
@@ -65,6 +79,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\Column(type="text", nullable=true)
      *
      */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $defaults = null;
 
     /**
@@ -72,6 +87,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @ORM\Column(type="text", nullable=true)
      *
      */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $requirements = null;
 
     public function __toString()
@@ -193,6 +209,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
      * @param string|null $requirements
      * @return self
      */
+
     public function setRequirements(?string $requirements): self
     {
         $this->requirements = $requirements;
