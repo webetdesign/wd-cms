@@ -15,14 +15,13 @@ use Doctrine\Common\Collections\Selectable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use WebEtDesign\CmsBundle\Repository\CmsRouteRepository;
-
+use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsSiteRepository")
  * @ORM\Table(name="cms__site")
  */
-#[ORM\Entity(repositoryClass: CmsRouteRepository::class)]
+#[ORM\Entity(repositoryClass: CmsSiteRepository::class)]
 #[ORM\Table(name: "cms__site")]
 class CmsSite
 {
@@ -36,7 +35,7 @@ class CmsSite
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     /**
      * @var string|null
@@ -46,7 +45,7 @@ class CmsSite
      */
     #[Gedmo\Slug(fields: ["label", "locale"])]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
-    private ?string $slug = null;
+    protected ?string $slug = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=false)
@@ -54,17 +53,7 @@ class CmsSite
      * @var string|null
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
-
-    private ?string $label = null;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     * @var string|null
-     */
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-
-    private ?string $locale = null;
+    protected ?string $label = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -73,7 +62,7 @@ class CmsSite
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
 
-    private ?string $host = null;
+    protected ?string $locale = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -82,7 +71,16 @@ class CmsSite
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
 
-    private ?string $localhost = null;
+    protected ?string $host = null;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @var string|null
+     */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+
+    protected ?string $localhost = null;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : 0})
@@ -90,7 +88,7 @@ class CmsSite
      * @var boolean
      */
     #[ORM\Column(type: Types::BOOLEAN, options: ["default" => 0])]
-    private bool $hostMultilingual = false;
+    protected bool $hostMultilingual = false;
 
     /**
      * @ORM\Column(name="`default`", type="boolean", options={"default" : 0})
@@ -98,7 +96,7 @@ class CmsSite
      * @var boolean
      */
     #[ORM\Column(name: "`default`", type: Types::BOOLEAN, options: ["default"=>0])]
-    private bool $default;
+    protected bool $default;
 
     /**
      * @var CmsPage[]|Collection|Selectable
@@ -106,7 +104,7 @@ class CmsSite
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="site", cascade={"persist", "remove"})
      */
     #[ORM\OneToMany(targetEntity: CmsPage::class, mappedBy: "site", cascade: ["persist", "remove"])]
-    private Collection $pages;
+    protected Collection $pages;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -114,14 +112,14 @@ class CmsSite
      * @var string|null
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private ?string $flagIcon = null;
+    protected ?string $flagIcon = null;
 
     /**
      * @var CmsPage[]|Collection|Selectable
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenu", mappedBy="site", cascade={"persist", "remove"})
      */
     #[ORM\OneToMany(targetEntity: CmsMenu::class, mappedBy: "site", cascade: ["persist", "remove"])]
-    private Collection $menus;
+    protected Collection $menus;
 
     /**
      * @var ArrayCollection
@@ -129,21 +127,21 @@ class CmsSite
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", mappedBy="site", cascade={"persist", "remove"})
      */
     #[ORM\OneToMany(targetEntity: CmsSharedBlock::class, mappedBy: "site", cascade: ["persist", "remove"])]
-    private Collection $sharedBlocks;
+    protected Collection $sharedBlocks;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean", options={"default": true})
      */
     #[ORM\Column(type: Types::BOOLEAN, options: ["default" => true])]
-    private bool $visible = true;
+    protected bool $visible = true;
 
     /**
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private ?string $templateFilter = null;
+    protected ?string $templateFilter = null;
 
     public bool $initPage = true;
     public bool $initMenu = true;
