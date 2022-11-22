@@ -109,7 +109,7 @@ class CmsMenuAdminController extends CRUDController
             $session->set('admin_current_site_id', $id);
             $datagrid->setValue('site', null, $id);
 
-            $rp = $em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
+            $rp = $em->getRepository(CmsMenuItem::class);
             $qb = $rp->createQueryBuilder('mi');
 
             $qb

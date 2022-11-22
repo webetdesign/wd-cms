@@ -116,7 +116,7 @@ class CmsPageAdminController extends CRUDController
         if ($id) {
             $session->set('admin_current_site_id', $id);
 
-            $rp = $this->em->getRepository('WebEtDesignCmsBundle:CmsPage');
+            $rp = $this->em->getRepository(CmsPage::class);
             $qb = $rp->createQueryBuilder('p');
 
             $qb
@@ -504,7 +504,7 @@ class CmsPageAdminController extends CRUDController
 
     protected function moveItems($submittedObject)
     {
-        $CmsRepo = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsPage');
+        $CmsRepo = $this->getDoctrine()->getRepository(CmsPage::class);
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':
