@@ -217,10 +217,10 @@ class CmsPageAdminController extends CRUDController
         $em = $this->getDoctrine();
         if ($id === null) {
             /** @var CmsSite $site */
-            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+            $site = $em->getRepository(CmsSite::class)->getDefault();
         } else {
             /** @var CmsSite $site */
-            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
+            $site = $em->getRepository(CmsSite::class)->find($id);
         }
         // the key used to lookup the template
         $templateKey = 'edit';
