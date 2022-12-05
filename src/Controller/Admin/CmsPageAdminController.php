@@ -116,7 +116,7 @@ class CmsPageAdminController extends CRUDController
         if ($id) {
             $session->set('admin_current_site_id', $id);
 
-            $rp = $this->em->getRepository('WebEtDesignCmsBundle:CmsPage');
+            $rp = $this->em->getRepository(CmsPage::class);
             $qb = $rp->createQueryBuilder('p');
 
             $qb
@@ -217,10 +217,10 @@ class CmsPageAdminController extends CRUDController
         $em = $this->getDoctrine();
         if ($id === null) {
             /** @var CmsSite $site */
-            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+            $site = $em->getRepository(CmsSite::class)->getDefault();
         } else {
             /** @var CmsSite $site */
-            $site = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
+            $site = $em->getRepository(CmsSite::class)->find($id);
         }
         // the key used to lookup the template
         $templateKey = 'edit';
@@ -504,7 +504,7 @@ class CmsPageAdminController extends CRUDController
 
     protected function moveItems($submittedObject)
     {
-        $CmsRepo = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsPage');
+        $CmsRepo = $this->getDoctrine()->getRepository(CmsPage::class);
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':

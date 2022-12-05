@@ -93,7 +93,7 @@ class CmsMenuAdminController extends CRUDController
             if ($session->get('admin_current_site_id')) {
                 $id = $session->get('admin_current_site_id');
             } else {
-                $defaultSite = $em->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+                $defaultSite = $em->getRepository('CmsSite::class')->getDefault();
                 if (!$defaultSite) {
                     $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
@@ -109,7 +109,7 @@ class CmsMenuAdminController extends CRUDController
             $session->set('admin_current_site_id', $id);
             $datagrid->setValue('site', null, $id);
 
-            $rp = $em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
+            $rp = $em->getRepository(CmsMenuItem::class);
             $qb = $rp->createQueryBuilder('mi');
 
             $qb
@@ -195,9 +195,9 @@ class CmsMenuAdminController extends CRUDController
     {
 
         if ($id === null) {
-            $site = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
+            $site = $this->getDoctrine()->getRepository('CmsSite::class')->getDefault();
         } else {
-            $site = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->find($id);
+            $site = $this->getDoctrine()->getRepository('CmsSite::class')->find($id);
         }
 
         $request = $this->requestStack->getCurrentRequest();

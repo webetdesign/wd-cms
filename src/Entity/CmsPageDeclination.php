@@ -3,8 +3,11 @@
 namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Cascade;
+use WebEtDesign\CmsBundle\Repository\CmsPageDeclinationRepository;
 use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
 use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
@@ -13,6 +16,8 @@ use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageDeclinationRepository")
  * @ORM\Table(name="cms__page_declination")
  */
+#[ORM\Entity(repositoryClass: CmsPageDeclinationRepository::class)]
+#[ORM\Table(name: "cms__page_declination")]
 class CmsPageDeclination
 {
     use SeoAwareTrait;
@@ -25,6 +30,9 @@ class CmsPageDeclination
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
     /**
@@ -33,6 +41,8 @@ class CmsPageDeclination
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="declinations")
      * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
      */
+    #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: "declinations")]
+    #[ORM\JoinColumn(name: "page_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private ?CmsPage $page = null;
 
     /**
@@ -40,6 +50,7 @@ class CmsPageDeclination
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     private string $title = '';
 
     /**
@@ -47,6 +58,8 @@ class CmsPageDeclination
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+
     private string $technic_name = '';
 
     /**
@@ -54,6 +67,7 @@ class CmsPageDeclination
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $locale = null;
 
     /**
@@ -61,18 +75,23 @@ class CmsPageDeclination
      *
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="declination", cascade={"remove", "persist"})
      */
+    #[ORM\OneToMany(targetEntity: CmsContent::class, mappedBy: "declination", cascade: ["remove", "persist"])]
     private PersistentCollection|ArrayCollection $contents;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean", length=255, nullable=false, options={"default": false})
      */
+    #[ORM\Column(type: Types::BOOLEAN, length: 255, nullable: false, options: ["default" => false])]
+
     private bool $active = false;
 
     /**
      * @var string
      * @ORM\Column(type="text", length=255, nullable=false)
      */
+    #[ORM\Column(type: Types::TEXT, length: 255, nullable: false)]
+
     private string $params = '[]';
 
     /**

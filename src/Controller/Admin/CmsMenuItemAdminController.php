@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder;
+use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use function count;
@@ -116,11 +117,11 @@ final class CmsMenuItemAdminController extends CRUDController
 
         if ($request->query->has('target')) {
             /** @var CmsMenuItem $target */
-            $target = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenuItem')->find($request->query->get('target'));
+            $target = $this->getDoctrine()->getRepository(CmsMenuItem::class)->find($request->query->get('target'));
             $newObject->setMoveTarget($target);
             $newObject->setMoveMode('persistAsLastChildOf');
         } else {
-            $menu = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenu')->find($request->get('childId'));
+            $menu = $this->getDoctrine()->getRepository(CmsMenu::class)->find($request->get('childId'));
             $newObject->setMoveTarget($menu->getRoot());
         }
 
@@ -221,7 +222,7 @@ final class CmsMenuItemAdminController extends CRUDController
     public function preEdit(Request $request, $object): ?Response
     {
         $em = $this->getDoctrine();
-        $rp = $em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
+        $rp = $em->getRepository(CmsMenuItem::class);
         $qb = $rp->createQueryBuilder('mi');
 
         $qb
@@ -260,7 +261,7 @@ final class CmsMenuItemAdminController extends CRUDController
 
     protected function moveItems($submittedObject)
     {
-        $cmsRepo = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
+        $cmsRepo = $this->getDoctrine()->getRepository(CmsMenuItem::class);
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':

@@ -12,14 +12,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-
+use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsSiteRepository")
  * @ORM\Table(name="cms__site")
  */
+#[ORM\Entity(repositoryClass: CmsSiteRepository::class)]
+#[ORM\Table(name: "cms__site")]
 class CmsSite
 {
     /**
@@ -29,7 +32,10 @@ class CmsSite
      *
      * @var int|null
      */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    protected ?int $id = null;
 
     /**
      * @var string|null
@@ -37,88 +43,105 @@ class CmsSite
      * @Gedmo\Slug(fields={"label", "locale"})
      * @ORM\Column(type="string", length=255, nullable=false)
      */
-    private ?string $slug = null;
+    #[Gedmo\Slug(fields: ["label", "locale"])]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $slug = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      * @var string|null
      */
-    private ?string $label = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    protected ?string $label = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      * @var string|null
      */
-    private ?string $locale = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+
+    protected ?string $locale = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      * @var string|null
      */
-    private ?string $host = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+
+    protected ?string $host = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      * @var string|null
      */
-    private ?string $localhost = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+
+    protected ?string $localhost = null;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : 0})
      *
      * @var boolean
      */
-    private bool $hostMultilingual = false;
+    #[ORM\Column(type: Types::BOOLEAN, options: ["default" => 0])]
+    protected bool $hostMultilingual = false;
 
     /**
      * @ORM\Column(name="`default`", type="boolean", options={"default" : 0})
      *
      * @var boolean
      */
-    private bool $default;
+    #[ORM\Column(name: "`default`", type: Types::BOOLEAN, options: ["default"=>0])]
+    protected bool $default;
 
     /**
      * @var CmsPage[]|Collection|Selectable
      *
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="site", cascade={"persist", "remove"})
      */
-    private Collection $pages;
+    #[ORM\OneToMany(targetEntity: CmsPage::class, mappedBy: "site", cascade: ["persist", "remove"])]
+    protected Collection $pages;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      * @var string|null
      */
-    private ?string $flagIcon = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $flagIcon = null;
 
     /**
      * @var CmsPage[]|Collection|Selectable
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenu", mappedBy="site", cascade={"persist", "remove"})
      */
-    private Collection $menus;
+    #[ORM\OneToMany(targetEntity: CmsMenu::class, mappedBy: "site", cascade: ["persist", "remove"])]
+    protected Collection $menus;
 
     /**
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", mappedBy="site", cascade={"persist", "remove"})
      */
-    private Collection $sharedBlocks;
+    #[ORM\OneToMany(targetEntity: CmsSharedBlock::class, mappedBy: "site", cascade: ["persist", "remove"])]
+    protected Collection $sharedBlocks;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean", options={"default": true})
      */
-    private bool $visible = true;
+    #[ORM\Column(type: Types::BOOLEAN, options: ["default" => true])]
+    protected bool $visible = true;
 
     /**
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private ?string $templateFilter = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    protected ?string $templateFilter = null;
 
     public bool $initPage = true;
     public bool $initMenu = true;
