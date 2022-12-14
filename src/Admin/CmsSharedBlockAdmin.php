@@ -102,7 +102,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         ], $this->blockFormThemesManager->getThemes()));
 
         if ($this->isCurrentRoute('create') && $this->getRequest()->get('id') !== null) {
-            $site = $this->em->getRepository('CmsSite::class')->find($this->getRequest()->get('id'));
+            $site = $this->em->getRepository(CmsSite::class)->find($this->getRequest()->get('id'));
             $object->setSite($site);
         } else {
             $site = $object->getSite();

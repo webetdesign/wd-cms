@@ -93,7 +93,7 @@ class CmsMenuAdminController extends CRUDController
             if ($session->get('admin_current_site_id')) {
                 $id = $session->get('admin_current_site_id');
             } else {
-                $defaultSite = $em->getRepository('CmsSite::class')->getDefault();
+                $defaultSite = $em->getRepository(CmsSite::class)->getDefault();
                 if (!$defaultSite) {
                     $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
@@ -195,9 +195,9 @@ class CmsMenuAdminController extends CRUDController
     {
 
         if ($id === null) {
-            $site = $this->getDoctrine()->getRepository('CmsSite::class')->getDefault();
+            $site = $this->getDoctrine()->getRepository(CmsSite::class)->getDefault();
         } else {
-            $site = $this->getDoctrine()->getRepository('CmsSite::class')->find($id);
+            $site = $this->getDoctrine()->getRepository(CmsSite::class)->find($id);
         }
 
         $request = $this->requestStack->getCurrentRequest();
@@ -375,7 +375,7 @@ class CmsMenuAdminController extends CRUDController
 
     protected function moveItems($submittedObject)
     {
-        $cmsReop = $this->getDoctrine()->getRepository('CmsMenuItem');
+        $cmsReop = $this->getDoctrine()->getRepository(CmsMenuItem::class);
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':
