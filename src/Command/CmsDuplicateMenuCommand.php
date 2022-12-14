@@ -31,11 +31,11 @@ class CmsDuplicateMenuCommand extends Command
      * @inheritDoc
      */
     public function __construct(
-        ?string $name = null,
         EntityManager $em,
         CmsMenuRepository $menuRepository,
         CmsMenuItemRepository $menuItemRepository,
-        CmsSiteRepository $siteRepository
+        CmsSiteRepository $siteRepository,
+        ?string $name = null
     ) {
         $this->em = $em;
         parent::__construct($name);
