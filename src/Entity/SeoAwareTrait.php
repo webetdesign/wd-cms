@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 trait SeoAwareTrait
@@ -11,6 +12,7 @@ trait SeoAwareTrait
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $seo_title;
 
     /**
@@ -18,6 +20,7 @@ trait SeoAwareTrait
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $seo_description;
 
     /**
@@ -25,6 +28,7 @@ trait SeoAwareTrait
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $seo_keywords;
 
     /**
@@ -32,6 +36,7 @@ trait SeoAwareTrait
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $seo_breadcrumb;
 
     public function getSeoTitle(): ?string

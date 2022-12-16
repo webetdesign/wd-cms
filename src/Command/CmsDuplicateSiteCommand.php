@@ -31,10 +31,10 @@ class CmsDuplicateSiteCommand extends Command
      * @inheritDoc
      */
     public function __construct(
-        ?string $name = null,
         EntityManager $em,
         CmsPageRepository $pageRepository,
-        CmsSiteRepository $siteRepository
+        CmsSiteRepository $siteRepository,
+        ?string $name = null
     ) {
         $this->em = $em;
         parent::__construct($name);

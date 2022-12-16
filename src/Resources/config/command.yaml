@@ -19,20 +19,20 @@ services:
 
   WebEtDesign\CmsBundle\Command\CmsDuplicateSiteCommand:
     arguments:
-      - ~
       - '@doctrine.orm.default_entity_manager'
       - '@WebEtDesign\CmsBundle\Repository\CmsPageRepository'
       - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
+      - ~
     tags:
       - { name: 'console.command', command: 'cms:duplicate:site' }
 
   WebEtDesign\CmsBundle\Command\CmsDuplicateMenuCommand:
     arguments:
-      - ~
       - '@doctrine.orm.default_entity_manager'
       - '@WebEtDesign\CmsBundle\Repository\CmsMenuRepository'
       - '@WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository'
       - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
+      - ~
     tags:
       - { name: 'console.command', command: 'cms:duplicate:menu' }
 

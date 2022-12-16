@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use Doctrine\ORM\EntityManager;
@@ -84,15 +85,15 @@ class CmsMenuBuilder
         $activeClass  = $options['activeClass'] ?? 'active';
         $mainClass    = $options['classes'] ?? false;
 
-        $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
+        $repo = $this->em->getRepository(CmsMenuItem::class);
         if ($page) {
             $locale = $page->getSite()->getLocale();
-            $menu   = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy([
+            $menu   = $this->em->getRepository(CmsMenu::class)->findOneBy([
                 'code' => $code,
                 'site' => $page->getSite()
             ]);
         } else {
-            $menu = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy(['code' => $code]);
+            $menu = $this->em->getRepository(CmsMenu::class)->findOneBy(['code' => $code]);
         }
         if (!$menu) {
             return $this->factory->createItem('root');
