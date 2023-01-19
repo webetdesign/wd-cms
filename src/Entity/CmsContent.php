@@ -131,6 +131,21 @@ class CmsContent
         $this->parent_heritance = false;
     }
 
+    public function clone(): CmsContent
+    {
+        return (new CmsContent())
+            ->setType($this->getType())
+            ->setActive($this->getActive())
+            ->setPosition($this->getPosition())
+            ->setLabel($this->getLabel())
+            ->setCode($this->getCode())
+            ->setValue($this->getValue())
+            ->setParentHeritance($this->getParentHeritance())
+            ->setPage(null) // $this->getPage()
+            ->setSharedBlockParent(null) // $this->getSharedBlockParent()
+            ->setDeclination(null); // $this->getDeclination()
+    }
+
     public function isSet(): bool
     {
         switch (true) {
@@ -153,8 +168,6 @@ class CmsContent
     {
         $this->id = $id;
     }
-
-
 
     public function getCode(): ?string
     {

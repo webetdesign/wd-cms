@@ -12,6 +12,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
@@ -84,7 +85,6 @@ class CmsDuplicateSiteCommand extends Command
             return $locale;
         });
 
-
         $newSite = $this->siteRepository->findOneBy(['locale' => $newLocale]);
 
         $doClean = false;
@@ -99,6 +99,8 @@ class CmsDuplicateSiteCommand extends Command
             $newSite->setHostMultilingual($site->isHostMultilingual());
             $newSite->setDefault(false);
             $newSite->setTemplateFilter($site->getTemplateFilter());
+            $newSite->initMenu = true;
+            $newSite->initPage = true;
 
             $label = $io->ask('Label', $site->getLabel());
             $newSite->setLabel($label);
@@ -108,7 +110,6 @@ class CmsDuplicateSiteCommand extends Command
             $this->em->persist($newSite);
             $this->em->flush();
         }
-
 
         $this->duplicate($site, $newSite, $doClean);
 
@@ -127,6 +128,8 @@ class CmsDuplicateSiteCommand extends Command
     {
         $home    = $site->getRootPage();
         $newHome = $newSite->getRootPage();
+        $newHome->setTitle($home->getTitle());
+        $newHome->setTemplate($home->getTemplate());
         $newHome->getRoute()->setName($this->processRouteName($home, $newSite->getLocale()));
         $newHome->getRoute()->setController($home->getRoute()->getController());
         $newHome->getRoute()->setPath($home->getRoute()->getPath());
@@ -139,6 +142,17 @@ class CmsDuplicateSiteCommand extends Command
         }
 
         $this->processPages($newSite, $home, $newHome);
+
+        foreach ($newHome->getContents() as $content) {
+            $newHome->removeContent($content);
+        }
+        $this->em->flush();
+
+        foreach ($home->getContents() as $content) {
+            /** @var CmsContent $content */
+            $content = $content->clone();
+            $newHome->addContent($content);
+        }
         $this->em->flush();
     }
 
@@ -176,6 +190,12 @@ class CmsDuplicateSiteCommand extends Command
         $newPage->setSite($site);
         $newPage->addCrossSitePage($page);
         $newPage->initRoute = false;
+
+        foreach ($page->getContents() as $content) {
+            /** @var CmsContent $content */
+            $content = $content->clone();
+            $newPage->addContent($content);
+        }
 
         if (count($page->getDeclinations()) > 0) {
             $this->duplicateDeclinations($page, $newPage);
