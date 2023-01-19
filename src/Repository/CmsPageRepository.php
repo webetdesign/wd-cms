@@ -86,6 +86,18 @@ class CmsPageRepository extends NestedTreeRepository
         return $qb;
     }
 
+    public function findPageByRouteName(string $name)
+    {
+        return $this
+            ->createQueryBuilder('page')
+            ->innerJoin('page.route', 'route')
+            ->where('route.name = :name')
+            ->setParameter('name', $name)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     // /**
     //  * @return CmsPage[] Returns an array of CmsPage objects
     //  */

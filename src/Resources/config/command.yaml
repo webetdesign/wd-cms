@@ -32,6 +32,7 @@ services:
       - '@WebEtDesign\CmsBundle\Repository\CmsMenuRepository'
       - '@WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository'
       - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
+      - '@WebEtDesign\CmsBundle\Repository\CmsPageRepository'
       - ~
     tags:
       - { name: 'console.command', command: 'cms:duplicate:menu' }

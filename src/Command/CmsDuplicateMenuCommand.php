@@ -16,6 +16,7 @@ use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
 use WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository;
 use WebEtDesign\CmsBundle\Repository\CmsMenuRepository;
+use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 class CmsDuplicateMenuCommand extends Command
@@ -26,6 +27,7 @@ class CmsDuplicateMenuCommand extends Command
     private CmsSiteRepository $siteRepository;
     private CmsMenuRepository $menuRepository;
     private CmsMenuItemRepository $menuItemRepository;
+    private CmsPageRepository $cmsPageRepository;
 
     /**
      * @inheritDoc
@@ -35,6 +37,7 @@ class CmsDuplicateMenuCommand extends Command
         CmsMenuRepository $menuRepository,
         CmsMenuItemRepository $menuItemRepository,
         CmsSiteRepository $siteRepository,
+        CmsPageRepository $cmsPageRepository,
         ?string $name = null
     ) {
         $this->em = $em;
@@ -42,6 +45,7 @@ class CmsDuplicateMenuCommand extends Command
         $this->siteRepository = $siteRepository;
         $this->menuRepository = $menuRepository;
         $this->menuItemRepository = $menuItemRepository;
+        $this->cmsPageRepository = $cmsPageRepository;
     }
 
     protected function configure()
@@ -127,6 +131,15 @@ class CmsDuplicateMenuCommand extends Command
             $item->setBlank($item->isBlank());
             $item->setAnchor($ref->getAnchor());
             $item->setParams($ref->getParams());
+
+            if ($ref->getPage()?->getRoute() != null) {
+                $fromRouteName = $ref->getPage()->getRoute()->getName();
+                $fromLocal = $ref->getPage()->getSite()->getLocale();
+                $toLocal = $newRoot->getSite()->getLocale();
+                $toRouteName = $toLocal . substr($fromRouteName, strlen($fromLocal) , strlen($fromRouteName) - 1);
+                $page = $this->cmsPageRepository->findPageByRouteName($toRouteName);
+                $item->setPage($page);
+            }
 
             $this->em->persist($item);
 
