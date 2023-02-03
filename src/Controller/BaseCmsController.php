@@ -70,10 +70,7 @@ class BaseCmsController extends AbstractController
             $baseParams['declination'] = $this->getDeclination($page);
         }
 
-        $extension = $this->getExtension();
-        $rootDir   = $extension && $extension !== 'html' ? $extension . '/' : '';
-
-        return $this->render($rootDir . $this->provider->getTemplate($page->getTemplate()), array_merge($params, $baseParams));
+        return $this->render($this->provider->getTemplate($page->getTemplate()), array_merge($params, $baseParams));
     }
 
     /**
