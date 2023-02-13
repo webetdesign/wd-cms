@@ -19,7 +19,7 @@ use WebEtDesign\CmsBundle\DependencyInjection\Models\RouteDefinition;
 class CmsPageMaker extends AbstractMaker
 {
 
-    public function __construct(private ContainerInterface $container) { }
+    public function __construct() { }
 
     const SKELETON_DIR = __DIR__ . '/../Resources/skeleton';
     protected string $shortName = '';
