@@ -61,6 +61,11 @@ class CmsHelper
         $this->requestStack         = $requestStack;
     }
 
+    public function setPage(CmsPage $page) {
+        $this->page = $page;
+        return $this;
+    }
+
     public function getPage()
     {
         $request = $this->getRequest();
