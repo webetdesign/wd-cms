@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
@@ -28,26 +29,18 @@ use function in_array;
 
 final class CmsSharedBlockAdmin extends AbstractAdmin
 {
-    protected ?bool                  $isMultisite;
-    protected EntityManagerInterface $em;
-    private SharedBlockFactory       $sharedBlockFactory;
-    private BlockFormThemesManager   $blockFormThemesManager;
+    protected ?bool $isMultisite;
 
     public function __construct(
-        string $code,
-        string $class,
-        string $baseControllerName,
-        EntityManagerInterface $em,
-        SharedBlockFactory $sharedBlockFactory,
-        ParameterBagInterface $parameterBag,
-        BlockFormThemesManager $blockFormThemesManager
+        private readonly EntityManagerInterface $em,
+        private readonly SharedBlockFactory $sharedBlockFactory,
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly BlockFormThemesManager $blockFormThemesManager,
     ) {
-        parent::__construct($code, $class, $baseControllerName);
-        $this->em                     = $em;
-        $this->sharedBlockFactory     = $sharedBlockFactory;
-        $this->isMultisite            = $parameterBag->get('wd_cms.cms')['multisite'];
-        $this->blockFormThemesManager = $blockFormThemesManager;
+        $this->isMultisite = $this->parameterBag->get('wd_cms.cms')['multisite'];
+        parent::__construct();
     }
+
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {

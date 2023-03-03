@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Command;
 
@@ -15,14 +16,13 @@ use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 
 class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 {
-    protected static $defaultName = 'cms:page:update-contents';
-
     protected CmsPageRepository $pageRp;
     private PageFactory         $pageFactory;
 
     protected function configure()
     {
         $this
+            ->setName('cms:page:update-contents')
             ->setDescription('Update configuration of content\'s pages and declination with configuration file')
             ->addArgument('template', InputArgument::OPTIONAL, 'template name')
             ->addOption('all', '-a', InputOption::VALUE_NONE, 'Reset all page')
@@ -52,10 +52,8 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
                     $this->processTemplate($template->getCode());
                 }
                 $this->io->success('Done');
-                return 0;
-            } else {
-                return 0;
             }
+            return 0;
         }
 
         $pageId = $input->getOption('page');
@@ -88,7 +86,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
         }
     }
 
-    protected function resetPage(?CmsPage $page)
+    protected function resetPage(?CmsPage $page): bool
     {
         $this->io->title('Update page ' . $page->getTitle());
 

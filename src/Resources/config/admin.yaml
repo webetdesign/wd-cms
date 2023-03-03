@@ -1,15 +1,12 @@
 services:
+  _defaults:
+    autowire:      true
+    autoconfigure: true
+
   cms.admin.cms_site:
     class: WebEtDesign\CmsBundle\Admin\CmsSiteAdmin
-    arguments:
-      - ~
-      - WebEtDesign\CmsBundle\Entity\CmsSite
-      - '@Symfony\Component\Routing\RouterInterface'
-      - '@doctrine.orm.entity_manager'
-      - WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController
-      - '%wd_cms.cms%'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Sites}
+      - { name: sonata.admin, model_class: WebEtDesign\CmsBundle\Entity\CmsSite, controller:  WebEtDesign\CmsBundle\Controller\Admin\CmsSiteAdminController, manager_type: orm, group: CMS, label: Sites}
     calls:
       - [ setTranslationDomain, [ 'wd_cms' ] ]
       - [ addChild, [ '@cms.admin.cms_page', 'site' ] ]
@@ -19,26 +16,14 @@ services:
 
   cms.admin.cms_route:
     class: WebEtDesign\CmsBundle\Admin\CmsRouteAdmin
-    arguments: [~, WebEtDesign\CmsBundle\Entity\CmsRoute, WebEtDesign\CmsBundle\Controller\Admin\CmsRouteAdminController]
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Routes, show_in_dashboard: false }
+      - { name: sonata.admin, model_class: WebEtDesign\CmsBundle\Entity\CmsRoute, controller: WebEtDesign\CmsBundle\Controller\Admin\CmsRouteAdminController, manager_type: orm, group: CMS, label: Routes, show_in_dashboard: false }
     public: true
 
   cms.admin.cms_page:
     class: WebEtDesign\CmsBundle\Admin\CmsPageAdmin
-    arguments:
-      - ~
-      - WebEtDesign\CmsBundle\Entity\CmsPage
-      - WebEtDesign\CmsBundle\Controller\Admin\CmsPageAdminController
-      - '@doctrine.orm.default_entity_manager'
-      - '@service_container'
-      - '%wd_cms.cms%'
-      - '%wd_cms.vars%'
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
-      - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Pages, label_translator_strategy: sonata.admin.label.strategy.underscore }
+      - { name: sonata.admin, model_class: WebEtDesign\CmsBundle\Entity\CmsPage, controller: WebEtDesign\CmsBundle\Controller\Admin\CmsPageAdminController, manager_type: orm, group: CMS, label: Pages, label_translator_strategy: sonata.admin.label.strategy.underscore }
     calls:
       - [setTranslationDomain, [ 'wd_cms' ] ]
       - [setTemplate, ['edit', '@@WebEtDesignCms/admin/page/edit.html.twig']]
@@ -48,28 +33,16 @@ services:
 
   cms.admin.cms_content:
     class: WebEtDesign\CmsBundle\Admin\CmsContentAdmin
-    arguments:
-      - ~
-      - WebEtDesign\CmsBundle\Entity\CmsContent
-      - WebEtDesign\CmsBundle\Controller\Admin\CmsContentAdminController
-      - '@doctrine.orm.default_entity_manager'
-      - '%wd_cms.custom_contents%'
-      - '@service_container'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Contents, show_in_dashboard: false }
+      - { name: sonata.admin, model_class: WebEtDesign\CmsBundle\Entity\CmsContent, controller: WebEtDesign\CmsBundle\Controller\Admin\CmsContentAdminController, manager_type: orm, group: CMS, label: Contents, show_in_dashboard: false }
     calls:
       - [ setTranslationDomain, [ 'wd_cms' ] ]
     public: true
 
   cms.admin.cms_menu:
     class: WebEtDesign\CmsBundle\Admin\CmsMenuAdmin
-    arguments:
-      - ~
-      - WebEtDesign\CmsBundle\Entity\CmsMenu
-      - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController
-      - '@doctrine.orm.default_entity_manager'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Menus, label_translator_strategy: sonata.admin.label.strategy.underscore }
+      - { name: sonata.admin, model_class: WebEtDesign\CmsBundle\Entity\CmsMenu, controller: WebEtDesign\CmsBundle\Controller\Admin\CmsMenuAdminController, manager_type: orm, group: CMS, label: Menus, label_translator_strategy: sonata.admin.label.strategy.underscore }
     calls:
       - [setTranslationDomain, ['CmsMenuAdmin']]
       #      - [setTemplate, ['list', '@@WebEtDesignCms/menu/list.html.twig']]
@@ -80,15 +53,8 @@ services:
 
   cms.admin.cms_menu_item:
     class: WebEtDesign\CmsBundle\Admin\CmsMenuItemAdmin
-    arguments:
-      - ~
-      - WebEtDesign\CmsBundle\Entity\CmsMenuItem
-      - WebEtDesign\CmsBundle\Controller\Admin\CmsMenuItemAdminController
-      - '@doctrine.orm.default_entity_manager'
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '%wd_cms.menu%'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false, label_translator_strategy: sonata.admin.label.strategy.underscore }
+      - { name: sonata.admin, model_class: WebEtDesign\CmsBundle\Entity\CmsMenuItem, controller: WebEtDesign\CmsBundle\Controller\Admin\CmsMenuItemAdminController, manager_type: orm, group: CMS, label: MenuItem, show_in_dashboard: false, label_translator_strategy: sonata.admin.label.strategy.underscore }
     calls:
       - [ setTranslationDomain, [ 'CmsMenuItemAdmin' ] ]
       - [setTemplate, ['edit', '@@WebEtDesignCms/admin/menuItem/edit.html.twig']]
@@ -97,16 +63,8 @@ services:
 
   cms.admin.cms_shared_block:
     class: WebEtDesign\CmsBundle\Admin\CmsSharedBlockAdmin
-    arguments:
-      - ~
-      - WebEtDesign\CmsBundle\Entity\CmsSharedBlock
-      - WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController
-      - '@doctrine.orm.default_entity_manager'
-      - '@WebEtDesign\CmsBundle\Factory\SharedBlockFactory'
-      - '@parameter_bag'
-      - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: Blocs partagés, label_translator_strategy: sonata.admin.label.strategy.underscore }
+      - { name: sonata.admin, model_class: WebEtDesign\CmsBundle\Entity\CmsSharedBlock, controller: WebEtDesign\CmsBundle\Controller\Admin\CmsSharedBlockAdminController, manager_type: orm, group: CMS, label: Blocs partagés, label_translator_strategy: sonata.admin.label.strategy.underscore }
     calls:
       - [ setTranslationDomain, [ 'CmsSharedBlockAdmin' ] ]
 #      - [setTemplate, ['list', '@@WebEtDesignCms/admin/sharedBlock/list.html.twig']]
@@ -114,28 +72,9 @@ services:
 
     public: true
 
-  cms.admin.cms_content_has_shared_block:
-    class: WebEtDesign\CmsBundle\Admin\CmsContentHasSharedBlockAdmin
-    arguments:
-      - ~
-      - WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock
-      - ~
-    tags:
-      - { name: sonata.admin, manager_type: orm, group: CMS, label: content has sharedBlock, show_in_dashboard: false }
-    public: true
-
   WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin:
-    arguments:
-      - ~
-      - WebEtDesign\CmsBundle\Entity\CmsPageDeclination
-      - WebEtDesign\CmsBundle\Controller\Admin\CmsPageDeclinationAdminController
-      - '@doctrine.orm.default_entity_manager'
-      - '%wd_cms.templates%'
-      - '%wd_cms.vars%'
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@WebEtDesign\CmsBundle\Manager\BlockFormThemesManager'
     tags:
-      - { name: sonata.admin, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
+      - { name: sonata.admin, model_class: WebEtDesign\CmsBundle\Entity\CmsPageDeclination, controller: WebEtDesign\CmsBundle\Controller\Admin\CmsPageDeclinationAdminController, manager_type: orm, group: 'CMS', label: 'Page déclinaison', show_in_dashboard: false }
     calls:
       - [ setTranslationDomain, [ 'wd_cms' ] ]
     public: true

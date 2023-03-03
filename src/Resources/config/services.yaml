@@ -128,19 +128,6 @@ services:
 
   cms.twig.extension:
     class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@router'
-      - '@service_container'
-      - '@twig'
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@WebEtDesign\CmsBundle\Factory\SharedBlockFactory'
-      - '@request_stack'
-      - '@parameter_bag'
-      - '@WebEtDesign\MediaBundle\Services\WDMediaService'
-      - '@WebEtDesign\CmsBundle\Services\WDDeclinationService'
-      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
-      - '@WebEtDesign\CmsBundle\Services\CmsHelper'
     tags:
       - { name: twig.extension }
     public: true

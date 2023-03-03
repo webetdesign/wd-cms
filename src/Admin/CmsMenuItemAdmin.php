@@ -13,6 +13,7 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
@@ -26,26 +27,15 @@ use WebEtDesign\CmsBundle\Form\Type\MenuIconType;
 
 final class CmsMenuItemAdmin extends AbstractAdmin
 {
-    protected EntityManagerInterface $em;
-    private ?array                   $configMenu;
-    private PageFactory              $pageFactory;
+    private ?array $configMenu;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct(
-        $code,
-        $class,
-        $baseControllerName,
-        EntityManagerInterface $em,
-        PageFactory $pageFactory,
-        $configMenu
+        private readonly EntityManagerInterface $em,
+        private readonly PageFactory $pageFactory,
+        private readonly ParameterBagInterface $parameterBag,
     ) {
-        $this->em = $em;
-
-        parent::__construct($code, $class, $baseControllerName);
-        $this->configMenu = $configMenu;
-        $this->pageFactory = $pageFactory;
+        $this->configMenu = $this->parameterBag->get('wd_cms.menu');
+        parent::__construct();
     }
 
 

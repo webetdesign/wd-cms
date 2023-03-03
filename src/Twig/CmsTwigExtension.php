@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Twig;
 
@@ -34,68 +35,53 @@ use WebEtDesign\CmsBundle\Services\WDDeclinationService;
 use WebEtDesign\MediaBundle\Entity\Media;
 use WebEtDesign\MediaBundle\Services\WDMediaService;
 
-/**
- * @property mixed configCms
- */
 class CmsTwigExtension extends AbstractExtension
 {
-    protected $declination;
-    protected $requestStack;
-    /** @var AbstractCmsGlobalVars */
-    protected                  $globalVars;
-    protected                  $globalVarsEnable;
-    protected PageFactory      $pageFactory;
-    protected                  $pageExtension;
-    private SharedBlockFactory $sharedBlockFactory;
-    private                    $twig;
-    private                    $container;
+    protected bool         $useDeclination = false;
+    protected RequestStack $requestStack;
 
-    private $em;
+    protected null|AbstractCmsGlobalVars $globalVars;
+    protected null|bool                  $globalVarsEnable;
+    protected PageFactory                $pageFactory;
+    private SharedBlockFactory           $sharedBlockFactory;
+    private Environment                  $twig;
 
-    protected $router;
+    private EntityManagerInterface $em;
 
-    protected                    $customContents;
-    private WDMediaService       $mediaService;
+    protected RouterInterface $router;
+
     private WDDeclinationService $declinationService;
     private BlockFactory         $blockFactory;
     private CmsHelper            $cmsHelper;
+    private array                $configCms;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct(
         EntityManagerInterface $entityManager,
         RouterInterface $router,
-        ContainerInterface $container,
         Environment $twig,
         PageFactory $templateFactory,
         SharedBlockFactory $sharedBlockFactory,
         RequestStack $requestStack,
         ParameterBagInterface $parameterBag,
-        WDMediaService $mediaService,
         WDDeclinationService $declinationService,
         BlockFactory $blockFactory,
         CmsHelper $cmsHelper
     ) {
         $this->em                 = $entityManager;
         $this->router             = $router;
-        $this->container          = $container;
         $this->twig               = $twig;
         $this->pageFactory        = $templateFactory;
         $this->sharedBlockFactory = $sharedBlockFactory;
         $this->requestStack       = $requestStack;
 
-        $this->pageExtension  = $parameterBag->get('wd_cms.cms.page_extension');
-        $this->declination    = $parameterBag->get('wd_cms.cms.declination');
-        $this->customContents = $parameterBag->get('wd_cms.custom_contents');
+        $this->useDeclination = $parameterBag->get('wd_cms.cms.declination');
         $globalVarsDefinition = $parameterBag->get('wd_cms.vars');
         $this->configCms      = $parameterBag->get('wd_cms.cms');
 
-        $this->globalVarsEnable = $globalVarsDefinition['enable'];
-        if ($globalVarsDefinition['enable']) {
-            $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
-        }
-        $this->mediaService       = $mediaService;
+//        $this->globalVarsEnable = $globalVarsDefinition['enable'];
+//        if ($globalVarsDefinition['enable']) {
+//            $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
+//        }
         $this->declinationService = $declinationService;
         $this->blockFactory       = $blockFactory;
         $this->cmsHelper          = $cmsHelper;
@@ -153,7 +139,7 @@ class CmsTwigExtension extends AbstractExtension
         return $content;
     }
 
-    private function getContent($object, $content_code)
+    private function getContent($object, $content_code): ?array
     {
         $defaultLangSite = $this->em->getRepository(CmsSite::class)->findOneBy(['default' => true]);
         $defaultPage     = null;
@@ -169,7 +155,7 @@ class CmsTwigExtension extends AbstractExtension
             }
         }
 
-        if ($this->declination && $object instanceof CmsPage) {
+        if ($this->useDeclination && $object instanceof CmsPage) {
             $content = null;
             if ($declination = $this->declinationService->getDeclination($object)) {
                 $content = $this->retrieveContent($declination, $content_code);
@@ -222,10 +208,11 @@ class CmsTwigExtension extends AbstractExtension
     /**
      * @param CmsPage|CmsPageDeclination|CmsSharedBlock $object
      * @param $content_code
+     * @param array|null $context
      * @return string|null
      * @throws Exception
      */
-    public function cmsRenderContent($object, $content_code, ?array $context = null)
+    public function cmsRenderContent($object, $content_code, ?array $context = null): ?string
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 
@@ -255,10 +242,10 @@ class CmsTwigExtension extends AbstractExtension
         return $value;
     }
 
-    public function getSharedBlock($code, $context = [])
+    public function getSharedBlock($code, $context = []): ?string
     {
         if ($this->configCms['multilingual']) {
-            $page = $this->cmsHelper->getPage();
+            $page  = $this->cmsHelper->getPage();
             $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy([
                 'code' => $code,
                 'site' => $page->getSite()
@@ -270,7 +257,7 @@ class CmsTwigExtension extends AbstractExtension
         return $this->renderSharedBlock($block, $context);
     }
 
-    public function renderSharedBlock(?CmsSharedBlock $block, $context = [])
+    public function renderSharedBlock(?CmsSharedBlock $block, $context = []): ?string
     {
         if (!$block || $block && !$block->isActive()) {
             return null;
@@ -382,7 +369,7 @@ class CmsTwigExtension extends AbstractExtension
         $method = 'get' . ucfirst($name);
 
         $value = null;
-        if ($object instanceof CmsPage && $this->declination && ($declination = $this->declinationService->getDeclination($object))) {
+        if ($object instanceof CmsPage && $this->useDeclination && ($declination = $this->declinationService->getDeclination($object))) {
             $value = $this->getSeoSmoValue($declination, $method);
             if (empty($value)) {
                 $value = $this->getSeoSmoValueFallbackParentPage($object, $method);
@@ -436,7 +423,7 @@ class CmsTwigExtension extends AbstractExtension
     /**
      * @param CmsPage $page
      */
-    public function breadcrumb($page)
+    public function breadcrumb($page): array
     {
         $items = [];
         while ($page != null) {
@@ -453,9 +440,9 @@ class CmsTwigExtension extends AbstractExtension
         return array_reverse($items);
     }
 
-    public function routeExist($path)
+    public function routeExist($path): bool
     {
-        return (null === $this->router->getRouteCollection()->get($path)) ? false : true;
+        return !(null === $this->router->getRouteCollection()->get($path));
     }
 
     public function choiceLabel($choices, $value)

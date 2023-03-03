@@ -26,18 +26,20 @@
         {% for rootNode in rootNodes %}
             {% set items = rootNode.children %}
             <div class="cmsMenuAdmin tab-pane" data-move-url="{{ url('admin_webetdesign_cms_cmsmenu_move', [], true) }}">
-                {% for item in items if item.lvl == 1 and item.parent == rootNode %}
-                    <div class="box box-primary">
-                        <div class="box-header item-data" data-id="{{ item.id }}" data-edit-url="{{ admin.generateUrl('edit', {id: item.id}) }}" data-add-url="{{ admin.generateUrl('create', {target: item.id}) }}">
-                            <h4 class="box-title">{{ item.name }} <code>{{ item.code }}</code></h4>
-                            <button class="cms-menu-item__btn-edit"><i class="fa fa-pencil"></i></button>
-                            <button class="cms-menu-item__btn-add"><i class="fa fa-plus"></i></button>
+                {% for item in items %}
+                    {% if item.lvl == 1 and item.parent == rootNode %}
+                        <div class="box box-primary">
+                            <div class="box-header item-data" data-id="{{ item.id }}" data-edit-url="{{ admin.generateUrl('edit', {id: item.id}) }}" data-add-url="{{ admin.generateUrl('create', {target: item.id}) }}">
+                                <h4 class="box-title">{{ item.name }} <code>{{ item.code }}</code></h4>
+                                <button class="cms-menu-item__btn-edit"><i class="fa fa-pencil"></i></button>
+                                <button class="cms-menu-item__btn-add"><i class="fa fa-plus"></i></button>
+                            </div>
+                            <div class="box-body">
+                                {% set menu = knp_menu_get('cmsAdminMenu', [], {item: item, admin: admin}) %}
+                                {{ knp_menu_render(menu, [], 'cms_menu_admin_renderer') }}
+                            </div>
                         </div>
-                        <div class="box-body">
-                            {% set menu = knp_menu_get('cmsAdminMenu', [], {item: item, admin: admin}) %}
-                            {{ knp_menu_render(menu, [], 'cms_menu_admin_renderer') }}
-                        </div>
-                    </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% endfor %}
@@ -54,10 +56,10 @@
         $('#add_global_btn').on('click', function (e) {
           var url = $(this).data('url');
           var id = $('.menu-tab.active').data('id');
-          showForm(url + '?target=' + id)
-        })
+          showForm(url + '?target=' + id);
+        });
 
-      })
+      });
 
       function showForm (url) {
         setTimeout(function () {
@@ -65,8 +67,8 @@
           $.get(url, function (response) {
             $('.edit-container').empty().append(response);
             $('.edit-container').fadeIn();
-          })
-        }, time)
+          });
+        }, time);
       }
     </script>
 {% endblock %}

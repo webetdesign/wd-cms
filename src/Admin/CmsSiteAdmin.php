@@ -13,6 +13,7 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
@@ -22,25 +23,20 @@ final class CmsSiteAdmin extends AbstractAdmin
 {
     protected ?bool $isMultilingual;
     protected ?bool $isMultisite;
-    private         $cmsConfig;
+    private ?array  $cmsConfig;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct(
-        string $code,
-        string $class,
-        protected RouterInterface $router,
-        private EntityManagerInterface $em,
-        string $baseControllerName,
-        $cmsConfig
+        private readonly RouterInterface $router,
+        private readonly EntityManagerInterface $em,
+        private readonly ParameterBagInterface $parameterBag,
     ) {
-        $this->isMultisite    = $cmsConfig['multisite'];
-        $this->isMultilingual = $cmsConfig['multilingual'];
+        $this->cmsConfig      = $this->parameterBag->get('wd_cms.cms');
+        $this->isMultisite    = $this->cmsConfig['multisite'];
+        $this->isMultilingual = $this->cmsConfig['multilingual'];
 
-        parent::__construct($code, $class, $baseControllerName);
-        $this->cmsConfig = $cmsConfig;
+        parent::__construct();
     }
+
 
     protected function configureRoutes(RouteCollectionInterface $collection): void
     {
@@ -94,7 +90,7 @@ final class CmsSiteAdmin extends AbstractAdmin
 
             $activeId = $this->getRequest()->attributes->get('id');
 
-            if (sizeof($groups) > 1 || (isset($groups['standalone']) && sizeof($groups['standalone']) > 1) ) {
+            if (sizeof($groups) > 1 || (isset($groups['standalone']) && sizeof($groups['standalone']) > 1)) {
                 foreach ($groups as $k => $sites) {
                     if (sizeof($sites) === 1 || $k === 'standalone') {
                         foreach ($sites as $site) {

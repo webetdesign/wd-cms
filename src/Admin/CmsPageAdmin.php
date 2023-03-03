@@ -1,21 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Knp\Menu\ItemInterface as MenuItemInterface;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Sonata\AdminBundle\Admin\AdminInterface;
-use Sonata\AdminBundle\Builder\FormContractorInterface;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Factory\BlockFactory;
@@ -47,31 +45,28 @@ class CmsPageAdmin extends AbstractAdmin
     protected mixed $multisite;
     protected mixed $declination;
 
-    protected array                   $datagridValues = [];
-    protected mixed                   $globalVarsEnable;
-    protected FormContractorInterface $customFormContractor;
-    protected PageFactory             $pageFactory;
+    protected array  $datagridValues = [];
+    protected mixed  $globalVarsEnable;
+    protected ?array $cmsConfig;
 
     public function __construct(
-        string $code,
-        string $class,
-        string $baseControllerName,
-        private EntityManager $em,
-        private ContainerInterface $container,
-        private $cmsConfig,
-        $globalVarsDefinition,
-        PageFactory $pageFactory,
-        private BlockFactory $blockFactory,
-        private BlockFormThemesManager $blockFormThemesManager,
+        protected readonly ParameterBagInterface $parameterBag,
+        protected readonly EntityManagerInterface $em,
+        protected readonly TokenStorageInterface $tokenStorage,
+        protected readonly PageFactory $pageFactory,
+        protected readonly BlockFactory $blockFactory,
+        protected readonly BlockFormThemesManager $blockFormThemesManager,
     ) {
-        $this->multisite        = $cmsConfig['multisite'];
-        $this->multilingual     = $cmsConfig['multilingual'];
-        $this->declination      = $cmsConfig['declination'];
-        $this->globalVarsEnable = $globalVarsDefinition['enable'];
+        $this->cmsConfig    = $this->parameterBag->get('wd_cms.cms');
+        $this->multisite    = $this->cmsConfig['multisite'];
+        $this->multilingual = $this->cmsConfig['multilingual'];
+        $this->declination  = $this->cmsConfig['declination'];
 
-        parent::__construct($code, $class, $baseControllerName);
-        $this->pageFactory = $pageFactory;
+        $this->globalVarsEnable = false; // TODO  $globalVarsDefinition['enable'];
+
+        parent::__construct();
     }
+
 
     protected function configureActionButtons(
         array $buttonList,
@@ -414,7 +409,7 @@ class CmsPageAdmin extends AbstractAdmin
      */
     protected function canManageContent()
     {
-        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+        $user = $this->tokenStorage->getToken()->getUser();
 
         return $user->hasRole('ROLE_ADMIN_CMS');
     }

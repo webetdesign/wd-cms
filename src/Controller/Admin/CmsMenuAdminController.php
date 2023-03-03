@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
@@ -15,12 +16,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
-use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
-use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
-use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use function count;
@@ -28,25 +25,18 @@ use function is_array;
 
 class CmsMenuAdminController extends CRUDController
 {
-    private RequestStack $requestStack;
 
-    /**
-     * CmsMenuAdminController constructor.
-     * @param RequestStack $requestStack
-     */
     public function __construct(
-        RequestStack $requestStack,
+        protected RequestStack $requestStack,
         protected EntityManagerInterface $em,
         protected Pool $pool
     ) {
         $this->requestStack = $requestStack;
     }
 
-    public function moveAction(Request $request, $id)
+    public function moveAction(Request $request, $id): RedirectResponse|Response
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $object = $em->getRepository(CmsMenuItem::class)->find($id);
+        $object = $this->em->getRepository(CmsMenuItem::class)->find($id);
 
         $form = $this->createForm(MoveForm::class, $object, [
             'data_class' => CmsMenuItem::class,
@@ -84,7 +74,6 @@ class CmsMenuAdminController extends CRUDController
 
     public function treeAction($id): RedirectResponse|Response
     {
-        $em       = $this->getDoctrine();
         $datagrid = $this->admin->getDatagrid();
         $request  = $this->requestStack->getCurrentRequest();
         $session  = $request->getSession();
@@ -93,11 +82,11 @@ class CmsMenuAdminController extends CRUDController
             if ($session->get('admin_current_site_id')) {
                 $id = $session->get('admin_current_site_id');
             } else {
-                $defaultSite = $em->getRepository(CmsSite::class)->getDefault();
+                $defaultSite = $this->em->getRepository(CmsSite::class)->getDefault();
                 if (!$defaultSite) {
                     $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
 
-                    return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
+                    return $this->redirect($this->pool->getAdminByClass(CmsSite::class)->generateUrl('list'));
                 }
 
                 $id = $defaultSite->getId();
@@ -109,7 +98,7 @@ class CmsMenuAdminController extends CRUDController
             $session->set('admin_current_site_id', $id);
             $datagrid->setValue('site', null, $id);
 
-            $rp = $em->getRepository(CmsMenuItem::class);
+            $rp = $this->em->getRepository(CmsMenuItem::class);
             $qb = $rp->createQueryBuilder('mi');
 
             $qb
@@ -195,9 +184,9 @@ class CmsMenuAdminController extends CRUDController
     {
 
         if ($id === null) {
-            $site = $this->getDoctrine()->getRepository(CmsSite::class)->getDefault();
+            $site = $this->em->getRepository(CmsSite::class)->getDefault();
         } else {
-            $site = $this->getDoctrine()->getRepository(CmsSite::class)->find($id);
+            $site = $this->em->getRepository(CmsSite::class)->find($id);
         }
 
         $request = $this->requestStack->getCurrentRequest();
@@ -375,7 +364,7 @@ class CmsMenuAdminController extends CRUDController
 
     protected function moveItems($submittedObject)
     {
-        $cmsReop = $this->getDoctrine()->getRepository(CmsMenuItem::class);
+        $cmsReop = $this->em->getRepository(CmsMenuItem::class);
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':
@@ -412,7 +401,7 @@ class CmsMenuAdminController extends CRUDController
                 break;
         }
 
-        $this->getDoctrine()->getManager()->flush();
+        $this->em->flush();
     }
 
 }

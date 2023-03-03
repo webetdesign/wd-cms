@@ -1,13 +1,14 @@
 <?php
-
 declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
+use Sonata\AdminBundle\Admin\Pool;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\ModelManagerException;
 use Symfony\Component\Form\FormRenderer;
@@ -16,35 +17,28 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 use WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Form\MoveForm;
-use function count;
-use function is_array;
 
 final class CmsMenuItemAdminController extends CRUDController
 {
 
-    private RequestStack $requestStack;
-
-    /**
-     * CmsMenuItemAdminController constructor.
-     * @param RequestStack $requestStack
-     */
     public function __construct(
-        RequestStack $requestStack,
-        protected MenuBreadcrumbsBuilder $menuBreadcrumbsBuilder
+        protected EntityManagerInterface $em,
+        protected RequestStack $requestStack,
+        protected MenuBreadcrumbsBuilder $menuBreadcrumbsBuilder,
+        protected Environment $twig,
+        protected Pool $pool,
     )
     {
-        $this->requestStack = $requestStack;
     }
 
-    public function moveAction(Request $request, $itemId)
+    public function moveAction(Request $request, $itemId): RedirectResponse|JsonResponse|Response
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $object = $em->getRepository(CmsMenuItem::class)->find($itemId);
+        $object = $this->em->getRepository(CmsMenuItem::class)->find($itemId);
 
         $object->setMoveTarget($object->getRoot());
 
@@ -117,11 +111,11 @@ final class CmsMenuItemAdminController extends CRUDController
 
         if ($request->query->has('target')) {
             /** @var CmsMenuItem $target */
-            $target = $this->getDoctrine()->getRepository(CmsMenuItem::class)->find($request->query->get('target'));
+            $target = $this->em->getRepository(CmsMenuItem::class)->find($request->query->get('target'));
             $newObject->setMoveTarget($target);
             $newObject->setMoveMode('persistAsLastChildOf');
         } else {
-            $menu = $this->getDoctrine()->getRepository(CmsMenu::class)->find($request->get('childId'));
+            $menu = $this->em->getRepository(CmsMenu::class)->find($request->get('childId'));
             $newObject->setMoveTarget($menu->getRoot());
         }
 
@@ -202,8 +196,7 @@ final class CmsMenuItemAdminController extends CRUDController
         $formView = $form->createView();
 
         // set the theme for the current Admin Form
-        $twig = $this->get('twig');
-        $twig->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFormTheme());
+        $this->twig->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFormTheme());
 
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
@@ -221,8 +214,7 @@ final class CmsMenuItemAdminController extends CRUDController
 
     public function preEdit(Request $request, $object): ?Response
     {
-        $em = $this->getDoctrine();
-        $rp = $em->getRepository(CmsMenuItem::class);
+        $rp = $this->em->getRepository(CmsMenuItem::class);
         $qb = $rp->createQueryBuilder('mi');
 
         $qb
@@ -261,7 +253,7 @@ final class CmsMenuItemAdminController extends CRUDController
 
     protected function moveItems($submittedObject)
     {
-        $cmsRepo = $this->getDoctrine()->getRepository(CmsMenuItem::class);
+        $cmsRepo = $this->em->getRepository(CmsMenuItem::class);
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':
@@ -294,7 +286,7 @@ final class CmsMenuItemAdminController extends CRUDController
                 break;
         }
 
-        $this->getDoctrine()->getManager()->flush();
+        $this->em->flush();
     }
 
     /**
@@ -356,7 +348,7 @@ final class CmsMenuItemAdminController extends CRUDController
         $parameters['admin'] = $parameters['admin'] ?? $this->admin;
         $parameters['base_template'] = $parameters['base_template'] ?? $this->getBaseTemplate();
         // NEXT_MAJOR: Remove next line.
-        $parameters['admin_pool'] = $this->get('sonata.admin.pool');
+        $parameters['admin_pool'] = $this->pool;
 
         return $parameters;
     }

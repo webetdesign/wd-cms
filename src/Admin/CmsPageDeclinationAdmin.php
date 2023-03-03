@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Form\CmsContentsType;
@@ -28,8 +30,6 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
     use SmoTwitterAdminTrait;
     use GlobalVarsAdminTrait;
 
-    protected EntityManager $em;
-    protected ?array        $pageConfig;
     protected ?bool         $globalVarsEnable;
 
     protected ?string $parentAssociationMapping = 'page';
@@ -40,21 +40,14 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
     ];
 
     public function __construct(
-        string $code,
-        string $class,
-        string $baseControllerName,
-        EntityManager $em,
-        $pageConfig,
-        $globalVarsDefinition,
-        protected PageFactory $pageFactory,
-        private BlockFormThemesManager $blockFormThemesManager
-    ) {
-        $this->em               = $em;
-        $this->pageConfig       = $pageConfig;
-        $this->globalVarsEnable = $globalVarsDefinition['enable'];
-
-        parent::__construct($code, $class, $baseControllerName);
+        private readonly EntityManagerInterface $em,
+        private readonly PageFactory $pageFactory,
+        private readonly ParameterBagInterface $parameterBag)
+    {
+        $this->globalVarsEnable = false; // TODO $globalVarsDefinition['enable'];
+        parent::__construct();
     }
+
 
     protected function configureRoutes(RouteCollectionInterface $collection): void
     {
