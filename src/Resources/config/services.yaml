@@ -47,15 +47,7 @@ services:
         template: '@WebEtDesignCms/collectors/template.html.twig'
         id: 'cms.collector'
     arguments:
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
-      - '@cms.helper'
-      - '@sonata.admin.pool'
-      - '@twig'
-      - '@twig.profile'
-      - '@WebEtDesign\CmsBundle\Repository\CmsContentRepository'
-      - '@Symfony\Component\Routing\RouterInterface'
-      - '%wd_cms.cms%'
+      $profile: '@twig.profile'
 
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
