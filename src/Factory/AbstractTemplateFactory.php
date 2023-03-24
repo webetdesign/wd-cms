@@ -43,9 +43,6 @@ abstract class AbstractTemplateFactory implements TemplateFactoryInterface
     {
         $tpls = [];
         foreach ($this->serviceLocator->getProvidedServices() as $key => $id) {
-            if ($id === ResetPasswordPage::class) {
-                dump($this->isDisabled($id, $key));
-            }
             $tpl = $this->getServices($key);
             if (
                 $tpl &&

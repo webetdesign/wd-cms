@@ -67,25 +67,36 @@
         {% set block = blocks[child.vars.name] %}
         {% if block.options['use_accordion'] ?? false %}
             {% set unique_key = form.vars.unique_block_prefix ~ '_' ~ form.parent.parent.vars.name ~ '_' ~ form.parent.vars.name ~ '_' ~ form.vars.name ~ '_' ~ config.code ~ '_' ~ random() %}
-                <div class="panel box" style="margin-bottom: 10px;">
-                    <div class="box-header with-border">
-                        <h4 class="box-title">
-                            <a data-toggle="collapse" href="#{{ unique_key }}_collapse">
-                                {{ form_label(child) }}
-                            </a>
-                            {% if config and config.help is not empty %}
-                                <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ config.help }}"></i>
-                            {% endif %}
-                        </h4>
-                    </div>
-                    <div id="{{ unique_key }}_collapse" class="panel-collapse collapse {% if config and config.open %} in {% endif %}">
-                        <div class="box-body">
-                            {{ form_row(child) }}
-                        </div>
+            <div class="panel box" style="margin-bottom: 10px;">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        <a data-toggle="collapse" href="#{{ unique_key }}_collapse">
+                            {{ form_label(child) }}
+                        </a>
+                        {% if config and config.help is not empty %}
+                            <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="{{ config.help }}"></i>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div id="{{ unique_key }}_collapse" class="panel-collapse collapse {% if config and config.open %} in {% endif %}">
+                    <div class="box-body">
+                        {{ form_row(child) }}
                     </div>
                 </div>
+            </div>
         {% else %}
-            {{ form_row(child) }}
+            {% if block.options.row_col_class is not null %}
+                <div class="{{ block.options.row_col_class }}">
+                    {{ form_label(child) }}
+                    {{ form_widget(child) }}
+                </div>
+            {% elseif block.options.use_row %}
+                <div class="row">
+                    {{ form_row(child) }}
+                </div>
+            {% else %}
+                {{ form_row(child) }}
+            {% endif %}
         {% endif %}
         {% if block.options['new_row_on_next_block'] ?? false %}
             <div class="clearfix"></div>

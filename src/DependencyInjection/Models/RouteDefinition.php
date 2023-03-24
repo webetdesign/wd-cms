@@ -12,6 +12,7 @@ class RouteDefinition
     protected ?string $action     = null;
     protected array   $attributes = [];
     protected array   $methods    = [Request::METHOD_GET];
+    protected int     $proriry    = 0;
 
     public static function new(): RouteDefinition
     {
@@ -138,5 +139,19 @@ class RouteDefinition
     public function getAction(): ?string
     {
         return $this->action;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority(): int
+    {
+        return $this->proriry;
+    }
+
+    public function setPriority(int $priority): self
+    {
+        $this->proriry = $priority;
+        return $this;
     }
 }

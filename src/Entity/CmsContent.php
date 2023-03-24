@@ -4,14 +4,19 @@ namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints\Cascade;
+use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
 
 /**
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsContentRepository")
  * @ORM\Table(name="cms__content")
  */
+#[ORM\Entity(repositoryClass: CmsContentRepository::class)]
+#[ORM\Table(name: "cms__content")]
 class CmsContent
 {
     /**
@@ -19,6 +24,9 @@ class CmsContent
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
     /**
@@ -26,6 +34,7 @@ class CmsContent
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $code = null;
 
     /**
@@ -33,6 +42,7 @@ class CmsContent
      * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $label = null;
 
     /**
@@ -40,6 +50,7 @@ class CmsContent
      * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     private string $type = '';
 
     /**
@@ -47,6 +58,7 @@ class CmsContent
      * @ORM\Column(type="text", nullable=true)
      *
      */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $value = null;
 
     /**
@@ -55,6 +67,9 @@ class CmsContent
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="contents")
      * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
      */
+    #[Gedmo\SortableGroup]
+    #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'contents')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?CmsPage $page = null;
 
     /**
@@ -62,6 +77,8 @@ class CmsContent
      * @ORM\Column(type="integer", nullable=true)
      * @Gedmo\SortablePosition()
      */
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[Gedmo\SortablePosition]
     private ?int $position = null;
 
     /**
@@ -70,12 +87,16 @@ class CmsContent
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", inversedBy="contents")
      * @ORM\JoinColumn(name="shared_block_parent_id", referencedColumnName="id")
      */
+    #[Gedmo\SortableGroup]
+    #[ORM\ManyToOne(targetEntity: CmsSharedBlock::class, inversedBy: 'contents')]
+    #[ORM\JoinColumn(name: "shared_block_parent_id", referencedColumnName: 'id')]
     private ?CmsSharedBlock $sharedBlockParent = null;
 
     /**
      * @var boolean
      * @ORM\Column(type="boolean", nullable=true)
      */
+    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $parent_heritance = null;
 
     /**
@@ -83,6 +104,7 @@ class CmsContent
      *
      * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: Types::BOOLEAN)]
     private bool $active;
 
     /**
@@ -91,6 +113,9 @@ class CmsContent
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", inversedBy="contents")
      * @ORM\JoinColumn(name="declination_id", referencedColumnName="id", onDelete="CASCADE")
      */
+    #[Gedmo\SortableGroup]
+    #[ORM\ManyToOne(targetEntity: CmsPageDeclination::class, inversedBy: 'contents')]
+    #[ORM\JoinColumn(name: "declination_id", referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?CmsPageDeclination $declination = null;
 
     public bool $collapseOpen = false;
@@ -104,6 +129,21 @@ class CmsContent
     {
         $this->active           = true;
         $this->parent_heritance = false;
+    }
+
+    public function clone(): CmsContent
+    {
+        return (new CmsContent())
+            ->setType($this->getType())
+            ->setActive($this->getActive())
+            ->setPosition($this->getPosition())
+            ->setLabel($this->getLabel())
+            ->setCode($this->getCode())
+            ->setValue($this->getValue())
+            ->setParentHeritance($this->getParentHeritance())
+            ->setPage(null) // $this->getPage()
+            ->setSharedBlockParent(null) // $this->getSharedBlockParent()
+            ->setDeclination(null); // $this->getDeclination()
     }
 
     public function isSet(): bool
@@ -128,8 +168,6 @@ class CmsContent
     {
         $this->id = $id;
     }
-
-
 
     public function getCode(): ?string
     {

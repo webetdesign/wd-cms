@@ -26,6 +26,8 @@ class StaticBlock extends AbstractBlock
             return null;
         }
 
+        $context = array_merge($context??[], ["settings" => $this->getSettings()]);
+
         $blocks = [];
         foreach ($values as $key => $blockData) {
             $config = $this->getBlock($key);

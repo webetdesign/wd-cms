@@ -45,3 +45,10 @@ services:
     tags:
       # The alias is used to retrieve the menu
       - { name: knp_menu.renderer, alias: 'cms_menu_renderer' }
+
+  sonata.admin.menu_builder:
+    autowire: true
+    public: true
+    class:  WebEtDesign\CmsBundle\Services\SonataAdminCmsSidebarMenu
+    tags:
+      - { name: knp_menu.menu_builder, method: createSidebarMenu, alias: sonata_admin_sidebar }

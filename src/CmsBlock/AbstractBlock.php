@@ -65,7 +65,7 @@ abstract class AbstractBlock implements BlockInterface
                 $value = array_merge($value, ['settings' => $this->getSettings()]);
             }
             if (!empty($context)) {
-                $value = array_merge($value, $context);
+                $value = array_merge_recursive($value, $context);
             }
 
             $value = $this->getTwig()->render($this->getTemplate(), $value);
@@ -371,6 +371,8 @@ abstract class AbstractBlock implements BlockInterface
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'use_row'               => false,
+            'row_col_class'         => null,
             'use_accordion'         => false,
             'new_row_on_next_block' => false,
         ]);

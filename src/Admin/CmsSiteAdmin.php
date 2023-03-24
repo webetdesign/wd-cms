@@ -93,7 +93,8 @@ final class CmsSiteAdmin extends AbstractAdmin
 
 
             $activeId = $this->getRequest()->attributes->get('id');
-            if (sizeof($groups) > 1) {
+
+            if (sizeof($groups) > 1 || (isset($groups['standalone']) && sizeof($groups['standalone']) > 1) ) {
                 foreach ($groups as $k => $sites) {
                     if (sizeof($sites) === 1 || $k === 'standalone') {
                         foreach ($sites as $site) {
@@ -108,7 +109,6 @@ final class CmsSiteAdmin extends AbstractAdmin
                                 ]
                             );
                         }
-
                     } else {
 
                         $child   = $menu->addChild($sites[0]->getLabel());

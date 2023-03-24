@@ -60,7 +60,7 @@ services:
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
-    arguments: [ '@doctrine.orm.entity_manager', '@parameter_bag', '%wd_cms.cms%' ]
+    arguments: [ '@doctrine.orm.entity_manager', '@parameter_bag', '@WebEtDesign\CmsBundle\Factory\PageFactory', '%wd_cms.cms%' ]
     tags:
       - { name: routing.loader }
 

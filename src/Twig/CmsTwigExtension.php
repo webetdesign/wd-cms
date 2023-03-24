@@ -420,6 +420,10 @@ class CmsTwigExtension extends AbstractExtension
 
     private function getSeoSmoValue($object, $method)
     {
+        if ($object == null) {
+            return null;
+        }
+
         if (method_exists($object, $method)) {
             return call_user_func_array([$object, $method], []);
         } else {

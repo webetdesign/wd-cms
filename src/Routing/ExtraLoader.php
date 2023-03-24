@@ -10,6 +10,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use WebEtDesign\CmsBundle\Factory\PageFactory;
 
 class ExtraLoader implements LoaderInterface
 {
@@ -22,6 +23,8 @@ class ExtraLoader implements LoaderInterface
 
     protected ?LoaderResolverInterface $resolver;
 
+    protected PageFactory $pageFactory;
+    
     /**
      * ExtraLoader constructor.
      * @param EntityManager $entityManager
@@ -30,11 +33,13 @@ class ExtraLoader implements LoaderInterface
     public function __construct(
         EntityManager $entityManager,
         ContainerBagInterface $parameterBag,
+        PageFactory $pageFactory,
         $cmsConfig
     ) {
         $this->em           = $entityManager;
         $this->parameterBag = $parameterBag;
         $this->cmsConfig    = $cmsConfig;
+        $this->pageFactory    = $pageFactory;
     }
 
     public function load($resource, $type = null): RouteCollection
@@ -58,6 +63,7 @@ class ExtraLoader implements LoaderInterface
             if ($cmsRoute->getPage() == null || $cmsRoute->getPage()->getRoot() == null || !$cmsRoute->getPage()->getActive()) {
                 continue;
             }
+            
             //            /** @var CmsSite $cmsSite */
             $cmsSite = $cmsRoute->getPage()->getRoot()->getSite();
             if ($cmsSite) {
@@ -102,18 +108,31 @@ class ExtraLoader implements LoaderInterface
                     $defaults['extension'] = '';
                 }
             }
-
+            
             $route = new Route($pattern, $defaults, $requirements ?? []);
             if (!empty($host)) {
                 $route->setHost($host);
             }
             $route->setMethods($cmsRoute->getMethods());
-
+            
+            $priority = 0;
+            try {
+                $pageConfig = $this->pageFactory->get($cmsRoute->getPage()->getTemplate());
+                $routeDefnition = $pageConfig->getRoute();
+                if ($routeDefnition !== null) {
+                    $priority = $routeDefnition->getPriority();
+                } 
+            }catch (Exception $e){
+                
+            }
+            
+            
             preg_match_all('/\{(\w+)\}/', $cmsRoute->getPath(), $matches);
             $routes [] = [
                 'nbParams' => count($matches[1]),
                 'name'     => $cmsRoute->getName(),
-                'route'    => $route
+                'route'    => $route,
+                'priority' => $priority
             ];
         }
 
@@ -126,7 +145,7 @@ class ExtraLoader implements LoaderInterface
 
         $routeCollection = new RouteCollection();
         foreach ($routes as $route) {
-            $routeCollection->add($route['name'], $route['route']);
+            $routeCollection->add($route['name'], $route['route'], $route['priority']);
         }
 
 
