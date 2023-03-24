@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
@@ -47,20 +48,15 @@ class BaseCmsController extends AbstractController
         $this->globalVars = $globalVars;
     }
 
-    /**
-     * @return TemplateProvider
-     */
-    public function getProvider(): TemplateProvider
+    public function getResponse(): Response
     {
-        return $this->provider;
-    }
+        if (!$this->response) {
+            $this->response = new Response();
+            $this->response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
+            $this->response->headers->set('X-Reverse-Proxy-TTL', 0);
+        }
 
-    /**
-     * @param TemplateProvider $provider
-     */
-    public function setProvider(TemplateProvider $provider): void
-    {
-        $this->provider = $provider;
+        return $this->response;
     }
 
     protected function defaultRender(array $params): Response
@@ -76,8 +72,23 @@ class BaseCmsController extends AbstractController
         return $this->render(
             $this->provider->getTemplate($page->getTemplate()),
             array_merge($params, $baseParams),
-            $this->response ?: null
+            $this->getResponse()
         );
+    }
+
+    public function addEsiHeaders($ttl, $clientTtl = null)
+    {
+        // Max ttl varnish 3h;
+        if ($ttl > 10800) {
+            $ttl = 10800;
+        }
+
+        $this->response = $this->getResponse();
+        $this->response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
+        $this->response->headers->set('X-Reverse-Proxy-TTL', $ttl);
+        $this->response->setClientTtl($clientTtl !== null ? $clientTtl : $ttl);
+        $this->response->setSharedMaxAge($ttl);
+        $this->response->setPublic();
     }
 
     /**
