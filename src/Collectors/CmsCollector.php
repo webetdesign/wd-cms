@@ -132,7 +132,7 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
 
             $blocks = [];
             foreach ($this->cmsContentRepository->findBy(['page' => $this->data['page']]) as $content) {
-                $config = $this->data['service']->getBlock($content->getCode());
+                $config = $this->data['service']?->getBlock($content->getCode());
                 if (!$config) {
                     continue;
                 }

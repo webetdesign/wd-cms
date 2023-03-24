@@ -78,7 +78,7 @@ class CmsTwigExtension extends AbstractExtension
         $globalVarsDefinition = $parameterBag->get('wd_cms.vars');
         $this->configCms      = $parameterBag->get('wd_cms.cms');
 
-//        $this->globalVarsEnable = $globalVarsDefinition['enable'];
+        $this->globalVarsEnable = $globalVarsDefinition['enable'];
 //        if ($globalVarsDefinition['enable']) {
 //            $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
 //        }
@@ -212,7 +212,7 @@ class CmsTwigExtension extends AbstractExtension
      * @return string|null
      * @throws Exception
      */
-    public function cmsRenderContent($object, $content_code, ?array $context = null): ?string
+    public function cmsRenderContent($object, $content_code, ?array $context = null): null|array|string
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 
