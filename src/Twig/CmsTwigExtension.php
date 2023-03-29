@@ -40,7 +40,7 @@ class CmsTwigExtension extends AbstractExtension
     protected bool         $useDeclination = false;
     protected RequestStack $requestStack;
 
-    protected null|AbstractCmsGlobalVars $globalVars;
+    protected null|AbstractCmsGlobalVars $globalVars = null;
     protected null|bool                  $globalVarsEnable;
     protected PageFactory                $pageFactory;
     private SharedBlockFactory           $sharedBlockFactory;
@@ -79,9 +79,7 @@ class CmsTwigExtension extends AbstractExtension
         $this->configCms      = $parameterBag->get('wd_cms.cms');
 
         $this->globalVarsEnable = $globalVarsDefinition['enable'];
-//        if ($globalVarsDefinition['enable']) {
-//            $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
-//        }
+
         $this->declinationService = $declinationService;
         $this->blockFactory       = $blockFactory;
         $this->cmsHelper          = $cmsHelper;
@@ -454,6 +452,16 @@ class CmsTwigExtension extends AbstractExtension
             }
         }
         return null;
+    }
+
+    /**
+     * @param AbstractCmsGlobalVars|null $globalVars
+     * @return CmsTwigExtension
+     */
+    public function setGlobalVars(?AbstractCmsGlobalVars $globalVars): CmsTwigExtension
+    {
+        $this->globalVars = $globalVars;
+        return $this;
     }
 
 }

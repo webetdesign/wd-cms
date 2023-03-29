@@ -23,8 +23,8 @@ class BaseCmsController extends AbstractController
     /** @var boolean */
     protected bool $granted;
 
-    /** @var AbstractCmsGlobalVars */
-    protected AbstractCmsGlobalVars $globalVars;
+    /** @var AbstractCmsGlobalVars|null */
+    protected ?AbstractCmsGlobalVars $globalVars = null;
 
     protected PageFactory $templateFactory;
 
