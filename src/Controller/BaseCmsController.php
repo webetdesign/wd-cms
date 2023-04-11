@@ -48,6 +48,22 @@ class BaseCmsController extends AbstractController
         $this->globalVars = $globalVars;
     }
 
+    /**
+     * @return TemplateProvider
+     */
+    public function getProvider(): TemplateProvider
+    {
+        return $this->provider;
+    }
+
+    /**
+     * @param TemplateProvider $provider
+     */
+    public function setProvider(TemplateProvider $provider): void
+    {
+        $this->provider = $provider;
+    }
+
     public function getResponse(): Response
     {
         if (!$this->response) {
