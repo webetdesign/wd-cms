@@ -95,7 +95,7 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
 
         /** @var CmsPage $page */
         $page = $this->getPage();
-        if ($page) {
+        if ($page && $page->getTemplate()) {
 
             try {
                 $service = $this->pageFactory->get($page->getTemplate());
