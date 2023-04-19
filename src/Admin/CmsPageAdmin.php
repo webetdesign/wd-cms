@@ -213,7 +213,8 @@ class CmsPageAdmin extends AbstractAdmin
         $admin->setFormTheme(array_merge($admin->getFormTheme(), [
             '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
             "@WebEtDesignCms/admin/form/cms_block.html.twig",
-            '@WebEtDesignCms/admin/form/admin_cms_vars_section.html.twig'
+            '@WebEtDesignCms/admin/form/dynamic_block.html.twig',
+            '@WebEtDesignCms/admin/form/admin_cms_vars_section.html.twig',
         ], $this->blockFormThemesManager->getThemes()));
 
         //region Général

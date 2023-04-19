@@ -12,7 +12,7 @@
     data-cms-adbc-prototype-names-value="{{ names|json_encode|e('html_attr') }}"
 {% endmacro %}
 
-{% block admin_cms_dynamic_block_collection_row %}
+{% block admin_cms_dynamic_block_collection_widget %}
     <div data-controller="cms-adbc" {{ allow_add ? _self.prototypes_row_attr(form.vars.prototypes, form.vars.prototypeNames) : '' }} data-cms-adbc-max-value="{{ max }}">
         <div class="box-group" id="{{ form.vars.id }}_accordion">
             {{ form_widget(form, {attr: { 'data-cms-adbc-target': 'collection' }}) }}
