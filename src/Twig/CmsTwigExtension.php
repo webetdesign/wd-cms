@@ -23,7 +23,6 @@ use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
-use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
 use WebEtDesign\CmsBundle\Services\CmsHelper;
 use WebEtDesign\CmsBundle\Services\WDDeclinationService;
 use WebEtDesign\MediaBundle\Entity\Media;
@@ -33,7 +32,6 @@ class CmsTwigExtension extends AbstractExtension
     protected bool         $useDeclination = false;
     protected RequestStack $requestStack;
 
-    protected null|AbstractCmsGlobalVars $globalVars = null;
     protected TemplateRegistry           $templateRegistry;
     private Environment                  $twig;
 
@@ -420,15 +418,4 @@ class CmsTwigExtension extends AbstractExtension
         }
         return null;
     }
-
-    /**
-     * @param AbstractCmsGlobalVars|null $globalVars
-     * @return CmsTwigExtension
-     */
-    public function setGlobalVars(?AbstractCmsGlobalVars $globalVars): CmsTwigExtension
-    {
-        $this->globalVars = $globalVars;
-        return $this;
-    }
-
 }

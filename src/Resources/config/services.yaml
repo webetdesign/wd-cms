@@ -107,10 +107,3 @@ services:
     tags:
       - { name: twig.extension }
     public: true
-
-
-
-  WebEtDesign\CmsBundle\Controller\SitemapController:
-    arguments:
-      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
-    tags: [ 'controller.service_arguments' ]
