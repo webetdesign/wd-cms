@@ -8,12 +8,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use WebEtDesign\CmsBundle\CmsTemplate\PageInterface;
-use WebEtDesign\CmsBundle\DependencyInjection\Models\RouteAttributeDefinition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsRouteInterface;
-use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use function Symfony\Component\String\u;
 
@@ -23,18 +22,18 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
     protected CmsPageRepository $pageRp;
 
-    protected ?array                   $configCms;
-    protected TemplateFactoryInterface $pageFactory;
+    protected ?array           $configCms;
+    protected TemplateRegistry $templateRegistry;
 
     public function __construct(
         EntityManagerInterface $em,
-        TemplateFactoryInterface $pageFactory,
-        array $configCms,
+        TemplateRegistry $templateRegistry,
+        ParameterBagInterface $parameterBag,
         string $name = null
     ) {
         parent::__construct($em, $name);
-        $this->configCms   = $configCms;
-        $this->pageFactory = $pageFactory;
+        $this->configCms        = $parameterBag->get('wd_cms.cms');
+        $this->templateRegistry = $templateRegistry;
     }
 
 
@@ -54,7 +53,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->pageFactory->getTemplateList());
+                $templates = array_values($this->templateRegistry->getTemplateList());
 
                 foreach ($templates as $template) {
                     $this->processTemplate($template->getCode());
@@ -100,7 +99,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         $this->io->title('Update page ' . $page->getTitle());
 
         try {
-            $config = $this->pageFactory->get($page->getTemplate());
+            $config = $this->templateRegistry->get($page->getTemplate());
         } catch (Exception $e) {
             $this->io->error($e->getMessage());
         }
@@ -223,7 +222,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
     protected function selectTemplate(): string
     {
-        $templates = $this->pageFactory->getTemplateChoices();
+        $templates = $this->templateRegistry->getTemplateChoices();
 
         return $this->io->choice('Template', array_flip($templates));
     }

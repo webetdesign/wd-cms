@@ -7,7 +7,7 @@ namespace WebEtDesign\CmsBundle\Command;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use WebEtDesign\CmsBundle\CmsTemplate\TemplateInterface;
+use WebEtDesign\CmsBundle\CMS\Template\ComponentInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
@@ -36,7 +36,7 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
         $this->io        = new SymfonyStyle($input, $output);
     }
 
-    protected function processContent($object, TemplateInterface $config)
+    protected function processContent($object, ComponentInterface $config)
     {
         foreach ($config->getBlocks() as $block) {
             $contentConf[$block->getCode()] = $block;

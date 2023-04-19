@@ -2,26 +2,25 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
-use WebEtDesign\CmsBundle\CmsTemplate\PageInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use Doctrine\ORM\EntityManager;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class PageDeclinationAdminListener
 {
-    protected           $em;
-    protected           $pageConfig;
-    private             $cmsConfig;
-    private PageFactory $pageFactory;
+    protected                $em;
+    protected                $pageConfig;
+    private                  $cmsConfig;
+    private TemplateRegistry $templateRegistry;
 
-    public function __construct(EntityManager $em, PageFactory $pageFactory, $cmsConfig)
+    public function __construct(EntityManagerInterface $em, TemplateRegistry $templateRegistry, ParameterBagInterface $parameterBag)
     {
-        $this->em = $em;
-        $this->cmsConfig = $cmsConfig;
-        $this->pageFactory = $pageFactory;
+        $this->em               = $em;
+        $this->cmsConfig        = $parameterBag->get('wd_cms.cms');
+        $this->templateRegistry = $templateRegistry;
     }
 
     public function prePersist($event)
@@ -48,8 +47,7 @@ class PageDeclinationAdminListener
         $technicName = $this->generateTechnicName($declination);
         $declination
             ->setTechnicName($technicName)
-            ->setLocale($declination->getPage()->getSite()->getLocale())
-        ;
+            ->setLocale($declination->getPage()->getSite()->getLocale());
     }
 
     public function preUpdate($event)
@@ -68,12 +66,13 @@ class PageDeclinationAdminListener
             ->setLocale($declination->getPage()->getSite()->getLocale());
     }
 
-    private function generateTechnicName(CmsPageDeclination $declination) {
+    private function generateTechnicName(CmsPageDeclination $declination)
+    {
 
         $technicName = $declination->getPage()->getRoute()->getName();
-        $values = json_decode($declination->getParams(), true);
+        $values      = json_decode($declination->getParams(), true);
         /** @var PageInterface $config */
-        $config = $this->pageFactory->get($declination->getPage()->getTemplate());
+        $config = $this->templateRegistry->get($declination->getPage()->getTemplate());
 
         foreach ($values as $name => $value) {
             $attribute = $config->getRoute()->getAttribute($name);

@@ -20,10 +20,10 @@ use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Form\Type\MenuIconType;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 final class CmsMenuItemAdmin extends AbstractAdmin
 {
@@ -31,7 +31,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly PageFactory $pageFactory,
+        private readonly TemplateRegistry $templateRegistry,
         private readonly ParameterBagInterface $parameterBag,
     ) {
         $this->configMenu = $this->parameterBag->get('wd_cms.menu');
@@ -269,7 +269,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
     {
 
         try {
-            $config = $this->pageFactory->get($subject->getPage()->getTemplate());
+            $config = $this->templateRegistry->get($subject->getPage()->getTemplate());
         } catch (Exception $e) {
             $config = null;
         }

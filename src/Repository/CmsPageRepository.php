@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Repository;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\NonUniqueResultException;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use LogicException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -35,10 +36,10 @@ class CmsPageRepository extends NestedTreeRepository
 
     /**
      * @param $name
-     * @return CmsPage[]|Collection
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return CmsPage|null
+     * @throws NonUniqueResultException
      */
-    public function findByRouteName($name)
+    public function findByRouteName($name): ?CmsPage
     {
         $qb = $this->createQueryBuilder('p');
         $qb->leftJoin('p.route', 'r')

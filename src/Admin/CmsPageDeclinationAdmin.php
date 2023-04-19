@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
-use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
-use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
-use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
-use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
-use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
+use WebEtDesign\CmsBundle\Utils\CmsVarsAdminTrait;
 use WebEtDesign\SeoBundle\Admin\SmoOpenGraphAdminTrait;
 use WebEtDesign\SeoBundle\Admin\SmoTwitterAdminTrait;
 
@@ -28,7 +23,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 {
     use SmoOpenGraphAdminTrait;
     use SmoTwitterAdminTrait;
-    use GlobalVarsAdminTrait;
+    use CmsVarsAdminTrait;
 
     protected ?bool         $globalVarsEnable;
 
@@ -41,7 +36,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly PageFactory $pageFactory,
+        private readonly TemplateRegistry $templateRegistry,
         private readonly ParameterBagInterface $parameterBag)
     {
         $this->globalVarsEnable = false; // TODO $globalVarsDefinition['enable'];
@@ -97,7 +92,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         }
         $route = $object->getPage()->getRoute();
 
-        $pageConfig = $this->pageFactory->get($object->getPage()->getTemplate());
+        $pageConfig = $this->templateRegistry->get($object->getPage()->getTemplate());
 
         //region Général
         $formMapper
@@ -122,7 +117,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         //region SEO
         $formMapper->tab('SEO');// The tab call is optional
-        $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable);
+        $this->addFormVarsSection($formMapper, $object->getPage(), $this->globalVarsEnable);
         $formMapper
             ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
             ->add('seo_title')
@@ -142,10 +137,10 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
                 'class'     => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'
             ])
             ->add('contents', AdminCmsBlockCollectionType::class, [
-                'templateFactory' => $this->pageFactory,
+                'templateFactory' => $this->templateRegistry,
             ])
             ->end();
-        $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable, true);
+        $this->addFormVarsSection($formMapper, $object->getPage(), $this->globalVarsEnable, true);
         $formMapper
             ->end();
         //endregion

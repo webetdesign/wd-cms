@@ -4,7 +4,7 @@
 namespace <?= $namespace; ?>;
 
 use WebEtDesign\CmsBundle\Attribute\AsCmsPage;
-use WebEtDesign\CmsBundle\CmsTemplate\AbstractPage;
+use WebEtDesign\CmsBundle\CMS\Template\AbstractPage;
 <?php foreach ($config['useStatements'] as $value) {?>
 use <?= $value; ?>;
 <?php }?>

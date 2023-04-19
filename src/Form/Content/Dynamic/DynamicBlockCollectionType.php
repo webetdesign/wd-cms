@@ -12,19 +12,19 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\CmsBundle\EventListener\CmsDynamicBlockResizeFormListener;
 use WebEtDesign\CmsBundle\EventListener\JsonFormListener;
-use WebEtDesign\CmsBundle\Factory\BlockFactory;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 
 class DynamicBlockCollectionType extends AbstractType
 {
-    public function __construct(private BlockFactory $blockFactory) { }
+    public function __construct(private readonly BlockRegistry $blockRegistry) { }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['base_block_config']) {
-            $block = $this->blockFactory->get($options['base_block_config']);
+            $block = $this->blockRegistry->get($options['base_block_config']);
         }
 
-        if ($options['allow_add'] && $options['prototype'] && $block) {
+        if ($options['allow_add'] && $options['prototype'] && $block ?? false) {
             $prototypes     = [];
             $prototypeNames = [];
 
@@ -66,7 +66,7 @@ class DynamicBlockCollectionType extends AbstractType
         }
 
         $resizeListener = new CmsDynamicBlockResizeFormListener(
-            $this->blockFactory,
+            $this->blockRegistry,
             $options['base_block_config'],
             $options['entry_type'],
             $options['entry_options'],

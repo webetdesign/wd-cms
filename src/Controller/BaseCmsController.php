@@ -2,18 +2,20 @@
 
 namespace WebEtDesign\CmsBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
+use WebEtDesign\CmsBundle\CMS\ConfigurationInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
-use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class BaseCmsController extends AbstractController
 {
+    protected ?ConfigurationInterface $configuration = null;
+
     /** @var CmsPage|null */
     protected ?CmsPage $page;
 
@@ -23,30 +25,11 @@ class BaseCmsController extends AbstractController
     /** @var boolean */
     protected bool $granted;
 
-    /** @var AbstractCmsGlobalVars|null */
-    protected ?AbstractCmsGlobalVars $globalVars = null;
-
-    protected PageFactory $templateFactory;
+    protected TemplateRegistry $templateRegistry;
 
     protected ?Response $response = null;
 
     private $cmsConfig;
-
-    public function setVarsObject(GlobalVarsInterface $object)
-    {
-        if ($this->globalVars) {
-            $this->globalVars->setObject($object);
-        }
-    }
-
-    /**
-     * @param mixed $globalVars
-     */
-    public function setGlobalVars($globalVars): void
-    {
-        $this->globalVars = $globalVars;
-    }
-
 
     protected function defaultRender(array $params): Response
     {
@@ -58,7 +41,7 @@ class BaseCmsController extends AbstractController
             $baseParams['declination'] = $this->getDeclination($page);
         }
 
-        $templateConfig = $this->templateFactory->get($page->getTemplate());
+        $templateConfig = $this->templateRegistry->get($page->getTemplate());
 
         return $this->render(
             $templateConfig->getTemplate(),
@@ -100,31 +83,13 @@ class BaseCmsController extends AbstractController
     }
 
     /**
-     * @return string|null
-     */
-    private function getExtension(): ?string
-    {
-        /** @var RequestStack $requestStack */
-        $requestStack = $this->get('request_stack');
-        $request      = $requestStack->getCurrentRequest();
-        $path         = $request->getRequestUri();
-
-        if ($path === '/index.php') {
-            return null;
-        }
-
-        preg_match('/\.([a-z]+)($|\?)/', $path, $extension);
-
-        return $extension[1] ?? null;
-    }
-
-    /**
      * @return bool
      */
     public function isPageGranted(): bool
     {
         return $this->granted;
     }
+
 
     /**
      * @param bool $granted
@@ -137,22 +102,26 @@ class BaseCmsController extends AbstractController
         return $this;
 
     }
+
+
+
+
     /**
-     * @param PageFactory $templateFactory
+     * @param TemplateRegistry $templateRegistry
      * @return BaseCmsController
      */
-    public function setTemplateFactory(PageFactory $templateFactory): BaseCmsController
+    public function setTemplateRegistry(TemplateRegistry $templateRegistry): BaseCmsController
     {
-        $this->templateFactory = $templateFactory;
+        $this->templateRegistry = $templateRegistry;
         return $this;
     }
 
     /**
-     * @return PageFactory
+     * @return TemplateRegistry
      */
-    public function getTemplateFactory(): PageFactory
+    public function getTemplateRegistry(): TemplateRegistry
     {
-        return $this->templateFactory;
+        return $this->templateRegistry;
     }
 
     /**
@@ -206,6 +175,24 @@ class BaseCmsController extends AbstractController
     {
         $this->cmsConfig = $cmsConfig;
 
+        return $this;
+    }
+
+    /**
+     * @return ConfigurationInterface|null
+     */
+    public function getConfiguration(): ?ConfigurationInterface
+    {
+        return $this->configuration;
+    }
+
+    /**
+     * @param ConfigurationInterface|null $configuration
+     * @return BaseCmsController
+     */
+    public function setConfiguration(?ConfigurationInterface $configuration): BaseCmsController
+    {
+        $this->configuration = $configuration;
         return $this;
     }
 }

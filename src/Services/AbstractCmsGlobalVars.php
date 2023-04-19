@@ -97,7 +97,7 @@ class AbstractCmsGlobalVars implements GlobalVarsInterface
         return $this->delimiter;
     }
 
-    #[ArrayShape(['s' => "string", 'e' => "string"])] public function getDelimiters()
+    public function getDelimiters()
     {
         switch ($this->delimiter) {
             case CmsGlobalVarsDelimiterEnum::DOUBLE_UNDERSCORE:

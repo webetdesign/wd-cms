@@ -30,12 +30,6 @@ services:
   # MISCELLANEOUS
   # ===============================================
 
-  WebEtDesign\CmsBundle\Factory\BlockFactory:
-    autoconfigure: false
-    arguments:
-      twig: '@twig'
-      em: '@doctrine.orm.entity_manager'
-
   WebEtDesign\CmsBundle\EventListener\CmsBlockResizeFormListener:
     autoconfigure: false
   WebEtDesign\CmsBundle\EventListener\CmsDynamicBlockResizeFormListener:
@@ -52,7 +46,6 @@ services:
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
-    arguments: [ '@doctrine.orm.entity_manager', '@parameter_bag', '@WebEtDesign\CmsBundle\Factory\PageFactory', '%wd_cms.cms%' ]
     tags:
       - { name: routing.loader }
 
@@ -72,15 +65,6 @@ services:
       - '%security.role_hierarchy.roles%'
 
   WebEtDesign\CmsBundle\Services\CmsHelper:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@twig'
-      - "@security.authorization_checker"
-      - '@security.role_hierarchy'
-      - '@security.token_storage'
-      - '@parameter_bag'
-      - '@request_stack'
     public: true
 
   cms.helper:

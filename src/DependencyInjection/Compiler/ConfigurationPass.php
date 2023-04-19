@@ -4,10 +4,9 @@ namespace WebEtDesign\CmsBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
-use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
-use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
-use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
+use WebEtDesign\CmsBundle\CMS\ConfigurationInterface;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -15,15 +14,18 @@ class ConfigurationPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
 
-        $pageFactory = $container->getDefinition(PageFactory::class);
-        $sharedBlockFactory = $container->getDefinition(SharedBlockFactory::class);
+        $blockRegistry    = $container->getDefinition(BlockRegistry::class);
+        $templateRegistry = $container->getDefinition(TemplateRegistry::class);
 
         foreach ($container->findTaggedServiceIds('wd_cms.configuration') as $id => $tags) {
+            $container->addAliases([ConfigurationInterface::class => $id]);
             $definition = $container->findDefinition($id);
             $definition->setPublic(true);
 
-            $pageFactory->addMethodCall('setConfiguration', [$definition]);
-            $sharedBlockFactory->addMethodCall('setConfiguration', [$definition]);
+            $definition->addMethodCall('setBlockRegistry', [$blockRegistry]);
+            $definition->addMethodCall('setTemplateRegistry', [$templateRegistry]);
+
+            $definition->addMethodCall('init');
         }
     }
 }

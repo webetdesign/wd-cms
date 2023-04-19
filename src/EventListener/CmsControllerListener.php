@@ -9,52 +9,49 @@
 namespace WebEtDesign\CmsBundle\EventListener;
 
 
-use Symfony\Component\DependencyInjection\Container;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Twig\Environment;
+use WebEtDesign\CmsBundle\CMS\ConfigurationInterface;
 use WebEtDesign\CmsBundle\Controller\BaseCmsController;
-use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Services\CmsHelper;
 
 class CmsControllerListener
 {
 
-    protected CmsHelper                $helper;
-    protected TemplateFactoryInterface $templateFactory;
-    protected Environment              $twig;
-    protected                          $globalVars;
-    protected                          $cmsConfig;
+    protected CmsHelper              $helper;
+    protected TemplateRegistry       $templateRegistry;
+    protected Environment            $twig;
+    protected array                  $cmsConfig;
+    protected EntityManagerInterface $em;
+    private ConfigurationInterface   $configuration;
 
     /**
      * CmsControllerListener constructor.
      * @param CmsHelper $cmsHelper
-     * @param TemplateFactoryInterface $templateFactory
-     * @param Container $container
-     * @param $globalVarsDefinition
-     * @param $cmsConfig
+     * @param TemplateRegistry $templateRegistry
      * @param Environment $environment
-     * @throws \Exception
+     * @param ParameterBagInterface $parameterBag
+     * @param ConfigurationInterface $configuration
      */
     public function __construct(
         CmsHelper $cmsHelper,
-        TemplateFactoryInterface $templateFactory,
-        Container $container,
-        $globalVarsDefinition,
-        $cmsConfig,
-        Environment $environment
+        TemplateRegistry $templateRegistry,
+        Environment $environment,
+        ParameterBagInterface $parameterBag,
+        ConfigurationInterface $configuration,
     ) {
-        $this->helper          = $cmsHelper;
-        $this->templateFactory = $templateFactory;
-        $this->cmsConfig       = $cmsConfig;
-        $this->twig            = $environment;
-        if ($globalVarsDefinition['enable']) {
-            $this->globalVars = $container->get($globalVarsDefinition['global_service']);
-            $this->globalVars->setDelimiter($globalVarsDefinition['delimiter']);
-        }
+        $this->helper           = $cmsHelper;
+        $this->templateRegistry = $templateRegistry;
+        $this->cmsConfig        = $parameterBag->get('wd_cms.cms');
+        $this->twig             = $environment;
+        $this->configuration    = $configuration;
     }
 
-    public function onKernelController(ControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
         if (is_array($controller)) {
@@ -63,6 +60,7 @@ class CmsControllerListener
         $request = $event->getRequest();
 
         if ($controller instanceof BaseCmsController) {
+            $controller->setConfiguration($this->configuration);
 
             if (!$this->helper->isGranted()) {
                 $event->setController(function () {
@@ -81,13 +79,11 @@ class CmsControllerListener
 
 
             $controller->setGranted($this->helper->isGranted());
-            $controller->setTemplateFactory($this->templateFactory);
+            $controller->setTemplateRegistry($this->templateRegistry);
             $controller->setCmsConfig($this->cmsConfig);
 
-            if ($this->globalVars) {
-                $controller->setGlobalVars($this->globalVars);
-            }
-
+            $this->configuration->setCurrentPage($page);
+            $this->configuration->autoPopulateVars();
         }
     }
 

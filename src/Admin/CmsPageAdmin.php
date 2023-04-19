@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
+use App\Entity\Actuality;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -14,10 +15,11 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use WebEtDesign\CmsBundle\CMS\ConfigurationInterface;
+use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
-use WebEtDesign\CmsBundle\Factory\BlockFactory;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Form\Admin\CmsVarsFormSection;
 use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Form\MultilingualType;
@@ -31,7 +33,10 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\Form\Type\SecurityRolesType;
 use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
-use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
+use WebEtDesign\CmsBundle\Utils\CmsVarsAdminTrait;
+use WebEtDesign\CmsBundle\Vars\Compiler;
 use WebEtDesign\SeoBundle\Admin\SmoOpenGraphAdminTrait;
 use WebEtDesign\SeoBundle\Admin\SmoTwitterAdminTrait;
 
@@ -39,7 +44,7 @@ class CmsPageAdmin extends AbstractAdmin
 {
     use SmoTwitterAdminTrait;
     use SmoOpenGraphAdminTrait;
-    use GlobalVarsAdminTrait;
+    use CmsVarsAdminTrait;
 
     protected mixed $multilingual;
     protected mixed $multisite;
@@ -53,9 +58,11 @@ class CmsPageAdmin extends AbstractAdmin
         protected readonly ParameterBagInterface $parameterBag,
         protected readonly EntityManagerInterface $em,
         protected readonly TokenStorageInterface $tokenStorage,
-        protected readonly PageFactory $pageFactory,
-        protected readonly BlockFactory $blockFactory,
+        protected readonly TemplateRegistry $templateRegistry,
+        protected readonly BlockRegistry $blockRegistry,
         protected readonly BlockFormThemesManager $blockFormThemesManager,
+        protected readonly Compiler $compiler,
+        protected readonly ConfigurationInterface $configuration,
     ) {
         $this->cmsConfig    = $this->parameterBag->get('wd_cms.cms');
         $this->multisite    = $this->cmsConfig['multisite'];
@@ -189,10 +196,14 @@ class CmsPageAdmin extends AbstractAdmin
      */
     protected function configureFormFields(FormMapper $form): void
     {
+
         $roleAdmin = $this->canManageContent();
         $admin     = $this;
         /** @var CmsPage $object */
         $object = $this->getSubject();
+
+        /** @var PageInterface $template */
+        $template = $this->templateRegistry->get($object->getTemplate());
 
         $site = $object->getSite();
 
@@ -200,12 +211,9 @@ class CmsPageAdmin extends AbstractAdmin
             ['id' => $site->getId()]));
 
         $admin->setFormTheme(array_merge($admin->getFormTheme(), [
-            '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
-            '@WebEtDesignCms/form/cms_contents_type.html.twig',
             '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
-            '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
-            '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
             "@WebEtDesignCms/admin/form/cms_block.html.twig",
+            '@WebEtDesignCms/admin/form/admin_cms_vars_section.html.twig'
         ], $this->blockFormThemesManager->getThemes()));
 
         //region Général
@@ -261,7 +269,7 @@ class CmsPageAdmin extends AbstractAdmin
 
             //region SEO
             $form->tab('cms_page.tab.seo');// The tab call is optional
-            $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable);
+            $this->addFormVarsSection($form, $object, 'seo');
             $form->with('cms_page.tab.general',
                 [
                     'class'              => 'col-xs-12 col-md-4',
@@ -283,16 +291,16 @@ class CmsPageAdmin extends AbstractAdmin
             //region Contenus
             if (count($object->getContents()) > 0) {
                 $form->tab('cms_page.tab.content');
+                $this->addFormVarsSection($form, $object, 'content');
                 $form
                     ->with('', [
                         'box_class' => 'header_none',
                         'class'     => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'
                     ])
                     ->add('contents', AdminCmsBlockCollectionType::class, [
-                        'templateFactory' => $this->pageFactory,
+                        'templateFactory' => $this->templateRegistry,
                     ])
                     ->end();
-                $this->addGlobalVarsHelp($form, $object, $this->globalVarsEnable, true);
                 $form
                     ->end();
             }
