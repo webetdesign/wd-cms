@@ -8,5 +8,7 @@ use WebEtDesign\CmsBundle\Vars\CmsVarsBag;
 
 interface PageInterface
 {
+    public function isSection(): bool;
+
     public function getRoute(): ?RouteDefinition;
 }
