@@ -179,5 +179,56 @@
                 </div>
             {% endfor %}
         </div>
+
+        <h2>CmsVars</h2>
+
+        <div class="sf-tabs">
+            {% for def in collector.data.service.varsBag.definitions %}
+                <div class="tab">
+                    <div class="tab-title">{{ def.code }}</div>
+                    <div class="tab-content">
+                        <table>
+                            <tr>
+                                <th>Code</th>
+                                <td>{{ def.code }}</td>
+                            </tr>
+                            <tr>
+                                <th>Class</th>
+                                <td>{{ def.class }}</td>
+                            </tr>
+                            <tr>
+                                <th>Name</th>
+                                <td>{{ def.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>routeAttributeKey</th>
+                                <td>{{ def.routeAttributeKey }}</td>
+                            </tr>
+                            <tr>
+                                <th>findOneBy</th>
+                                <td>{{ def.findOneBy }}</td>
+                            </tr>
+                            <tr>
+                                <th>Exposed properties</th>
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Property accessor</th>
+                                        </tr>
+                                        {% for var, accessor in collector.data.service.varsBag.exposed[def.code] %}
+                                            <tr>
+                                                <th>{{ var }}</th>
+                                                <td>{{ accessor }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% endif %}
 {% endblock %}
