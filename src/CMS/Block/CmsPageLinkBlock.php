@@ -1,10 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\CMS\Block;
 
 use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
-use WebEtDesign\CmsBundle\DependencyInjection\Models\BlockDefinition;
-use WebEtDesign\CmsBundle\Form\Type\CmsPageEntityType;
 use WebEtDesign\CmsBundle\Form\Type\CmsPageLinkType;
 
 #[AsCmsBlock(self::code)]
