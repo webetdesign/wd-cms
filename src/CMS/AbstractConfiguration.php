@@ -50,6 +50,10 @@ abstract class AbstractConfiguration implements ConfigurationInterface
             return $this->varsBag;
         }
 
+        if (!$this->getCurrentPage()) {
+            return null;
+        }
+
         $template = $this->templateRegistry->get($this->getCurrentPage()->getTemplate());
 
         $this->varsBag = $template->getVarsBag();
@@ -60,14 +64,16 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     public function autoPopulateVars()
     {
         $bag = $this->getVarsBag();
+        if (!$bag) {
+            return;
+        }
         $request = $this->requestStack->getCurrentRequest();
 
         foreach ($bag->getDefinitions() as $definition) {
             if ($definition->getRouteAttributeKey() && $request->attributes->has($definition->getRouteAttributeKey())) {
-                $class = $definition->getClass();
+                $class  = $definition->getClass();
                 $method = $definition->getFindOneBy() ?: 'findOneBy' . ucfirst($definition->getRouteAttributeKey());
                 $object = $this->em->getRepository($class)->$method($request->attributes->get($definition->getRouteAttributeKey()));
-
 
 
                 if ($object instanceof $class) {
