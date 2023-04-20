@@ -1,19 +1,12 @@
 services:
-  WebEtDesign\CmsBundle\Command\CmsUpdatePageParamsCommand:
-    arguments:
-      - '@doctrine.orm.default_entity_manager'
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '%wd_cms.cms%'
-      - ~
+  _defaults:
+    autowire: true
 
+  WebEtDesign\CmsBundle\Command\CmsUpdatePageParamsCommand:
     tags:
       - { name: 'console.command', command: 'cms:page:update-params' }
 
   WebEtDesign\CmsBundle\Command\CmsUpdateContentsSharedBlockCommand:
-    arguments:
-      - '@doctrine.orm.default_entity_manager'
-      - '@WebEtDesign\CmsBundle\Factory\SharedBlockFactory'
-      - ~
     tags:
       - { name: 'console.command', command: 'cms:shared-block:update-contents' }
 

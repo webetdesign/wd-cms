@@ -122,19 +122,6 @@ document.addEventListener('DOMContentLoaded', function () {
           let script = modal.querySelector('.modal-body')
             .querySelector('script');
 
-
-
-          //TODO: Uncomment lines bellow when choicejs will be fixed.
-          // https://github.com/Choices-js/Choices/pull/1001
-
-          // const choices = new Choices(modal.querySelector('select'), {
-          //   allowHTML: true,
-          //   shouldSort: false,
-          //   fuseOptions: {
-          //     includeScore: false
-          //   },
-          // });
-
           $(modal)
             .modal('show');
         });

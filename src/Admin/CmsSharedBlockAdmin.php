@@ -1,53 +1,41 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
-use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelHiddenType;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
-use Sonata\AdminBundle\Show\ShowMapper;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
-use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
 use WebEtDesign\CmsBundle\Form\BlockTemplateType;
-use Knp\Menu\ItemInterface as MenuItemInterface;
-use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
 use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 use function count;
 use function in_array;
 
 final class CmsSharedBlockAdmin extends AbstractAdmin
 {
-    protected ?bool                  $isMultisite;
-    protected EntityManagerInterface $em;
-    private SharedBlockFactory       $sharedBlockFactory;
-    private BlockFormThemesManager   $blockFormThemesManager;
+    protected ?bool $isMultisite;
 
     public function __construct(
-        string $code,
-        string $class,
-        string $baseControllerName,
-        EntityManagerInterface $em,
-        SharedBlockFactory $sharedBlockFactory,
-        ParameterBagInterface $parameterBag,
-        BlockFormThemesManager $blockFormThemesManager
+        private readonly EntityManagerInterface $em,
+        private readonly TemplateRegistry $templateRegistry,
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly BlockFormThemesManager $blockFormThemesManager,
     ) {
-        parent::__construct($code, $class, $baseControllerName);
-        $this->em                     = $em;
-        $this->sharedBlockFactory     = $sharedBlockFactory;
-        $this->isMultisite            = $parameterBag->get('wd_cms.cms')['multisite'];
-        $this->blockFormThemesManager = $blockFormThemesManager;
+        $this->isMultisite = $this->parameterBag->get('wd_cms.cms')['multisite'];
+        parent::__construct();
     }
+
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
@@ -139,7 +127,7 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             $formMapper
                 ->with('', ['box_class' => 'header_none', 'class' => 'col-xs-12'])
                 ->add('contents', AdminCmsBlockCollectionType::class, [
-                    'templateFactory' => $this->sharedBlockFactory,
+                    'templateFactory' => $this->templateRegistry,
                 ])
                 ->end();
             $formMapper->end();

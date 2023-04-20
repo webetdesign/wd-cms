@@ -13,12 +13,12 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use Symfony\Component\HttpFoundation\Request;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class CmsHelper
 {
     private EntityManagerInterface $em;
-    private PageFactory            $pageFactory;
+    private TemplateRegistry       $templateRegistry;
     private Environment            $twig;
     /** @var AuthorizationCheckerInterface */
     private AuthorizationCheckerInterface $authorizationChecker;
@@ -33,7 +33,7 @@ class CmsHelper
 
     /**
      * @param EntityManagerInterface $em
-     * @param PageFactory $pageFactory
+     * @param TemplateRegistry $templateRegistry
      * @param Environment $twig
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param RoleHierarchyInterface $roleHierarchy
@@ -43,7 +43,7 @@ class CmsHelper
      */
     public function __construct(
         EntityManagerInterface $em,
-        PageFactory $pageFactory,
+        TemplateRegistry $templateRegistry,
         Environment $twig,
         AuthorizationCheckerInterface $authorizationChecker,
         RoleHierarchyInterface $roleHierarchy,
@@ -52,7 +52,7 @@ class CmsHelper
         RequestStack $requestStack
     ) {
         $this->em                   = $em;
-        $this->pageFactory          = $pageFactory;
+        $this->templateRegistry     = $templateRegistry;
         $this->twig                 = $twig;
         $this->authorizationChecker = $authorizationChecker;
         $this->roleHierarchy        = $roleHierarchy;
@@ -61,12 +61,12 @@ class CmsHelper
         $this->requestStack         = $requestStack;
     }
 
-    public function setPage(CmsPage $page) {
+    public function setPage(CmsPage $page): CmsHelper {
         $this->page = $page;
         return $this;
     }
 
-    public function getPage()
+    public function getPage(): ?CmsPage
     {
         $request = $this->getRequest();
 

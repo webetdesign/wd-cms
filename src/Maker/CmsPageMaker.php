@@ -14,12 +14,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use WebEtDesign\CmsBundle\DependencyInjection\Models\RouteDefinition;
+use WebEtDesign\CmsBundle\CMS\Configuration\RouteDefinition;
 
 class CmsPageMaker extends AbstractMaker
 {
 
-    public function __construct(private ContainerInterface $container) { }
+    public function __construct() { }
 
     const SKELETON_DIR = __DIR__ . '/../Resources/skeleton';
     protected string $shortName = '';

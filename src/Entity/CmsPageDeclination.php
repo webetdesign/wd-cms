@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Entity;
 
@@ -6,8 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\Cascade;
 use WebEtDesign\CmsBundle\Repository\CmsPageDeclinationRepository;
+use WebEtDesign\SeoBundle\Entity\SeoAwareTrait;
 use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
 use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
@@ -17,7 +18,7 @@ use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
  * @ORM\Table(name="cms__page_declination")
  */
 #[ORM\Entity(repositoryClass: CmsPageDeclinationRepository::class)]
-#[ORM\Table(name: "cms__page_declination")]
+#[ORM\Table(name: 'cms__page_declination')]
 class CmsPageDeclination
 {
     use SeoAwareTrait;
@@ -41,8 +42,8 @@ class CmsPageDeclination
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="declinations")
      * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: "declinations")]
-    #[ORM\JoinColumn(name: "page_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'declinations')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?CmsPage $page = null;
 
     /**
@@ -75,14 +76,14 @@ class CmsPageDeclination
      *
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="declination", cascade={"remove", "persist"})
      */
-    #[ORM\OneToMany(targetEntity: CmsContent::class, mappedBy: "declination", cascade: ["remove", "persist"])]
+    #[ORM\OneToMany(mappedBy: 'declination', targetEntity: CmsContent::class, cascade: ['remove', 'persist'])]
     private PersistentCollection|ArrayCollection $contents;
 
     /**
-     * @var boolean
+     * @var bool
      * @ORM\Column(type="boolean", length=255, nullable=false, options={"default": false})
      */
-    #[ORM\Column(type: Types::BOOLEAN, length: 255, nullable: false, options: ["default" => false])]
+    #[ORM\Column(type: Types::BOOLEAN, length: 255, nullable: false, options: ['default' => false])]
 
     private bool $active = false;
 
@@ -94,18 +95,12 @@ class CmsPageDeclination
 
     private string $params = '[]';
 
-    /**
-     * @inheritDoc
-     */
     public function __construct()
     {
         $this->contents = new ArrayCollection();
         $this->setActive(false);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __toString()
     {
         return (string)$this->getTitle();
@@ -227,15 +222,6 @@ class CmsPageDeclination
     public function getParams(): string
     {
         return $this->params;
-    }
-
-    public function getSeoTitle(): ?string
-    {
-        if ($this->seo_title === null) {
-            return '';
-        }
-
-        return $this->seo_title;
     }
 
     public function getTechnicName(): ?string

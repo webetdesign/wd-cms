@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Command;
 
@@ -10,19 +11,18 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 
 class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 {
-    protected static $defaultName = 'cms:page:update-contents';
-
     protected CmsPageRepository $pageRp;
-    private PageFactory         $pageFactory;
+    private TemplateRegistry         $templateRegistry;
 
     protected function configure()
     {
         $this
+            ->setName('cms:page:update-contents')
             ->setDescription('Update configuration of content\'s pages and declination with configuration file')
             ->addArgument('template', InputArgument::OPTIONAL, 'template name')
             ->addOption('all', '-a', InputOption::VALUE_NONE, 'Reset all page')
@@ -31,11 +31,11 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 
     public function __construct(
         EntityManagerInterface $em,
-        PageFactory $pageFactory,
+        TemplateRegistry $templateRegistry,
         string $name = null
     ) {
         parent::__construct($em, $name);
-        $this->pageFactory = $pageFactory;
+        $this->templateRegistry = $templateRegistry;
     }
 
 
@@ -46,16 +46,14 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->pageFactory->getTemplateList());
+                $templates = array_values($this->templateRegistry->getTemplateList());
 
                 foreach ($templates as $template) {
                     $this->processTemplate($template->getCode());
                 }
                 $this->io->success('Done');
-                return 0;
-            } else {
-                return 0;
             }
+            return 0;
         }
 
         $pageId = $input->getOption('page');
@@ -88,12 +86,12 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
         }
     }
 
-    protected function resetPage(?CmsPage $page)
+    protected function resetPage(?CmsPage $page): bool
     {
         $this->io->title('Update page ' . $page->getTitle());
 
         try {
-            $config = $this->pageFactory->get($page->getTemplate());
+            $config = $this->templateRegistry->get($page->getTemplate());
         } catch (Exception $e) {
             $this->io->error($e->getMessage());
             return false;
@@ -114,7 +112,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 
     protected function selectTemplate(): string
     {
-        $templates = $this->pageFactory->getTemplateChoices();
+        $templates = $this->templateRegistry->getTemplateChoices();
 
         return $this->io->choice('Template', array_flip($templates));
     }

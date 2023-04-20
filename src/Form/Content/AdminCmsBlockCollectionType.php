@@ -7,12 +7,12 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\CmsBundle\EventListener\CmsBlockResizeFormListener;
-use WebEtDesign\CmsBundle\Factory\BlockFactory;
-use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistryInterface;
 
 class AdminCmsBlockCollectionType extends AbstractType
 {
-    public function __construct(private BlockFactory $blockFactory)
+    public function __construct(private readonly BlockRegistry $blockRegistry)
     {
     }
 
@@ -34,7 +34,7 @@ class AdminCmsBlockCollectionType extends AbstractType
 
         $resizeListener =  $options['listener'] ?? new CmsBlockResizeFormListener(
             $options['templateFactory'],
-            $this->blockFactory,
+            $this->blockRegistry,
             $options['entry_type'],
             $options['entry_options'],
             $options['allow_add'],
@@ -65,7 +65,7 @@ class AdminCmsBlockCollectionType extends AbstractType
 
         $resolver->setRequired(['templateFactory']);
 
-        $resolver->setAllowedTypes('templateFactory', TemplateFactoryInterface::class);
+        $resolver->setAllowedTypes('templateFactory', TemplateRegistryInterface::class);
     }
 
 

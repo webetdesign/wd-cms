@@ -8,7 +8,6 @@
 
 namespace WebEtDesign\CmsBundle\DependencyInjection;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Sonata\Doctrine\Mapper\Builder\ColumnDefinitionBuilder;
 use Sonata\Doctrine\Mapper\DoctrineCollector;
@@ -19,17 +18,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use WebEtDesign\CmsBundle\Attribute\AsCmsBlock;
 use WebEtDesign\CmsBundle\Attribute\AsCmsConfiguration;
 use WebEtDesign\CmsBundle\Attribute\AsCmsPage;
-use WebEtDesign\CmsBundle\Attribute\AsCmsSharedBlock;
+use WebEtDesign\CmsBundle\Attribute\AsCmsShared;
+use WebEtDesign\CmsBundle\Attribute\AsCmsTemplate;
 use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
-use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
-use WebEtDesign\CmsBundle\Factory\BlockFactory;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Enum\CmsVarsDelimiterEnum;
 use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class WebEtDesignCmsExtension extends Extension
 {
@@ -37,6 +36,7 @@ class WebEtDesignCmsExtension extends Extension
     {
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
+        $config['cms']['vars']['delimiter'] = CmsVarsDelimiterEnum::from($config['cms']['vars']['delimiter']);
 
         $this->configureClass($config, $container);
 
@@ -54,8 +54,7 @@ class WebEtDesignCmsExtension extends Extension
         // TODO : work for autowired configuration
         $container->setParameter('wd_cms.menu.icon_set', []);
         $container->setParameter('wd_cms.cms', $config['cms']);
-        $container->setParameter('wd_cms.cms.multisite',
-            $config['cms']['multilingual'] || $config['cms']['multisite'] ? true : false);
+        $container->setParameter('wd_cms.cms.multisite', $config['cms']['multilingual'] || $config['cms']['multisite'] ? true : false);
         $container->setParameter('wd_cms.cms.multilingual', $config['cms']['multilingual']);
         $container->setParameter('wd_cms.cms.declination', $config['cms']['declination']);
         $container->setParameter('wd_cms.cms.page_extension', $config['cms']['page_extension']);
@@ -87,16 +86,27 @@ class WebEtDesignCmsExtension extends Extension
 
             $container->registerAttributeForAutoconfiguration(AsCmsPage::class,
                 static function (ChildDefinition $definition, AsCmsPage $attribute) {
-                    $definition->addTag('wd_cms.page_template', array_filter([
-                        'key' => $attribute->code,
+                    $definition->addTag('wd_cms.template', array_filter([
+                        'key'  => $attribute->code,
+                        'type' => $attribute->type,
                     ]));
                 }
             );
 
-            $container->registerAttributeForAutoconfiguration(AsCmsSharedBlock::class,
-                static function (ChildDefinition $definition, AsCmsSharedBlock $attribute) {
-                    $definition->addTag('wd_cms.shared_block', array_filter([
-                        'key' => $attribute->code,
+            $container->registerAttributeForAutoconfiguration(AsCmsShared::class,
+                static function (ChildDefinition $definition, AsCmsShared $attribute) {
+                    $definition->addTag('wd_cms.template', array_filter([
+                        'key'  => $attribute->code,
+                        'type' => $attribute->type,
+                    ]));
+                }
+            );
+
+            $container->registerAttributeForAutoconfiguration(AsCmsTemplate::class,
+                static function (ChildDefinition $definition, AsCmsTemplate $attribute) {
+                    $definition->addTag('wd_cms.template', array_filter([
+                        'key'  => $attribute->code,
+                        'type' => $attribute->type,
                     ]));
                 }
             );
@@ -108,21 +118,14 @@ class WebEtDesignCmsExtension extends Extension
             );
         }
 
-        $container->getDefinition(BlockFactory::class)->setArguments([
-            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.block', 'key', null, true)),
+        $container->getDefinition(BlockRegistry::class)->setArguments([
+            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.block', 'key', null, true))
         ]);
 
-        $container->getDefinition(PageFactory::class)->setArguments([
-            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.page_template', 'key',
-                null, true)),
-            []
+        $container->getDefinition(TemplateRegistry::class)->setArguments([
+            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.template', null, null, true))
         ]);
 
-        $container->getDefinition(SharedBlockFactory::class)->setArguments([
-            new ServiceLocatorArgument(new TaggedIteratorArgument('wd_cms.shared_block', 'key',
-                null, true)),
-            []
-        ]);
     }
 
     /**

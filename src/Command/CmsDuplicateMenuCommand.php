@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 
 namespace WebEtDesign\CmsBundle\Command;
@@ -21,8 +22,6 @@ use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 class CmsDuplicateMenuCommand extends Command
 {
-    protected static $defaultName = 'cms:duplicate:menu';
-
     protected EntityManager $em;
     private CmsSiteRepository $siteRepository;
     private CmsMenuRepository $menuRepository;
@@ -51,6 +50,7 @@ class CmsDuplicateMenuCommand extends Command
     protected function configure()
     {
         $this
+            ->setName('cms:duplicate:menu')
             ->setDescription('Duplicate Menu for an other locale')
         ;
     }

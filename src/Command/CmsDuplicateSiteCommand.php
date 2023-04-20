@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 
 namespace WebEtDesign\CmsBundle\Command;
@@ -22,8 +23,6 @@ use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 class CmsDuplicateSiteCommand extends Command
 {
-    protected static $defaultName = 'cms:duplicate:site';
-
     protected EntityManager $em;
     private CmsPageRepository $pageRepository;
     private CmsSiteRepository $siteRepository;
@@ -46,6 +45,7 @@ class CmsDuplicateSiteCommand extends Command
     protected function configure()
     {
         $this
+            ->setName('cms:duplicate:site')
             ->setDescription('Duplicate site for an other locale')
         ;
     }

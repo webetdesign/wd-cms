@@ -24,14 +24,6 @@ services:
     tags:
       - { name: form.type }
 
-  WebEtDesign\CmsBundle\Form\GlobalVarsType:
-    arguments:
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@service_container'
-      - '%wd_cms.vars%'
-    tags:
-      - { name: form.type }
-
   WebEtDesign\CmsBundle\Form\CmsRouteParamsType:
     arguments:
       - '@doctrine.orm.entity_manager'

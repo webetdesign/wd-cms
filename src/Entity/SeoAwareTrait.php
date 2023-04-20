@@ -5,6 +5,9 @@ namespace WebEtDesign\CmsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @deprecated will be removed
+ */
 trait SeoAwareTrait
 {
     /**

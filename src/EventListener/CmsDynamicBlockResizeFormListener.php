@@ -7,16 +7,15 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use WebEtDesign\CmsBundle\CmsBlock\AbstractBlock;
-use WebEtDesign\CmsBundle\DependencyInjection\Models\BlockDefinition;
-use WebEtDesign\CmsBundle\Factory\BlockFactory;
+use WebEtDesign\CmsBundle\CMS\Configuration\BlockDefinition;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 
 class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 {
 
     public function __construct(
-        private BlockFactory $blockFactory,
-        private BlockDefinition $blockDefinition,
+        private readonly BlockRegistry $blockRegistry,
+        private readonly BlockDefinition $blockDefinition,
         string $type,
         array $options = [],
         bool $allowAdd = false,
@@ -42,7 +41,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 
     public function preSetData(FormEvent $event)
     {
-        $block = $this->blockFactory->get($this->blockDefinition);
+        $block = $this->blockRegistry->get($this->blockDefinition);
         $form  = $event->getForm();
         $data  = $event->getData();
 
@@ -77,7 +76,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 
     public function preSubmit(FormEvent $event)
     {
-        $block = $this->blockFactory->get($this->blockDefinition);
+        $block = $this->blockRegistry->get($this->blockDefinition);
         $form  = $event->getForm();
         $data  = $event->getData();
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: jvaldena
@@ -35,11 +36,8 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('enable')->defaultFalse()->end()
                                 ->scalarNode('global_service')->defaultNull()->end()
-                                ->scalarNode('delimiter')
-                                    ->validate()
-                                        ->ifNotInArray(CmsGlobalVarsDelimiterEnum::getAvailableTypes())
-                                        ->thenInvalid('Invalid type %s')
-                                    ->end()
+                                ->enumNode('delimiter')
+                                    ->values(CmsGlobalVarsDelimiterEnum::getAvailableTypes())
                                     ->defaultValue(CmsGlobalVarsDelimiterEnum::DOUBLE_UNDERSCORE)
                                 ->end()
                             ->end()

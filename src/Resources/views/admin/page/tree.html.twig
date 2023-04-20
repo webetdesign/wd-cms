@@ -43,6 +43,7 @@ file that was distributed with this source code.
                     {% endif %}
                     {% if app.user.hasRole('ROLE_ADMIN_CMS') and page.route is not null %}
                         <span><code class="pull-right">{{ page.route.name }}</code></span>
+                        <span><code style="margin: 0 10px;" class="pull-right">{{ page.template }}</code></span>
                     {% endif %}
                     {% if page.declinations.count > 0 %}
                         <div class="declinations">

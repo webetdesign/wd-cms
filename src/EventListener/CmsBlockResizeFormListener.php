@@ -6,15 +6,15 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Factory\BlockFactory;
-use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class CmsBlockResizeFormListener extends ResizeFormListener
 {
 
     public function __construct(
-        private TemplateFactoryInterface $templateFactory,
-        private BlockFactory $blockFactory,
+        private readonly TemplateRegistry $templateRegistry,
+        private readonly BlockRegistry $blockRegistry,
         string $type,
         array $options = [],
         bool $allowAdd = false,
@@ -58,9 +58,9 @@ class CmsBlockResizeFormListener extends ResizeFormListener
                 }
 
                 if (isset($template)) {
-                    $tpl     = $this->templateFactory->get($template);
+                    $tpl     = $this->templateRegistry->get($template);
                     $config  = $tpl->getBlock($value->getCode());
-                    $block   = $config ? $this->blockFactory->get($config) : null;
+                    $block   = $config ? $this->blockRegistry->get($config) : null;
                     $options = array_merge($this->options, ['block' => $block, 'config' => $config]);
 
                     $form->add($name, $this->type, array_replace([

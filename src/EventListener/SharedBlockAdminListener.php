@@ -2,23 +2,23 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
-use WebEtDesign\CmsBundle\Factory\SharedBlockFactory;
-use Doctrine\ORM\EntityManager;
 use Sonata\AdminBundle\Event\PersistenceEvent;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class SharedBlockAdminListener
 {
-    protected SharedBlockFactory $sharedBlockFactory;
-    protected EntityManager      $em;
+    protected TemplateRegistry $templateRegistry;
+    protected EntityManagerInterface      $em;
 
     public function __construct(
-        SharedBlockFactory $sharedBlockFactory,
-        EntityManager $em,
+        TemplateRegistry $templateRegistry,
+        EntityManagerInterface $em,
     ) {
-        $this->sharedBlockFactory = $sharedBlockFactory;
-        $this->em                 = $em;
+        $this->templateRegistry = $templateRegistry;
+        $this->em               = $em;
     }
 
     // create page form template configuration
@@ -30,7 +30,7 @@ class SharedBlockAdminListener
             return;
         }
 
-        $config = $this->sharedBlockFactory->get($block->getTemplate());
+        $config = $this->templateRegistry->get($block->getTemplate());
 
         $duplicate = $this->em->getRepository(CmsSharedBlock::class)
             ->findDuplicate($block->getTemplate());

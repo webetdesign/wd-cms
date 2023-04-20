@@ -7,19 +7,19 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use WebEtDesign\CmsBundle\Factory\BlockFactory;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 
 class BlocksBlockType extends AbstractType
 {
-    public function __construct(private BlockFactory $blockFactory) { }
+    public function __construct(private BlockRegistry $blockRegistry) { }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['base_block_config']) {
-            $block = $this->blockFactory->get($options['base_block_config']);
+            $block = $this->blockRegistry->get($options['base_block_config']);
 
             foreach ($block->getBlocks() as $blockConfig) {
-                $childBlock = $this->blockFactory->get($blockConfig);
+                $childBlock = $this->blockRegistry->get($blockConfig);
 
                 $opts = $childBlock->getFormOptions();
 
@@ -38,12 +38,12 @@ class BlocksBlockType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $block = $this->blockFactory->get($options['base_block_config']);
+        $block = $this->blockRegistry->get($options['base_block_config']);
         $configs = [];
         $blocks = [];
         foreach ($block->getBlocks() as $blockDefinition) {
             $configs[$blockDefinition->getCode()] = $blockDefinition;
-            $blocks[$blockDefinition->getCode()] = $this->blockFactory->get($blockDefinition);
+            $blocks[$blockDefinition->getCode()] = $this->blockRegistry->get($blockDefinition);
         }
 
         $view->vars['blocks'] = $blocks;

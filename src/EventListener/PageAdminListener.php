@@ -2,50 +2,46 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use WebEtDesign\CmsBundle\CmsTemplate\AbstractPage;
+use Symfony\Component\Routing\RouterInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
-use WebEtDesign\CmsBundle\Factory\TemplateFactoryInterface;
 use Doctrine\ORM\EntityManager;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use function Symfony\Component\String\u;
 
 class PageAdminListener
 {
-    protected TemplateFactoryInterface $templateFactory;
-    protected EntityManager            $em;
-    protected Router                   $router;
-    protected Filesystem               $fs;
-    protected KernelInterface          $kernel;
-    protected string                   $routeClass;
-    protected array                    $configCms;
-    protected ContainerInterface       $container;
-    protected ParameterBagInterface    $parameterBag;
+    protected TemplateRegistry       $templateRegistry;
+    protected EntityManagerInterface $em;
+    protected RouterInterface        $router;
+    protected Filesystem             $fs;
+    protected KernelInterface        $kernel;
+    protected string                 $routeClass;
+    protected array                  $configCms;
+    protected ParameterBagInterface  $parameterBag;
 
     public function __construct(
-        TemplateFactoryInterface $templateFactory,
-        EntityManager $em,
-        Router $router,
+        TemplateRegistry $templateFactory,
+        EntityManagerInterface $em,
+        RouterInterface $router,
         Filesystem $fs,
         KernelInterface $kernel,
         ParameterBagInterface $parameterBag,
-        ContainerInterface $container
     ) {
-        $this->templateFactory = $templateFactory;
-        $this->em              = $em;
-        $this->router          = $router;
-        $this->fs              = $fs;
-        $this->kernel          = $kernel;
-        $this->container       = $container;
-        $this->parameterBag    = $parameterBag;
-        $this->configCms       = $this->parameterBag->get('wd_cms.cms');
-        $this->routeClass      = CmsRoute::class;
+        $this->templateRegistry = $templateFactory;
+        $this->em               = $em;
+        $this->router           = $router;
+        $this->fs               = $fs;
+        $this->kernel           = $kernel;
+        $this->parameterBag     = $parameterBag;
+        $this->configCms        = $this->parameterBag->get('wd_cms.cms');
+        $this->routeClass       = CmsRoute::class;
     }
 
     // create page form template configuration
@@ -56,7 +52,7 @@ class PageAdminListener
         if (!$page instanceof CmsPage) {
             return;
         }
-        $config = $this->templateFactory->get($page->getTemplate());
+        $config = $this->templateRegistry->get($page->getTemplate());
 
         if (!$page->dontImportContent) {
             // hydrate content
@@ -81,7 +77,7 @@ class PageAdminListener
             return;
         }
 
-        $config = $this->templateFactory->get($page->getTemplate());
+        $config = $this->templateRegistry->getTemplate($page->getTemplate());
 
         if ($config->isSection() || $page->getRoute() != null || !$page->initRoute) {
             return;
@@ -101,7 +97,7 @@ class PageAdminListener
             return;
         }
 
-        $config = $this->templateFactory->get($page->getTemplate());
+        $config = $this->templateRegistry->get($page->getTemplate());
 
         if (!$config->isSection() && $page->getRoute() === null && $page->initRoute) {
             $this->createRoute($config, $page);

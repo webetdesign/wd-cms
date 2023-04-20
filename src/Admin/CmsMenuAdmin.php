@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
@@ -19,29 +18,17 @@ use function in_array;
 
 final class CmsMenuAdmin extends AbstractAdmin
 {
-    private   EntityManager $em;
-
-    /**
-     * CmsMenuAdmin constructor.
-     * @param string $code
-     * @param string $class
-     * @param string $baseControllerName
-     * @param EntityManager $em
-     */
     public function __construct(
-        string $code,
-        string $class,
-        string $baseControllerName,
-        EntityManager $em,
+        private EntityManagerInterface $em,
     ) {
-        $this->em           = $em;
-        parent::__construct($code, $class, $baseControllerName);
+        parent::__construct();
     }
+
 
     /**
      * @inheritDoc
      */
-    public function configureActionButtons(array $list, string $action, ?object $object = null): array
+    protected function configureActionButtons(array $list, string $action, ?object $object = null): array
     {
 
         if ($action === 'tree'
@@ -90,7 +77,7 @@ final class CmsMenuAdmin extends AbstractAdmin
         $action,
         AdminInterface $childAdmin = null
     ) {
-        $admin   = $this->isChild() ? $this->getParent() : $this;
+        $admin = $this->isChild() ? $this->getParent() : $this;
 
         if (!$childAdmin && in_array($action, ['list', 'tree'])) {
             $sites = $this->em->getRepository(CmsSite::class)->findAll();

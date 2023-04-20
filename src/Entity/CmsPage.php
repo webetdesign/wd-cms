@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Entity;
 
@@ -13,6 +14,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 use JetBrains\PhpStorm\ArrayShape;
 use WebEtDesign\CmsBundle\Handler\CmsPageSlugHandler;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
+use WebEtDesign\SeoBundle\Entity\SeoAwareTrait;
 use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
 use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
@@ -21,9 +23,9 @@ use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
  * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageRepository")
  * @ORM\Table(name="cms__page")
  */
-#[Gedmo\Tree(type: "nested")]
+#[Gedmo\Tree(type: 'nested')]
 #[ORM\Entity(repositoryClass: CmsPageRepository::class)]
-#[ORM\Table(name: "cms__page")]
+#[ORM\Table(name: 'cms__page')]
 class CmsPage
 {
     use SeoAwareTrait;
@@ -63,8 +65,8 @@ class CmsPage
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="page", cascade={"persist", "remove"})
      * @ORM\OrderBy({"position" = "ASC"})
      */
-    #[ORM\OneToMany(targetEntity: CmsContent::class, mappedBy: "page", cascade: ["persist", "remove"])]
-    #[ORM\OrderBy(["position" => "ASC"])]
+    #[ORM\OneToMany(mappedBy: 'page', targetEntity: CmsContent::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['position' => 'ASC'])]
     private PersistentCollection|ArrayCollection $contents;
 
     /**
@@ -73,8 +75,8 @@ class CmsPage
      * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsRoute", inversedBy="page", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="route_id", referencedColumnName="id", onDelete="CASCADE"))
      */
-    #[ORM\OneToOne(targetEntity: CmsRoute::class, inversedBy: "page", cascade: ["persist", "remove"])]
-    #[ORM\JoinColumn(name: "route_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\OneToOne(targetEntity: CmsRoute::class, inversedBy: 'page', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'route_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?CmsRouteInterface $route = null;
 
     /**
@@ -86,7 +88,7 @@ class CmsPage
      *
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
-    #[Gedmo\Slug(fields: ["title"], unique: false)]
+    #[Gedmo\Slug(fields: ['title'], unique: false)]
     #[Gedmo\SlugHandler(class: CmsPageSlugHandler::class)]
     private ?string $slug = null;
 
@@ -99,11 +101,11 @@ class CmsPage
     private ?string $breadcrumb = null;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(type="boolean", options={"default" = 0})
      */
-    #[ORM\Column(type: Types::BOOLEAN, options: ["default" => 0])]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $active = false;
 
     /**
@@ -122,9 +124,9 @@ class CmsPage
      * )
      */
     #[ORM\ManyToMany(targetEntity: CmsPage::class)]
-    #[ORM\JoinTable(name: "cms__page_has_page")]
-    #[ORM\JoinColumn(name: "page_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    #[ORM\InverseJoinColumn(name: "associated_page_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\JoinTable(name: 'cms__page_has_page')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'associated_page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Collection $crossSitePages;
 
     private mixed $referencePage;
@@ -133,14 +135,14 @@ class CmsPage
      * @var ArrayCollection|Collection
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", mappedBy="page", cascade={"persist", "remove"})
      */
-    #[ORM\OneToMany(targetEntity: CmsPageDeclination::class, mappedBy: "page", cascade: ["persist", "remove"])]
+    #[ORM\OneToMany(targetEntity: CmsPageDeclination::class, mappedBy: 'page', cascade: ['persist', 'remove'])]
     private Collection|ArrayCollection $declinations;
 
     /**
      * @var ArrayCollection|Collection
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="page")
      */
-    #[ORM\OneToMany(targetEntity: CmsMenuItem::class, mappedBy: "page")]
+    #[ORM\OneToMany(targetEntity: CmsMenuItem::class, mappedBy: 'page')]
     private Collection|ArrayCollection $menuItems;
 
     /**
@@ -149,8 +151,8 @@ class CmsPage
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="pages")
      * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: "pages")]
-    #[ORM\JoinColumn(name: "site_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: 'pages')]
+    #[ORM\JoinColumn(name: 'site_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private CmsSite $site;
 
     /**
@@ -158,7 +160,7 @@ class CmsPage
      * @ORM\Column(name="lft", type="integer")
      */
     #[Gedmo\TreeLeft]
-    #[ORM\Column(name: "lft", type: Types::INTEGER)]
+    #[ORM\Column(name: 'lft', type: Types::INTEGER)]
     private ?int $lft = null;
 
     /**
@@ -166,7 +168,7 @@ class CmsPage
      * @ORM\Column(name="lvl", type="integer")
      */
     #[Gedmo\TreeLevel]
-    #[ORM\Column(name: "lvl", type: Types::INTEGER)]
+    #[ORM\Column(name: 'lvl', type: Types::INTEGER)]
     private ?int $lvl = null;
 
     /**
@@ -174,7 +176,7 @@ class CmsPage
      * @ORM\Column(name="rgt", type="integer")
      */
     #[Gedmo\TreeRight]
-    #[ORM\Column(name: "rgt", type: Types::INTEGER)]
+    #[ORM\Column(name: 'rgt', type: Types::INTEGER)]
     private ?int $rgt = null;
 
     /**
@@ -183,8 +185,8 @@ class CmsPage
      * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
      */
     #[Gedmo\TreeRoot]
-    #[ORM\ManyToOne(targetEntity: "CmsPage")]
-    #[ORM\JoinColumn(name: "tree_root", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\ManyToOne(targetEntity: 'CmsPage')]
+    #[ORM\JoinColumn(name: 'tree_root', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?CmsPage $root = null;
 
     /**
@@ -193,15 +195,15 @@ class CmsPage
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      */
     #[Gedmo\TreeParent]
-    #[ORM\ManyToOne(targetEntity: "CmsPage", inversedBy: "children")]
-    #[ORM\JoinColumn(name: "parent_id", referencedColumnName: "id")]
+    #[ORM\ManyToOne(targetEntity: 'CmsPage', inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
     private ?CmsPage $parent = null;
 
     /**
      * @var ArrayCollection|Collection
      * @ORM\OneToMany(targetEntity="CmsPage", mappedBy="parent", cascade={"remove"})
      */
-    #[ORM\OneToMany(mappedBy: "parent", targetEntity: "CmsPage", cascade: ["remove"])]
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'CmsPage', cascade: ['remove'])]
     private Collection|ArrayCollection $children;
 
     private ?string $moveMode = null;
@@ -230,7 +232,7 @@ class CmsPage
         $this->setMoveTarget($values['moveTarget']);
     }
 
-    #[ArrayShape(['moveMode' => "mixed|null|string", 'moveTarget' => "mixed|null"])] public function getPosition()
+    #[ArrayShape(['moveMode' => 'mixed|null|string', 'moveTarget' => 'mixed|null'])] public function getPosition()
     {
         return [
             'moveMode' => $this->getMoveMode(),

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 
 namespace WebEtDesign\CmsBundle\Command;
@@ -12,7 +13,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CmsMenuIconSetGeneratorCommand extends Command
 {
-    protected static $defaultName = 'cms:menu:icon-set-generator';
     private array    $iconSet;
 
     public function __construct(
@@ -27,6 +27,7 @@ class CmsMenuIconSetGeneratorCommand extends Command
     protected function configure()
     {
         $this
+            ->setName('cms:menu:icon-set-generator')
             ->setDescription('')
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
             ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');

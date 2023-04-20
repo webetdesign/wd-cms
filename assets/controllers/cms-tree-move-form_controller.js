@@ -10,6 +10,14 @@ export default class extends Controller {
     console.log('la');
     const opts = this.selectTarget.querySelector('[value="' + this.selectTarget.value + '"]');
     this.toggleRadio(opts.dataset.customProperties == 1);
+
+    const choices = new Choices(this.selectTarget, {
+      allowHTML: true,
+      shouldSort: false,
+      fuseOptions: {
+        includeScore: false
+      },
+    });
   }
 
   change(e) {

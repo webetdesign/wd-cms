@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
@@ -8,11 +9,11 @@ use LogicException;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
+use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Admin\Pool;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\LockException;
 use Sonata\AdminBundle\Exception\ModelManagerException;
-use Sonata\AdminBundle\Form\Type\Operator\ContainsOperatorType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,38 +21,25 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use WebEtDesign\CmsBundle\Admin\CmsPageDeclinationAdmin;
+use Twig\Environment;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Form\MoveForm;
-use function count;
-use function is_array;
 
 class CmsPageAdminController extends CRUDController
 {
 
-    private RequestStack            $requestStack;
-    private CmsPageDeclinationAdmin $declinationAdmin;
-    private Pool                    $pool;
-    private EntityManagerInterface  $em;
+    private AdminInterface $declinationAdmin;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param CmsPageDeclinationAdmin $declinationAdmin
-     * @param Pool $pool
-     */
     public function __construct(
-        RequestStack $requestStack,
-        CmsPageDeclinationAdmin $declinationAdmin,
-        Pool $pool,
-        EntityManagerInterface $entityManager,
+        protected RequestStack $requestStack,
+        protected Pool $pool,
+        protected EntityManagerInterface $em,
+        protected Environment $twig,
     ) {
-        $this->requestStack           = $requestStack;
-        $this->declinationAdmin       = $declinationAdmin;
-        $this->pool                   = $pool;
-        $this->em                     = $entityManager;
+        $this->declinationAdmin = $this->pool->getAdminByClass(CmsPageDeclination::class);
     }
 
     protected function preList(Request $request): ?Response
@@ -60,11 +48,9 @@ class CmsPageAdminController extends CRUDController
         return null;
     }
 
-    public function moveAction(Request $request, $childId)
+    public function moveAction(Request $request, $childId): RedirectResponse|JsonResponse|Response
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $object = $em->getRepository(CmsPage::class)->find($childId);
+        $object = $this->em->getRepository(CmsPage::class)->find($childId);
 
         $object->setMoveTarget($object->getRoot());
 
@@ -105,7 +91,7 @@ class CmsPageAdminController extends CRUDController
             ]);
     }
 
-    public function treeAction($id = null)
+    public function treeAction($id = null): Response
     {
 
         $request = $this->requestStack->getCurrentRequest();
@@ -186,7 +172,7 @@ class CmsPageAdminController extends CRUDController
         if (!$parent) {
             $site = null;
             if ($session->get('admin_current_site_id')) {
-                $id = $session->get('admin_current_site_id');
+                $id   = $session->get('admin_current_site_id');
                 $site = $this->em->find(CmsSite::class, $id);
             }
 
@@ -198,7 +184,7 @@ class CmsPageAdminController extends CRUDController
         }
 
         $siteAdmin = $this->pool->getAdminByClass(CmsSite::class);
-        $url = $siteAdmin->generateUrl('cms.admin.cms_page.tree', ['id' => $site->getId()]);
+        $url       = $siteAdmin->generateUrl('cms.admin.cms_page.tree', ['id' => $site->getId()]);
 
         return $this->redirect($url);
     }
@@ -213,14 +199,12 @@ class CmsPageAdminController extends CRUDController
     {
         $id = $request->get($this->admin->getIdParameter(), null);
 
-        /** @var EntityManagerInterface $em */
-        $em = $this->getDoctrine();
         if ($id === null) {
             /** @var CmsSite $site */
-            $site = $em->getRepository(CmsSite::class)->getDefault();
+            $site = $this->em->getRepository(CmsSite::class)->getDefault();
         } else {
             /** @var CmsSite $site */
-            $site = $em->getRepository(CmsSite::class)->find($id);
+            $site = $this->em->getRepository(CmsSite::class)->find($id);
         }
         // the key used to lookup the template
         $templateKey = 'edit';
@@ -262,8 +246,7 @@ class CmsPageAdminController extends CRUDController
             }
 
             $refPage->addCrossSitePage($newObject);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($refPage);
+            $this->em->persist($refPage);
         }
 
         $preResponse = $this->preCreate($request, $newObject);
@@ -345,8 +328,7 @@ class CmsPageAdminController extends CRUDController
 
         $formView = $form->createView();
         // set the theme for the current Admin Form
-        $twig = $this->get('twig');
-        $twig->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFormTheme());
+        $this->twig->getRuntime(FormRenderer::class)->setTheme($formView, $this->admin->getFormTheme());
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
@@ -468,11 +450,10 @@ class CmsPageAdminController extends CRUDController
         $formView = $form->createView();
         // set the theme for the current Admin Form
         //        $this->setFormTheme($formView, $this->admin->getFormTheme());
-        $twig      = $this->get('twig');
         $formTheme = array_merge($this->admin->getFormTheme(), [
             '@WebEtDesignCms/form/cms_multilingual_type.html.twig'
         ]);
-        $twig->getRuntime(FormRenderer::class)->setTheme($formView, $formTheme);
+        $this->twig->getRuntime(FormRenderer::class)->setTheme($formView, $formTheme);
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
@@ -504,7 +485,7 @@ class CmsPageAdminController extends CRUDController
 
     protected function moveItems($submittedObject)
     {
-        $CmsRepo = $this->getDoctrine()->getRepository(CmsPage::class);
+        $CmsRepo = $this->em->getRepository(CmsPage::class);
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':
@@ -541,7 +522,7 @@ class CmsPageAdminController extends CRUDController
                 break;
         }
 
-        $this->getDoctrine()->getManager()->flush();
+        $this->em->flush();
     }
 
     /**
@@ -592,12 +573,12 @@ class CmsPageAdminController extends CRUDController
         return new RedirectResponse($url);
     }
 
-    public function redirectToTree()
+    public function redirectToTree(): RedirectResponse
     {
         return $this->redirect($this->admin->generateUrl('tree'));
     }
 
-    public function duplicateAction()
+    public function duplicateAction(): RedirectResponse|Response
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -654,8 +635,8 @@ class CmsPageAdminController extends CRUDController
                 $newCmsPage) : $site->getRootPage());
             $newCmsPage = $this->copyContent($existingCmsPage, $newCmsPage);
 
-            $this->getDoctrine()->getManager()->persist($newCmsPage);
-            $this->getDoctrine()->getManager()->flush();
+            $this->em->persist($newCmsPage);
+            $this->em->flush();
 
             $this->addFlash(
                 'sonata_flash_success',
@@ -672,7 +653,7 @@ class CmsPageAdminController extends CRUDController
         ], null);
     }
 
-    private function copyDeclination(CmsPageDeclination $declination, CmsPage $page)
+    private function copyDeclination(CmsPageDeclination $declination, CmsPage $page): CmsPage
     {
         $newDeclination = clone $declination;
         $contents       = $newDeclination->getContents();
@@ -683,7 +664,7 @@ class CmsPageAdminController extends CRUDController
             $nc = clone $content;
             $nc->setId(null);
             $nc->setDeclination($declination);
-            $this->getDoctrine()->getManager()->persist($nc);
+            $this->em->persist($nc);
             $newDeclination->addContent($nc);
         }
 
@@ -692,7 +673,7 @@ class CmsPageAdminController extends CRUDController
         return $page;
     }
 
-    private function copyContent(CmsPage $origin, CmsPage $page)
+    private function copyContent(CmsPage $origin, CmsPage $page): CmsPage
     {
         foreach ($origin->getContents() as $cmsContent) {
             /** @var CmsContent $newContent */
@@ -700,7 +681,7 @@ class CmsPageAdminController extends CRUDController
             $newContent->setId(null);
             $newContent->setPage($page);
 
-            $this->getDoctrine()->getManager()->persist($newContent);
+            $this->em->persist($newContent);
             $page->addContent($newContent);
         }
 
@@ -712,7 +693,7 @@ class CmsPageAdminController extends CRUDController
      * @param CmsPage $dest
      * @return CmsPage
      */
-    private function getParentPage(CmsPage $src, CmsPage $dest)
+    private function getParentPage(CmsPage $src, CmsPage $dest): CmsPage
     {
         if ($src->getSite()->getId() === $dest->getSite()->getId()) {
             return $src->getParent();

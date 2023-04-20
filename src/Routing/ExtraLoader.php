@@ -2,15 +2,19 @@
 
 namespace WebEtDesign\CmsBundle\Routing;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class ExtraLoader implements LoaderInterface
 {
@@ -18,28 +22,21 @@ class ExtraLoader implements LoaderInterface
 
     protected ?EntityManager $em = null;
 
-    protected ?ContainerBagInterface $parameterBag = null;
-    private ?array                   $cmsConfig;
-
     protected ?LoaderResolverInterface $resolver;
 
-    protected PageFactory $pageFactory;
-    
+    protected TemplateRegistry $templateRegistry;
+
     /**
      * ExtraLoader constructor.
      * @param EntityManager $entityManager
-     * @param ContainerBagInterface $parameterBag
+     * @param TemplateRegistry $templateRegistry
      */
     public function __construct(
-        EntityManager $entityManager,
-        ContainerBagInterface $parameterBag,
-        PageFactory $pageFactory,
-        $cmsConfig
+        EntityManagerInterface $entityManager,
+        TemplateRegistry $templateRegistry,
     ) {
-        $this->em           = $entityManager;
-        $this->parameterBag = $parameterBag;
-        $this->cmsConfig    = $cmsConfig;
-        $this->pageFactory    = $pageFactory;
+        $this->em               = $entityManager;
+        $this->templateRegistry = $templateRegistry;
     }
 
     public function load($resource, $type = null): RouteCollection
@@ -63,7 +60,7 @@ class ExtraLoader implements LoaderInterface
             if ($cmsRoute->getPage() == null || $cmsRoute->getPage()->getRoot() == null || !$cmsRoute->getPage()->getActive()) {
                 continue;
             }
-            
+
             //            /** @var CmsSite $cmsSite */
             $cmsSite = $cmsRoute->getPage()->getRoot()->getSite();
             if ($cmsSite) {
@@ -71,8 +68,7 @@ class ExtraLoader implements LoaderInterface
                 $host       = !empty($cmsSite->getHost()) ? $cmsSite->getHost() : null;
                 if (isset($_ENV['MULTISITE_LOCALHOST'])
                     && filter_var($_ENV['MULTISITE_LOCALHOST'], FILTER_VALIDATE_BOOLEAN)
-                    && !empty($cmsSite->getLocalhost()))
-                {
+                    && !empty($cmsSite->getLocalhost())) {
                     $host = $cmsSite->getLocalhost();
                 }
             }
@@ -102,31 +98,24 @@ class ExtraLoader implements LoaderInterface
                 }
             }
 
-            if ($this->parameterBag->get('wd_cms.cms.page_extension')) {
-                if ($pattern !== '/' && strpos($pattern, '.{extension}') === false) {
-                    $pattern               .= '.{extension}';
-                    $defaults['extension'] = '';
-                }
-            }
-            
             $route = new Route($pattern, $defaults, $requirements ?? []);
             if (!empty($host)) {
                 $route->setHost($host);
             }
             $route->setMethods($cmsRoute->getMethods());
-            
+
             $priority = 0;
             try {
-                $pageConfig = $this->pageFactory->get($cmsRoute->getPage()->getTemplate());
+                $pageConfig     = $this->templateRegistry->get($cmsRoute->getPage()->getTemplate());
                 $routeDefnition = $pageConfig->getRoute();
                 if ($routeDefnition !== null) {
                     $priority = $routeDefnition->getPriority();
-                } 
-            }catch (Exception $e){
-                
+                }
+            } catch (Exception $e) {
+
             }
-            
-            
+
+
             preg_match_all('/\{(\w+)\}/', $cmsRoute->getPath(), $matches);
             $routes [] = [
                 'nbParams' => count($matches[1]),

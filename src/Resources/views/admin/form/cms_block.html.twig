@@ -58,10 +58,10 @@
                             {% if form.value is defined %}
                                 {% if block.options.use_row %}
                                     <div class="row">
-                                        {{ form_row(form.value) }}
+                                        {{ form_widget(form.value) }}
                                     </div>
                                 {% else %}
-                                    {{ form_row(form.value) }}
+                                    {{ form_widget(form.value) }}
                                 {% endif %}
                             {% elseif form.translations is defined %}
                                 {{ form_row(form.translations) }}

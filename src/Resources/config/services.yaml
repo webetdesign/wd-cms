@@ -30,12 +30,6 @@ services:
   # MISCELLANEOUS
   # ===============================================
 
-  WebEtDesign\CmsBundle\Factory\BlockFactory:
-    autoconfigure: false
-    arguments:
-      twig: '@twig'
-      em: '@doctrine.orm.entity_manager'
-
   WebEtDesign\CmsBundle\EventListener\CmsBlockResizeFormListener:
     autoconfigure: false
   WebEtDesign\CmsBundle\EventListener\CmsDynamicBlockResizeFormListener:
@@ -47,20 +41,11 @@ services:
         template: '@WebEtDesignCms/collectors/template.html.twig'
         id: 'cms.collector'
     arguments:
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
-      - '@cms.helper'
-      - '@sonata.admin.pool'
-      - '@twig'
-      - '@twig.profile'
-      - '@WebEtDesign\CmsBundle\Repository\CmsContentRepository'
-      - '@Symfony\Component\Routing\RouterInterface'
-      - '%wd_cms.cms%'
+      $profile: '@twig.profile'
 
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
-    arguments: [ '@doctrine.orm.entity_manager', '@parameter_bag', '@WebEtDesign\CmsBundle\Factory\PageFactory', '%wd_cms.cms%' ]
     tags:
       - { name: routing.loader }
 
@@ -80,15 +65,6 @@ services:
       - '%security.role_hierarchy.roles%'
 
   WebEtDesign\CmsBundle\Services\CmsHelper:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@twig'
-      - "@security.authorization_checker"
-      - '@security.role_hierarchy'
-      - '@security.token_storage'
-      - '@parameter_bag'
-      - '@request_stack'
     public: true
 
   cms.helper:
@@ -110,16 +86,17 @@ services:
   # CKEditor Renderer
   # ===============================================
 
-  fos_ck_editor.renderer:
-    class: WebEtDesign\CmsBundle\Services\CKEditorRenderer
-    arguments:
-      - '@fos_ck_editor.builder.json_builder'
-      - '@router'
-      - '@assets.packages'
-      - '@request_stack'
-      - "@=container.has('twig') ? container.get('twig') : container.get('templating')"
-      - "@=container.hasParameter('locale') ? parameter('locale') : null"
-    public: true
+# Uncomment : MAJ sf6, obselet
+#  fos_ck_editor.renderer:
+#    class: WebEtDesign\CmsBundle\Services\CKEditorRenderer
+#    arguments:
+#      - '@fos_ck_editor.builder.json_builder'
+#      - '@router'
+#      - '@assets.packages'
+#      - '@request_stack'
+#      - "@=container.has('twig') ? container.get('twig') : container.get('templating')"
+#      - "@=container.hasParameter('locale') ? parameter('locale') : null"
+#    public: true
 
   # ===============================================
   # TWIG EXTENSION
@@ -127,26 +104,6 @@ services:
 
   cms.twig.extension:
     class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@router'
-      - '@service_container'
-      - '@twig'
-      - '@WebEtDesign\CmsBundle\Factory\PageFactory'
-      - '@WebEtDesign\CmsBundle\Factory\SharedBlockFactory'
-      - '@request_stack'
-      - '@parameter_bag'
-      - '@WebEtDesign\MediaBundle\Services\WDMediaService'
-      - '@WebEtDesign\CmsBundle\Services\WDDeclinationService'
-      - '@WebEtDesign\CmsBundle\Factory\BlockFactory'
-      - '@WebEtDesign\CmsBundle\Services\CmsHelper'
     tags:
       - { name: twig.extension }
     public: true
-
-
-
-  WebEtDesign\CmsBundle\Controller\SitemapController:
-    arguments:
-      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
-    tags: [ 'controller.service_arguments' ]

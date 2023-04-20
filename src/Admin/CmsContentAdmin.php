@@ -1,11 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use Doctrine\ORM\EntityManager;
 use Exception;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
@@ -19,37 +18,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\CallbackTransformer;
 use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
-use WebEtDesign\CmsBundle\Services\AbstractCustomContent;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
-    protected EntityManager $em;
     protected ?array $customContents;
-    protected Container $container;
-
-    /**
-     * CmsContentAdmin constructor.
-     * @param string $code
-     * @param string $class
-     * @param string $baseControllerName
-     * @param EntityManager $em
-     * @param $contentTypeOption
-     * @param Container $container
-     */
-    public function __construct(
-        string $code,
-        string $class,
-        string $baseControllerName,
-        EntityManager $em,
-        $contentTypeOption,
-        Container $container,
-    ) {
-        $this->em             = $em;
-        $this->customContents = $contentTypeOption;
-        $this->container      = $container;
-
-        parent::__construct($code, $class, $baseControllerName);
-    }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
@@ -205,25 +177,6 @@ final class CmsContentAdmin extends AbstractAdmin
                     ));
 
                     break;
-            }
-
-            foreach ($this->customContents as $content => $configuration) {
-                if ($subject->getType() === $content) {
-                    /** @var AbstractCustomContent $contentService */
-                    $contentService = $this->container->get($configuration['service']);
-                    $contentService->setContentOptions($options);
-                    $formMapper->add(
-                        'value',
-                        $contentService->getFormType(),
-                        $contentService->getFormOptions()
-                    );
-
-                    if (method_exists($contentService, 'getEventSubscriber')) {
-                        $formMapper->getFormBuilder()->get('value')->addEventSubscriber($contentService->getEventSubscriber());
-                    }
-
-                    $formMapper->getFormBuilder()->get('value')->addModelTransformer($contentService->getCallbackTransformer());
-                }
             }
         }
     }

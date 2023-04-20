@@ -1,15 +1,19 @@
 <?php
+declare(strict_types=1);
 
 
 namespace WebEtDesign\CmsBundle\Collectors;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use ReflectionClass;
 use Sonata\AdminBundle\Admin\AdminInterface;
 use Sonata\AdminBundle\Admin\Pool;
 use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -19,8 +23,8 @@ use Twig\Error\LoaderError;
 use Twig\Profiler\Profile;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use WebEtDesign\CmsBundle\Factory\BlockFactory;
-use WebEtDesign\CmsBundle\Factory\PageFactory;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
 use WebEtDesign\CmsBundle\Services\CmsHelper;
 
@@ -28,38 +32,59 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
 {
     protected $data;
 
-    private CmsHelper            $cmsHelper;
-    private array                $cmsConfig;
-    private PageFactory          $pageFactory;
-    private AdminInterface       $cmsPageAdmin;
-    protected AdminInterface     $cmsPageDeclinationAdmin;
-    private Environment          $twig;
-    private Profile              $profile;
-    private BlockFactory         $blockFactory;
-    private CmsContentRepository $cmsContentRepository;
-    private RouterInterface      $router;
+    private CmsHelper              $cmsHelper;
+    private array                  $cmsConfig;
+    private TemplateRegistry       $pageFactory;
+    private AdminInterface         $cmsPageAdmin;
+    protected AdminInterface       $cmsPageDeclinationAdmin;
+    private Environment            $twig;
+    private Profile                $profile;
+    private BlockRegistry          $blockRegistry;
+    private CmsContentRepository   $cmsContentRepository;
+    private RouterInterface        $router;
+    private ParameterBagInterface  $parameterBag;
+    private RequestStack           $requestStack;
+    private EntityManagerInterface $em;
 
+    /**
+     * @param TemplateRegistry $templateRegistry
+     * @param BlockRegistry $blockRegistry
+     * @param CmsHelper $cmsHelper
+     * @param Pool $adminPool
+     * @param Environment $twig
+     * @param Profile $profile
+     * @param CmsContentRepository $cmsContentRepository
+     * @param RouterInterface $router
+     * @param ParameterBagInterface $parameterBag
+     * @param RequestStack $requestStack
+     * @param EntityManagerInterface $em
+     */
     public function __construct(
-        PageFactory $pageFactory,
-        BlockFactory $blockFactory,
+        TemplateRegistry $templateRegistry,
+        BlockRegistry $blockRegistry,
         CmsHelper $cmsHelper,
         Pool $adminPool,
         Environment $twig,
         Profile $profile,
         CmsContentRepository $cmsContentRepository,
         RouterInterface $router,
-        $cmsConfig
+        ParameterBagInterface $parameterBag,
+        RequestStack $requestStack,
+        EntityManagerInterface $em,
     ) {
-        $this->pageFactory             = $pageFactory;
+        $this->pageFactory             = $templateRegistry;
         $this->cmsHelper               = $cmsHelper;
-        $this->cmsConfig               = $cmsConfig;
+        $this->cmsConfig               = $parameterBag->get('wd_cms.cms');
         $this->cmsPageAdmin            = $adminPool->getAdminByClass(CmsPage::class);
         $this->cmsPageDeclinationAdmin = $adminPool->getAdminByClass(CmsPageDeclination::class);
         $this->twig                    = $twig;
         $this->profile                 = $profile;
-        $this->blockFactory            = $blockFactory;
+        $this->blockRegistry           = $blockRegistry;
         $this->cmsContentRepository    = $cmsContentRepository;
         $this->router                  = $router;
+        $this->parameterBag            = $parameterBag;
+        $this->requestStack            = $requestStack;
+        $this->em                      = $em;
     }
 
     /**
@@ -67,9 +92,10 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
      */
     public function collect(Request $request, Response $response, Throwable $exception = null)
     {
+
         /** @var CmsPage $page */
-        $page = $this->cmsHelper->getPage();
-        if ($page) {
+        $page = $this->getPage();
+        if ($page && $page->getTemplate()) {
 
             try {
                 $service = $this->pageFactory->get($page->getTemplate());
@@ -88,7 +114,9 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
                 $addDeclinationUrl  = $this->router->generate('admin_webetdesign_cms_cmssite_cmspage_cmspagedeclination_create',
                     ['id' => $page->getSite()->getId(), 'childId' => $page->getId()]);
             }
-            $editUrl = $this->cmsPageAdmin->generateUrl('edit', ['id' => $page->getId()]);
+            $editUrl = $this->router->generate('admin_webetdesign_cms_cmssite_cmspage_edit', [
+                'id' => $page->getSite()->getId(), 'childId' => $page->getId()
+            ]);
 
             $this->data = [
                 'page'               => $page,
@@ -105,11 +133,11 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
 
             $blocks = [];
             foreach ($this->cmsContentRepository->findBy(['page' => $this->data['page']]) as $content) {
-                $config  = $this->data['service']->getBlock($content->getCode());
+                $config = $this->data['service']?->getBlock($content->getCode());
                 if (!$config) {
                     continue;
                 }
-                $block       = $this->blockFactory->get($config);
+                $block       = $this->blockRegistry->get($config);
                 $blockRC     = new ReflectionClass($block);
                 $transformer = $block->getModelTransformer();
 
@@ -156,6 +184,15 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
             }
         };
         $templateFinder($this->profile);
+    }
+
+    public function getPage(): ?CmsPage
+    {
+        if ('admin_webetdesign_cms_cmssite_cmspage_edit' === $this->requestStack->getCurrentRequest()->get('_route')) {
+            return $this->em->find(CmsPage::class, $this->requestStack->getCurrentRequest()->get('childId'));
+        }
+
+        return $this->cmsHelper->getPage();
     }
 
     /**
