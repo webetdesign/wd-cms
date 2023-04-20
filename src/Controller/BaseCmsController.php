@@ -130,6 +130,7 @@ class BaseCmsController extends AbstractController
      */
     public function setPage(?CmsPage $page): BaseCmsController
     {
+        $this->configuration->setCurrentPage($page);
         $this->page = $page;
 
         return $this;
