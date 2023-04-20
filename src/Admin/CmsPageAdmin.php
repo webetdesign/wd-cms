@@ -202,9 +202,6 @@ class CmsPageAdmin extends AbstractAdmin
         /** @var CmsPage $object */
         $object = $this->getSubject();
 
-        /** @var PageInterface $template */
-        $template = $this->templateRegistry->get($object->getTemplate());
-
         $site = $object->getSite();
 
         $form->getFormBuilder()->setAction($this->generateUrl('create',
