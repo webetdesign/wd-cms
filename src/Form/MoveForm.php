@@ -33,7 +33,7 @@ class MoveForm extends AbstractType
                 'choice_attr' => function ($choice, $key, $value) {
                     return [
                         'data-disallow-root' => in_array($choice, ['persistAsNextSiblingOf', 'persistAsPrevSiblingOf']),
-                        'data-allow-root' => in_array($choice, ['persistAsFirstChildOf', 'persistAsLastChildOf'])
+                        'data-allow-root'    => in_array($choice, ['persistAsFirstChildOf', 'persistAsLastChildOf'])
                     ];
                 },
                 'expanded'    => true,
@@ -76,6 +76,9 @@ class MoveForm extends AbstractType
                 'choice_attr'   => function ($choice, $key, $value) {
                     return ['data-custom-properties' => $choice->isRoot() ? 1 : 0];
                 },
+                'attr'          => [
+                    'data-sonata-select2' => "false"
+                ],
                 'label'         => false,
                 'required'      => true,
             ]);
