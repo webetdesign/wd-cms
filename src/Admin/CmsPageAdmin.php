@@ -249,7 +249,7 @@ class CmsPageAdmin extends AbstractAdmin
         //endregion
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
-            $form->getFormBuilder()->setMethod('put');
+//            $form->getFormBuilder()->setMethod('put');
 
             //region Général - additional
             $form

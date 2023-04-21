@@ -14,6 +14,7 @@ use Sonata\AdminBundle\Admin\Pool;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\LockException;
 use Sonata\AdminBundle\Exception\ModelManagerException;
+use Sonata\AdminBundle\Exception\ModelManagerThrowable;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -351,14 +352,11 @@ class CmsPageAdminController extends CRUDController
         // the key used to lookup the template
         $templateKey = 'edit';
 
-        $id = $request->get($this->admin->getIdParameter());
         /** @var CmsPage $existingObject */
-        $existingObject = $this->admin->getObject($id);
+        $existingObject = $this->assertObjectExists($request, true);
+        \assert(null !== $existingObject);
 
-        if (!$existingObject) {
-            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s',
-                $id));
-        }
+        $this->checkParentChildAssociation($request, $existingObject);
 
         $this->admin->checkAccess('edit', $existingObject);
 
@@ -369,23 +367,17 @@ class CmsPageAdminController extends CRUDController
 
         $this->admin->setSubject($existingObject);
         $objectId = $this->admin->getNormalizedIdentifier($existingObject);
+        \assert(null !== $objectId);
 
         $form = $this->admin->getForm();
 
-        if (!is_array($fields = $form->all()) || 0 === count($fields)) {
-            throw new RuntimeException(
-                'No editable field defined. Did you forget to implement the "configureFormFields" method?'
-            );
-        }
-
         $form->setData($existingObject);
         $form->handleRequest($request);
-
         if ($form->isSubmitted()) {
             $isFormValid = $form->isValid();
 
             // persist if the form was valid and if in preview mode the preview was approved
-            if ($isFormValid && (!$this->isInPreviewMode($this->requestStack->getCurrentRequest()) || $this->isPreviewApproved($this->requestStack->getCurrentRequest()))) {
+            if ($isFormValid && (!$this->isInPreviewMode($request) || $this->isPreviewApproved($request))) {
                 $submittedObject = $form->getData();
                 $this->admin->setSubject($submittedObject);
 
@@ -394,12 +386,8 @@ class CmsPageAdminController extends CRUDController
 
                     $this->moveItems($submittedObject);
 
-                    if ($this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
-                        return $this->renderJson([
-                            'result'     => 'ok',
-                            'objectId'   => $objectId,
-                            'objectName' => $this->escapeHtml($this->admin->toString($existingObject)),
-                        ], 200, []);
+                    if ($this->isXmlHttpRequest($request)) {
+                        return $this->handleXmlHttpRequestSuccessResponse($request, $existingObject);
                     }
 
                     $this->addFlash(
@@ -412,17 +400,19 @@ class CmsPageAdminController extends CRUDController
                     );
 
                     // redirect to edit mode
-                    return $this->redirectTo($this->requestStack->getCurrentRequest(),
-                        $existingObject);
+                    return $this->redirectTo($request, $existingObject);
                 } catch (ModelManagerException $e) {
                     $this->handleModelManagerException($e);
+
+                    $isFormValid = false;
+                } catch (ModelManagerThrowable $e) {
+                    $errorMessage = $this->handleModelManagerThrowable($e);
 
                     $isFormValid = false;
                 } catch (LockException $e) {
                     $this->addFlash('sonata_flash_error', $this->trans('flash_lock_error', [
                         '%name%'       => $this->escapeHtml($this->admin->toString($existingObject)),
-                        '%link_start%' => '<a href="' . $this->admin->generateObjectUrl('edit',
-                                $existingObject) . '">',
+                        '%link_start%' => sprintf('<a href="%s">', $this->admin->generateObjectUrl('edit', $existingObject)),
                         '%link_end%'   => '</a>',
                     ], 'SonataAdminBundle'));
                 }
@@ -430,17 +420,18 @@ class CmsPageAdminController extends CRUDController
 
             // show an error message if the form failed validation
             if (!$isFormValid) {
-                if (!$this->isXmlHttpRequest($this->requestStack->getCurrentRequest())) {
-                    $this->addFlash(
-                        'sonata_flash_error',
-                        $this->trans(
-                            'flash_edit_error',
-                            ['%name%' => $this->escapeHtml($this->admin->toString($existingObject))],
-                            'SonataAdminBundle'
-                        )
-                    );
+                if ($this->isXmlHttpRequest($request) && null !== ($response = $this->handleXmlHttpRequestErrorResponse($request, $form))) {
+                    return $response;
                 }
-            } elseif ($this->isPreviewRequested($this->requestStack->getCurrentRequest())) {
+
+                $this->addFlash(
+                    'sonata_flash_error',
+                    $errorMessage ?? $this->trans(
+                    'flash_edit_error',
+                    ['%name%' => $this->escapeHtml($this->admin->toString($existingObject))],
+                    'SonataAdminBundle')
+                );
+            } elseif ($this->isPreviewRequested($request)) {
                 // enable the preview template if the form was valid and preview was requested
                 $templateKey = 'preview';
                 $this->admin->getShow();
@@ -450,15 +441,13 @@ class CmsPageAdminController extends CRUDController
         $formView = $form->createView();
         // set the theme for the current Admin Form
         //        $this->setFormTheme($formView, $this->admin->getFormTheme());
+
         $formTheme = array_merge($this->admin->getFormTheme(), [
             '@WebEtDesignCms/form/cms_multilingual_type.html.twig'
         ]);
-        $this->twig->getRuntime(FormRenderer::class)->setTheme($formView, $formTheme);
+        $this->setFormTheme($formView, $formTheme);
 
-        // NEXT_MAJOR: Remove this line and use commented line below it instead
         $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
-
-        // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
             'action'   => 'edit',
