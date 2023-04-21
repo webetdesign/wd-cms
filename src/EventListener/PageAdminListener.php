@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\RouterInterface;
+use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -77,7 +78,7 @@ class PageAdminListener
             return;
         }
 
-        $config = $this->templateRegistry->getTemplate($page->getTemplate());
+        $config = $this->templateRegistry->get($page->getTemplate());
 
         if ($config->isSection() || $page->getRoute() != null || !$page->initRoute) {
             return;
@@ -126,7 +127,7 @@ class PageAdminListener
         $this->router->warmUp($cacheDir);
     }
 
-    protected function createRoute(AbstractPage $config, CmsPage $page): void
+    protected function createRoute(PageInterface $config, CmsPage $page): void
     {
         $paramString  = '';
         $defaults     = [];
