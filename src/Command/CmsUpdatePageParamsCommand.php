@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use WebEtDesign\CmsBundle\CMS\Configuration\RouteAttributeDefinition;
+use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsRouteInterface;
@@ -53,7 +55,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->templateRegistry->getTemplateList());
+                $templates = array_values($this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_PAGE));
 
                 foreach ($templates as $template) {
                     $this->processTemplate($template->getCode());
@@ -222,7 +224,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
     protected function selectTemplate(): string
     {
-        $templates = $this->templateRegistry->getTemplateChoices();
+        $templates = $this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_PAGE);
 
         return $this->io->choice('Template', array_flip($templates));
     }
