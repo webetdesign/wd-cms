@@ -522,10 +522,10 @@ class CmsPageAdminController extends CRUDController
         $url = false;
 
         if (null !== $request->get('btn_update_and_list')) {
-            return $this->redirectToTree();
+            $url = $this->redirectToList();
         }
         if (null !== $request->get('btn_create_and_list')) {
-            return $this->redirectToTree();
+            $url = $this->redirectToList();
         }
 
         if (null !== $request->get('btn_create_and_create')) {
@@ -533,21 +533,22 @@ class CmsPageAdminController extends CRUDController
             if ($this->admin->hasActiveSubClass()) {
                 $params['subclass'] = $request->get('subclass');
             }
-            $params['id'] = $object->getSite()->getId();
-            $url          = $this->admin->generateUrl('create', $params);
+
+            $url = new RedirectResponse($this->admin->generateUrl('create', $params));
         }
 
-        if ('DELETE' === $this->requestStack->getCurrentRequest()->getMethod()) {
-            return $this->redirectToTree();
+        if (null !== $request->get('btn_delete')) {
+            return $this->redirectToList();
         }
 
-        if (!$url) {
-            foreach (['edit', 'show'] as $route) {
-                if ($this->admin->hasRoute($route) && $this->admin->hasAccess($route, $object)) {
-                    $url = $this->admin->generateObjectUrl($route, $object);
-
-                    break;
-                }
+        foreach (['edit', 'show'] as $route) {
+            if ($this->admin->hasRoute($route) && $this->admin->hasAccess($route, $object)) {
+                $url = $this->admin->getParent()->generateObjectUrl(
+                    'cms.admin.cms_page.tree',
+                    $this->admin->getParent()->getSubject(),
+                    $this->getSelectedTab($request)
+                );
+                return new RedirectResponse($url);
             }
         }
 
