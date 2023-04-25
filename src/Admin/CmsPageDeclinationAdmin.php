@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
+use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Utils\CmsVarsAdminTrait;
 use WebEtDesign\SeoBundle\Admin\SmoOpenGraphAdminTrait;
@@ -25,7 +26,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
     use SmoTwitterAdminTrait;
     use CmsVarsAdminTrait;
 
-    protected ?bool         $globalVarsEnable;
+    protected ?bool $globalVarsEnable;
 
     protected ?string $parentAssociationMapping = 'page';
     protected array   $datagridValues           = [
@@ -37,8 +38,9 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly TemplateRegistry $templateRegistry,
-        private readonly ParameterBagInterface $parameterBag)
-    {
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly BlockFormThemesManager $blockFormThemesManager
+    ) {
         $this->globalVarsEnable = false; // TODO $globalVarsDefinition['enable'];
         parent::__construct();
     }
@@ -87,7 +89,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         /** @var CmsPageDeclination $object */
         $object = $this->getSubject();
-        if (!$object) { //For Batch action delete
+        if (!$object || !$object->getPage()) { //For Batch action delete
             return;
         }
         $route = $object->getPage()->getRoute();
@@ -102,12 +104,14 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         $formMapper
             ->add('title', null, ['label' => 'Title']);
 
-        $formMapper->add('params', CmsRouteParamsType::class, [
-            'config' => $pageConfig,
-            'route'  => $route,
-            'object' => $object,
-            'label'  => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
-        ]);
+        if ($route) {
+            $formMapper->add('params', CmsRouteParamsType::class, [
+                'config' => $pageConfig,
+                'route'  => $route,
+                'object' => $object,
+                'label'  => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
+            ]);
+        }
 
         $formMapper
             ->end()// End form group

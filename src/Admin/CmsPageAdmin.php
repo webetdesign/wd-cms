@@ -10,6 +10,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -57,7 +58,7 @@ class CmsPageAdmin extends AbstractAdmin
     public function __construct(
         protected readonly ParameterBagInterface $parameterBag,
         protected readonly EntityManagerInterface $em,
-        protected readonly TokenStorageInterface $tokenStorage,
+        protected readonly Security $security,
         protected readonly TemplateRegistry $templateRegistry,
         protected readonly BlockRegistry $blockRegistry,
         protected readonly BlockFormThemesManager $blockFormThemesManager,
@@ -204,8 +205,7 @@ class CmsPageAdmin extends AbstractAdmin
 
         $site = $object->getSite();
 
-        $form->getFormBuilder()->setAction($this->generateUrl('create',
-            ['id' => $site->getId()]));
+        $form->getFormBuilder()->setAction($this->generateUrl('create', ['id' => $site->getId()]));
 
         $admin->setFormTheme(array_merge($admin->getFormTheme(), [
             '@WebEtDesignCms/admin/nestedTreeMoveAction/wd_cms_move_form.html.twig',
@@ -413,11 +413,11 @@ class CmsPageAdmin extends AbstractAdmin
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    protected function canManageContent()
+    protected function canManageContent(): bool
     {
-        $user = $this->tokenStorage->getToken()->getUser();
+        $user = $this->security->getUser();
 
-        return $user->hasRole('ROLE_ADMIN_CMS');
+        return $user !== null ? $user->hasRole('ROLE_ADMIN_CMS') : false;
     }
 
     protected function configureQuery(ProxyQueryInterface $query): ProxyQueryInterface

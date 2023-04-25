@@ -146,14 +146,14 @@ class CmsPage
     private Collection|ArrayCollection $menuItems;
 
     /**
-     * @var CmsSite
+     * @var CmsSite|null
      *
      * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="pages")
      * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="CASCADE")
      */
     #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: 'pages')]
     #[ORM\JoinColumn(name: 'site_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private CmsSite $site;
+    private ?CmsSite $site = null;
 
     /**
      * @Gedmo\TreeLeft
