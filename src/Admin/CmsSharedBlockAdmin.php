@@ -82,10 +82,8 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         $object    = $this->getSubject();
 
         $admin->setFormTheme(array_merge($admin->getFormTheme(), [
-            '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
-            '@WebEtDesignCms/form/cms_contents_type.html.twig',
-            '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
-            '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
+            '@WebEtDesignCms/admin/form/dynamic_block.html.twig',
+            '@WebEtDesignCms/admin/form/admin_cms_vars_section.html.twig',
             '@WebEtDesignCms/admin/form/cms_block.html.twig',
         ], $this->blockFormThemesManager->getThemes()));
 

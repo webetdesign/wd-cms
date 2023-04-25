@@ -18,14 +18,14 @@ use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
  */
 class BlockTemplateType extends AbstractType
 {
-    public function __construct(private TemplateRegistry $templateRegistry) { }
+    public function __construct(private readonly TemplateRegistry $templateRegistry) { }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('tpl', ChoiceType::class, [
             'required'    => false,
             'label'       => false,
-            'choices'     => $this->templateRegistry->getTemplateChoices($options['collection']),
+            'choices'     => $this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_SHARED, $options['collection']),
             'constraints' => [
                 new NotBlank(),
             ]
