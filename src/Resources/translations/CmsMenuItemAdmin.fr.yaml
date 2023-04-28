@@ -9,5 +9,5 @@ form.group_avancé: Options avancé
 form.label_code: Code
 form.label_name: Nom
 form.label_label: label
-
+form.label_position: Position
 form.label_role: Rôle
