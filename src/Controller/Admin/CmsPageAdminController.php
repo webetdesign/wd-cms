@@ -514,55 +514,6 @@ class CmsPageAdminController extends CRUDController
         $this->em->flush();
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function redirectTo(Request $request, object $object): RedirectResponse
-    {
-        $url = false;
-
-        if (null !== $request->get('btn_update_and_list')) {
-            $url = $this->redirectToList();
-        }
-        if (null !== $request->get('btn_create_and_list')) {
-            $url = $this->redirectToList();
-        }
-
-        if (null !== $request->get('btn_create_and_create')) {
-            $params = [];
-            if ($this->admin->hasActiveSubClass()) {
-                $params['subclass'] = $request->get('subclass');
-            }
-
-            $url = new RedirectResponse($this->admin->generateUrl('create', $params));
-        }
-
-        if (null !== $request->get('btn_delete')) {
-            return $this->redirectToList();
-        }
-
-        foreach (['edit', 'show'] as $route) {
-            if ($this->admin->hasRoute($route) && $this->admin->hasAccess($route, $object)) {
-                $url = $this->admin->getParent()->generateObjectUrl(
-                    'cms.admin.cms_page.tree',
-                    $this->admin->getParent()->getSubject(),
-                    $this->getSelectedTab($request)
-                );
-                return new RedirectResponse($url);
-            }
-        }
-
-        if (!$url) {
-            return $this->redirectToTree();
-        } else {
-            if (sizeof($request->query->all()) > 0) {
-                $url .= '?' . http_build_query($request->query->all());
-            }
-        }
-
-        return new RedirectResponse($url);
-    }
-
     public function redirectToTree(): RedirectResponse
     {
         return $this->redirect($this->admin->generateUrl('tree'));
