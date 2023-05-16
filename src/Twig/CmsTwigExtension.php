@@ -301,7 +301,6 @@ class CmsTwigExtension extends AbstractExtension
         $request = $this->requestStack->getCurrentRequest();
 
         $pages = [];
-
         foreach ($page->getCrossSitePages() as $p) {
             if (!$p->getSite()->isVisible() || $p->getId() === $page->getId()) {
                 continue;
@@ -309,32 +308,35 @@ class CmsTwigExtension extends AbstractExtension
             preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
 
             /** @var PageInterface $pageConfig */
-            $pageConfig  = $this->pageFactory->get($page->getTemplate());
+            $pageConfig = $this->pageFactory->get($page->getTemplate());
             $routeConfig = $pageConfig->getRoute();
-
             $routeParams = [];
-            foreach ($routeConfig->getAttributes() as $attribute) {
-                if ($attribute->getEntityClass() !== null && is_subclass_of($attribute->getEntityClass(),
-                        TranslatableInterface::class)) {
-                    $repoMethod = 'findOneBy' . ucfirst($attribute->getEntityProperty() ?: 'id');
-                    $criterion  = $request->get('_route_params')[$attribute->getName()] ?? null;
+            if($routeConfig !== null) {
+                foreach ($routeConfig->getAttributes() as $attribute) {
+                    if ($attribute->getEntityClass() !== null && is_subclass_of($attribute->getEntityClass(),
+                            TranslatableInterface::class)) {
+                        $repoMethod = 'findOneBy' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                        $criterion = $request->get('_route_params')[$attribute->getName()] ?? null;
 
-                    $object = $this->em->getRepository($attribute->getEntityClass())
-                        ->$repoMethod($criterion, $page->getSite()->getLocale());
+                        $object = $this->em->getRepository($attribute->getEntityClass())
+                            ->$repoMethod($criterion, $page->getSite()->getLocale());
 
-                    if ($object) {
-                        $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
-                        $routeParams[$attribute->getName()] = $object->translate($p->getSite()->getLocale())->$getProperty();
-                    }
+                        if ($object) {
+                            $getProperty = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                            $routeParams[$attribute->getName()] = $object->translate($p->getSite()->getLocale())->$getProperty();
+                        }
 
-                } else {
-                    if ($attribute->getEntityClass() !== null) {
-                        $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
-                        $routeParams[$attribute->getName()] = $request->get($attribute->getName())->$getProperty();
                     } else {
-                        $routeParams[$attribute->getName()] = $request->get($attribute->getName());
+                        if ($attribute->getEntityClass() !== null) {
+                            $getProperty = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                            $routeParams[$attribute->getName()] = $request->get($attribute->getName())->$getProperty();
+                        } else {
+                            $routeParams[$attribute->getName()] = $request->get($attribute->getName());
+
+                        }
                     }
                 }
+
             }
 
             try {
@@ -344,9 +346,9 @@ class CmsTwigExtension extends AbstractExtension
             }
 
             $pages[] = [
-                'path'   => $path,
-                'code'   => $p->getSite()->getLocale(),
-                'icon'   => $p->getSite()->getFlagIcon(),
+                'path' => $path,
+                'code' => $p->getSite()->getLocale(),
+                'icon' => $p->getSite()->getFlagIcon(),
                 'locale' => $p->getSite()->getLocale(),
             ];
         }
