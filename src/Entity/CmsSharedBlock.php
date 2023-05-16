@@ -56,6 +56,7 @@ class CmsSharedBlock
      * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="sharedBlockParent", cascade={"persist", "remove"})
      */
     #[ORM\OneToMany(targetEntity: CmsContent::class, mappedBy: "sharedBlockParent", cascade: ["persist", "remove"])]
+    #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $contents;
 
     /**
