@@ -324,6 +324,8 @@ class CmsTwigExtension extends AbstractExtension
                         if ($object) {
                             $getProperty = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
                             $routeParams[$attribute->getName()] = $object->translate($p->getSite()->getLocale())->$getProperty();
+                        }else{
+                            $routeParams[$attribute->getName()] = $criterion;
                         }
 
                     } else {
