@@ -3,11 +3,18 @@
         border-top : 1px solid #dfdfdf;
     }
 
-    .panel {
+    &>div>.panel {
         border-radius : 0;
         margin        : 0;
         border-top    : none;
         border-color  : #dfdfdf;
+    }
+
+    .panel {
+        //border-radius : 0;
+        //margin        : 0;
+        //border-top    : none;
+        //border-color  : #dfdfdf;
 
         &-heading {
             border-radius   : 0;

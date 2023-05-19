@@ -14,6 +14,7 @@ class StaticBlock extends AbstractBlock
 
     protected array $formOptions = [
         'base_block_config' => true,
+        'required'          => false,
     ];
 
     public function render($value, ?array $context = null)
@@ -26,7 +27,7 @@ class StaticBlock extends AbstractBlock
             return null;
         }
 
-        $context = array_merge($context??[], ["settings" => $this->getSettings()]);
+        $context = array_merge($context ?? [], ["settings" => $this->getSettings()]);
 
         $blocks = [];
         foreach ($values as $key => $blockData) {

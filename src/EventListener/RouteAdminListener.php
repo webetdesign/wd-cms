@@ -54,9 +54,8 @@ class RouteAdminListener
     {
         $cacheDir = $this->kernel->getCacheDir();
 
-        foreach (['matcher_class', 'generator_class'] as $option) {
-            $className = $this->router->getOption($option);
-            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
+        foreach (['url_matching_routes', 'url_generating_routes'] as $option) {
+            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $option . '.php';
             $this->fs->remove($cacheFile);
         }
 

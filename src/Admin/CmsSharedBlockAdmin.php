@@ -118,8 +118,6 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
         ;
 
         if ($this->isCurrentRoute('edit') || $this->getRequest()->isXmlHttpRequest()) {
-            $formMapper->getFormBuilder()->setMethod('put');
-
             //region Contenus
             $formMapper->tab('Contenus');
             $formMapper
