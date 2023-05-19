@@ -85,7 +85,7 @@ class CmsDuplicateSiteCommand extends Command
             return $locale;
         });
 
-        $newSite = $this->siteRepository->findOneBy(['locale' => $newLocale]);
+        $newSite = $this->siteRepository->findOneBy(['host' => $site->getHost(), 'locale' => $newLocale]);
 
         $doClean = false;
         if ($newSite) {
