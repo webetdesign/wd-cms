@@ -194,7 +194,7 @@ class CmsTwigExtension extends AbstractExtension
      * @return string|null
      * @throws Exception
      */
-    public function cmsRenderContent($object, $content_code, ?array $context = null): null|array|string
+    public function cmsRenderContent($object, $content_code, ?array $context = null): null|array|string|object
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 

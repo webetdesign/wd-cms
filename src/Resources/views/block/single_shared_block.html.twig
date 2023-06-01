@@ -1,1 +1,1 @@
-{{ cms_render_shared_block(object.code, settings) }}
+{{ cms_render_shared_block(object.code, settings is defined ? settings : [] ) }}
