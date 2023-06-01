@@ -17,7 +17,7 @@ class CmsMenuLinkTypeEnum
         self::ROUTENAME => 'Route name',
         self::URL       => 'Url',
         self::PATH      => 'Static path',
-        self::SERVICE   => 'Service',
+        self::SERVICE   => 'Menu auto-généré',
     ];
 
     /**
