@@ -51,7 +51,6 @@
         "symfony/twig-bridge": "^5.4|^6.0",
         "symfony/twig-bundle": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0",
-        "twig/extensions": "^1.5",
         "webetdesign/wd-media-bundle": "4.0.*||dev-sf6",
         "webetdesign/wd-seo-bundle": "4.0.*||dev-sf6"
     },
