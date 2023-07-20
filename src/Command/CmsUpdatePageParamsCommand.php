@@ -58,7 +58,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
                 $templates = array_values($this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_PAGE));
 
                 foreach ($templates as $template) {
-                    $this->processTemplate($template->getCode());
+                    $this->processTemplate($template);
                 }
                 $this->io->success('Done');
             }
