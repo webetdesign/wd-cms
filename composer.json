@@ -51,8 +51,8 @@
         "symfony/twig-bridge": "^5.4|^6.0",
         "symfony/twig-bundle": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0",
-        "webetdesign/wd-media-bundle": "4.*|dev-4.x",
-        "webetdesign/wd-seo-bundle": "4.*|dev-4.x"
+        "webetdesign/wd-media-bundle": "4.*|4.x-dev",
+        "webetdesign/wd-seo-bundle": "4.*|4.x-dev"
     },
     "require-dev": {
         "symfony/filesystem": "^5.4|^6.0",
