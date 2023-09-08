@@ -229,8 +229,7 @@ class CmsPageAdmin extends AbstractAdmin
             ])
             ->add('breadcrumb', null,
                 ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'],
-                ['translation_domain' => $this->getTranslationDomain()])
-        ;
+                ['translation_domain' => $this->getTranslationDomain()]);
 
         $form->add('site', HiddenType::class);
         $form->get('site')->addModelTransformer(new CallbackTransformer(
@@ -275,19 +274,19 @@ class CmsPageAdmin extends AbstractAdmin
             $this->addFormVarsSection($form, $object, 'seo');
             $form->with('cms_page.tab.general',
                 [
-                    'class'              => 'col-xs-12 col-md-4',
-                    'box_class'          => '',
-                    'translation_domain' => 'wd_seo'
+                    'class'     => 'col-xs-12 col-md-4',
+                    'box_class' => '',
                 ])
-                ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'])
+                ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'], ['translation_domain' => 'wd_seo'])
                 ->add('seo_description', TextareaType::class,
-                    ['label' => 'wd_seo.form.seo_description.label', 'required' => false])
+                    ['label' => 'wd_seo.form.seo_description.label', 'required' => false], [ 'translation_domain' => 'wd_seo'])
                 ->add('preview', null, [
-                    'mapped'       => false,
-                    'block_prefix' => 'google_seo_preview',
-                    'translation_domain' => 'wd_seo',
-                    'label' => 'wd_seo.form.seo_preview.label'
-
+                    'mapped'             => false,
+                    'block_prefix'       => 'google_seo_preview',
+                    'label'              => 'wd_seo.form.seo_preview.label'
+                ], [ 'translation_domain' => 'wd_seo'])
+                ->add('noIndex', null, [
+                    'label' => 'cms_page.form.no_index.label',
                 ])
                 ->end();
             $this->addFormFieldSmoOpenGraph($form);

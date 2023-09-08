@@ -24,6 +24,7 @@ cms_page.form.title.label: Titre de la page dans l'interface d'administration
 cms_page.form.template.label: Modèle de page
 cms_page.form.active.label: Accessible
 cms_page.form.cross_site_pages.label: Pages associées
+cms_page.form.no_index.label: Ne pas indexer la page dans les moteur de recherche
 
 
 cms_page.form.seo_title.label: Titre (balise title)

@@ -206,6 +206,9 @@ class CmsPage
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'CmsPage', cascade: ['remove'])]
     private Collection|ArrayCollection $children;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $noIndex = false;
+
     private ?string $moveMode = null;
 
     private mixed $moveTarget = null;
@@ -791,6 +794,25 @@ class CmsPage
     public function setBreadcrumb(?string $breadcrumb): void
     {
         $this->breadcrumb = $breadcrumb;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNoIndex(): bool
+    {
+        return $this->noIndex;
+    }
+
+    /**
+     * @param bool $noIndex
+     * @return CmsPage
+     */
+    public function setNoIndex(bool $noIndex): CmsPage
+    {
+        $this->noIndex = $noIndex;
+
+        return $this;
     }
 
 }
