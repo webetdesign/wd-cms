@@ -1,6 +1,7 @@
 require('./sass/app.scss');
 
 import $ from 'jquery';
+import 'bootstrap'
 import 'moment/moment';
 
 import './js/cms_route_params';
@@ -8,6 +9,10 @@ import './js/menu_admin';
 import './js/tree';
 import './js/contents';
 import './stimulus';
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+})
 
 $(document).ready(function() {
   // show active tab on reload
