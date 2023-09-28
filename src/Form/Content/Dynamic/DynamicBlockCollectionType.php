@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form\Content\Dynamic;
 
@@ -18,7 +19,7 @@ class DynamicBlockCollectionType extends AbstractType
 {
     public function __construct(private readonly BlockRegistry $blockRegistry) { }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['base_block_config']) {
             $block = $this->blockRegistry->get($options['base_block_config']);
@@ -95,7 +96,7 @@ class DynamicBlockCollectionType extends AbstractType
         ));
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace($view->vars, [
             'allow_add'    => $options['allow_add'],
@@ -126,7 +127,7 @@ class DynamicBlockCollectionType extends AbstractType
         return CollectionType::class;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'entry_type'    => DynamicBlockLoaderType::class,

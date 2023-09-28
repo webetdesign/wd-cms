@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
@@ -25,7 +26,7 @@ class CmsBlockResizeFormListener extends ResizeFormListener
     }
 
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
         /** @var CmsContent $data */

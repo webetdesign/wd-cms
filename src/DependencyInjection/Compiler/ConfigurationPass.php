@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\DependencyInjection\Compiler;
 
@@ -11,7 +12,7 @@ use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 class ConfigurationPass implements CompilerPassInterface
 {
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
 
         $blockRegistry    = $container->getDefinition(BlockRegistry::class);

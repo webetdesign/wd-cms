@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form\Content;
 
@@ -13,7 +14,7 @@ class BlocksBlockType extends AbstractType
 {
     public function __construct(private BlockRegistry $blockRegistry) { }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['base_block_config']) {
             $block = $this->blockRegistry->get($options['base_block_config']);
@@ -36,7 +37,7 @@ class BlocksBlockType extends AbstractType
         }
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $block = $this->blockRegistry->get($options['base_block_config']);
         $configs = [];
@@ -51,7 +52,7 @@ class BlocksBlockType extends AbstractType
     }
 
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'base_block_config' => null,

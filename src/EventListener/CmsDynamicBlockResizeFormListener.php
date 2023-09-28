@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
@@ -39,7 +40,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
         ];
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $block = $this->blockRegistry->get($this->blockDefinition);
         $form  = $event->getForm();
@@ -74,7 +75,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 
     }
 
-    public function preSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $event): void
     {
         $block = $this->blockRegistry->get($this->blockDefinition);
         $form  = $event->getForm();

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\DependencyInjection\Compiler;
 
@@ -12,7 +13,7 @@ use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 class BlockPass implements CompilerPassInterface
 {
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $ManagerDefinition = $container->getDefinition(BlockFormThemeRegistry::class);
 

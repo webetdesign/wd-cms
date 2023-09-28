@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Routing;
 
@@ -158,7 +159,7 @@ class ExtraLoader implements LoaderInterface
         return $this->resolver;
     }
 
-    public function setResolver(LoaderResolverInterface $resolver)
+    public function setResolver(LoaderResolverInterface $resolver): void
     {
         $this->resolver = $resolver;
     }

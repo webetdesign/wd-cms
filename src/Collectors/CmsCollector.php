@@ -30,8 +30,6 @@ use WebEtDesign\CmsBundle\Services\CmsHelper;
 
 class CmsCollector extends AbstractDataCollector implements LateDataCollectorInterface
 {
-    protected $data;
-
     private CmsHelper              $cmsHelper;
     private array                  $cmsConfig;
     private TemplateRegistry       $pageFactory;
@@ -90,7 +88,7 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
     /**
      * @inheritDoc
      */
-    public function collect(Request $request, Response $response, Throwable $exception = null)
+    public function collect(Request $request, Response $response, Throwable $exception = null): void
     {
 
         /** @var CmsPage $page */
@@ -162,7 +160,7 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
         }
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data['template_paths'] = [];
 

@@ -47,7 +47,7 @@ class CmsDuplicateMenuCommand extends Command
         $this->cmsPageRepository = $cmsPageRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('cms:duplicate:menu')
@@ -115,7 +115,7 @@ class CmsDuplicateMenuCommand extends Command
      * @throws ORMException
      * @author Benjamin Robert
      */
-    private function duplicate(CmsMenuItem $root, CmsMenuItem $newRoot)
+    private function duplicate(CmsMenuItem $root, CmsMenuItem $newRoot): void
     {
         /** @var CmsMenuItem $ref */
         foreach ($root->getChildrenLeft() as $ref) {

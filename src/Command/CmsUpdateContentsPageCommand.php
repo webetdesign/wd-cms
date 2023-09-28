@@ -19,7 +19,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
     protected CmsPageRepository $pageRp;
     private TemplateRegistry         $templateRegistry;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('cms:page:update-contents')
@@ -76,7 +76,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
         return 0;
     }
 
-    public function processTemplate($template)
+    public function processTemplate($template): void
     {
         $pages = $this->pageRp->findByTemplate($template);
 
