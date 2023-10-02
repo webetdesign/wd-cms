@@ -64,7 +64,7 @@ class CmsBlockResizeFormListener extends ResizeFormListener
                     $block   = $config ? $this->blockRegistry->get($config) : null;
                     $options = array_merge($this->options, ['block' => $block, 'config' => $config]);
 
-                    $form->add($name, $this->type, array_replace([
+                    $form->add(is_int($name) ? (string) $name : $name, $this->type, array_replace([
                         'property_path' => '[' . $name . ']',
                     ], $options ?? $this->options));
                 }
