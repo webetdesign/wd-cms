@@ -48,7 +48,7 @@ class CmsBlockResizeFormListener extends ResizeFormListener
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-
+            $name = (string) $name;
             if ($value instanceof CmsContent) {
                 if ($value->getPage()) {
                     $template = $value->getPage()->getTemplate();
@@ -64,7 +64,7 @@ class CmsBlockResizeFormListener extends ResizeFormListener
                     $block   = $config ? $this->blockRegistry->get($config) : null;
                     $options = array_merge($this->options, ['block' => $block, 'config' => $config]);
 
-                    $form->add(is_int($name) ? (string) $name : $name, $this->type, array_replace([
+                    $form->add($name, $this->type, array_replace([
                         'property_path' => '[' . $name . ']',
                     ], $options ?? $this->options));
                 }
