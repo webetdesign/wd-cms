@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form\Admin;
 
@@ -12,7 +13,7 @@ class CmsVarsFormSection extends AbstractType
 {
     public function __construct(protected TemplateRegistry $templateRegistry) { }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $template = $this->templateRegistry->get($options['template']);
         $exposed = $template->getVarsBag()->getExposed();
@@ -27,7 +28,7 @@ class CmsVarsFormSection extends AbstractType
     }
 
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'mapped' => false,

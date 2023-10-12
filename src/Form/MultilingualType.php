@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form;
 
@@ -37,7 +38,7 @@ class MultilingualType extends AbstractType
     /**
      * @inheritDoc
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $site        = $options['site'];
         $this->sites = $this->em->getRepository($this->siteClass)->findOther($site, $options['templateFilter']);
@@ -60,7 +61,7 @@ class MultilingualType extends AbstractType
 
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
 
         $view->vars['sites'] = $this->sites;
@@ -69,7 +70,7 @@ class MultilingualType extends AbstractType
     }
 
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

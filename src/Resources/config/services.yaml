@@ -107,3 +107,9 @@ services:
     tags:
       - { name: twig.extension }
     public: true
+
+  cms.breadcrumb.extension:
+    class: WebEtDesign\CmsBundle\Twig\BreadcrumbTwigExtension
+    tags:
+      - { name: twig.extension }
+    public: true

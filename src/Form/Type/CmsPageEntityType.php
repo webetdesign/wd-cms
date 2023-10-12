@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form\Type;
 
@@ -14,7 +15,7 @@ class CmsPageEntityType extends AbstractType
 {
     public function __construct(private CmsPageRepository $cmsPageRepository) { }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $collections = $options['collections'];
 
@@ -38,7 +39,7 @@ class CmsPageEntityType extends AbstractType
         ));
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'collections' => null

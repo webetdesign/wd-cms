@@ -24,7 +24,7 @@ class CmsMenuIconSetGeneratorCommand extends Command
     }
 
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('cms:menu:icon-set-generator')

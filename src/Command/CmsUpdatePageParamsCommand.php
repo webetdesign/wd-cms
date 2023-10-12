@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Command;
 
@@ -39,7 +40,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
     }
 
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Update pages parameters and declination with configuration file')
@@ -86,7 +87,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         return 0;
     }
 
-    public function processTemplate($template)
+    public function processTemplate($template): void
     {
         $pages = $this->pageRp->findByTemplate($template);
 
@@ -147,7 +148,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         }
     }
 
-    private function updateParams(CmsRouteInterface $cmsRoute, PageInterface $config)
+    private function updateParams(CmsRouteInterface $cmsRoute, PageInterface $config): void
     {
         $routeConfig = $config->getRoute();
 

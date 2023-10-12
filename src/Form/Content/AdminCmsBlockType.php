@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form\Content;
 
@@ -18,7 +19,7 @@ class AdminCmsBlockType extends AbstractType
     ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('active', null, [
             'label' => 'Visible',
@@ -40,7 +41,7 @@ class AdminCmsBlockType extends AbstractType
         }
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if ($options['config']) {
             $block               = $this->blockRegistry->get($options['config']);
@@ -51,7 +52,7 @@ class AdminCmsBlockType extends AbstractType
     }
 
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => CmsContent::class,

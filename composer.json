@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^8.2",
         "cocur/slugify": "^4.0",
         "doctrine/common": "^2.11 || ^3.1",
         "doctrine/doctrine-bundle": "^1.12 || ^2.0",
@@ -51,8 +51,8 @@
         "symfony/twig-bridge": "^5.4|^6.0",
         "symfony/twig-bundle": "^5.4|^6.0",
         "symfony/validator": "^5.4|^6.0",
-        "webetdesign/wd-media-bundle": "4.0.*||dev-sf6",
-        "webetdesign/wd-seo-bundle": "4.0.*||dev-sf6"
+        "webetdesign/wd-media-bundle": "4.*|4.x-dev|release/4.1.0-dev",
+        "webetdesign/wd-seo-bundle": "4.*|4.x-dev|release/4.1.0-dev"
     },
     "require-dev": {
         "symfony/filesystem": "^5.4|^6.0",

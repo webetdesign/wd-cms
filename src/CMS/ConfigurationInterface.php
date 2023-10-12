@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\CMS;
 
+use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Enum\CmsVarsDelimiterEnum;
 use WebEtDesign\CmsBundle\Registry\BlockRegistryInterface;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistryInterface;
@@ -24,4 +25,8 @@ interface ConfigurationInterface
     public function setCmsVarsDelimiter(CmsVarsDelimiterEnum $cmsVarsDelimiter): AbstractConfiguration;
 
     public function getVarsBag(): ?CmsVarsBag;
+
+    public function getCurrentPage(): ?CmsPage;
+
+    public function setCurrentPage(?CmsPage $currentPage): AbstractConfiguration;
 }

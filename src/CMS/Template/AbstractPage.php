@@ -2,9 +2,11 @@
 
 namespace WebEtDesign\CmsBundle\CMS\Template;
 
-
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use WebEtDesign\CmsBundle\CMS\Configuration\RouteDefinition;
-use WebEtDesign\CmsBundle\Vars\CmsVarsBag;
+use WebEtDesign\CmsBundle\Entity\CmsPage;
+use WebEtDesign\CmsBundle\Models\BreadcrumbItem;
 
 abstract class AbstractPage extends AbstractComponent implements PageInterface
 {
@@ -30,6 +32,17 @@ abstract class AbstractPage extends AbstractComponent implements PageInterface
     public function setSection(bool $section): AbstractPage
     {
         $this->section = $section;
+
         return $this;
+    }
+
+    public function buildBreadcrumbItem(
+        EntityManagerInterface $em,
+        Request                $request,
+        CmsPage                $page,
+        callable               $generateUrl,
+        string                 $defaultTitle): ?BreadcrumbItem
+    {
+        return new BreadcrumbItem($defaultTitle, $generateUrl($page->getRoute()->getName()));
     }
 }

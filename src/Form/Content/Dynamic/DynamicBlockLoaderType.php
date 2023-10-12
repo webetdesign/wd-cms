@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form\Content\Dynamic;
 
@@ -13,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DynamicBlockLoaderType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('disc', HiddenType::class, [
             'data' => $options['block_config']?->getCode()
@@ -33,13 +34,13 @@ class DynamicBlockLoaderType extends AbstractType
         ]);
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['block_config'] = $options['block_config'];
     }
 
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'block_config' => null,
@@ -48,6 +49,6 @@ class DynamicBlockLoaderType extends AbstractType
 
     public function getBlockPrefix(): string
     {
-        return "admin_cms_dynamic_block_loader";
+        return 'admin_cms_dynamic_block_loader';
     }
 }

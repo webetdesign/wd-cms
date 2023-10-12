@@ -1,0 +1,19 @@
+<ol class="breadcrumb" vocab="https://schema.org/" typeof="BreadcrumbList">
+    {% for item in breadcrumb %}
+        {% if loop.last %}
+            <li property="itemListElement" typeof="ListItem">
+                <span property="item" typeof="WebPage">
+                    <span property="name" class="text--xs">{{ item.title }}</span>
+                </span>
+                <meta property="position" content="{{ loop.index }}"/>
+            </li>
+        {% else %}
+            <li property="itemListElement" typeof="ListItem">
+                <a property="item" typeof="WebPage" href="{{ item.url }}">
+                    <span property="name" class="text--xs">{{ item.title }}</span>
+                </a>
+                <meta property="position" content="{{ loop.index }}"/>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ol>

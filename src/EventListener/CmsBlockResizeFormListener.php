@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
@@ -25,7 +26,7 @@ class CmsBlockResizeFormListener extends ResizeFormListener
     }
 
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
         /** @var CmsContent $data */
@@ -47,7 +48,7 @@ class CmsBlockResizeFormListener extends ResizeFormListener
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-
+            $name = (string) $name;
             if ($value instanceof CmsContent) {
                 if ($value->getPage()) {
                     $template = $value->getPage()->getTemplate();

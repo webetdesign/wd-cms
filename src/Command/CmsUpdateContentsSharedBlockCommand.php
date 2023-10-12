@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Command;
 
@@ -32,7 +33,7 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
     }
 
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Update configuration of content\'s sharedBlock with configuration file')
@@ -80,7 +81,7 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
         return 0;
     }
 
-    public function processTemplate($template)
+    public function processTemplate($template): void
     {
         $pages = $this->sharedBlockRp->findByTemplate($template);
 

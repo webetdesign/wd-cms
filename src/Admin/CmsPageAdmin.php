@@ -56,15 +56,16 @@ class CmsPageAdmin extends AbstractAdmin
     protected ?array $cmsConfig;
 
     public function __construct(
-        protected readonly ParameterBagInterface $parameterBag,
+        protected readonly ParameterBagInterface  $parameterBag,
         protected readonly EntityManagerInterface $em,
-        protected readonly Security $security,
-        protected readonly TemplateRegistry $templateRegistry,
-        protected readonly BlockRegistry $blockRegistry,
+        protected readonly Security               $security,
+        protected readonly TemplateRegistry       $templateRegistry,
+        protected readonly BlockRegistry          $blockRegistry,
         protected readonly BlockFormThemesManager $blockFormThemesManager,
-        protected readonly Compiler $compiler,
+        protected readonly Compiler               $compiler,
         protected readonly ConfigurationInterface $configuration,
-    ) {
+    )
+    {
         $this->cmsConfig    = $this->parameterBag->get('wd_cms.cms');
         $this->multisite    = $this->cmsConfig['multisite'];
         $this->multilingual = $this->cmsConfig['multilingual'];
@@ -75,12 +76,12 @@ class CmsPageAdmin extends AbstractAdmin
         parent::__construct();
     }
 
-
     protected function configureActionButtons(
-        array $buttonList,
-        string $action,
+        array   $buttonList,
+        string  $action,
         ?object $object = null
-    ): array {
+    ): array
+    {
         $buttons           = parent::configureActionButtons($buttonList, $action, $object);
         $buttons['create'] = ['template' => '@WebEtDesignCms/admin/page/create_button.html.twig'];
 
@@ -197,7 +198,6 @@ class CmsPageAdmin extends AbstractAdmin
      */
     protected function configureFormFields(FormMapper $form): void
     {
-
         $roleAdmin = $this->canManageContent();
         $admin     = $this;
         /** @var CmsPage $object */
@@ -212,6 +212,7 @@ class CmsPageAdmin extends AbstractAdmin
             "@WebEtDesignCms/admin/form/cms_block.html.twig",
             '@WebEtDesignCms/admin/form/dynamic_block.html.twig',
             '@WebEtDesignCms/admin/form/admin_cms_vars_section.html.twig',
+            '@WDSeo/admin/google_seo_preview.html.twig',
         ], $this->blockFormThemesManager->getThemes()));
 
         //region Général
@@ -225,7 +226,10 @@ class CmsPageAdmin extends AbstractAdmin
             ->add('template', PageTemplateType::class, [
                 'label'      => 'cms_page.form.template.label',
                 'collection' => $site->getTemplateFilter()
-            ]);
+            ])
+            ->add('breadcrumb', null,
+                ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'],
+                ['translation_domain' => $this->getTranslationDomain()]);
 
         $form->add('site', HiddenType::class);
         $form->get('site')->addModelTransformer(new CallbackTransformer(
@@ -270,16 +274,20 @@ class CmsPageAdmin extends AbstractAdmin
             $this->addFormVarsSection($form, $object, 'seo');
             $form->with('cms_page.tab.general',
                 [
-                    'class'              => 'col-xs-12 col-md-4',
-                    'box_class'          => '',
-                    'translation_domain' => 'wd_seo'
+                    'class'     => 'col-xs-12 col-md-4',
+                    'box_class' => '',
                 ])
-                ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'])
+                ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'], ['translation_domain' => 'wd_seo'])
                 ->add('seo_description', TextareaType::class,
-                    ['label' => 'wd_seo.form.seo_description.label', 'required' => false])
-                ->add('breadcrumb', null,
-                    ['required' => false, 'label' => 'cms_page.form.seo_breadcrumb.label'],
-                    ['translation_domain' => $this->getTranslationDomain()])
+                    ['label' => 'wd_seo.form.seo_description.label', 'required' => false], [ 'translation_domain' => 'wd_seo'])
+                ->add('preview', null, [
+                    'mapped'             => false,
+                    'block_prefix'       => 'google_seo_preview',
+                    'label'              => 'wd_seo.form.seo_preview.label'
+                ], [ 'translation_domain' => 'wd_seo'])
+                ->add('noIndex', null, [
+                    'label' => 'cms_page.form.no_index.label',
+                ])
                 ->end();
             $this->addFormFieldSmoOpenGraph($form);
             $this->addFormFieldSmoTwitter($form);

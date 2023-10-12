@@ -42,7 +42,7 @@ class CmsDuplicateSiteCommand extends Command
         $this->siteRepository = $siteRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('cms:duplicate:site')
@@ -124,7 +124,7 @@ class CmsDuplicateSiteCommand extends Command
      * @throws OptimisticLockException
      * @author Benjamin Robert
      */
-    private function duplicate(?CmsSite $site, ?CmsSite $newSite, bool $doClean)
+    private function duplicate(?CmsSite $site, ?CmsSite $newSite, bool $doClean): void
     {
         $home    = $site->getRootPage();
         $newHome = $newSite->getRootPage();
@@ -163,7 +163,7 @@ class CmsDuplicateSiteCommand extends Command
      * @throws ORMException
      * @author Benjamin Robert
      */
-    protected function processPages(CmsSite $site, CmsPage $reference, CmsPage $newParent)
+    protected function processPages(CmsSite $site, CmsPage $reference, CmsPage $newParent): void
     {
         /** @var CmsPage $referenceChild */
         foreach ($reference->getChildrenLeft() as $referenceChild) {
@@ -180,7 +180,7 @@ class CmsDuplicateSiteCommand extends Command
      * @throws ORMException
      * @author Benjamin Robert
      */
-    private function duplicatePage(CmsSite $site, CmsPage $page)
+    private function duplicatePage(CmsSite $site, CmsPage $page): CmsPage
     {
         $newPage = new CmsPage();
 
@@ -207,7 +207,7 @@ class CmsDuplicateSiteCommand extends Command
         return $newPage;
     }
 
-    public function processRouteName(CmsPage $page, $newLocale)
+    public function processRouteName(CmsPage $page, $newLocale): array|string|null
     {
         $name   = $page->getRoute()->getName();
         $locale = $page->getSite()->getLocale();
@@ -221,7 +221,7 @@ class CmsDuplicateSiteCommand extends Command
      * @throws ORMException
      * @author Benjamin Robert
      */
-    private function duplicateDeclinations(CmsPage $page, CmsPage $newPage)
+    private function duplicateDeclinations(CmsPage $page, CmsPage $newPage): void
     {
         /** @var CmsPageDeclination $declination */
         foreach ($page->getDeclinations() as $declination) {
@@ -239,7 +239,7 @@ class CmsDuplicateSiteCommand extends Command
      * @throws ORMException
      * @author Benjamin Robert
      */
-    private function duplicateRoute(CmsPage $page, CmsPage $newPage)
+    private function duplicateRoute(CmsPage $page, CmsPage $newPage): void
     {
         /** @var CmsRoute $route */
         $route = $page->getRoute();

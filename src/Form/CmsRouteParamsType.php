@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form;
 
@@ -35,7 +35,7 @@ class CmsRouteParamsType extends AbstractType
     /**
      * @inheritDoc
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var PageInterface config */
         $config = $options['config'];
@@ -105,7 +105,7 @@ class CmsRouteParamsType extends AbstractType
     /**
      * @inheritDoc
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('config');
         $resolver->setRequired('route');
