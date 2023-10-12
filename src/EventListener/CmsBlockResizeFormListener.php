@@ -48,7 +48,7 @@ class CmsBlockResizeFormListener extends ResizeFormListener
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-
+            $name = (string) $name;
             if ($value instanceof CmsContent) {
                 if ($value->getPage()) {
                     $template = $value->getPage()->getTemplate();
