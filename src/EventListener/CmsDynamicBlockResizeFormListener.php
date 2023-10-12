@@ -68,6 +68,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
                 'label'        => '#' . $name . ' | ' . $config->getLabel(),
                 'block_config' => $config
             ]);
+            $name = (string) $name;
             $form->add($name, $this->type, array_replace([
                 'property_path' => '[' . $name . ']',
             ], $opts));
