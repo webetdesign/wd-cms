@@ -68,6 +68,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
                 'label'        => '#' . $name . ' | ' . $config->getLabel(),
                 'block_config' => $config
             ]);
+            $name = (string) $name;
             $form->add($name, $this->type, array_replace([
                 'property_path' => '[' . $name . ']',
             ], $opts));
@@ -101,6 +102,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
         // Add all additional rows
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
+                $name = (string) $name;
                 if ($name === 'block_selector') {
                     unset($data[$name]);
                     continue;
