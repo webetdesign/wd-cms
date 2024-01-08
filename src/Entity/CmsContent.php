@@ -1,121 +1,69 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Symfony\Component\Validator\Constraints\Cascade;
 use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
 
-/**
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsContentRepository")
- * @ORM\Table(name="cms__content")
- */
 #[ORM\Entity(repositoryClass: CmsContentRepository::class)]
-#[ORM\Table(name: "cms__content")]
-class CmsContent
+#[ORM\Table(name: 'cms__content')]
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsContent implements Loggable
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
-    /**
-     * @var string|null
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
     private ?string $code = null;
 
-    /**
-     * @var null|string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
     private ?string $label = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
     private string $type = '';
 
-    /**
-     * @var null|string
-     * @ORM\Column(type="text", nullable=true)
-     *
-     */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Gedmo\Versioned]
     private ?string $value = null;
 
-    /**
-     * @var null|CmsPage
-     * @Gedmo\SortableGroup()
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="contents")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
-     */
     #[Gedmo\SortableGroup]
     #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'contents')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Gedmo\Versioned]
     private ?CmsPage $page = null;
 
-    /**
-     * @var integer|null
-     * @ORM\Column(type="integer", nullable=true)
-     * @Gedmo\SortablePosition()
-     */
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     #[Gedmo\SortablePosition]
+    #[Gedmo\Versioned]
     private ?int $position = null;
 
-    /**
-     * @var null|CmsSharedBlock
-     * @Gedmo\SortableGroup()
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", inversedBy="contents")
-     * @ORM\JoinColumn(name="shared_block_parent_id", referencedColumnName="id")
-     */
     #[Gedmo\SortableGroup]
     #[ORM\ManyToOne(targetEntity: CmsSharedBlock::class, inversedBy: 'contents')]
     #[ORM\JoinColumn(name: "shared_block_parent_id", referencedColumnName: 'id')]
+    #[Gedmo\Versioned]
     private ?CmsSharedBlock $sharedBlockParent = null;
 
-    /**
-     * @var boolean
-     * @ORM\Column(type="boolean", nullable=true)
-     */
     #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
+    #[Gedmo\Versioned]
     private ?bool $parent_heritance = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(type="boolean")
-     */
     #[ORM\Column(type: Types::BOOLEAN)]
+    #[Gedmo\Versioned]
     private bool $active;
 
-    /**
-     * Mapping Relation in WebEtDesignCmsExtension
-     * @Gedmo\SortableGroup()
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", inversedBy="contents")
-     * @ORM\JoinColumn(name="declination_id", referencedColumnName="id", onDelete="CASCADE")
-     */
     #[Gedmo\SortableGroup]
     #[ORM\ManyToOne(targetEntity: CmsPageDeclination::class, inversedBy: 'contents')]
     #[ORM\JoinColumn(name: "declination_id", referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Gedmo\Versioned]
     private ?CmsPageDeclination $declination = null;
 
     public bool $collapseOpen = false;

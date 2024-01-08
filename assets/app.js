@@ -1,7 +1,7 @@
 require('./sass/app.scss');
 
 import $ from 'jquery';
-import 'bootstrap'
+import "bootstrap/js/tooltip";
 import 'moment/moment';
 
 import './js/cms_route_params';

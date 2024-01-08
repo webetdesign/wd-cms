@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: Clement
@@ -14,12 +15,9 @@ use WebEtDesign\CmsBundle\Repository\CmsRouteRepository;
 /**
  * Class CmsRoute
  * @package WebEtDesign\CmsBundle\Entity
- *
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsRouteRepository")
- * @ORM\Table(name="cms__route")
  */
 #[ORM\Entity(repositoryClass: CmsRouteRepository::class)]
-#[ORM\Table(name: "cms__route")]
+#[ORM\Table(name: 'cms__route')]
 class CmsRoute extends AbstractCmsRoute
 {
 
