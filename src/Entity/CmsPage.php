@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use JetBrains\PhpStorm\ArrayShape;
@@ -18,15 +19,11 @@ use WebEtDesign\SeoBundle\Entity\SeoAwareTrait;
 use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
 use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
-/**
- * @Gedmo\Tree(type="nested")
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageRepository")
- * @ORM\Table(name="cms__page")
- */
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\Entity(repositoryClass: CmsPageRepository::class)]
 #[ORM\Table(name: 'cms__page')]
-class CmsPage
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsPage implements Loggable
 {
     use SeoAwareTrait;
     use SmoOpenGraphTrait;
@@ -49,6 +46,7 @@ class CmsPage
      *
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
     private string $title = '';
 
     /**
@@ -90,6 +88,7 @@ class CmsPage
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     #[Gedmo\Slug(fields: ['title'], unique: false)]
     #[Gedmo\SlugHandler(class: CmsPageSlugHandler::class)]
+    #[Gedmo\Versioned]
     private ?string $slug = null;
 
     /**
@@ -98,6 +97,7 @@ class CmsPage
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
     private ?string $breadcrumb = null;
 
     /**
@@ -106,6 +106,7 @@ class CmsPage
      * @ORM\Column(type="boolean", options={"default" = 0})
      */
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 0])]
+    #[Gedmo\Versioned]
     private bool $active = false;
 
     /**
@@ -114,6 +115,7 @@ class CmsPage
      * @ORM\Column(type="array", nullable=true)
      */
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Gedmo\Versioned]
     private array $roles;
 
     /** @var Collection
@@ -153,6 +155,7 @@ class CmsPage
      */
     #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: 'pages')]
     #[ORM\JoinColumn(name: 'site_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Gedmo\Versioned]
     private ?CmsSite $site = null;
 
     /**

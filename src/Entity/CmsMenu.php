@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Entity;
 
@@ -11,67 +12,39 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Loggable\Loggable;
 use WebEtDesign\CmsBundle\Repository\CmsMenuRepository;
 
-/**
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsMenuRepository")
- * @ORM\Table(name="cms__menu", uniqueConstraints={@ORM\UniqueConstraint(name="code_idx", columns={"code", "site_id"})})
- */
 #[ORM\Entity(repositoryClass: CmsMenuRepository::class)]
-#[ORM\Table(name: "cms__menu")]
-#[ORM\UniqueConstraint(name: "code_idx", columns: ["code", "site_id"])]
-class CmsMenu
+#[ORM\Table(name: 'cms__menu')]
+#[ORM\UniqueConstraint(name: 'code_idx', columns: ['code', 'site_id'])]
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsMenu implements Loggable
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     *
-     * @var int
-     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     * @var string
-     */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
     private $label;
 
-    /**
-     * @ORM\Column(type="string", length=128, nullable=false)
-     *
-     * @var string
-     */
     #[ORM\Column(type: Types::STRING, length: 128, nullable: false)]
+    #[Gedmo\Versioned]
     private $code;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     * @var string
-     */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
     private $type;
 
-    /**
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="menu", cascade={"persist", "remove"})
-     * @var CmsMenuItem[]|Collection|Selectable
-     */
     #[ORM\OneToMany(mappedBy: "menu", targetEntity: CmsMenuItem::class, cascade: ["persist", "remove"])]
     private $children;
 
-    /**
-     * @var CmsSite
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="menus")
-     * @ORM\JoinColumn(name="site_id", referencedColumnName="id")
-     */
     #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: "menus")]
     #[ORM\JoinColumn(name: "site_id", referencedColumnName: "id")]
+    #[Gedmo\Versioned]
     private $site;
 
     public $initRoot = true;

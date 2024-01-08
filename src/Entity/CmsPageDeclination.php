@@ -7,19 +7,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Loggable\Loggable;
 use WebEtDesign\CmsBundle\Repository\CmsPageDeclinationRepository;
 use WebEtDesign\SeoBundle\Entity\SeoAwareTrait;
 use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
 use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
 
-/**
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageDeclinationRepository")
- * @ORM\Table(name="cms__page_declination")
- */
 #[ORM\Entity(repositoryClass: CmsPageDeclinationRepository::class)]
 #[ORM\Table(name: 'cms__page_declination')]
-class CmsPageDeclination
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsPageDeclination implements Loggable
 {
     use SeoAwareTrait;
     use SmoOpenGraphTrait;
