@@ -18,7 +18,7 @@ class DynamicBlock extends AbstractBlock
         'base_block_config' => true,
     ];
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 

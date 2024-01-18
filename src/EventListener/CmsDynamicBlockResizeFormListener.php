@@ -15,14 +15,15 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 {
 
     public function __construct(
-        private readonly BlockRegistry $blockRegistry,
+        private readonly BlockRegistry   $blockRegistry,
         private readonly BlockDefinition $blockDefinition,
-        string $type,
-        array $options = [],
-        bool $allowAdd = false,
-        bool $allowDelete = false,
-        $deleteEmpty = false
-    ) {
+        string                           $type,
+        array                            $options = [],
+        bool                             $allowAdd = false,
+        bool                             $allowDelete = false,
+                                         $deleteEmpty = false
+    )
+    {
         parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
     }
 
@@ -59,6 +60,14 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
             $form->remove($name);
         }
 
+        if (empty($data)) {
+            foreach ($block->getBlocks() as $item) {
+                if (is_string($item)) {
+                    $data[] = ['disc' => $item];
+                }
+            }
+        }
+
         foreach ($data as $name => $value) {
             $config = $block->getAvailableBlock($value['disc']);
             if ($config === null) {
@@ -68,12 +77,11 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
                 'label'        => '#' . $name . ' | ' . $config->getLabel(),
                 'block_config' => $config
             ]);
-            $name = (string) $name;
+            $name = (string)$name;
             $form->add($name, $this->type, array_replace([
                 'property_path' => '[' . $name . ']',
             ], $opts));
         }
-
     }
 
     public function preSubmit(FormEvent $event): void
@@ -102,7 +110,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
         // Add all additional rows
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
-                $name = (string) $name;
+                $name = (string)$name;
                 if ($name === 'block_selector') {
                     unset($data[$name]);
                     continue;
@@ -113,7 +121,7 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
                     'label'        => '#' . $name . ' | ' . $config->getLabel(),
                     'block_config' => $config
                 ]);
-                $name = (string) $name;
+                $name   = (string)$name;
                 $form->add($name, $this->type, array_replace([
                     'property_path' => '[' . $name . ']',
                 ], $opts));
