@@ -1,7 +1,9 @@
 {% macro prototypes_row_attr(prototypes, prototypeNames) %}
     {% set rows = {} %}
     {% for key, form in prototypes %}
-        {% set rows = rows|merge({(key): form_row(form)}) %}
+        {% if form.rendered is same as true %}
+        {% endif %}
+            {% set rows = rows|merge({(key): form_row(form)}) %}
     {% endfor %}
 
     {% set names = {} %}
@@ -17,14 +19,14 @@
         <div class="box-group" id="{{ form.vars.id }}_accordion">
             {{ form_widget(form, {attr: { 'data-cms-adbc-target': 'collection' }}) }}
         </div>
-        {% if allow_add %}
+        {% if allow_add and form.vars.block_selector.rendered is same as false %}
             <div class="block-selector-container form-inline">
                 <div class="form-group">
                     {{ form_widget(form.vars.block_selector) }}
                 </div>
                 <button type="button" data-action="click->cms-adbc#add"
                         class="btn btn-primary" data-cms-adbc-target="addButton"
-                        {% if max > 0 and form.vars.value|length == max %} disabled {% endif %}
+                    {% if max > 0 and form.vars.value|length == max %} disabled {% endif %}
                 >
                     <i class="fa fa-plus"></i></button>
             </div>
@@ -98,7 +100,7 @@
                 </div>
             {% elseif block.options.use_row %}
                 {{ form_label(child) }}
-                <div class="row">
+                <div class="row mb-3">
                     {{ form_widget(child) }}
                 </div>
             {% else %}
