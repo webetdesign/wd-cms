@@ -6,6 +6,7 @@ namespace WebEtDesign\CmsBundle\Command;
 
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use RuntimeException;
@@ -23,15 +24,15 @@ use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 class CmsDuplicateSiteCommand extends Command
 {
-    protected EntityManager $em;
-    private CmsPageRepository $pageRepository;
-    private CmsSiteRepository $siteRepository;
+    protected EntityManagerInterface $em;
+    protected CmsPageRepository $pageRepository;
+    protected CmsSiteRepository $siteRepository;
 
     /**
      * @inheritDoc
      */
     public function __construct(
-        EntityManager $em,
+        EntityManagerInterface $em,
         CmsPageRepository $pageRepository,
         CmsSiteRepository $siteRepository,
         ?string $name = null
@@ -124,7 +125,7 @@ class CmsDuplicateSiteCommand extends Command
      * @throws OptimisticLockException
      * @author Benjamin Robert
      */
-    private function duplicate(?CmsSite $site, ?CmsSite $newSite, bool $doClean)
+    protected function duplicate(?CmsSite $site, ?CmsSite $newSite, bool $doClean)
     {
         $home    = $site->getRootPage();
         $newHome = $newSite->getRootPage();
