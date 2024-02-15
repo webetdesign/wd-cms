@@ -21,40 +21,40 @@ abstract class AbstractCmsRoute implements CmsRouteInterface, Loggable
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER)]
-    private ?int $id = null;
+    protected ?int $id = null;
 
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     #[Gedmo\Versioned]
-    private ?string $name = null;
+    protected ?string $name = null;
 
 
     #[ORM\Column(type: Types::ARRAY, nullable: false)]
     #[Gedmo\Versioned]
-    private array $methods = [];
+    protected array $methods = [];
 
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     #[Gedmo\Versioned]
-    private ?string $path = null;
+    protected ?string $path = null;
 
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     #[Gedmo\Versioned]
-    private ?string $controller = null;
+    protected ?string $controller = null;
 
     #[ORM\OneToOne(mappedBy: 'route', targetEntity: CmsPage::class, cascade: ["remove"])]
     #[Gedmo\Versioned]
-    private ?CmsPage $page = null;
+    protected ?CmsPage $page = null;
 
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Gedmo\Versioned]
-    private ?string $defaults = null;
+    protected ?string $defaults = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Gedmo\Versioned]
-    private ?string $requirements = null;
+    protected ?string $requirements = null;
 
     public function __toString()
     {
