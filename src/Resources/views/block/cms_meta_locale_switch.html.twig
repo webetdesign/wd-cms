@@ -1,3 +1,4 @@
-{% for page in pages %}
-    <link rel="alternate" href="{{ page.path }}" hreflang="{{ page.locale }}"/>
+<link rel="canonical" href="{{ absolute_url(canonical.path) }}"/>
+{% for alternate in alternates %}
+    <link rel="alternate" href="{{ absolute_url(alternate.path) }}" hreflang="{{ alternate.locale }}"/>
 {% endfor %}
