@@ -233,10 +233,6 @@ class CmsPage implements Loggable
 
     public $indexedContent = null;
 
-    #[Gedmo\Versioned]
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => UrlConcrete::CHANGEFREQ_MONTHLY])]
-    protected ?string $seoSitemapChangeFreq = UrlConcrete::CHANGEFREQ_MONTHLY;
-
     public function setPosition($values)
     {
         $this->setMoveMode($values['moveMode']);
