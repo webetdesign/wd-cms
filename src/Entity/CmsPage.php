@@ -309,6 +309,11 @@ class CmsPage implements Loggable
         $this->id = $id;
     }
 
+    public function getSeoSitemapPriority(): float
+    {
+        return $this->seoSitemapPriority ?: 1 - $this->getLvl() * 0.2;
+    }
+
     public function getTitle(): ?string
     {
         return $this->title;
