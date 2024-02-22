@@ -13,6 +13,7 @@ use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use JetBrains\PhpStorm\ArrayShape;
+use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
 use WebEtDesign\CmsBundle\Handler\CmsPageSlugHandler;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use WebEtDesign\SeoBundle\Entity\SeoAwareTrait;
@@ -231,6 +232,10 @@ class CmsPage implements Loggable
     public bool $initRoute = true;
 
     public $indexedContent = null;
+
+    #[Gedmo\Versioned]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => UrlConcrete::CHANGEFREQ_MONTHLY])]
+    protected ?string $seoSitemapChangeFreq = UrlConcrete::CHANGEFREQ_MONTHLY;
 
     public function setPosition($values)
     {
