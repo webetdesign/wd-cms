@@ -89,17 +89,17 @@ class CmsRouteParamsType extends AbstractType
             }
         }
 
-        $builder->addModelTransformer(new CallbackTransformer(
-            function ($values) use ($config, $object) {
-                if ($values != null) {
-                    $values = json_decode($values, true);
-                }
-                return $values;
-            },
-            function ($values) use ($config, $locale) {
-                return json_encode($values);
-            }
-        ));
+//        $builder->addModelTransformer(new CallbackTransformer(
+//            function ($values) use ($config, $object) {
+//                if ($values != null) {
+//                    $values = json_decode($values, true);
+//                }
+//                return $values;
+//            },
+//            function ($values) use ($config, $locale) {
+//                return json_encode($values);
+//            }
+//        ));
     }
 
     /**
