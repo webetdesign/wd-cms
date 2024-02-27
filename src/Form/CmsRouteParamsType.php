@@ -31,14 +31,13 @@ class CmsRouteParamsType extends AbstractType
         $this->cmsConfig = $cmsConfig;
     }
 
-
     /**
      * @inheritDoc
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var PageInterface config */
-        $config = $options['config'];
+        $config      = $options['config'];
         $routeConfig = $config->getRoute();
 
         /** @var CmsRoute $route */
@@ -59,18 +58,22 @@ class CmsRouteParamsType extends AbstractType
                     ])
                 ];
             }
-            if (!empty($attribute->getEntityClass())) {
+            if (!empty($attribute->getFormType())) {
+                $builder->add($name, $attribute->getFormType(), [
+                    'required'    => false,
+                    'constraints' => $constraints ?? [],
+                ]);
+            } elseif (!empty($attribute->getEntityClass())) {
                 $choices = [];
                 foreach ($this->em->getRepository($attribute->getEntityClass())->findAll() as $item) {
                     if (!empty($attribute->getEntityProperty())) {
-                        $getter                       = 'get' . ucfirst($attribute->getEntityProperty());
+                        $getter = 'get' . ucfirst($attribute->getEntityProperty());
                         if ($this->cmsConfig['multilingual'] &&
                             is_subclass_of($attribute->getEntityClass(), TranslatableInterface::class)) {
                             $choices[$item->__toString()] = $item->translate($locale)->$getter();
                         } else {
                             $choices[$item->__toString()] = $item->$getter();
                         }
-
                     } else {
                         $choices[$item->__toString()] = $item->getId();
                     }
@@ -119,6 +122,5 @@ class CmsRouteParamsType extends AbstractType
     {
         return 'cms_route_params';
     }
-
 
 }

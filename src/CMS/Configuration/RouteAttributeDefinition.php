@@ -9,6 +9,7 @@ class RouteAttributeDefinition
     protected ?string         $entityProperty = null;
     protected ?string         $requirement    = null;
     protected null|string|int $default        = null;
+    protected ?string         $formType       = null;
 
     public function __construct(string $name)
     {
@@ -35,6 +36,7 @@ class RouteAttributeDefinition
     public function setName(?string $name): RouteAttributeDefinition
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -53,6 +55,7 @@ class RouteAttributeDefinition
     public function setEntityClass(?string $entityClass): RouteAttributeDefinition
     {
         $this->entityClass = $entityClass;
+
         return $this;
     }
 
@@ -71,6 +74,7 @@ class RouteAttributeDefinition
     public function setRequirement(?string $requirement): RouteAttributeDefinition
     {
         $this->requirement = $requirement;
+
         return $this;
     }
 
@@ -89,6 +93,7 @@ class RouteAttributeDefinition
     public function setDefault(int|string|null $default): RouteAttributeDefinition
     {
         $this->default = $default;
+
         return $this;
     }
 
@@ -99,6 +104,7 @@ class RouteAttributeDefinition
     public function setEntityProperty(?string $entityProperty): RouteAttributeDefinition
     {
         $this->entityProperty = $entityProperty;
+
         return $this;
     }
 
@@ -110,5 +116,23 @@ class RouteAttributeDefinition
         return $this->entityProperty;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getFormType(): ?string
+    {
+        return $this->formType;
+    }
+
+    /**
+     * @param string|null $formType
+     * @return RouteAttributeDefinition
+     */
+    public function setFormType(?string $formType): RouteAttributeDefinition
+    {
+        $this->formType = $formType;
+
+        return $this;
+    }
 
 }
