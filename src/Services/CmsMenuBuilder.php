@@ -175,7 +175,7 @@ class CmsMenuBuilder
                             $route = $item->getPage()->getRoute();
                             if ($route) {
                                 if ($route->isDynamic()) {
-                                    $params = json_decode($item->getParams(), true) ?: [];
+                                    $params = $item->getParams();
                                     try {
                                         $menuItem->setUri($this->router->generate($route->getName() . $anchor,
                                             $params));
