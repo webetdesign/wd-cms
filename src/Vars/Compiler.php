@@ -51,7 +51,7 @@ class Compiler
     {
         $exposed = [];
 
-        foreach ($reflectionClass->getProperties() as $reflectionProperty) {
+        foreach ([...$reflectionClass->getProperties(), ...$reflectionClass->getMethods()] as $reflectionProperty) {
             $propertyAttributes = $reflectionProperty->getAttributes(AsCmsVarsProperty::class);
             $objectAttributes   = $reflectionProperty->getAttributes(AsCmsVarsObject::class);
             if (!empty($propertyAttributes)) {
