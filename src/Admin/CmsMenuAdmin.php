@@ -2,7 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Sonata\Form\Type\ImmutableArrayType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -29,7 +29,7 @@ final class CmsMenuAdmin extends AbstractAdmin
     protected $pageProvider;
     private   $em;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, TemplateProvider $pageProvider)
+    public function __construct(string $code, string $class, string $baseControllerName, EntityManagerInterface $em, TemplateProvider $pageProvider)
     {
         $this->em = $em;
         $this->pageProvider = $pageProvider;
@@ -112,16 +112,16 @@ final class CmsMenuAdmin extends AbstractAdmin
                     'required'    => false,
                     'label'       => 'Page cms',
                 ]);
-            
+
             if ($subject && $subject->getId() != null && $subject->getPage() != null) {
                 /** @var CmsRoute $route */
                 $route = $subject->getPage()->getRoute();
                 if ($route->isDynamic()) {
                     $this->getRouteParamsField($formMapper, $subject, $route);
                 }
-                
+
             }
-            
+
             $formMapper
                 ->add('linkValue', null, [
                     'sonata_help' => 'Valeur pour les autres types de liens',
