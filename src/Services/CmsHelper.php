@@ -96,7 +96,7 @@ class CmsHelper
         }
 
 
-        if (sizeof($page->getRoles()) < 1) {
+        if (!$page->getRoles() || sizeof($page->getRoles()) < 1) {
             return true;
         }
 
