@@ -56,7 +56,8 @@ class CmsPage
     /**
      * @var null | CmsRouteInterface
      *
-     * Mapping Relation in WebEtDesignCmsExtension.php
+     * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsRoute", inversedBy="page", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="route_id", referencedColumnName="id", onDelete="CASCADE"))
      */
     private $route;
 
@@ -105,10 +106,21 @@ class CmsPage
      */
     private $roles;
 
+    /** @var Collection
+     * @ORM\ManyToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage")
+     * @ORM\JoinTable(name="cms__page_has_page",
+     *      joinColumns={@ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="associated_page_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     */
     private $crossSitePages;
 
     private $referencePage;
 
+    /**
+     * @var Collection
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", mappedBy="page", cascade={"persist", "remove"})
+     */
     private $declinations;
 
     /**
@@ -120,7 +132,8 @@ class CmsPage
     /**
      * @var CmsSite
      *
-     * Mapping Relation in WebEtDesignCmsExtension
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="pages")
+     * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $site;
 

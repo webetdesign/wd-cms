@@ -53,6 +53,8 @@ class CmsContent
 
     /**
      * @var null|CmsPage
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="contents")
+     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
      * @Gedmo\SortableGroup()
      */
     private $page;
@@ -67,7 +69,8 @@ class CmsContent
     /**
      * @var null|CmsSharedBlock
      * @Gedmo\SortableGroup()
-     * Mapping Relation in WebEtDesignCmsExtension
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", inversedBy="contents")
+     * @ORM\JoinColumn(name="shared_block_parent_id", referencedColumnName="id")
      */
     private $sharedBlockParent;
 
@@ -97,15 +100,16 @@ class CmsContent
     private $active;
 
     /**
-     *
-     * @var ArrayCollection|PersistentCollection
-     *
+     * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContentSlider", mappedBy="content", cascade={"persist", "remove"},orphanRemoval=false)
      */
     private $sliders;
 
     /**
      * Mapping Relation in WebEtDesignCmsExtension
      * @Gedmo\SortableGroup()
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", inversedBy="contents")
+     * @ORM\JoinColumn(name="declination_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $declination;
 

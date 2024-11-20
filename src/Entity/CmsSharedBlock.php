@@ -46,11 +46,13 @@ class CmsSharedBlock
 
     /**
      * @var ArrayCollection|PersistentCollection
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="sharedBlockParent", cascade={"persist", "remove"})
      */
     private $contents;
 
     /**
      * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContentHasSharedBlock", mappedBy="sharedBlock", cascade={"persist", "remove"})
      */
     private $contentList;
 
@@ -60,7 +62,11 @@ class CmsSharedBlock
      */
     private $template;
 
-
+    /**
+     * @var CmsSite
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="sharedBlocks")
+     * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="SET NULL")
+     */
     private $site;
 
     public $indexedContent = null;

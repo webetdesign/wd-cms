@@ -38,9 +38,7 @@ class CmsContentSlider
      *
      */
     private $url;
-
-    /**
-     */
+    
     private $media;
 
     /**
@@ -50,7 +48,10 @@ class CmsContentSlider
      */
     private $description;
 
+
     /**
+     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", inversedBy="sliders")
+     * @ORM\JoinColumn(name="content_id", referencedColumnName="id")
      */
     private $content;
 
