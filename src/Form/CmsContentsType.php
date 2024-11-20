@@ -6,14 +6,14 @@ namespace WebEtDesign\CmsBundle\Form;
 
 use Sonata\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Sonata\Form\EventListener\ResizeFormListener;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class CmsContentsType extends AbstractType
+class CmsContentsType extends CollectionType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -44,11 +44,6 @@ class CmsContentsType extends AbstractType
             'btn_catalogue'          => 'SonataFormBundle',
             'role_admin'             => false,
         ]);
-    }
-
-    public function getParent()
-    {
-        return CollectionType::class;
     }
 
 
