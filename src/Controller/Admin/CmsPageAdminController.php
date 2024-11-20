@@ -463,9 +463,7 @@ class CmsPageAdminController extends CRUDController
         $template = $this->admin->getTemplate($templateKey);
 
         // $template = $this->templateRegistry->getTemplate($templateKey);
-
-        dump($template);die;
-
+        
         return $this->renderWithExtraParams($template, [
             'action'   => 'edit',
             'form'     => $formView,
