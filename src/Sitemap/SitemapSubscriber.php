@@ -12,6 +12,7 @@ use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
@@ -24,6 +25,7 @@ class SitemapSubscriber implements EventSubscriberInterface
     private UrlGeneratorInterface  $urlGenerator;
     private CmsSiteRepository      $cmsSiteRepository;
     private ParameterBagInterface  $parameterBag;
+    private RouterInterface        $router;
 
     /**
      * @param UrlGeneratorInterface $urlGenerator
@@ -33,11 +35,13 @@ class SitemapSubscriber implements EventSubscriberInterface
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
         CmsSiteRepository $cmsSiteRepository,
-        ParameterBagInterface $parameterBag
+        ParameterBagInterface $parameterBag,
+        RouterInterface $router
     ) {
         $this->urlGenerator      = $urlGenerator;
         $this->cmsSiteRepository = $cmsSiteRepository;
         $this->parameterBag      = $parameterBag;
+        $this->router            = $router;
     }
 
     #[ArrayShape([SitemapPopulateEvent::ON_SITEMAP_POPULATE => "string"])]
@@ -95,7 +99,8 @@ class SitemapSubscriber implements EventSubscriberInterface
 
                             foreach ($page->getCrossSitePages() as $crossSitePage) {
                                 $crossRoute = $crossSitePage->getRoute();
-                                if ($crossRoute && !$crossRoute->isDynamic()) {
+                                $route = $this->router->getRouteCollection()->get($crossRoute->getName());
+                                if ($route && $crossRoute && !$crossRoute->isDynamic()) {
                                     $decoratedUrl->addLink($this->urlGenerator->generate(
                                         $crossRoute->getName(),
                                         [],
