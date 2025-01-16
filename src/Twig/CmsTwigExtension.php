@@ -197,7 +197,7 @@ class CmsTwigExtension extends AbstractExtension
      * @return string|null
      * @throws Exception
      */
-    public function cmsRenderContent($object, $content_code, ?array $context = null): null|array|string|object
+    public function cmsRenderContent($object, $content_code, ?array $context = null): null|array|string|object|bool
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 
@@ -323,8 +323,12 @@ class CmsTwigExtension extends AbstractExtension
         return $pages;
     }
 
-    public function renderLocaleSwitch(CmsPage $page, $useless = null): ?string
+    public function renderLocaleSwitch(?CmsPage $page = null, $useless = null): ?string
     {
+        if ($page === null) {
+            return null;
+        }
+
         $pages = $this->getLocalSwitchPages($page);
 
         return $this->twig->render('@WebEtDesignCms/block/cms_locale_switch.html.twig', [
