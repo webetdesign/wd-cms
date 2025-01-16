@@ -12,7 +12,7 @@ class CmsMenuLinkTypeEnum
     const SERVICE   = 'SERVICE';
 
     /** @var array user friendly named type */
-    protected static $typeName = [
+    protected static array $typeName = [
         self::CMS_PAGE  => 'Page cms',
         self::ROUTENAME => 'Route name',
         self::URL       => 'Url',
@@ -24,7 +24,7 @@ class CmsMenuLinkTypeEnum
      * @param string $typeShortName
      * @return string
      */
-    public static function getName($typeShortName)
+    public static function getName($typeShortName): string
     {
         if (!isset(static::$typeName[$typeShortName])) {
             return "Unknown type ($typeShortName)";
@@ -36,7 +36,7 @@ class CmsMenuLinkTypeEnum
     /**
      * @return array<string>
      */
-    public static function getAvailableTypes()
+    public static function getAvailableTypes(): array
     {
         return [
             self::CMS_PAGE,
@@ -47,7 +47,7 @@ class CmsMenuLinkTypeEnum
         ];
     }
 
-    public static function getChoices()
+    public static function getChoices(): array
     {
         $choices = [];
         foreach (self::getAvailableTypes() as $availableType) {
