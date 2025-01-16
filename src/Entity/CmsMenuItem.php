@@ -7,6 +7,7 @@ use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Selectable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Loggable\Loggable;
@@ -23,87 +24,87 @@ class CmsMenuItem implements Loggable
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     #[Gedmo\Versioned]
-    private $name;
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Gedmo\Versioned]
-    private $information;
+    private ?string $information = null;
 
     #[ORM\Column(name: 'link_type', type: Types::STRING, length: 255, nullable: true)]
     #[Gedmo\Versioned]
-    private $linkType;
+    private ?string $linkType = null;
 
     #[ORM\Column(name: 'link_value', type: Types::STRING, length: 255, nullable: true)]
     #[Gedmo\Versioned]
-    private $linkValue;
+    private ?string $linkValue = null;
 
     #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'menuItems')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     #[Gedmo\Versioned]
-    private $page;
+    private ?CmsPage $page = null;
 
     #[ORM\Column(name: 'is_visible', type: Types::BOOLEAN, nullable: false, options: ['default' => true])]
     #[Gedmo\Versioned]
-    private $isVisible = true;
+    private bool $isVisible = true;
 
     #[Gedmo\TreeLevel]
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
     #[Gedmo\Versioned]
-    private $lvl;
+    private ?int $lvl = null;
 
     #[Gedmo\TreeLeft]
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
     #[Gedmo\Versioned]
-    private $lft;
+    private ?int $lft = null;
 
     #[Gedmo\TreeRight]
     #[ORM\Column(type: Types::INTEGER, nullable: false)]
     #[Gedmo\Versioned]
-    private $rgt;
+    private ?int $rgt = null;
 
     #[Gedmo\TreeRoot]
     #[ORM\ManyToOne(targetEntity: CmsMenuItem::class)]
     #[ORM\JoinColumn(name: 'tree_root', referencedColumnName: "id", onDelete: 'CASCADE')]
     #[Gedmo\Versioned]
-    private $root;
+    private ?CmsMenuItem $root = null;
 
     #[Gedmo\TreeParent]
     #[ORM\ManyToOne(targetEntity: CmsMenuItem::class, inversedBy: 'children')]
     #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Gedmo\Versioned]
-    private $parent;
+    private ?CmsMenuItem $parent = null;
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: CmsMenuItem::class)]
     #[ORM\OrderBy(['lft' => 'ASC'])]
-    private $children;
+    private ?Collection $children;
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
     #[Gedmo\Versioned]
-    private $liClass;
+    private ?string $liClass = null;
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
     #[Gedmo\Versioned]
-    private $ulClass;
+    private ?string $ulClass = null;
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
     #[Gedmo\Versioned]
-    private $linkClass;
+    private ?string $linkClass = null;
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
     #[Gedmo\Versioned]
-    private $iconClass;
+    private ?string $iconClass = null;
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
     #[Gedmo\Versioned]
-    private $connected;
+    private ?string $connected = null;
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
     #[Gedmo\Versioned]
-    private $role;
+    private ?string $role = null;
 
     private $moveMode;
 
@@ -112,15 +113,15 @@ class CmsMenuItem implements Loggable
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $params = [];
 
-    #[ORM\ManyToOne(targetEntity: CmsMenu::class, inversedBy: "children", cascade: ["persist"])]
+    #[ORM\ManyToOne(targetEntity: CmsMenu::class, cascade: ["persist"], inversedBy: "children")]
     #[ORM\JoinColumn(name: "menu_id", referencedColumnName: "id")]
-    private $menu;
+    private ?CmsMenu $menu = null;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
-    private $blank = 0;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    private bool $blank = false;
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
-    protected $anchor;
+    protected ?string $anchor = null;
 
     public function __construct()
     {
@@ -132,17 +133,16 @@ class CmsMenuItem implements Loggable
         return (string)$this->getName();
     }
 
-    public function getPath()
+    public function getPath(): array|string|null
     {
         $pagePath = $this->getPage()->getRoute()->getPath();
-        $path     = preg_replace_callback('/\{(\w+)\}/', function ($matches) {
+
+        return preg_replace_callback('/\{(\w+)\}/', function ($matches) {
             return $this->params[$matches[1]] ?? '';
         }, $pagePath);
-
-        return $path;
     }
 
-    public function isRoot()
+    public function isRoot(): bool
     {
         return $this->getId() == $this->getRoot()->getId();
     }
@@ -160,7 +160,7 @@ class CmsMenuItem implements Loggable
         }
     }
 
-    public function setPosition($values)
+    public function setPosition($values): void
     {
         $this->setMoveMode($values['moveMode']);
         $this->setMoveTarget($values['moveTarget']);
@@ -168,7 +168,7 @@ class CmsMenuItem implements Loggable
 
     #[ArrayShape(['moveMode'   => "null|String",
                   'moveTarget' => "null|\WebEtDesign\CmsBundle\Entity\CmsMenuItem"
-    ])] public function getPosition()
+    ])] public function getPosition(): array
     {
         return [
             'moveMode'   => $this->getMoveMode(),
@@ -176,33 +176,27 @@ class CmsMenuItem implements Loggable
         ];
     }
 
-    public function getVisibleString()
+    public function getVisibleString(): string
     {
         if ($this->isVisible()) {
-            switch ($this->getConnected()) {
-                case 'ONLY_LOGIN':
-                    return 'Visible si connecté';
-                    break;
-                case 'ONLY_LOGOUT':
-                    return 'Visible si non connecté';
-                    break;
-                default:
-                    return 'Visible';
-                    break;
-            }
+            return match ($this->getConnected()) {
+                'ONLY_LOGIN'  => 'Visible si connecté',
+                'ONLY_LOGOUT' => 'Visible si non connecté',
+                default       => 'Visible',
+            };
         } else {
             return 'Caché';
         }
     }
 
-    public function getChildrenRight()
+    public function getChildrenRight(): Collection&Selectable
     {
         $criteria = Criteria::create()->orderBy(['rgt' => 'ASC']);
 
         return $this->children->matching($criteria);
     }
 
-    public function getChildrenLeft()
+    public function getChildrenLeft(): Collection&Selectable
     {
         $criteria = Criteria::create()->orderBy(['lft' => 'ASC']);
 
@@ -275,7 +269,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return Collection|CmsMenuItem[]
+     * @return Collection
      */
     public function getChildren(): Collection
     {
@@ -341,17 +335,17 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return mixed
+     * @return CmsPage|null
      */
-    public function getPage()
+    public function getPage(): ?CmsPage
     {
         return $this->page;
     }
 
     /**
-     * @param mixed $page
+     * @param CmsPage|null $page
      */
-    public function setPage($page): void
+    public function setPage(?CmsPage $page): void
     {
         $this->page = $page;
     }
@@ -405,7 +399,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLinkType(): ?string
     {
@@ -413,7 +407,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param string $linkType
+     * @param string|null $linkType
      */
     public function setLinkType(?string $linkType): void
     {
@@ -421,7 +415,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      * @deprecated use getLiClass()
      */
     public function getClasses(): ?string
@@ -430,7 +424,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getConnected(): ?string
     {
@@ -438,7 +432,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param string $connected
+     * @param string|null $connected
      * @return CmsMenuItem
      */
     public function setConnected(?string $connected): CmsMenuItem
@@ -449,7 +443,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return array
+     * @return string|null
      */
     public function getRole(): ?string
     {
@@ -457,7 +451,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param string $roles
+     * @param string|null $role
      * @return CmsMenuItem
      */
     public function setRole(?string $role): CmsMenuItem
@@ -518,10 +512,10 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param CmsMenu $menu
+     * @param CmsMenu|null $menu
      * @return CmsMenuItem
      */
-    public function setMenu(CmsMenu $menu): CmsMenuItem
+    public function setMenu(?CmsMenu $menu): CmsMenuItem
     {
         $this->menu = $menu;
 
@@ -529,7 +523,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return CmsMenu
+     * @return CmsMenu|null
      */
     public function getMenu(): ?CmsMenu
     {
@@ -556,7 +550,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param string $anchor
+     * @param string|null $anchor
      * @return CmsMenuItem
      */
     public function setAnchor(?string $anchor): CmsMenuItem
@@ -567,7 +561,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAnchor(): ?string
     {
@@ -585,7 +579,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param string $liClass
+     * @param string|null $liClass
      * @return CmsMenuItem
      */
     public function setLiClass(?string $liClass): CmsMenuItem
@@ -596,7 +590,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLiClass(): ?string
     {
@@ -604,7 +598,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param string $ulClass
+     * @param string|null $ulClass
      * @return CmsMenuItem
      */
     public function setUlClass(?string $ulClass): CmsMenuItem
@@ -615,7 +609,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUlClass(): ?string
     {
@@ -623,7 +617,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param string $linkClass
+     * @param string|null $linkClass
      * @return CmsMenuItem
      */
     public function setLinkClass(?string $linkClass): CmsMenuItem
@@ -634,7 +628,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLinkClass(): ?string
     {
@@ -642,7 +636,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIconClass(): ?string
     {
@@ -650,7 +644,7 @@ class CmsMenuItem implements Loggable
     }
 
     /**
-     * @param string $iconClass
+     * @param string|null $iconClass
      * @return CmsMenuItem
      */
     public function setIconClass(?string $iconClass): CmsMenuItem
