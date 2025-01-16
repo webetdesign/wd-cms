@@ -107,6 +107,8 @@ class CmsDuplicateMenuCommand extends Command
         $this->duplicate($root, $newRoot);
 
         $this->em->flush();
+
+        return self::SUCCESS;
     }
 
     /**
