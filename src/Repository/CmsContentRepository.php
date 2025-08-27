@@ -2,8 +2,11 @@
 
 namespace WebEtDesign\CmsBundle\Repository;
 
+use App\Cms\Page\ActualityPage;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
+use WebEtDesign\ActualityBundle\Entity\Actuality;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -76,8 +79,7 @@ class CmsContentRepository extends ServiceEntityRepository
             ->setParameter('parent', $content->getPage()->getParent())
             ->andWhere('c.code = :code')
             ->setParameter('code', $content->getCode())
-            ->setMaxResults(1)
-        ;
+            ->setMaxResults(1);
 
         try {
             return $qb->getQuery()->getOneOrNullResult();
@@ -140,30 +142,69 @@ class CmsContentRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c');
 
-        if($parent instanceof CmsPage) {
-            $qb->andWhere('c.page = :page')
-                ->setParameter('page', $parent);
+        switch (true) {
+            case $parent instanceof CmsPage:
+                $qb->andWhere('c.page = :page')
+                    ->setParameter('page', $parent);
+                break;
+
+            case $parent instanceof CmsPageDeclination:
+                $qb->andWhere('c.declination = :declination')
+                    ->setParameter('declination', $parent);
+                break;
+
+            case $parent instanceof CmsSharedBlock:
+                $qb->andWhere('c.sharedBlockParent = :sharedBlock')
+                    ->setParameter('sharedBlock', $parent);
+                break;
+
+            default:
+                throw new \InvalidArgumentException('Parent type not supported in QB mode');
         }
 
-        if($parent instanceof CmsPageDeclination) {
-            $qb->andWhere('c.declination = :declination')
-                ->setParameter('declination', $parent);
-        }
-
-        if($parent instanceof CmsSharedBlock) {
-            $qb->andWhere('c.sharedBlockParent = :sharedBlock')
-                ->setParameter('sharedBlock', $parent);
-        }
-
+        // filtres communs
         if ($criteria === 'IN') {
-            $qb->andWhere($qb->expr()->in('c.code', $codes));
+            $qb->andWhere($qb->expr()->in('c.code', ':codes'))
+                ->setParameter('codes', $codes);
         }
 
         if ($criteria === 'OUT') {
-            $qb->andWhere($qb->expr()->notIn('c.code', $codes));
+            $qb->andWhere($qb->expr()->notIn('c.code', ':codes'))
+                ->setParameter('codes', $codes);
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function findByCustomParent($parent, array $codes, string $table, string $field, ?string $criteria = null): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm->addRootEntityFromClassMetadata(CmsContent::class, 'c');
+
+        $sql = "
+            SELECT c.*
+            FROM cms__content c
+            INNER JOIN $table ac ON ac.cms_content_id = c.id
+            WHERE ac.$field = :objectId
+        ";
+
+        // filtres
+        if ($criteria === 'IN' && !empty($codes)) {
+            $sql .= " AND c.code IN (:codes)";
+        }
+
+        if ($criteria === 'OUT' && !empty($codes)) {
+            $sql .= " AND c.code NOT IN (:codes)";
+        }
+
+        $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query->setParameter('objectId', $parent->getId());
+
+        if (!empty($codes)) {
+            $query->setParameter('codes', $codes); // Doctrine expanse les tableaux
+        }
+
+        return $query->getResult();
     }
 
     // /**

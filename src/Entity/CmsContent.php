@@ -35,18 +35,15 @@ class CmsContent implements Loggable
     #[Gedmo\Versioned]
     private ?string $value = null;
 
-    #[Gedmo\SortableGroup]
     #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'contents')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Gedmo\Versioned]
     private ?CmsPage $page = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    #[Gedmo\SortablePosition]
     #[Gedmo\Versioned]
     private ?int $position = null;
 
-    #[Gedmo\SortableGroup]
     #[ORM\ManyToOne(targetEntity: CmsSharedBlock::class, inversedBy: 'contents')]
     #[ORM\JoinColumn(name: "shared_block_parent_id", referencedColumnName: 'id')]
     #[Gedmo\Versioned]
@@ -60,7 +57,6 @@ class CmsContent implements Loggable
     #[Gedmo\Versioned]
     private bool $active;
 
-    #[Gedmo\SortableGroup]
     #[ORM\ManyToOne(targetEntity: CmsPageDeclination::class, inversedBy: 'contents')]
     #[ORM\JoinColumn(name: "declination_id", referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Gedmo\Versioned]

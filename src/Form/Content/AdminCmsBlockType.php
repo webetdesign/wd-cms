@@ -60,6 +60,7 @@ class AdminCmsBlockType extends AbstractType
             'config'     => null,
         ]);
 
+        $resolver->setDefined('template_code');
     }
 
     public function getBlockPrefix(): string

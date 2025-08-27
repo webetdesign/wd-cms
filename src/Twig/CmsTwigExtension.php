@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Twig;
 
+use Doctrine\Common\Collections\Criteria;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -114,12 +115,18 @@ class CmsTwigExtension extends AbstractExtension
 
     private function retrieveContent($object, $content_code): ?CmsContent
     {
-        /** @var CmsContent $content */
-        $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByObjectAndContentCodeAndType(
-                $object,
-                $content_code
-            );
+        if ($object instanceof CmsPageDeclination || $object instanceof CmsPage || $object instanceof CmsSharedBlock) {
+            /** @var CmsContent $content */
+            $content = $this->em->getRepository(CmsContent::class)
+                ->findOneByObjectAndContentCodeAndType(
+                    $object,
+                    $content_code
+                );
+        } else {
+            $criteria = new Criteria();
+            $criteria->where(Criteria::expr()->eq('code', $content_code));
+            $content = $object->getContents()->matching($criteria)->first();
+        }
 
         return $content;
     }
