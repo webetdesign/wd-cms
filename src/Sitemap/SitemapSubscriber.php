@@ -40,11 +40,11 @@ class SitemapSubscriber implements EventSubscriberInterface
         $this->parameterBag      = $parameterBag;
     }
 
-    #[ArrayShape([SitemapPopulateEvent::ON_SITEMAP_POPULATE => "string"])]
+    #[ArrayShape([SitemapPopulateEvent::class => "string"])]
     public static function getSubscribedEvents(): array
     {
         return [
-            SitemapPopulateEvent::ON_SITEMAP_POPULATE => 'populate',
+            SitemapPopulateEvent::class => 'populate',
         ];
     }
 

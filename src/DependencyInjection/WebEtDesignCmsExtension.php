@@ -8,7 +8,7 @@
 
 namespace WebEtDesign\CmsBundle\DependencyInjection;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Sonata\Doctrine\Mapper\Builder\ColumnDefinitionBuilder;
 use Sonata\Doctrine\Mapper\DoctrineCollector;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -148,7 +148,7 @@ class WebEtDesignCmsExtension extends Extension
         $collector = DoctrineCollector::getInstance();
 
         $collector->addInheritanceType(AbstractCmsRoute::class,
-            ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE);
+            ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE);
         $collector->addDiscriminator(AbstractCmsRoute::class, 'base', CmsRoute::class);
         $collector->addDiscriminatorColumn(AbstractCmsRoute::class,
             ColumnDefinitionBuilder::create()

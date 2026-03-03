@@ -5,6 +5,9 @@ namespace WebEtDesign\CmsBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,20 +17,31 @@ use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 
+#[AsCommand(
+    name: 'cms:page:update-contents',
+    description: 'Update configuration of content\'s pages and declination with configuration file',
+)]
+#[Argument(
+    name: 'template',
+    mode: InputArgument::OPTIONAL,
+    description: 'template name',
+)]
+#[Option(
+    name: 'all',
+    shortcut: 'a',
+    mode: InputOption::VALUE_NONE,
+    description: 'Reset all page',
+)]
+#[Option(
+    name: 'page',
+    shortcut: 'p',
+    mode: InputOption::VALUE_REQUIRED,
+    description: 'Page id',
+)]
 class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 {
     protected CmsPageRepository $pageRp;
     private TemplateRegistry         $templateRegistry;
-
-    protected function configure(): void
-    {
-        $this
-            ->setName('cms:page:update-contents')
-            ->setDescription('Update configuration of content\'s pages and declination with configuration file')
-            ->addArgument('template', InputArgument::OPTIONAL, 'template name')
-            ->addOption('all', '-a', InputOption::VALUE_NONE, 'Reset all page')
-            ->addOption('page', '-p', InputOption::VALUE_REQUIRED, 'Page id');
-    }
 
     public function __construct(
         EntityManagerInterface $em,
@@ -39,7 +53,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
     }
 
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(InputInterface $input, OutputInterface $output): int
     {
         $this->init($input, $output);
         $this->pageRp = $this->em->getRepository(CmsPage::class);
@@ -52,7 +66,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
                 }
                 $this->io->success('Done');
             }
-            return 0;
+            return Command::SUCCESS;
         }
 
         $pageId = $input->getOption('page');
@@ -61,7 +75,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
             if ($page) {
                 $this->resetPage($page);
                 $this->io->success('Done');
-                return 0;
+                return Command::SUCCESS;
             }
         }
 
@@ -73,7 +87,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
         $this->processTemplate($template);
 
         $this->io->success('Done');
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function processTemplate($template): void

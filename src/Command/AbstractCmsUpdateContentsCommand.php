@@ -6,6 +6,8 @@ namespace WebEtDesign\CmsBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use WebEtDesign\CmsBundle\CMS\Template\ComponentInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
@@ -30,21 +32,22 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
         $this->em = $em;
     }
 
-    protected function init($input, $output)
+    protected function init(InputInterface $input, OutputInterface $output): void
     {
         $this->contentRp = $this->em->getRepository(CmsContent::class);
         $this->io        = new SymfonyStyle($input, $output);
     }
 
-    protected function processContent($object, ComponentInterface $config)
+    protected function processContent(object $object, ComponentInterface $config): bool
     {
+        $contentConf = [];
         foreach ($config->getBlocks() as $block) {
             $contentConf[$block->getCode()] = $block;
         }
 
         $codes = array_keys($contentConf ?? []);
 
-        if (count($codes) == 0) {
+        if (count($codes) === 0) {
             return true;
         }
 
