@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace WebEtDesign\CmsBundle\EventListener;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
@@ -12,6 +13,8 @@ use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class CmsBlockResizeFormListener extends ResizeFormListener
 {
+    private string $entryType;
+    private array $entryOptions;
 
     public function __construct(
         private readonly TemplateRegistry $templateRegistry,
@@ -23,10 +26,12 @@ class CmsBlockResizeFormListener extends ResizeFormListener
         $deleteEmpty = false
     ) {
         parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
+        $this->entryType = $type;
+        $this->entryOptions = $options;
     }
 
 
-    public function preSetData(FormEvent $event): void
+    public function postSetData(FormEvent|PostSetDataEvent $event): void
     {
         $form = $event->getForm();
         /** @var CmsContent $data */
@@ -62,11 +67,11 @@ class CmsBlockResizeFormListener extends ResizeFormListener
                     $tpl     = $this->templateRegistry->get($template);
                     $config  = $tpl->getBlock($value->getCode());
                     $block   = $config ? $this->blockRegistry->get($config) : null;
-                    $options = array_merge($this->options, ['block' => $block, 'config' => $config]);
+                    $options = array_merge($this->entryOptions, ['block' => $block, 'config' => $config]);
 
-                    $form->add($name, $this->type, array_replace([
+                    $form->add($name, $this->entryType, array_replace([
                         'property_path' => '[' . $name . ']',
-                    ], $options ?? $this->options));
+                    ], $options ?? $this->entryOptions));
                 }
             }
         }
