@@ -8,6 +8,7 @@ use Exception;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,23 +21,6 @@ use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 #[AsCommand(
     name: 'cms:page:update-contents',
     description: 'Update configuration of content\'s pages and declination with configuration file',
-)]
-#[Argument(
-    name: 'template',
-    mode: InputArgument::OPTIONAL,
-    description: 'template name',
-)]
-#[Option(
-    name: 'all',
-    shortcut: 'a',
-    mode: InputOption::VALUE_NONE,
-    description: 'Reset all page',
-)]
-#[Option(
-    name: 'page',
-    shortcut: 'p',
-    mode: InputOption::VALUE_REQUIRED,
-    description: 'Page id',
 )]
 class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 {
@@ -53,12 +37,29 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
     }
 
 
-    public function __invoke(InputInterface $input, OutputInterface $output): int
+    public function __invoke(
+        InputInterface $input,
+        OutputInterface $output,
+        #[Argument(
+            description: 'template name',
+        )]
+        ?string $template = null,
+        #[Option(
+            shortcut: 'a',
+            description: 'Reset all page',
+        )]
+        bool $all = false,
+        #[Option(
+            shortcut: 'p',
+            description: 'Page id',
+        )]
+        ?int $page = null
+    ): int
     {
         $this->init($input, $output);
         $this->pageRp = $this->em->getRepository(CmsPage::class);
 
-        if ($input->getOption('all')) {
+        if ($all) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
                 $templates = array_values($this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_PAGE));
                 foreach ($templates as $template) {
@@ -69,7 +70,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
             return Command::SUCCESS;
         }
 
-        $pageId = $input->getOption('page');
+        $pageId = $page;
         if (isset($pageId)) {
             $page = $this->pageRp->find($pageId);
             if ($page) {
@@ -79,7 +80,6 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
             }
         }
 
-        $template = $input->getArgument('template');
         if (!$template) {
             $template = $this->selectTemplate();
         }
