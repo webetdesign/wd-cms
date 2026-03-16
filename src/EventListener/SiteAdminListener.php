@@ -9,6 +9,7 @@ use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -35,9 +36,9 @@ class SiteAdminListener
         $this->parameterBag = $parameterBag;
     }
 
-    public function prePersist($event): void
+    public function prePersist(LifecycleEventArgs $event): void
     {
-        $em = $event->getEntityManager();
+        $em = $event->getObjectManager();
         /** @var CmsSite $site */
         $site = $event->getObject();
 
@@ -54,7 +55,7 @@ class SiteAdminListener
         }
     }
 
-    public function postUpdate($event): void
+    public function postUpdate(LifecycleEventArgs $event): void
     {
         $site = $event->getObject();
 
@@ -65,7 +66,7 @@ class SiteAdminListener
         $this->warmUpRouteCache();
     }
 
-    public function postPersist($event)
+    public function postPersist(LifecycleEventArgs $event): void
     {
         $site = $event->getObject();
 

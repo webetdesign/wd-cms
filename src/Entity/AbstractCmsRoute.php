@@ -29,7 +29,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface, Loggable
     protected ?string $name = null;
 
 
-    #[ORM\Column(type: Types::ARRAY, nullable: false)]
+    #[ORM\Column(type: Types::JSON, nullable: false)]
     #[Gedmo\Versioned]
     protected array $methods = [];
 
