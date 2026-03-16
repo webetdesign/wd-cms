@@ -32,7 +32,7 @@ use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class WebEtDesignCmsExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
@@ -132,7 +132,7 @@ class WebEtDesignCmsExtension extends Extension
      * @param array $config
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      */
-    public function configureClass($config, ContainerBuilder $container)
+    public function configureClass($config, ContainerBuilder $container): void
     {
         // manager configuration
         $container->setParameter('wd_cms.admin.content.user', $config['class']['user']);
@@ -143,7 +143,7 @@ class WebEtDesignCmsExtension extends Extension
         return 'web_et_design_cms';
     }
 
-    private function registerDoctrineMapping($config)
+    private function registerDoctrineMapping($config): void
     {
         $collector = DoctrineCollector::getInstance();
 
