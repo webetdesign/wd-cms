@@ -272,7 +272,7 @@ class CmsMenuBuilder
     public function isActive(CmsMenuItem $item)
     {
         $request         = $this->requestStack->getCurrentRequest();
-        $activeRouteName = $request->get('_route');
+        $activeRouteName = $request->attributes->get('_route');
         if (!$item->getPage()->getRoute()) {
             return false;
         }

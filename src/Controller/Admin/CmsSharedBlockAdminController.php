@@ -51,7 +51,7 @@ final class CmsSharedBlockAdminController extends CRUDController
         }
 
         $session = $request->getSession();
-        $id = $request->get($this->admin->getIdParameter());
+        $id = $request->attributes->get($this->admin->getIdParameter());
 
         $this->admin->checkAccess('list');
 
@@ -60,7 +60,7 @@ final class CmsSharedBlockAdminController extends CRUDController
             return $preResponse;
         }
 
-        if ($listMode = $request->get('_list_mode')) {
+        if ($listMode = $request->query->get('_list_mode')) {
             $this->admin->setListMode($listMode);
         }
 

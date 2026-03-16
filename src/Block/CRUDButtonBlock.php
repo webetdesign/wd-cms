@@ -39,7 +39,7 @@ class CRUDButtonBlock extends AbstractBlockService
      * @return Response|void
      * @throws Exception
      */
-    public function execute(BlockContextInterface $blockContext, Response $response = null): Response
+    public function execute(BlockContextInterface $blockContext, ?Response $response = null): Response
     {
 
         $admin = $this->pool->getAdminByAdminCode($blockContext->getSetting('code'));
