@@ -25,7 +25,7 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
 
     public function __construct(
         EntityManagerInterface $em,
-        string                 $name = null
+        ?string                 $name = null
     )
     {
         parent::__construct($name);

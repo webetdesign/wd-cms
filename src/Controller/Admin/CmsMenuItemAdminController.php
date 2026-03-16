@@ -115,7 +115,7 @@ final class CmsMenuItemAdminController extends CRUDController
             $newObject->setMoveTarget($target);
             $newObject->setMoveMode('persistAsLastChildOf');
         } else {
-            $menu = $this->em->getRepository(CmsMenu::class)->find($request->get('childId'));
+            $menu = $this->em->getRepository(CmsMenu::class)->find($request->attributes->get('childId'));
             $newObject->setMoveTarget($menu->getRoot());
         }
 
@@ -296,17 +296,17 @@ final class CmsMenuItemAdminController extends CRUDController
     {
         $url = false;
 
-        if (null !== $request->get('btn_update_and_list')) {
+        if (null !== $request->request->get('btn_update_and_list')) {
             return $this->redirect($this->admin->getParent()->generateUrl('list'));
         }
-        if (null !== $request->get('btn_create_and_list')) {
+        if (null !== $request->request->get('btn_create_and_list')) {
             return $this->redirect($this->admin->getParent()->generateUrl('list'));
         }
 
-        if (null !== $request->get('btn_create_and_create')) {
+        if (null !== $request->request->get('btn_create_and_create')) {
             $params = [];
             if ($this->admin->hasActiveSubClass()) {
-                $params['subclass'] = $request->get('subclass');
+                $params['subclass'] = $request->request->get('subclass');
             }
             $url = $this->admin->generateUrl('create', $params);
         }

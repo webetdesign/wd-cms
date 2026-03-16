@@ -3,18 +3,21 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
-class CmsBlockResizeFormListener extends ResizeFormListener
+class CmsBlockResizeFormListener implements EventSubscriberInterface
 {
     private string $entryType;
     private array $entryOptions;
+    private ResizeFormListener $resizeFormListener;
 
     public function __construct(
         private readonly TemplateRegistry $templateRegistry,
@@ -25,11 +28,29 @@ class CmsBlockResizeFormListener extends ResizeFormListener
         bool $allowDelete = false,
         $deleteEmpty = false,
     ) {
-        parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
         $this->entryType = $type;
         $this->entryOptions = $options;
+        $this->resizeFormListener = new ResizeFormListener($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
     }
 
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            FormEvents::POST_SET_DATA => 'postSetData',
+            FormEvents::PRE_SUBMIT => 'preSubmit',
+            FormEvents::SUBMIT => ['onSubmit', 50],
+        ];
+    }
+
+    public function preSubmit(FormEvent $event): void
+    {
+        $this->resizeFormListener->preSubmit($event);
+    }
+
+    public function onSubmit(FormEvent $event): void
+    {
+        $this->resizeFormListener->onSubmit($event);
+    }
 
     public function postSetData(FormEvent|PostSetDataEvent $event): void
     {

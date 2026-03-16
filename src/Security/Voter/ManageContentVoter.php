@@ -4,6 +4,7 @@ namespace WebEtDesign\CmsBundle\Security\Voter;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter as Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -19,7 +20,7 @@ class ManageContentVoter extends Voter
         return $attribute === self::CAN_MANAGE_CONTENT;
     }
 
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
 

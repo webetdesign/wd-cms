@@ -246,7 +246,7 @@ class CmsTwigExtension extends AbstractExtension
             array_merge(['block' => $block, 'page' => $this->cmsHelper->getPage()], $context));
     }
 
-    public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
+    public function cmsPath($route, $params = [], $absoluteUrl = false, ?CmsPage $page = null)
     {
         if ($this->configCms['multilingual'] && $page !== null) {
             $prefix = $page->getSite()->getLocale() . '_';
@@ -275,7 +275,7 @@ class CmsTwigExtension extends AbstractExtension
             if ($attribute->getEntityClass() !== null && is_subclass_of($attribute->getEntityClass(),
                     TranslatableInterface::class)) {
                 $repoMethod = 'findOneBy' . ucfirst($attribute->getEntityProperty() ?: 'id');
-                $criterion  = $request->get('_route_params')[$attribute->getName()] ?? null;
+                $criterion  = $request->attributes->get('_route_params')[$attribute->getName()] ?? null;
 
                 $object = $this->em->getRepository($attribute->getEntityClass())->$repoMethod($criterion, $page->getSite()->getLocale());
 
@@ -286,9 +286,9 @@ class CmsTwigExtension extends AbstractExtension
             } else {
                 if ($attribute->getEntityClass() !== null) {
                     $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
-                    $routeParams[$attribute->getName()] = $request->get($attribute->getName())->$getProperty();
+                    $routeParams[$attribute->getName()] = $request->attributes->get($attribute->getName())->$getProperty();
                 } else {
-                    $routeParams[$attribute->getName()] = $request->get($attribute->getName());
+                    $routeParams[$attribute->getName()] = $request->attributes->get($attribute->getName());
                 }
             }
         }

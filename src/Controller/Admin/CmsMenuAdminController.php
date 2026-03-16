@@ -326,17 +326,17 @@ class CmsMenuAdminController extends CRUDController
     {
         $url = false;
 
-        if (null !== $request->get('btn_update_and_list')) {
+        if (null !== $request->request->get('btn_update_and_list')) {
             return $this->customRedirectToList($object->getId());
         }
-        if (null !== $request->get('btn_create_and_list')) {
+        if (null !== $request->request->get('btn_create_and_list')) {
             return $this->customRedirectToList($object->getId());
         }
 
-        if (null !== $request->get('btn_create_and_create')) {
+        if (null !== $request->request->get('btn_create_and_create')) {
             $params = [];
             if ($this->admin->hasActiveSubClass()) {
-                $params['subclass'] = $request->get('subclass');
+                $params['subclass'] = $request->request->get('subclass');
             }
             $url = $this->admin->generateUrl('create', $params);
         }

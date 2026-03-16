@@ -10,9 +10,9 @@ interface TemplateRegistryInterface
 
     public function get(string $code): ComponentInterface;
 
-    public function getList(string $type, string $collection = null): array;
+    public function getList(string $type, ?string $collection = null): array;
 
-    public function getChoiceList(string $type, string $collection = null): array;
+    public function getChoiceList(string $type, ?string $collection = null): array;
 
     public function getConfigs(): array;
 

@@ -30,7 +30,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
     public function __construct(
         EntityManagerInterface $em,
         TemplateRegistry $templateRegistry,
-        string $name = null
+        ?string $name = null
     ) {
         parent::__construct($em, $name);
         $this->templateRegistry = $templateRegistry;

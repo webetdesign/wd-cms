@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace WebEtDesign\CmsBundle\EventListener;
 
 use JetBrains\PhpStorm\ArrayShape;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
@@ -12,12 +13,13 @@ use Symfony\Component\Form\FormEvents;
 use WebEtDesign\CmsBundle\CMS\Configuration\BlockDefinition;
 use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 
-class CmsDynamicBlockResizeFormListener extends ResizeFormListener
+class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
 {
     private string $entryType;
     private array $entryOptions;
     private bool $allowAddLocal;
     private bool $allowDeleteLocal;
+    private ResizeFormListener $resizeFormListener;
 
     public function __construct(
         private readonly BlockRegistry   $blockRegistry,
@@ -29,11 +31,11 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
                                          $deleteEmpty = false
     )
     {
-        parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
         $this->entryType = $type;
         $this->entryOptions = $options;
         $this->allowAddLocal = $allowAdd;
         $this->allowDeleteLocal = $allowDelete;
+        $this->resizeFormListener = new ResizeFormListener($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
     }
 
     #[ArrayShape([
@@ -48,6 +50,11 @@ class CmsDynamicBlockResizeFormListener extends ResizeFormListener
             // (MergeCollectionListener, MergeDoctrineCollectionListener)
             FormEvents::SUBMIT       => ['onSubmit', 50],
         ];
+    }
+
+    public function onSubmit(FormEvent $event): void
+    {
+        $this->resizeFormListener->onSubmit($event);
     }
 
     public function postSetData(FormEvent|PostSetDataEvent $event): void
