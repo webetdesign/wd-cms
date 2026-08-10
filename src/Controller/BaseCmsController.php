@@ -83,7 +83,7 @@ class BaseCmsController extends AbstractController
     public function getDeclination(CmsPage $page): ?CmsPageDeclination
     {
         /** @var RequestStack $requestStack */
-        $requestStack     = $this->get('request_stack');
+        $requestStack     = $this->container->get('request_stack');
         $request          = $requestStack->getCurrentRequest();
         $path             = $request->getRequestUri();
         $path             = preg_replace('(\?.*)', '', $path);

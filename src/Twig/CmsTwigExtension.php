@@ -67,6 +67,7 @@ class CmsTwigExtension extends AbstractExtension
         $this->declinationService = $declinationService;
         $this->blockRegistry      = $blockRegistry;
         $this->cmsHelper          = $cmsHelper;
+        $this->customContents     = [];
     }
 
     public function getTests(): array
