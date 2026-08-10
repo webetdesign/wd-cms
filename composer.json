@@ -1,6 +1,5 @@
 {
     "name": "webetdesign/wd-cms",
-    "version": "7.x-dev",
     "type": "symfony-bundle",
     "license": "proprietary",
     "authors": [
