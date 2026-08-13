@@ -43,6 +43,7 @@ class CmsTwigExtension extends AbstractExtension
     private BlockRegistry        $blockRegistry;
     private CmsHelper            $cmsHelper;
     private array                $configCms;
+    protected array              $customContents;
 
     public function __construct(
         EntityManagerInterface $entityManager,
