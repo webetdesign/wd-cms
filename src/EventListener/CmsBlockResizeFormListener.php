@@ -26,7 +26,7 @@ class CmsBlockResizeFormListener implements EventSubscriberInterface
         array $options = [],
         bool $allowAdd = false,
         bool $allowDelete = false,
-        $deleteEmpty = false
+        $deleteEmpty = false,
     ) {
         $this->entryType = $type;
         $this->entryOptions = $options;
@@ -71,7 +71,6 @@ class CmsBlockResizeFormListener implements EventSubscriberInterface
             $form->remove($name);
         }
 
-
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
             $name = (string) $name;
@@ -82,6 +81,8 @@ class CmsBlockResizeFormListener implements EventSubscriberInterface
                     $template = $value->getDeclination()->getPage()->getTemplate();
                 } elseif ($value->getSharedBlockParent()) {
                     $template = $value->getSharedBlockParent()->getTemplate();
+                } elseif (isset($this->options['template_code'])) {
+                    $template = $this->options['template_code'];
                 }
 
                 if (isset($template)) {

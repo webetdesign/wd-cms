@@ -1,10 +1,9 @@
 <?php
 
-
 namespace WebEtDesign\CmsBundle\Command;
 
-
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,8 +25,9 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
 
     public function __construct(
         EntityManagerInterface $em,
-        ?string $name = null
-    ) {
+        ?string                 $name = null
+    )
+    {
         parent::__construct($name);
         $this->em = $em;
     }
@@ -38,7 +38,7 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
         $this->io        = new SymfonyStyle($input, $output);
     }
 
-    protected function processContent(object $object, ComponentInterface $config): bool
+    protected function processContent($object, ComponentInterface $config, ?string $table = null, ?string $field = null): true
     {
         $contentConf = [];
         foreach ($config->getBlocks() as $block) {
@@ -51,8 +51,15 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
             return true;
         }
 
-        $ins  = $this->contentRp->findByParentInOutCodes($object, $codes, 'IN');
-        $outs = $this->contentRp->findByParentInOutCodes($object, $codes, 'OUT');
+        if ($object instanceof CmsPage || $object instanceof CmsPageDeclination || $object instanceof CmsSharedBlock) {
+            $ins  = $this->contentRp->findByParentInOutCodes($object, $codes, 'IN');
+            $outs = $this->contentRp->findByParentInOutCodes($object, $codes, 'OUT');
+        } elseif (!empty($table) && !empty($field)) {
+            $ins  = $this->contentRp->findByCustomParent($object, $codes, $table, $field, 'IN');
+            $outs = $this->contentRp->findByCustomParent($object, $codes, $table, $field, 'OUT');
+        } else {
+            throw new InvalidArgumentException('Parent type not supported');
+        }
 
         foreach ($outs as $out) {
             $this->em->remove($out);
@@ -85,20 +92,25 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
             $content->setCode($code);
             $content->setLabel($conf->getLabel());
             $content->setType($conf->getType());
-            if ($object instanceof CmsPage) {
-                $content->setPage($object);
-            }
-            if ($object instanceof CmsPageDeclination) {
-                $content->setDeclination($object);
-            }
-            if ($object instanceof CmsSharedBlock) {
-                $content->setSharedBlockParent($object);
+            switch (true) {
+                case $object instanceof CmsPage:
+                    $content->setPage($object);
+                    break;
+                case $object instanceof CmsPageDeclination:
+                    $content->setDeclination($object);
+                    break;
+                case $object instanceof CmsSharedBlock:
+                    $content->setSharedBlockParent($object);
+                    break;
+                default:
+                    $object->addContent($content);
             }
 
             $this->em->persist($content);
         }
 
         $this->em->flush();
+
         return true;
     }
 }

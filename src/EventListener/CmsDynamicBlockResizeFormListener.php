@@ -22,14 +22,15 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
     private ResizeFormListener $resizeFormListener;
 
     public function __construct(
-        private readonly BlockRegistry $blockRegistry,
+        private readonly BlockRegistry   $blockRegistry,
         private readonly BlockDefinition $blockDefinition,
-        string $type,
-        array $options = [],
-        bool $allowAdd = false,
-        bool $allowDelete = false,
-        $deleteEmpty = false
-    ) {
+        string                           $type,
+        array                            $options = [],
+        bool                             $allowAdd = false,
+        bool                             $allowDelete = false,
+                                         $deleteEmpty = false
+    )
+    {
         $this->entryType = $type;
         $this->entryOptions = $options;
         $this->allowAddLocal = $allowAdd;
@@ -75,6 +76,14 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
             $form->remove($name);
         }
 
+        if (empty($data)) {
+            foreach ($block->getBlocks() as $item) {
+                if (is_string($item)) {
+                    $data[] = ['disc' => $item];
+                }
+            }
+        }
+
         foreach ($data as $name => $value) {
             $config = $block->getAvailableBlock($value['disc']);
             if ($config === null) {
@@ -84,12 +93,11 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
                 'label'        => '#' . $name . ' | ' . $config->getLabel(),
                 'block_config' => $config
             ]);
-            $name = (string) $name;
+            $name = (string)$name;
             $form->add($name, $this->entryType, array_replace([
                 'property_path' => '[' . $name . ']',
             ], $opts));
         }
-
     }
 
     public function preSubmit(FormEvent $event): void
@@ -118,7 +126,7 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
         // Add all additional rows
         if ($this->allowAddLocal) {
             foreach ($data as $name => $value) {
-                $name = (string) $name;
+                $name = (string)$name;
                 if ($name === 'block_selector') {
                     unset($data[$name]);
                     continue;
@@ -129,7 +137,7 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
                     'label'        => '#' . $name . ' | ' . $config->getLabel(),
                     'block_config' => $config
                 ]);
-                $name = (string) $name;
+                $name   = (string)$name;
                 $form->add($name, $this->entryType, array_replace([
                     'property_path' => '[' . $name . ']',
                 ], $opts));

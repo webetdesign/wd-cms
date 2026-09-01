@@ -2,6 +2,7 @@
 
 namespace WebEtDesign\CmsBundle\Form\Transformer;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Form\DataTransformerInterface;
@@ -66,6 +67,18 @@ class CmsBlockTransformer implements DataTransformerInterface
     #[ArrayShape(['id' => "", 'class' => "string"])]
     private function reverseTransformObject(mixed $value): array
     {
+        if ($value instanceof Collection) {
+            $out = [];
+            foreach ($value as $item) {
+                $out[] = [
+                    'id'    => $item->getId(),
+                    'class' => get_class($item)
+                ];
+            }
+
+            return $out;
+        }
+
         return [
             'id'    => $value->getId(),
             'class' => get_class($value)

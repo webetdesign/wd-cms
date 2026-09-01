@@ -15,7 +15,7 @@ class BlockPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        $ManagerDefinition = $container->getDefinition(BlockFormThemeRegistry::class);
+        $managerDefinition = $container->getDefinition(BlockFormThemeRegistry::class);
 
         foreach ($container->findTaggedServiceIds('wd_cms.block') as $id => $tags) {
             $definition = $container->findDefinition($id);
@@ -23,8 +23,8 @@ class BlockPass implements CompilerPassInterface
             $definition->setPublic(true);
 
             foreach ($tags as $tag) {
-                if (isset($tag['formTheme']) && !empty($tag['formTheme'])) {
-                    $ManagerDefinition->addMethodCall('addTheme', [$tag['formTheme']]);
+                if (!empty($tag['formTheme'])) {
+                   $managerDefinition->addMethodCall('addTheme', [$tag['formTheme']]);
                 }
             }
         }

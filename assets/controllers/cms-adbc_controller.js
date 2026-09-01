@@ -67,6 +67,12 @@ export default class extends Controller {
 
     Admin.setup_select2(this.collectionTarget);
     Admin.setup_icheck(this.collectionTarget);
+    /**
+     * Comme on uttilise insertAdjacentHTML les balise script ne s'exécute pas automatiquement.
+     * On utilise executeScripts pour exécuter les scripts présents dans le HTML inséré.
+     * Pour certain champs Sonata
+     */
+    this.executeScripts(this.collectionTarget);
     this.number++;
     this.computePosition();
   }
@@ -118,5 +124,21 @@ export default class extends Controller {
         let textarea_id = item.querySelector('textarea').id;
         item.querySelector('textarea').value = CKEDITOR.instances[textarea_id].getData();
       });
+  }
+
+  executeScripts(element) {
+    element.querySelectorAll('script').forEach(oldScript => {
+      const newScript = document.createElement('script');
+
+      // Copie attributs (important pour type, src, etc.)
+      [...oldScript.attributes].forEach(attr =>
+        newScript.setAttribute(attr.name, attr.value)
+      );
+
+      // Copie contenu (si script inline)
+      newScript.textContent = oldScript.textContent;
+
+      oldScript.replaceWith(newScript); // Remplace l'ancien par le nouveau
+    });
   }
 }

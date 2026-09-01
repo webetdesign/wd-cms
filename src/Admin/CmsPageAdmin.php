@@ -5,6 +5,7 @@ namespace WebEtDesign\CmsBundle\Admin;
 
 use App\Entity\Actuality;
 use Doctrine\ORM\EntityManagerInterface;
+use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Sonata\AdminBundle\Datagrid\ProxyQueryInterface;
@@ -14,8 +15,10 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Validator\Constraints\Range;
 use WebEtDesign\CmsBundle\CMS\ConfigurationInterface;
 use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
@@ -279,14 +282,42 @@ class CmsPageAdmin extends AbstractAdmin
                 ])
                 ->add('seo_title', null, ['label' => 'wd_seo.form.seo_title.label'], ['translation_domain' => 'wd_seo'])
                 ->add('seo_description', TextareaType::class,
-                    ['label' => 'wd_seo.form.seo_description.label', 'required' => false], [ 'translation_domain' => 'wd_seo'])
+                    ['label' => 'wd_seo.form.seo_description.label', 'required' => false], ['translation_domain' => 'wd_seo'])
                 ->add('preview', null, [
-                    'mapped'             => false,
-                    'block_prefix'       => 'google_seo_preview',
-                    'label'              => 'wd_seo.form.seo_preview.label'
-                ], [ 'translation_domain' => 'wd_seo'])
+                    'mapped'       => false,
+                    'block_prefix' => 'google_seo_preview',
+                    'label'        => 'wd_seo.form.seo_preview.label'
+                ], ['translation_domain' => 'wd_seo'])
                 ->add('noIndex', null, [
                     'label' => 'cms_page.form.no_index.label',
+                ])
+                ->add('seoSitemapPriority', NumberType::class, [
+                    'label'       => 'cms_page.form.seo_sitemap_priority.label',
+                    'required'    => false,
+                    'html5'       => true,
+                    'scale'       => 1,
+                    'attr'        => [
+                        'min'  => 0,
+                        'max'  => 1,
+                        'step' => 0.1,
+                    ],
+                    'constraints' => [
+                        new Range(min: 0, max: 1)
+                    ]
+                ])
+                ->add('seoSitemapChangeFreq', ChoiceType::class, [
+                    'label'                     => 'cms_page.form.seo_sitemap_change_freq.label',
+                    'required'                  => false,
+                    'choices'                   => [
+                        'cms_page.form.seo_sitemap_change_freq.always'  => UrlConcrete::CHANGEFREQ_ALWAYS,
+                        'cms_page.form.seo_sitemap_change_freq.hourly'  => UrlConcrete::CHANGEFREQ_HOURLY,
+                        'cms_page.form.seo_sitemap_change_freq.daily'   => UrlConcrete::CHANGEFREQ_DAILY,
+                        'cms_page.form.seo_sitemap_change_freq.weekly'  => UrlConcrete::CHANGEFREQ_WEEKLY,
+                        'cms_page.form.seo_sitemap_change_freq.monthly' => UrlConcrete::CHANGEFREQ_MONTHLY,
+                        'cms_page.form.seo_sitemap_change_freq.yearly'  => UrlConcrete::CHANGEFREQ_YEARLY,
+                        'cms_page.form.seo_sitemap_change_freq.never'   => UrlConcrete::CHANGEFREQ_NEVER,
+                    ],
+                    'choice_translation_domain' => 'wd_cms',
                 ])
                 ->end();
             $this->addFormFieldSmoOpenGraph($form);

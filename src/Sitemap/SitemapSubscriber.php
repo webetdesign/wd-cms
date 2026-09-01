@@ -1,8 +1,6 @@
 <?php
 
-
 namespace WebEtDesign\CmsBundle\Sitemap;
-
 
 use JetBrains\PhpStorm\ArrayShape;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
@@ -12,6 +10,7 @@ use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
@@ -21,9 +20,9 @@ class SitemapSubscriber implements EventSubscriberInterface
     /**
      * @var UrlGeneratorInterface
      */
-    private UrlGeneratorInterface  $urlGenerator;
-    private CmsSiteRepository      $cmsSiteRepository;
-    private ParameterBagInterface  $parameterBag;
+    private UrlGeneratorInterface $urlGenerator;
+    private CmsSiteRepository     $cmsSiteRepository;
+    private ParameterBagInterface $parameterBag;
 
     /**
      * @param UrlGeneratorInterface $urlGenerator
@@ -32,9 +31,10 @@ class SitemapSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
-        CmsSiteRepository $cmsSiteRepository,
+        CmsSiteRepository     $cmsSiteRepository,
         ParameterBagInterface $parameterBag
-    ) {
+    )
+    {
         $this->urlGenerator      = $urlGenerator;
         $this->cmsSiteRepository = $cmsSiteRepository;
         $this->parameterBag      = $parameterBag;
@@ -74,6 +74,7 @@ class SitemapSubscriber implements EventSubscriberInterface
 
             $pages = $site->getPages();
 
+            /** @var CmsPage $page */
             foreach ($pages as $page) {
                 /** @var CmsRoute $route */
                 $route = $page->getRoute();
@@ -85,23 +86,28 @@ class SitemapSubscriber implements EventSubscriberInterface
                                 [],
                                 UrlGeneratorInterface::ABSOLUTE_URL
                             ),
-                            $page->getUpdatedAt()
+                            $page->getUpdatedAt(),
+                            changefreq: $page->getSeoSitemapChangeFreq(),
+                            priority: $page->getSeoSitemapPriority(),
                         );
 
                         $decoratedUrl = new GoogleMultilangUrlDecorator($url);
 
-
                         if ($cms_config['multilingual']) {
-
                             foreach ($page->getCrossSitePages() as $crossSitePage) {
                                 $crossRoute = $crossSitePage->getRoute();
-                                if ($crossRoute && !$crossRoute->isDynamic()) {
-                                    $decoratedUrl->addLink($this->urlGenerator->generate(
+                                if (!$crossSitePage->isActive() || !$crossRoute || $crossRoute->isDynamic()) {
+                                    continue;
+                                }
+
+                                $decoratedUrl->addLink(
+                                    $this->urlGenerator->generate(
                                         $crossRoute->getName(),
                                         [],
-                                        UrlGeneratorInterface::ABSOLUTE_URL
-                                    ), $crossSitePage->getSite()->getLocale());
-                                }
+                                        UrlGeneratorInterface::ABSOLUTE_URL,
+                                    ),
+                                    $crossSitePage->getSite()->getLocale(),
+                                );
                             }
                         }
 

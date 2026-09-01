@@ -25,29 +25,29 @@ class CmsMenu implements Loggable
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     #[Gedmo\Versioned]
-    private $label;
+    private ?string $label = null;
 
     #[ORM\Column(type: Types::STRING, length: 128, nullable: false)]
     #[Gedmo\Versioned]
-    private $code;
+    private ?string $code = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     #[Gedmo\Versioned]
-    private $type;
+    private ?string $type = null;
 
     #[ORM\OneToMany(mappedBy: "menu", targetEntity: CmsMenuItem::class, cascade: ["persist", "remove"])]
-    private $children;
+    private Collection $children;
 
     #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: "menus")]
     #[ORM\JoinColumn(name: "site_id", referencedColumnName: "id")]
     #[Gedmo\Versioned]
-    private $site;
+    private ?CmsSite $site = null;
 
-    public $initRoot = true;
+    public bool $initRoot = true;
 
 
     public function __construct()
@@ -56,9 +56,6 @@ class CmsMenu implements Loggable
         $this->children = new ArrayCollection();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __toString()
     {
         return (string)$this->getLabel();
@@ -73,7 +70,7 @@ class CmsMenu implements Loggable
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
      */
     public function setId(?int $id): void
     {
@@ -110,9 +107,9 @@ class CmsMenu implements Loggable
     }
 
     /**
-     * @return Collection|Selectable|CmsMenuItem[]
+     * @return Collection
      */
-    public function getChildren()
+    public function getChildren(): Collection
     {
         return $this->children;
     }
@@ -151,7 +148,7 @@ class CmsMenu implements Loggable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCode(): ?string
     {
@@ -187,7 +184,7 @@ class CmsMenu implements Loggable
     }
 
     /**
-     * @return CmsSite
+     * @return CmsSite|null
      */
     public function getSite(): ?CmsSite
     {

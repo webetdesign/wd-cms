@@ -265,7 +265,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             ->add('params');
     }
 
-    protected function getRouteParamsField(FormMapper $formMapper, $subject, $route)
+    protected function getRouteParamsField(FormMapper $formMapper, $subject, $route): void
     {
 
         try {

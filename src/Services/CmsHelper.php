@@ -128,7 +128,11 @@ class CmsHelper
     protected function getBrowserLocale()
     {
         $request        = $this->getRequest();
-        $browserLocales = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        if ($request === null) {
+            return null;
+        }
+
+        $browserLocales = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '');
 
         $locale = $request->getDefaultLocale();
         foreach ($browserLocales as $browserLocale) {

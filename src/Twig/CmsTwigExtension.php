@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Twig;
 
+use Doctrine\Common\Collections\Criteria;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\TwigTest;
+use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,8 +34,8 @@ class CmsTwigExtension extends AbstractExtension
     protected bool         $useDeclination = false;
     protected RequestStack $requestStack;
 
-    protected TemplateRegistry           $templateRegistry;
-    private Environment                  $twig;
+    protected TemplateRegistry $templateRegistry;
+    private Environment        $twig;
 
     private EntityManagerInterface $em;
 
@@ -47,15 +49,16 @@ class CmsTwigExtension extends AbstractExtension
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        RouterInterface $router,
-        Environment $twig,
-        TemplateRegistry $templateRegistry,
-        RequestStack $requestStack,
-        ParameterBagInterface $parameterBag,
-        WDDeclinationService $declinationService,
-        BlockRegistry $blockRegistry,
-        CmsHelper $cmsHelper
-    ) {
+        RouterInterface        $router,
+        Environment            $twig,
+        TemplateRegistry       $templateRegistry,
+        RequestStack           $requestStack,
+        ParameterBagInterface  $parameterBag,
+        WDDeclinationService   $declinationService,
+        BlockRegistry          $blockRegistry,
+        CmsHelper              $cmsHelper
+    )
+    {
         $this->em               = $entityManager;
         $this->router           = $router;
         $this->twig             = $twig;
@@ -114,12 +117,19 @@ class CmsTwigExtension extends AbstractExtension
 
     private function retrieveContent($object, $content_code): ?CmsContent
     {
-        /** @var CmsContent $content */
-        $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByObjectAndContentCodeAndType(
-                $object,
-                $content_code
-            );
+        if ($object instanceof CmsPageDeclination || $object instanceof CmsPage || $object instanceof CmsSharedBlock) {
+            /** @var CmsContent $content */
+            $content = $this->em->getRepository(CmsContent::class)
+                ->findOneByObjectAndContentCodeAndType(
+                    $object,
+                    $content_code
+                );
+        } else {
+            $criteria = new Criteria();
+            $criteria->where(Criteria::expr()->eq('code', $content_code));
+            $content = $object->getContents()->matching($criteria)->first();
+        }
+
         return $content;
     }
 
@@ -196,7 +206,7 @@ class CmsTwigExtension extends AbstractExtension
      * @return string|null
      * @throws Exception
      */
-    public function cmsRenderContent($object, $content_code, ?array $context = null): null|array|string|object
+    public function cmsRenderContent($object, $content_code, ?array $context = null): null|array|string|object|bool
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 
@@ -252,6 +262,48 @@ class CmsTwigExtension extends AbstractExtension
         }
     }
 
+    private function generatePageUrl(CmsPage $page)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        preg_match_all('/\{(\w+)\}/', $page->getRoute()->getPath(), $params);
+
+        /** @var PageInterface $pageConfig */
+        $pageConfig  = $this->templateRegistry->get($page->getTemplate());
+        $routeConfig = $pageConfig->getRoute();
+
+        $routeParams = [];
+        foreach ($routeConfig->getAttributes() as $attribute) {
+            if ($attribute->getEntityClass() !== null && is_subclass_of($attribute->getEntityClass(),
+                    TranslatableInterface::class)) {
+                $repoMethod = 'findOneBy' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                $criterion  = $request->attributes->get('_route_params')[$attribute->getName()] ?? null;
+
+                $object = $this->em->getRepository($attribute->getEntityClass())->$repoMethod($criterion, $page->getSite()->getLocale());
+
+                if ($object) {
+                    $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                    $routeParams[$attribute->getName()] = $object->translate($page->getSite()->getLocale())->$getProperty();
+                }
+            } else {
+                if ($attribute->getEntityClass() !== null) {
+                    $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                    $routeParams[$attribute->getName()] = $request->attributes->get($attribute->getName())->$getProperty();
+                } else {
+                    $routeParams[$attribute->getName()] = $request->attributes->get($attribute->getName());
+                }
+            }
+        }
+
+        try {
+            $path = $this->router->generate($page->getRoute()->getName(), $routeParams);
+        } catch (RouteNotFoundException $e) {
+            $path = null;
+        }
+
+        return $path;
+    }
+
     private function getLocalSwitchPages(CmsPage $page): array
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -262,40 +314,10 @@ class CmsTwigExtension extends AbstractExtension
             if (!$p->getSite()->isVisible() || $p->getId() === $page->getId()) {
                 continue;
             }
-            preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
 
-            /** @var PageInterface $pageConfig */
-            $pageConfig  = $this->templateRegistry->get($page->getTemplate());
-            $routeConfig = $pageConfig->getRoute();
+            $path = $this->generatePageUrl($p);
 
-            $routeParams = [];
-            foreach ($routeConfig->getAttributes() as $attribute) {
-                if ($attribute->getEntityClass() !== null && is_subclass_of($attribute->getEntityClass(),
-                        TranslatableInterface::class)) {
-                    $repoMethod = 'findOneBy' . ucfirst($attribute->getEntityProperty() ?: 'id');
-                    $criterion  = $request->attributes->get('_route_params')[$attribute->getName()] ?? null;
-
-                    $object = $this->em->getRepository($attribute->getEntityClass())
-                        ->$repoMethod($criterion, $page->getSite()->getLocale());
-
-                    if ($object) {
-                        $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
-                        $routeParams[$attribute->getName()] = $object->translate($p->getSite()->getLocale())->$getProperty();
-                    }
-
-                } else {
-                    if ($attribute->getEntityClass() !== null) {
-                        $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
-                        $routeParams[$attribute->getName()] = $request->attributes->get($attribute->getName())->$getProperty();
-                    } else {
-                        $routeParams[$attribute->getName()] = $request->attributes->get($attribute->getName());
-                    }
-                }
-            }
-
-            try {
-                $path = $this->router->generate($p->getRoute()->getName(), $routeParams);
-            } catch (RouteNotFoundException $e) {
+            if ($path === null) {
                 continue;
             }
 
@@ -310,8 +332,12 @@ class CmsTwigExtension extends AbstractExtension
         return $pages;
     }
 
-    public function renderLocaleSwitch(CmsPage $page, $useless = null): ?string
+    public function renderLocaleSwitch(?CmsPage $page = null, $useless = null): ?string
     {
+        if ($page === null) {
+            return null;
+        }
+
         $pages = $this->getLocalSwitchPages($page);
 
         return $this->twig->render('@WebEtDesignCms/block/cms_locale_switch.html.twig', [
@@ -324,9 +350,16 @@ class CmsTwigExtension extends AbstractExtension
     {
         $pages = $this->getLocalSwitchPages($page);
 
+        $path = $this->generatePageUrl($page);
+
         return $this->twig->render('@WebEtDesignCms/block/cms_meta_locale_switch.html.twig', [
-            'page'  => $page,
-            'pages' => $pages
+            'canonical'  => [
+                'path'   => $path,
+                'code'   => $page->getSite()->getLocale(),
+                'icon'   => $page->getSite()->getFlagIcon(),
+                'locale' => $page->getSite()->getLocale(),
+            ],
+            'alternates' => $pages
         ]);
     }
 
@@ -418,6 +451,7 @@ class CmsTwigExtension extends AbstractExtension
                 return $choice->label;
             }
         }
+
         return null;
     }
 }
