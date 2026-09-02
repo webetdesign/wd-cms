@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,9 +54,9 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->templateRegistry->getTemplateList());
+                $templates = array_values($this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_SHARED));
                 foreach ($templates as $template) {
-                    $this->processTemplate($template->getCode());
+                    $this->processTemplate($template);
                 }
                 $this->io->success('Done');
                 return Command::SUCCESS;
