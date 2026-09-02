@@ -21,7 +21,7 @@ use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
-    protected ?array $customContents;
+    protected ?array $customContents = [];
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
