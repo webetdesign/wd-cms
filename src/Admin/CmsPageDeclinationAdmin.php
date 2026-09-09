@@ -106,10 +106,11 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         if ($route) {
             $formMapper->add('params', CmsRouteParamsType::class, [
-                'config' => $pageConfig,
-                'route'  => $route,
-                'object' => $object,
-                'label'  => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
+                'config'      => $pageConfig,
+                'route'       => $route,
+                'object'      => $object,
+                'json_string' => true,
+                'label'       => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
             ]);
         }
 
