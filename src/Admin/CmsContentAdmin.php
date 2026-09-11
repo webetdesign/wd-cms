@@ -21,7 +21,7 @@ use WebEtDesign\CmsBundle\Security\Voter\ManageContentVoter;
 
 final class CmsContentAdmin extends AbstractAdmin
 {
-    protected ?array $customContents;
+    protected ?array $customContents = [];
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
@@ -130,7 +130,7 @@ final class CmsContentAdmin extends AbstractAdmin
             $options = $contentParams['options'] ?? [];
             switch ($subject->getType()) {
                 case CmsContentTypeEnum::TEXT:
-                    $formMapper->add('value', TextType::class, ['required' => false, 'help' => $subject->getHelp()]);
+                    $formMapper->add('value', TextType::class, ['required' => false, 'help' => $contentParams['help'] ?? null]);
                     break;
 
                 case CmsContentTypeEnum::WYSIWYG:
@@ -142,7 +142,7 @@ final class CmsContentAdmin extends AbstractAdmin
                             'ckeditor_context' => $options['ckeditor_context'] ?? 'cms_page',
                             'required'         => false,
                             'auto_initialize'  => false,
-                            'help' => $subject->getHelp()
+                            'help' => $contentParams['help'] ?? null
                         ]
                     );
                     break;
@@ -154,7 +154,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         [
                             'required'        => false,
                             'auto_initialize' => false,
-                            'help' => $subject->getHelp()
+                            'help' => $contentParams['help'] ?? null
                         ]
                     );
                     break;
@@ -164,7 +164,7 @@ final class CmsContentAdmin extends AbstractAdmin
                         [
                             'required' => false,
                             'label' => false,
-                            'help' => $subject->getHelp()
+                            'help' => $contentParams['help'] ?? null
                         ]);
 
                     $formMapper->getFormBuilder()->get('value')->addModelTransformer(new CallbackTransformer(

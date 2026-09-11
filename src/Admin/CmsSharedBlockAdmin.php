@@ -87,8 +87,8 @@ final class CmsSharedBlockAdmin extends AbstractAdmin
             '@WebEtDesignCms/admin/form/cms_block.html.twig',
         ], $this->blockFormThemesManager->getThemes()));
 
-        if ($this->isCurrentRoute('create') && $this->getRequest()->get('id') !== null) {
-            $site = $this->em->getRepository(CmsSite::class)->find($this->getRequest()->get('id'));
+        if ($this->isCurrentRoute('create') && $this->getRequest()->attributes->get('id') !== null) {
+            $site = $this->em->getRepository(CmsSite::class)->find($this->getRequest()->attributes->get('id'));
             $object->setSite($site);
         } else {
             $site = $object->getSite();

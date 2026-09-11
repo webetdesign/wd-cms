@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,6 +22,10 @@ use WebEtDesign\CmsBundle\Entity\CmsSite;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
+#[AsCommand(
+    name: 'cms:duplicate:site',
+    description: 'Duplicate site for an other locale',
+)]
 class CmsDuplicateSiteCommand extends Command
 {
     protected EntityManager $em;
@@ -42,23 +47,11 @@ class CmsDuplicateSiteCommand extends Command
         $this->siteRepository = $siteRepository;
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->setName('cms:duplicate:site')
-            ->setDescription('Duplicate site for an other locale')
-        ;
-    }
-
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int|void
      * @throws ORMException
      * @throws OptimisticLockException
-     * @author Benjamin Robert
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function __invoke(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -113,7 +106,7 @@ class CmsDuplicateSiteCommand extends Command
 
         $this->duplicate($site, $newSite, $doClean);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

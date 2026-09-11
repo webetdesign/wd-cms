@@ -106,10 +106,11 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         if ($route) {
             $formMapper->add('params', CmsRouteParamsType::class, [
-                'config' => $pageConfig,
-                'route'  => $route,
-                'object' => $object,
-                'label'  => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
+                'config'      => $pageConfig,
+                'route'       => $route,
+                'object'      => $object,
+                'json_string' => true,
+                'label'       => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
             ]);
         }
 
@@ -121,7 +122,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
         //region SEO
         $formMapper->tab('SEO');// The tab call is optional
-        $this->addFormVarsSection($formMapper, $object->getPage(), $this->globalVarsEnable);
+        $this->addFormVarsSection($formMapper, $object->getPage(), 'seo');
         $formMapper
             ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
             ->add('seo_title')
@@ -144,7 +145,7 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
                 'templateFactory' => $this->templateRegistry,
             ])
             ->end();
-        $this->addFormVarsSection($formMapper, $object->getPage(), $this->globalVarsEnable, true);
+        $this->addFormVarsSection($formMapper, $object->getPage(), 'content');
         $formMapper
             ->end();
         //endregion

@@ -18,60 +18,28 @@ use WebEtDesign\CmsBundle\Repository\CmsSharedBlockRepository;
 #[ORM\Table(name: "cms__shared_block")]
 class CmsSharedBlock
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
-    /**
-     * @var string|null
-     * @ORM\Column(type="string", length=255, nullable=false)
-     */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
-
     private ?string $code = null;
 
-    /**
-     * @var string | null
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-
     private ?string $label = null;
-
-    /**
-     * @var boolean
-     * @ORM\Column(type="boolean")
-     */
+    
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $active;
-
-    /**
-     * @var ArrayCollection|PersistentCollection
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="sharedBlockParent", cascade={"persist", "remove"})
-     */
+    
     #[ORM\OneToMany(targetEntity: CmsContent::class, mappedBy: "sharedBlockParent", cascade: ["persist", "remove"])]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $contents;
-
-    /**
-     * @var string | null
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-
     private ?string $template = null;
-
-    /**
-     * @var CmsSite|null
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="sharedBlocks")
-     * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="SET NULL")
-     */
+    
     #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: "sharedBlocks")]
     #[ORM\JoinColumn(name: "site_id", referencedColumnName: "id", onDelete: "SET NULL")]
     private ?CmsSite $site = null;

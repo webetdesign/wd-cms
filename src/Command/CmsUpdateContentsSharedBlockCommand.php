@@ -5,6 +5,10 @@ namespace WebEtDesign\CmsBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,10 +17,12 @@ use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Repository\CmsSharedBlockRepository;
 
+#[AsCommand(
+    name: 'cms:shared-block:update-contents',
+    description: 'Update configuration of content\'s sharedBlock with configuration file',
+)]
 class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsCommand
 {
-    protected static $defaultName = 'cms:shared-block:update-contents';
-
     /**
      * @var CmsSharedBlockRepository
      */
@@ -26,37 +32,36 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
     public function __construct(
         EntityManagerInterface $em,
         TemplateRegistry $templateRegistry,
-        string $name = null,
+        ?string $name = null,
     ) {
         parent::__construct($em, $name);
         $this->templateRegistry = $templateRegistry;
     }
 
-
     protected function configure(): void
     {
         $this
-            ->setDescription('Update configuration of content\'s sharedBlock with configuration file')
             ->addArgument('template', InputArgument::OPTIONAL, 'template name')
             ->addOption('all', '-a', InputOption::VALUE_NONE, 'Reset all page')
             ->addOption('block', '-b', InputOption::VALUE_REQUIRED, 'sharedBlock id');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+
+    public function __invoke(InputInterface $input, OutputInterface $output): int
     {
         $this->init($input, $output);
         $this->sharedBlockRp = $this->em->getRepository(CmsSharedBlock::class);
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->templateRegistry->getTemplateList());
+                $templates = array_values($this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_SHARED));
                 foreach ($templates as $template) {
-                    $this->processTemplate($template->getCode());
+                    $this->processTemplate($template);
                 }
                 $this->io->success('Done');
-                return 0;
+                return Command::SUCCESS;
             } else {
-                return 0;
+                return Command::SUCCESS;
             }
         }
 
@@ -66,7 +71,7 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
             if ($block) {
                 $this->resetSharedBlock($block);
                 $this->io->success('Done');
-                return 0;
+                return Command::SUCCESS;
             }
         }
 
@@ -78,7 +83,7 @@ class CmsUpdateContentsSharedBlockCommand extends AbstractCmsUpdateContentsComma
         $this->processTemplate($template);
 
         $this->io->success('Done');
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function processTemplate($template): void

@@ -52,7 +52,7 @@ class TemplateRegistry implements TemplateRegistryInterface
         return $configs;
     }
 
-    public function getList(string $type, string $collection = null): array
+    public function getList(string $type, ?string $collection = null): array
     {
         $configs = $this->getConfigById();
 
@@ -90,7 +90,7 @@ class TemplateRegistry implements TemplateRegistryInterface
         return $templates;
     }
 
-    public function getChoiceList(string $type, string $collection = null): array
+    public function getChoiceList(string $type, ?string $collection = null): array
     {
         return array_flip($this->getList($type, $collection));
     }
