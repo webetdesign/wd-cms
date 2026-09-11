@@ -133,10 +133,10 @@ class CmsMenuBuilder
             if ($item->getRole() && !$this->authorizationChecker->isGranted($item->getRole())) {
                 continue;
             }
-            if ($item->getConnected() == 'ONLY_LOGIN' && !$user) {
+            if ($item->getConnected() == 'ONLY_LOGIN' && $user === 'anon.') {
                 continue;
             }
-            if ($item->getConnected() == 'ONLY_LOGOUT' && $user) {
+            if ($item->getConnected() == 'ONLY_LOGOUT' && $user !== 'anon.') {
                 continue;
             }
 
@@ -272,7 +272,7 @@ class CmsMenuBuilder
     public function isActive(CmsMenuItem $item)
     {
         $request         = $this->requestStack->getCurrentRequest();
-        $activeRouteName = $request->attributes->get('_route');
+        $activeRouteName = $request->get('_route');
         if (!$item->getPage()->getRoute()) {
             return false;
         }

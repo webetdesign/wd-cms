@@ -5,10 +5,6 @@ namespace WebEtDesign\CmsBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Component\Console\Attribute\Argument;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,12 +19,10 @@ use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use function Symfony\Component\String\u;
 
-#[AsCommand(
-    name: 'cms:page:update-params',
-    description: 'Update pages parameters and declination with configuration file',
-)]
 class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 {
+    protected static $defaultName = 'cms:page:update-params';
+
     protected CmsPageRepository $pageRp;
 
     protected ?array           $configCms;
@@ -38,23 +32,24 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         EntityManagerInterface $em,
         TemplateRegistry $templateRegistry,
         ParameterBagInterface $parameterBag,
-        ?string $name = null
+        string $name = null
     ) {
         parent::__construct($em, $name);
         $this->configCms        = $parameterBag->get('wd_cms.cms');
         $this->templateRegistry = $templateRegistry;
     }
 
+
     protected function configure(): void
     {
         $this
+            ->setDescription('Update pages parameters and declination with configuration file')
             ->addArgument('template', InputArgument::OPTIONAL, 'template name')
             ->addOption('all', '-a', InputOption::VALUE_NONE, 'Reset all page')
             ->addOption('page', '-p', InputOption::VALUE_REQUIRED, 'Page id');
     }
 
-
-    public function __invoke(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->init($input, $output);
         $this->pageRp = $this->em->getRepository(CmsPage::class);
@@ -68,7 +63,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
                 }
                 $this->io->success('Done');
             }
-            return Command::SUCCESS;
+            return 0;
         }
 
         $pageId = $input->getOption('page');
@@ -77,7 +72,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
             if ($page) {
                 $this->resetPage($page);
                 $this->io->success('Done');
-                return Command::SUCCESS;
+                return 0;
             }
         }
 
@@ -89,7 +84,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         $this->processTemplate($template);
 
         $this->io->success('Done');
-        return Command::SUCCESS;
+        return 0;
     }
 
     public function processTemplate($template): void

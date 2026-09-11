@@ -40,11 +40,11 @@ class SitemapSubscriber implements EventSubscriberInterface
         $this->parameterBag      = $parameterBag;
     }
 
-    #[ArrayShape([SitemapPopulateEvent::class => "string"])]
+    #[ArrayShape([SitemapPopulateEvent::ON_SITEMAP_POPULATE => "string"])]
     public static function getSubscribedEvents(): array
     {
         return [
-            SitemapPopulateEvent::class => 'populate',
+            SitemapPopulateEvent::ON_SITEMAP_POPULATE => 'populate',
         ];
     }
 
@@ -96,18 +96,13 @@ class SitemapSubscriber implements EventSubscriberInterface
                         if ($cms_config['multilingual']) {
                             foreach ($page->getCrossSitePages() as $crossSitePage) {
                                 $crossRoute = $crossSitePage->getRoute();
-                                if (!$crossSitePage->isActive() || !$crossRoute || $crossRoute->isDynamic()) {
-                                    continue;
-                                }
-
-                                $decoratedUrl->addLink(
-                                    $this->urlGenerator->generate(
+                                if ($crossRoute && !$crossRoute->isDynamic()) {
+                                    $decoratedUrl->addLink($this->urlGenerator->generate(
                                         $crossRoute->getName(),
                                         [],
-                                        UrlGeneratorInterface::ABSOLUTE_URL,
-                                    ),
-                                    $crossSitePage->getSite()->getLocale(),
-                                );
+                                        UrlGeneratorInterface::ABSOLUTE_URL
+                                    ), $crossSitePage->getSite()->getLocale());
+                                }
                             }
                         }
 

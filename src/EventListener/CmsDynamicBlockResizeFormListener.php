@@ -4,22 +4,15 @@ declare(strict_types=1);
 namespace WebEtDesign\CmsBundle\EventListener;
 
 use JetBrains\PhpStorm\ArrayShape;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use WebEtDesign\CmsBundle\CMS\Configuration\BlockDefinition;
 use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 
-class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
+class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 {
-    private string $entryType;
-    private array $entryOptions;
-    private bool $allowAddLocal;
-    private bool $allowDeleteLocal;
-    private ResizeFormListener $resizeFormListener;
 
     public function __construct(
         private readonly BlockRegistry   $blockRegistry,
@@ -31,33 +24,24 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
                                          $deleteEmpty = false
     )
     {
-        $this->entryType = $type;
-        $this->entryOptions = $options;
-        $this->allowAddLocal = $allowAdd;
-        $this->allowDeleteLocal = $allowDelete;
-        $this->resizeFormListener = new ResizeFormListener($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
+        parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
     }
 
     #[ArrayShape([
-        FormEvents::POST_SET_DATA => "string",
+        FormEvents::PRE_SET_DATA => "string",
         FormEvents::PRE_SUBMIT   => "string",
         FormEvents::SUBMIT       => "array"
     ])] public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::POST_SET_DATA => 'postSetData',
+            FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::PRE_SUBMIT   => 'preSubmit',
             // (MergeCollectionListener, MergeDoctrineCollectionListener)
             FormEvents::SUBMIT       => ['onSubmit', 50],
         ];
     }
 
-    public function onSubmit(FormEvent $event): void
-    {
-        $this->resizeFormListener->onSubmit($event);
-    }
-
-    public function postSetData(FormEvent|PostSetDataEvent $event): void
+    public function preSetData(FormEvent $event): void
     {
         $block = $this->blockRegistry->get($this->blockDefinition);
         $form  = $event->getForm();
@@ -89,12 +73,12 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
             if ($config === null) {
                 continue;
             }
-            $opts = array_merge($this->entryOptions, [
+            $opts = array_merge($this->options, [
                 'label'        => '#' . $name . ' | ' . $config->getLabel(),
                 'block_config' => $config
             ]);
             $name = (string)$name;
-            $form->add($name, $this->entryType, array_replace([
+            $form->add($name, $this->type, array_replace([
                 'property_path' => '[' . $name . ']',
             ], $opts));
         }
@@ -115,7 +99,7 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
         }
 
         // Remove all empty rows
-        if ($this->allowDeleteLocal) {
+        if ($this->allowDelete) {
             foreach ($form as $name => $child) {
                 if (!isset($data[$name])) {
                     $form->remove($name);
@@ -124,7 +108,7 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
         }
 
         // Add all additional rows
-        if ($this->allowAddLocal) {
+        if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 $name = (string)$name;
                 if ($name === 'block_selector') {
@@ -133,12 +117,12 @@ class CmsDynamicBlockResizeFormListener implements EventSubscriberInterface
                 }
                 $form->remove($name);
                 $config = $block->getAvailableBlock($value['disc']);
-                $opts   = array_merge($this->entryOptions, [
+                $opts   = array_merge($this->options, [
                     'label'        => '#' . $name . ' | ' . $config->getLabel(),
                     'block_config' => $config
                 ]);
                 $name   = (string)$name;
-                $form->add($name, $this->entryType, array_replace([
+                $form->add($name, $this->type, array_replace([
                     'property_path' => '[' . $name . ']',
                 ], $opts));
             }

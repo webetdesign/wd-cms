@@ -44,7 +44,7 @@ class ExtraLoader implements LoaderInterface
     {
         try {
             $con = $this->em->getConnection();
-            $con->getNativeConnection();
+            $con->connect();
             $cmsRoutes = $this->em->getRepository(CmsRoute::class)->findAll();
         } catch (Exception $exception) {
             return new RouteCollection();
@@ -154,7 +154,7 @@ class ExtraLoader implements LoaderInterface
         return 'cms' === $type;
     }
 
-    public function getResolver(): LoaderResolverInterface
+    public function getResolver(): ?LoaderResolverInterface
     {
         return $this->resolver;
     }

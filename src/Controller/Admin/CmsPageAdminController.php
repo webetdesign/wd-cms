@@ -198,7 +198,7 @@ class CmsPageAdminController extends CRUDController
      */
     public function createAction(Request $request): Response
     {
-        $id = $request->attributes->get($this->admin->getIdParameter());
+        $id = $request->get($this->admin->getIdParameter(), null);
 
         if ($id === null) {
             /** @var CmsSite $site */
@@ -523,7 +523,7 @@ class CmsPageAdminController extends CRUDController
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $id = $request->attributes->get($this->admin->getIdParameter());
+        $id = $request->get($this->admin->getIdParameter());
         /** @var CmsPage $existingCmsPage */
         $existingCmsPage = $this->admin->getObject($id);
 

@@ -23,8 +23,10 @@ class CmsRouteRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->andWhere('c.name = :name')
             ->andWhere('c.id != :id')
-            ->setParameter('name', $routeName)
-            ->setParameter('id', $route->getId())
+            ->setParameters([
+                'name' => $routeName,
+                'id' => $route->getId()
+            ])
             ->getQuery()
             ->getResult()
             ;

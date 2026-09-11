@@ -5,10 +5,6 @@ namespace WebEtDesign\CmsBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Component\Console\Attribute\Argument;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Attribute\Option;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,48 +14,37 @@ use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 
-#[AsCommand(
-    name: 'cms:page:update-contents',
-    description: 'Update configuration of content\'s pages and declination with configuration file',
-)]
 class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
 {
     protected CmsPageRepository $pageRp;
     private TemplateRegistry         $templateRegistry;
 
+    protected function configure(): void
+    {
+        $this
+            ->setName('cms:page:update-contents')
+            ->setDescription('Update configuration of content\'s pages and declination with configuration file')
+            ->addArgument('template', InputArgument::OPTIONAL, 'template name')
+            ->addOption('all', '-a', InputOption::VALUE_NONE, 'Reset all page')
+            ->addOption('page', '-p', InputOption::VALUE_REQUIRED, 'Page id');
+    }
+
     public function __construct(
         EntityManagerInterface $em,
         TemplateRegistry $templateRegistry,
-        ?string $name = null
+        string $name = null
     ) {
         parent::__construct($em, $name);
         $this->templateRegistry = $templateRegistry;
     }
 
 
-    public function __invoke(
-        InputInterface $input,
-        OutputInterface $output,
-        #[Argument(
-            description: 'template name',
-        )]
-        ?string $template = null,
-        #[Option(
-            shortcut: 'a',
-            description: 'Reset all page',
-        )]
-        bool $all = false,
-        #[Option(
-            shortcut: 'p',
-            description: 'Page id',
-        )]
-        ?int $page = null
-    ): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->init($input, $output);
         $this->pageRp = $this->em->getRepository(CmsPage::class);
 
-        if ($all) {
+        if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
                 $templates = array_values($this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_PAGE));
                 foreach ($templates as $template) {
@@ -67,19 +52,20 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
                 }
                 $this->io->success('Done');
             }
-            return Command::SUCCESS;
+            return 0;
         }
 
-        $pageId = $page;
+        $pageId = $input->getOption('page');
         if (isset($pageId)) {
             $page = $this->pageRp->find($pageId);
             if ($page) {
                 $this->resetPage($page);
                 $this->io->success('Done');
-                return Command::SUCCESS;
+                return 0;
             }
         }
 
+        $template = $input->getArgument('template');
         if (!$template) {
             $template = $this->selectTemplate();
         }
@@ -87,7 +73,7 @@ class CmsUpdateContentsPageCommand extends AbstractCmsUpdateContentsCommand
         $this->processTemplate($template);
 
         $this->io->success('Done');
-        return Command::SUCCESS;
+        return 0;
     }
 
     public function processTemplate($template): void

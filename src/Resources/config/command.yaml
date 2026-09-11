@@ -2,10 +2,6 @@ services:
   _defaults:
     autowire: true
 
-  WebEtDesign\CmsBundle\Command\CmsNormalizeLegacyJsonCommand:
-    tags:
-      - { name: 'console.command', command: 'cms:normalize-legacy-json' }
-
   WebEtDesign\CmsBundle\Command\CmsUpdatePageParamsCommand:
     tags:
       - { name: 'console.command', command: 'cms:page:update-params' }

@@ -6,9 +6,8 @@ namespace WebEtDesign\CmsBundle\Command;
 
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
-use Symfony\Component\Console\Attribute\AsCommand;
+use Doctrine\ORM\ORMException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,10 +20,6 @@ use WebEtDesign\CmsBundle\Repository\CmsMenuRepository;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
 use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
-#[AsCommand(
-    name: 'cms:duplicate:menu',
-    description: 'Duplicate Menu for an other locale',
-)]
 class CmsDuplicateMenuCommand extends Command
 {
     protected EntityManager $em;
@@ -52,11 +47,23 @@ class CmsDuplicateMenuCommand extends Command
         $this->cmsPageRepository = $cmsPageRepository;
     }
 
+    protected function configure(): void
+    {
+        $this
+            ->setName('cms:duplicate:menu')
+            ->setDescription('Duplicate Menu for an other locale')
+        ;
+    }
+
     /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void
      * @throws ORMException
      * @throws OptimisticLockException
+     * @author Benjamin Robert
      */
-    public function __invoke(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -101,7 +108,7 @@ class CmsDuplicateMenuCommand extends Command
 
         $this->em->flush();
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     /**

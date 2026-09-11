@@ -92,13 +92,17 @@ class CmsRouteParamsType extends AbstractType
             }
         }
 
-        // A declination keeps its params in a JSON string column, where a menu item keeps an array.
-        if ($options['json_string']) {
-            $builder->addModelTransformer(new CallbackTransformer(
-                static fn(?string $values): array => $values ? (json_decode($values, true) ?? []) : [],
-                static fn(?array $values): string => json_encode($values ?? [])
-            ));
-        }
+//        $builder->addModelTransformer(new CallbackTransformer(
+//            function ($values) use ($config, $object) {
+//                if ($values != null) {
+//                    $values = json_decode($values, true);
+//                }
+//                return $values;
+//            },
+//            function ($values) use ($config, $locale) {
+//                return json_encode($values);
+//            }
+//        ));
     }
 
     /**
@@ -109,8 +113,6 @@ class CmsRouteParamsType extends AbstractType
         $resolver->setRequired('config');
         $resolver->setRequired('route');
         $resolver->setRequired('object');
-        $resolver->setDefault('json_string', false);
-        $resolver->setAllowedTypes('json_string', 'bool');
     }
 
     /**

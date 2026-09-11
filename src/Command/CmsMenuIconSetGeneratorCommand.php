@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Command;
 
-use Symfony\Component\Console\Attribute\Argument;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,24 +11,29 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'cms:menu:icon-set-generator',
-    description: 'Generate a menu icon set configuration file',
-)]
 class CmsMenuIconSetGeneratorCommand extends Command
 {
     private array    $iconSet;
 
     public function __construct(
         array $iconSet,
-        ?string $name = null
+        string $name = null
     ) {
         parent::__construct($name);
         $this->iconSet = $iconSet;
     }
 
 
-    public function __invoke(InputInterface $input, OutputInterface $output): int
+    protected function configure(): void
+    {
+        $this
+            ->setName('cms:menu:icon-set-generator')
+            ->setDescription('')
+            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
+            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io   = new SymfonyStyle($input, $output);
 
@@ -68,6 +70,6 @@ EOT;
 
         file_put_contents($outputFile, $output);
 
-        return Command::SUCCESS;
+        return 0;
     }
 }

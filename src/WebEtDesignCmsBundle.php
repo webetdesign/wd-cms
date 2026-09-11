@@ -15,7 +15,7 @@ use WebEtDesign\CmsBundle\DependencyInjection\Compiler\TemplatePass;
  */
 class WebEtDesignCmsBundle extends Bundle
 {
-    public function build(ContainerBuilder $container): void
+    public function build(ContainerBuilder $container)
     {
         parent::build($container);
         $container->addCompilerPass(new BlockPass());
