@@ -42,6 +42,17 @@ class BaseCmsController extends AbstractController
         return $this->response;
     }
 
+    public function getResponse(): Response
+    {
+        if (!$this->response) {
+            $this->response = new Response();
+            $this->response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
+            $this->response->headers->set('X-Reverse-Proxy-TTL', 0);
+        }
+
+        return $this->response;
+    }
+
     protected function defaultRender(array $params): Response
     {
         /** @var CmsPage $page */

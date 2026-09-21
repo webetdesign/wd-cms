@@ -34,6 +34,8 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
     protected ?array           $configCms;
     protected TemplateRegistry $templateRegistry;
 
+    protected $routes = [];
+
     public function __construct(
         EntityManagerInterface $em,
         TemplateRegistry $templateRegistry,
@@ -58,6 +60,10 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
     {
         $this->init($input, $output);
         $this->pageRp = $this->em->getRepository(CmsPage::class);
+
+        foreach ($this->em->getRepository(CmsRoute::class)->findAll() as $route) {
+            $this->routes[$route->getName()] = $route->getId();
+        }
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
