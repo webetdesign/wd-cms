@@ -11,8 +11,9 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Route\RouteCollection;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
@@ -22,43 +23,26 @@ use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
 use WebEtDesign\CmsBundle\Form\MoveForm;
 use WebEtDesign\CmsBundle\Form\Type\MenuIconType;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 final class CmsMenuItemAdmin extends AbstractAdmin
 {
-    /**
-     * @var TemplateProvider
-     */
-    protected $pageProvider;
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
-    private   $configMenu;
+    private ?array $configMenu;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct(
-        $code,
-        $class,
-        $baseControllerName,
-        EntityManagerInterface $em,
-        TemplateProvider $pageProvider,
-        $configMenu
+        private readonly EntityManagerInterface $em,
+        private readonly TemplateRegistry $templateRegistry,
+        private readonly ParameterBagInterface $parameterBag,
     ) {
-        $this->em           = $em;
-        $this->pageProvider = $pageProvider;
-
-        parent::__construct($code, $class, $baseControllerName);
-        $this->configMenu = $configMenu;
+        $this->configMenu = $this->parameterBag->get('wd_cms.menu');
+        parent::__construct();
     }
 
 
-    protected function configureRoutes(RouteCollection $collection)
+    protected function configureRoutes(RouteCollectionInterface $collection): void
     {
         $collection->add('move', 'move/{itemId}');
-        //        $collection->remove('list');
+        $collection->remove('show');
     }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
@@ -93,7 +77,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             ->add('connected')
             ->add('role')
             ->add('params')
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'show'   => [],
                     'edit'   => [],
@@ -117,10 +101,10 @@ final class CmsMenuItemAdmin extends AbstractAdmin
 
         $formMapper
             ->tab('General')
-            ->with('', ['box_class' => ''])
+            ->with('', ['box_class' => 'header_none'])
             ->add('name')
             ->add('information', TextType::class, [
-                'label' => 'Informations',
+                'label'    => 'Informations',
                 'required' => false
             ])
             ->add('isVisible', null, ['label' => 'Actif']);
@@ -147,7 +131,7 @@ final class CmsMenuItemAdmin extends AbstractAdmin
         if ($object && $object->getId() != null) {
             $formMapper
                 ->tab('Lien')
-                ->with('', ['box_class' => ''])
+                ->with('', ['box_class' => 'header_none'])
                 ->add('linkType', ChoiceType::class, [
                     'choices'  => CmsMenuLinkTypeEnum::getChoices(),
                     'label'    => 'Type de lien',
@@ -225,11 +209,10 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             // fin tab lien
             $formMapper
                 ->tab('Avancé')
-                ->with('', ['box_class' => '']);
+                ->with('', ['box_class' => 'header_none']);
 
             $formMapper
                 ->add('blank', null, ['label' => 'Nouvelle fenetre'])
-
                 ->add('liClass', null, [
                     'label'    => 'item class (li)',
                     'required' => false,
@@ -253,9 +236,8 @@ final class CmsMenuItemAdmin extends AbstractAdmin
                         "uniquement si l'utilisateur n'est pas connecté" => 'ONLY_LOGOUT'
                     ],
                     'label'   => 'Visible',
+                    'help'    => "Permet de dynamiser le menu si l'utilisateur est connecté ou non"
                 ])
-                ->addHelp('connected',
-                    "Permet de dynamiser le menu si l'utilisateur est connecté ou non")
                 ->add('role');
 
             $formMapper
@@ -283,11 +265,11 @@ final class CmsMenuItemAdmin extends AbstractAdmin
             ->add('params');
     }
 
-    protected function getRouteParamsField(FormMapper $formMapper, $subject, $route)
+    protected function getRouteParamsField(FormMapper $formMapper, $subject, $route): void
     {
 
         try {
-            $config = $this->pageProvider->getConfigurationFor($subject->getPage()->getTemplate());
+            $config = $this->templateRegistry->get($subject->getPage()->getTemplate());
         } catch (Exception $e) {
             $config = null;
         }

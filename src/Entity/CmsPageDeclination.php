@@ -1,98 +1,71 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
-use WebEtDesign\CmsBundle\Utils\SmoOpenGraphTrait;
-use WebEtDesign\CmsBundle\Utils\SmoTwitterTrait;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Loggable\Loggable;
+use WebEtDesign\CmsBundle\Repository\CmsPageDeclinationRepository;
+use WebEtDesign\SeoBundle\Entity\SeoAwareTrait;
+use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
+use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
 
-/**
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageDeclinationRepository")
- * @ORM\Table(name="cms__page_declination")
- */
-class CmsPageDeclination
+#[ORM\Entity(repositoryClass: CmsPageDeclinationRepository::class)]
+#[ORM\Table(name: 'cms__page_declination')]
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsPageDeclination implements Loggable
 {
     use SeoAwareTrait;
     use SmoOpenGraphTrait;
     use SmoTwitterTrait;
+    
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
+    
+    #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'declinations')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?CmsPage $page = null;
+    
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    private string $title = '';
+    
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
 
+    private string $technic_name = '';
+    
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $locale = null;
+    
+    #[ORM\OneToMany(mappedBy: 'declination', targetEntity: CmsContent::class, cascade: ['remove', 'persist'])]
+    private PersistentCollection|ArrayCollection $contents;
+    
+    #[ORM\Column(type: Types::BOOLEAN, length: 255, nullable: false, options: ['default' => false])]
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    private bool $active = false;
+    
+    #[ORM\Column(type: Types::TEXT, length: 255, nullable: false)]
 
-    /**
-     * @var CmsPage
-     *
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="declinations")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    private $page;
+    private string $params = '[]';
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
-    private $title;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
-    private $technic_name;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
-    private $locale;
-
-    /**
-     * @var ArrayCollection|PersistentCollection
-     *
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="declination", cascade={"remove", "persist"})
-     */
-    private $contents;
-
-    /**
-     * @var boolean
-     * @ORM\Column(type="boolean", length=255, nullable=false, options={"default": false})
-     */
-    private $active = false;
-
-    /**
-     * @var string
-     * @ORM\Column(type="text", length=255, nullable=false)
-     */
-    private $params = '[]';
-
-    /**
-     * @inheritDoc
-     */
     public function __construct()
     {
         $this->contents = new ArrayCollection();
         $this->setActive(false);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __toString()
     {
         return (string)$this->getTitle();
     }
 
-    public function getPath()
+    public function getPath(): array|string|null
     {
         $params = json_decode($this->getParams(), true);
         $pagePath = $this->getPage()->getRoute()->getPath();
@@ -120,9 +93,9 @@ class CmsPageDeclination
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getContents()
+    public function getContents(): ArrayCollection|PersistentCollection
     {
         return $this->contents;
     }
@@ -178,16 +151,16 @@ class CmsPageDeclination
      * @param mixed $page
      * @return CmsPageDeclination
      */
-    public function setPage($page)
+    public function setPage($page): static
     {
         $this->page = $page;
         return $this;
     }
 
     /**
-     * @return CmsPage
+     * @return CmsPage|null
      */
-    public function getPage()
+    public function getPage(): ?CmsPage
     {
         return $this->page;
     }
@@ -196,7 +169,7 @@ class CmsPageDeclination
      * @param string $params
      * @return CmsPageDeclination
      */
-    public function setParams($params)
+    public function setParams($params): static
     {
         $this->params = $params;
         return $this;
@@ -208,15 +181,6 @@ class CmsPageDeclination
     public function getParams(): string
     {
         return $this->params;
-    }
-
-    public function getSeoTitle(): ?string
-    {
-        if ($this->seo_title === null) {
-            return '';
-        }
-
-        return $this->seo_title;
     }
 
     public function getTechnicName(): ?string

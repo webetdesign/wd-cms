@@ -1,93 +1,72 @@
 <?php
+declare(strict_types=1);
+/** @noinspection RegExpRedundantEscape */
 
 namespace WebEtDesign\CmsBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
+use Gedmo\Loggable\Loggable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use WebEtDesign\CmsBundle\Repository\CmsRouteRepository;
 
 
-/**
- * @UniqueEntity("path")
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsRouteRepository")
- * @ORM\Table(name="cms__route")
- */
-abstract class AbstractCmsRoute implements CmsRouteInterface
+#[UniqueEntity('path')]
+#[ORM\Entity(repositoryClass: CmsRouteRepository::class)]
+#[ORM\Table(name: 'cms__route')]
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+abstract class AbstractCmsRoute implements CmsRouteInterface, Loggable
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(type: Types::INTEGER)]
+    protected ?int $id = null;
 
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
-    private $name;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
+    protected ?string $name = null;
 
 
-    /**
-     * @var array
-     * @ORM\Column(type="array", nullable=false)
-     *
-     */
-    private $methods = [];
+    #[ORM\Column(type: Types::JSON, nullable: false)]
+    #[Gedmo\Versioned]
+    protected array $methods = [];
 
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
-    private $path;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
+    protected ?string $path = null;
 
 
-    /**
-     * @var string|null
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
-    private $controller;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    protected ?string $controller = null;
 
-    /**
-     * @var CmsPage
-     *
-     * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="route", cascade={"remove"})
-     */
-    private $page;
+    #[ORM\OneToOne(mappedBy: 'route', targetEntity: CmsPage::class, cascade: ["remove"])]
+    #[Gedmo\Versioned]
+    protected ?CmsPage $page = null;
 
 
-    /**
-     * @var string
-     * @ORM\Column(type="text", nullable=true)
-     *
-     */
-    private $defaults;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Gedmo\Versioned]
+    protected ?string $defaults = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="text", nullable=true)
-     *
-     */
-    private $requirements;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Gedmo\Versioned]
+    protected ?string $requirements = null;
 
-    /**
-     * @inheritDoc
-     */
     public function __toString()
     {
         return (string) $this->getName();
     }
 
-    public function isDynamic()
+    public function isDynamic(): bool
     {
         return (bool) preg_match('/\{.*\}/', $this->getPath());
     }
 
-    public function getParams()
+    public function getParams(): array
     {
         preg_match_all('/\{(\w+)\}/', $this->getPath(), $matches);
         return $matches[1];
@@ -135,7 +114,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @return CmsPage
+     * @return CmsPage|null
      */
     public function getPage(): ?CmsPage
     {
@@ -143,7 +122,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @param CmsPage $page
+     * @param CmsPage|null $page
      */
     public function setPage(?CmsPage $page): void
     {
@@ -151,7 +130,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getController(): ?string
     {
@@ -159,7 +138,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @param string $controller
+     * @param string|null $controller
      */
     public function setController(?string $controller): void
     {
@@ -167,7 +146,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDefaults(): ?string
     {
@@ -175,7 +154,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @param string $defaults
+     * @param string|null $defaults
      * @return self
      */
     public function setDefaults(?string $defaults): self
@@ -185,7 +164,7 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRequirements(): ?string
     {
@@ -193,9 +172,10 @@ abstract class AbstractCmsRoute implements CmsRouteInterface
     }
 
     /**
-     * @param string $requirements
+     * @param string|null $requirements
      * @return self
      */
+
     public function setRequirements(?string $requirements): self
     {
         $this->requirements = $requirements;

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace WebEtDesign\CmsBundle\Services;
-
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Sonata\AdminBundle\Admin\Pool;
@@ -17,21 +15,21 @@ class CmsSonataFormBuilderHelper
      */
     private Pool $adminPool;
 
-    public function __construct(Pool $adminPool) {
-
+    public function __construct(Pool $adminPool)
+    {
         $this->adminPool = $adminPool;
     }
 
     public function buildModelListType(
         FormBuilderInterface $builder,
-        $fieldName,
-        $parentClass,
-        $childClass,
-        $options = []
-    ) {
-
+                             $fieldName,
+                             $parentClass,
+                             $childClass,
+                             $options = []
+    )
+    {
         $parentAdmin = $this->adminPool->getAdminByClass($parentClass);
-        $childAdmin = $this->adminPool->getAdminByClass($childClass);
+        $childAdmin  = $this->adminPool->getAdminByClass($childClass);
 
         $linkParameters = ['context' => 'default'];
         if (isset($options['link_parameters'])) {
@@ -39,19 +37,14 @@ class CmsSonataFormBuilderHelper
         }
 
         /** @var FieldDescription $fieldDescription */
-        $fieldDescription = $childAdmin
-            ->getModelManager()
-            ->getNewFieldDescriptionInstance($childAdmin->getClass(), $fieldName, [
-                'translation_domain' => $options['translation_domain'] ?? 'wd_cms',
-                'link_parameters'    => $linkParameters
-            ]);
+        $fieldDescription = $childAdmin->getFieldDescriptionFactory()->create($childClass, $fieldName, [
+            'translation_domain' => $options['translation_domain'] ?? 'wd_cms',
+            'link_parameters'    => $linkParameters
+        ]);
+
         $fieldDescription->setAdmin($parentAdmin);
         $fieldDescription->setAssociationAdmin($childAdmin);
         $fieldDescription->setOption('edit', 'list');
-        $fieldDescription->setAssociationMapping([
-            'fieldName' => $fieldName,
-            'type'      => ClassMetadataInfo::MANY_TO_ONE,
-        ]);
 
         $opts = [
             'model_manager'            => $childAdmin->getModelManager(),

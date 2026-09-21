@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: Leo MEYER
@@ -11,107 +12,71 @@ namespace WebEtDesign\CmsBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\Selectable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
+use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
-
-/**
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsSiteRepository")
- * @ORM\Table(name="cms__site")
- */
-class CmsSite
+#[ORM\Entity(repositoryClass: CmsSiteRepository::class)]
+#[ORM\Table(name: 'cms__site')]
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsSite implements Loggable
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     *
-     * @var int|null
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    protected ?int $id = null;
 
-    /**
-     * @var string|null
-     *
-     * @Gedmo\Slug(fields={"label", "locale"})
-     * @ORM\Column(type="string", length=255, nullable=false)
-     */
-    private ?string $slug = null;
+    #[Gedmo\Slug(fields: ['label', 'locale'])]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
+    protected ?string $slug = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     * @var string|null
-     */
-    private ?string $label = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
+    protected ?string $label = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     * @var string|null
-     */
-    private ?string $locale = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    protected ?string $locale = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     * @var string|null
-     */
-    private ?string $host = null;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    protected ?string $host = null;
 
-    /**
-     * @ORM\Column(type="boolean", options={"default" : 0})
-     *
-     * @var boolean
-     */
-    private bool $hostMultilingual = false;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    protected ?string $localhost = null;
 
-    /**
-     * @ORM\Column(name="`default`", type="boolean", options={"default" : 0})
-     *
-     * @var boolean
-     */
-    private bool $default;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 0])]
+    #[Gedmo\Versioned]
+    protected bool $hostMultilingual = false;
 
-    /**
-     * @var CmsPage[]|Collection|Selectable
-     *
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", mappedBy="site", cascade={"persist", "remove"})
-     */
-    private Collection $pages;
+    #[ORM\Column(name: '`default`', type: Types::BOOLEAN, options: ['default' =>0])]
+    #[Gedmo\Versioned]
+    protected bool $default;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     * @var string|null
-     */
-    private ?string $flagIcon = null;
+    #[ORM\OneToMany(mappedBy: 'site', targetEntity: CmsPage::class, cascade: ['persist', 'remove'])]
+    protected Collection $pages;
 
-    /**
-     * @var CmsPage[]|Collection|Selectable
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenu", mappedBy="site", cascade={"persist", "remove"})
-     */
-    private Collection $menus;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    protected ?string $flagIcon = null;
 
-    /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSharedBlock", mappedBy="site", cascade={"persist", "remove"})
-     */
-    private Collection $sharedBlocks;
+    #[ORM\OneToMany(mappedBy: 'site', targetEntity: CmsMenu::class, cascade: ['persist', 'remove'])]
+    protected Collection $menus;
 
-    /**
-     * @var boolean
-     * @ORM\Column(type="boolean", options={"default": true})
-     */
-    private bool $visible = true;
+    #[ORM\OneToMany(mappedBy: 'site', targetEntity: CmsSharedBlock::class, cascade: ['persist', 'remove'])]
+    protected Collection $sharedBlocks;
 
-    /**
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private ?string $templateFilter = null;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    #[Gedmo\Versioned]
+    protected bool $visible = true;
+
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    protected ?string $templateFilter = null;
 
     public bool $initPage = true;
     public bool $initMenu = true;
@@ -243,21 +208,11 @@ class CmsSite
     }
 
     /**
-     * @param string $flagIcon
+     * @param string|null $flagIcon
      */
     public function setFlagIcon(?string $flagIcon): void
     {
         $this->flagIcon = $flagIcon;
-    }
-
-    public function getMenuArbo()
-    {
-        $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq('type', CmsMenuTypeEnum::PAGE_ARBO));
-
-        $menus = $this->menus->matching($criteria);
-
-        return $menus[0] ?? null;
     }
 
     public function getMenu()
@@ -444,6 +399,24 @@ class CmsSite
     public function getSlug(): ?string
     {
         return $this->slug;
+    }
+
+    /**
+     * @param string|null $localhost
+     * @return CmsSite
+     */
+    public function setLocalhost(?string $localhost): CmsSite
+    {
+        $this->localhost = $localhost;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLocalhost(): ?string
+    {
+        return $this->localhost;
     }
 
 }

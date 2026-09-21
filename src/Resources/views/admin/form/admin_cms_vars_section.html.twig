@@ -1,0 +1,31 @@
+{% block admin_cms_vars_section_row %}
+    {% set uniqueId = form.vars.id %}
+    {% if form.vars.data is not empty %}
+        <div class="box box-success">
+            <div class="box-header">
+                <div class="box-title">
+                    <a data-toggle="collapse" href="#{{ uniqueId }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        {{ form.vars.data | length }} variable{{ form.vars.data | length > 1 ? 's' : '' }} de contenu disponible.
+                    </a>
+                </div>
+            </div>
+            <div class="box-body collapse" id="{{ uniqueId }}">
+                {% for var in form.vars.data %}
+                    <button
+                            class="btn btn-info"
+                            data-controller="cms-copytoclipboard"
+                            data-action="click->cms-copytoclipboard#copy"
+                        >{{ var }}
+                    </button>
+                {% endfor %}
+
+                <p class="text-muted" style="margin-top: 15px">
+                    Les variables de contenu peuvent être ajouté dans n'importe quel champs texte présent dans cette interface, elles seront automatiquement
+                    remplacées par la valeur sur la page. <br>
+                    Exemple: <strong>__actualite.titre__</strong> sera remplacé par le titre de l'actualité. <br>
+                    Cliquez sur la variable souhaitée pour la copier, puis collez la dans un champs.
+                </p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

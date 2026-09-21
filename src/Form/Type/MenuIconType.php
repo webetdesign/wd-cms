@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form\Type;
 
@@ -20,7 +20,7 @@ class MenuIconType extends AbstractType
     /**
      * @inheritDoc
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['iconSet'] = $this->iconSet;
     }
@@ -29,7 +29,7 @@ class MenuIconType extends AbstractType
     /**
      * @inheritDoc
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }
@@ -37,7 +37,7 @@ class MenuIconType extends AbstractType
     /**
      * @inheritDoc
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'cms_menu_icon';
     }

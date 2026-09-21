@@ -108,22 +108,4 @@ class CmsMenuItemRepository extends NestedTreeRepository
 
         return $qb->getQuery()->getResult();
     }
-
-    public function getPageArboMenuItem(CmsPage $page)
-    {
-        $site = $page->getSite();
-
-        $qb = $this->createQueryBuilder('mi');
-        $qb
-            ->join('mi.menu', 'm')
-            ->where('mi.page = :page')
-            ->andWhere('m.site = :site')
-            ->andWhere('m.type = :type')
-            ->setParameter('page', $page)
-            ->setParameter('site', $site)
-            ->setParameter('type', CmsMenuTypeEnum::PAGE_ARBO);
-
-
-        return $qb->getQuery()->getOneOrNullResult();
-    }
 }

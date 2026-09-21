@@ -1,97 +1,80 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Twig;
 
+use Doctrine\Common\Collections\Criteria;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\TwigTest;
+use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
-use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use WebEtDesign\CmsBundle\Registry\BlockRegistry;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
+use WebEtDesign\CmsBundle\Services\CmsHelper;
 use WebEtDesign\CmsBundle\Services\WDDeclinationService;
 use WebEtDesign\MediaBundle\Entity\Media;
-use WebEtDesign\MediaBundle\Services\WDMediaService;
 
-/**
- * @property mixed configCms
- */
 class CmsTwigExtension extends AbstractExtension
 {
-    protected $declination;
-    protected $requestStack;
-    /** @var AbstractCmsGlobalVars */
-    protected $globalVars;
-    protected $globalVarsEnable;
-    protected $pageProvider;
-    protected $pageExtension;
-    private   $sharedBlockProvider;
-    private   $twig;
-    private   $container;
+    protected bool         $useDeclination = false;
+    protected RequestStack $requestStack;
 
-    private $em;
+    protected TemplateRegistry $templateRegistry;
+    private Environment        $twig;
 
-    protected $router;
+    private EntityManagerInterface $em;
 
-    protected                    $customContents;
-    private WDMediaService       $mediaService;
+    protected RouterInterface $router;
+
     private WDDeclinationService $declinationService;
+    private BlockRegistry        $blockRegistry;
+    private CmsHelper            $cmsHelper;
+    private array                $configCms;
+    protected array              $customContents;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct(
         EntityManagerInterface $entityManager,
-        RouterInterface $router,
-        ContainerInterface $container,
-        Environment $twig,
-        TemplateProvider $pageProvider,
-        TemplateProvider $templateProvider,
-        RequestStack $requestStack,
-        ParameterBagInterface $parameterBag,
-        WDMediaService $mediaService,
-        WDDeclinationService $declinationService
-    ) {
-        $this->em                  = $entityManager;
-        $this->router              = $router;
-        $this->container           = $container;
-        $this->twig                = $twig;
-        $this->pageProvider        = $pageProvider;
-        $this->sharedBlockProvider = $templateProvider;
-        $this->requestStack        = $requestStack;
+        RouterInterface        $router,
+        Environment            $twig,
+        TemplateRegistry       $templateRegistry,
+        RequestStack           $requestStack,
+        ParameterBagInterface  $parameterBag,
+        WDDeclinationService   $declinationService,
+        BlockRegistry          $blockRegistry,
+        CmsHelper              $cmsHelper
+    )
+    {
+        $this->em               = $entityManager;
+        $this->router           = $router;
+        $this->twig             = $twig;
+        $this->templateRegistry = $templateRegistry;
+        $this->requestStack     = $requestStack;
 
-        $this->pageExtension  = $parameterBag->get('wd_cms.cms.page_extension');
-        $this->declination    = $parameterBag->get('wd_cms.cms.declination');
-        $this->customContents = $parameterBag->get('wd_cms.custom_contents');
-        $globalVarsDefinition = $parameterBag->get('wd_cms.vars');
+        $this->useDeclination = $parameterBag->get('wd_cms.cms.declination');
         $this->configCms      = $parameterBag->get('wd_cms.cms');
 
-        $this->globalVarsEnable = $globalVarsDefinition['enable'];
-        if ($globalVarsDefinition['enable']) {
-            $this->globalVars = $this->container->get($globalVarsDefinition['global_service']);
-        }
-        $this->mediaService       = $mediaService;
         $this->declinationService = $declinationService;
+        $this->blockRegistry      = $blockRegistry;
+        $this->cmsHelper          = $cmsHelper;
+        $this->customContents     = [];
     }
 
-    public function getTests()
+    public function getTests(): array
     {
         return [
             new TwigTest('instanceOf', [$this, 'isInstanceOf'])
@@ -127,29 +110,30 @@ class CmsTwigExtension extends AbstractExtension
         ];
     }
 
-    public function isInstanceOf($object, $class)
+    public function isInstanceOf($object, $class): bool
     {
         return $object instanceof $class;
     }
 
-    private function retrieveContent($object, $content_code)
+    private function retrieveContent($object, $content_code): ?CmsContent
     {
-        /** @var CmsContent $content */
-        $content = $this->em->getRepository(CmsContent::class)
-            ->findOneByObjectAndContentCodeAndType(
-                $object,
-                $content_code,
-                array_merge([
-                    CmsContentTypeEnum::TEXT,
-                    CmsContentTypeEnum::TEXTAREA,
-                    CmsContentTypeEnum::WYSIWYG,
-                    CmsContentTypeEnum::CHECKBOX,
-                ], array_keys($this->customContents))
-            );
+        if ($object instanceof CmsPageDeclination || $object instanceof CmsPage || $object instanceof CmsSharedBlock) {
+            /** @var CmsContent $content */
+            $content = $this->em->getRepository(CmsContent::class)
+                ->findOneByObjectAndContentCodeAndType(
+                    $object,
+                    $content_code
+                );
+        } else {
+            $criteria = new Criteria();
+            $criteria->where(Criteria::expr()->eq('code', $content_code));
+            $content = $object->getContents()->matching($criteria)->first();
+        }
+
         return $content;
     }
 
-    private function getContent($object, $content_code)
+    private function getContent($object, $content_code): ?array
     {
         $defaultLangSite = $this->em->getRepository(CmsSite::class)->findOneBy(['default' => true]);
         $defaultPage     = null;
@@ -165,7 +149,7 @@ class CmsTwigExtension extends AbstractExtension
             }
         }
 
-        if ($this->declination && $object instanceof CmsPage) {
+        if ($this->useDeclination && $object instanceof CmsPage) {
             $content = null;
             if ($declination = $this->declinationService->getDeclination($object)) {
                 $content = $this->retrieveContent($declination, $content_code);
@@ -216,12 +200,13 @@ class CmsTwigExtension extends AbstractExtension
     }
 
     /**
-     * @param CmsPage|CmsSharedBlock $object
+     * @param CmsPage|CmsPageDeclination|CmsSharedBlock $object
      * @param $content_code
+     * @param array|null $context
      * @return string|null
      * @throws Exception
      */
-    public function cmsRenderContent($object, $content_code)
+    public function cmsRenderContent($object, $content_code, ?array $context = null): null|array|string|object|bool
     {
         [$content, $defaultPage, $defaultLangSite] = $this->getContent($object, $content_code);
 
@@ -229,61 +214,41 @@ class CmsTwigExtension extends AbstractExtension
             return null;
         }
 
-        if (in_array($content->getType(), array_keys($this->customContents))) {
-            if ((!$content->getValue() || $content->getValue() === '[]') && $defaultPage) {
-                $content = $this->retrieveContent($defaultPage, $content_code);
-            }
+        $template = $this->templateRegistry->get($object->getTemplate());
 
-            $contentService = $this->container->get($this->customContents[$content->getType()]['service']);
-            return $contentService->render($content);
-        }
+        $block = $this->blockRegistry->get($template->getBlock($content->getCode()));
 
-        if ($content->getType() === CmsContentTypeEnum::CHECKBOX) {
-            return filter_var($content->getValue(), FILTER_VALIDATE_BOOLEAN);
-        }
-
-        $value = $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
-
-        if (!$value && $defaultLangSite && $defaultPage) {
-            $content = $this->retrieveContent($defaultPage, $content_code);
-            $value   = $this->globalVarsEnable ? $this->globalVars->replaceVars($content->getValue()) : $content->getValue();
-        }
-
-        return $value;
+        return $block->render($content->getValue(), $context);
     }
 
-    public function getSharedBlock($code, $object = null)
+    public function getSharedBlock($code, $context = []): ?string
     {
         if ($this->configCms['multilingual']) {
-            if (!$object) {
-                throw new HttpException('500',
-                    'A CmsPage or CmsSharedBlock must be passed as the second parameter of the `cms_render_shared_block` twig function, null given');
-            }
-
+            $page  = $this->cmsHelper->getPage();
             $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy([
                 'code' => $code,
-                'site' => $object->getSite()
+                'site' => $page->getSite()
             ]);
         } else {
             $block = $this->em->getRepository(CmsSharedBlock::class)->findOneBy(['code' => $code]);
         }
 
-        return $this->renderSharedBlock($block);
+        return $this->renderSharedBlock($block, $context);
     }
 
-    public function renderSharedBlock(?CmsSharedBlock $block)
+    public function renderSharedBlock(?CmsSharedBlock $block, $context = []): ?string
     {
         if (!$block || $block && !$block->isActive()) {
             return null;
         }
 
-        return $this->twig->render($this->sharedBlockProvider->getConfigurationFor($block->getTemplate())['template'],
-            [
-                'block' => $block
-            ]);
+        $config = $this->templateRegistry->get($block->getTemplate());
+
+        return $this->twig->render($config->getTemplate(),
+            array_merge(['block' => $block, 'page' => $this->cmsHelper->getPage()], $context));
     }
 
-    public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
+    public function cmsPath($route, $params = [], $absoluteUrl = false, ?CmsPage $page = null)
     {
         if ($this->configCms['multilingual'] && $page !== null) {
             $prefix = $page->getSite()->getLocale() . '_';
@@ -291,13 +256,55 @@ class CmsTwigExtension extends AbstractExtension
 
         try {
             return $this->router->generate(($prefix ?? null) . $route, $params,
-                $absoluteUrl ? UrlGenerator::ABSOLUTE_URL : UrlGenerator::ABSOLUTE_PATH);
+                $absoluteUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH);
         } catch (RouteNotFoundException $e) {
             return '#404(route:' . $route . ')';
         }
     }
 
-    private function getLocalSwithPages(CmsPage $page)
+    private function generatePageUrl(CmsPage $page)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        preg_match_all('/\{(\w+)\}/', $page->getRoute()->getPath(), $params);
+
+        /** @var PageInterface $pageConfig */
+        $pageConfig  = $this->templateRegistry->get($page->getTemplate());
+        $routeConfig = $pageConfig->getRoute();
+
+        $routeParams = [];
+        foreach ($routeConfig->getAttributes() as $attribute) {
+            if ($attribute->getEntityClass() !== null && is_subclass_of($attribute->getEntityClass(),
+                    TranslatableInterface::class)) {
+                $repoMethod = 'findOneBy' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                $criterion  = $request->attributes->get('_route_params')[$attribute->getName()] ?? null;
+
+                $object = $this->em->getRepository($attribute->getEntityClass())->$repoMethod($criterion, $page->getSite()->getLocale());
+
+                if ($object) {
+                    $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                    $routeParams[$attribute->getName()] = $object->translate($page->getSite()->getLocale())->$getProperty();
+                }
+            } else {
+                if ($attribute->getEntityClass() !== null) {
+                    $getProperty                        = 'get' . ucfirst($attribute->getEntityProperty() ?: 'id');
+                    $routeParams[$attribute->getName()] = $request->attributes->get($attribute->getName())->$getProperty();
+                } else {
+                    $routeParams[$attribute->getName()] = $request->attributes->get($attribute->getName());
+                }
+            }
+        }
+
+        try {
+            $path = $this->router->generate($page->getRoute()->getName(), $routeParams);
+        } catch (RouteNotFoundException $e) {
+            $path = null;
+        }
+
+        return $path;
+    }
+
+    private function getLocalSwitchPages(CmsPage $page): array
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -307,37 +314,10 @@ class CmsTwigExtension extends AbstractExtension
             if (!$p->getSite()->isVisible() || $p->getId() === $page->getId()) {
                 continue;
             }
-            preg_match_all('/\{(\w+)\}/', $p->getRoute()->getPath(), $params);
-            $routeParams  = [];
-            $paramsConfig = $this->pageProvider->getConfigurationFor($page->getTemplate())['params'];
-            foreach ($params[1] as $param) {
-                if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null &&
-                    is_subclass_of($paramsConfig[$param]['entity'], TranslatableInterface::class)) {
 
-                    $repoMethod = 'findOneBy' . ucfirst($paramsConfig[$param]['property']);
-                    $criterion  = $request->get('_route_params')[$param] ?? null;
+            $path = $this->generatePageUrl($p);
 
-                    $object = $this->em->getRepository($paramsConfig[$param]['entity'])
-                        ->$repoMethod($criterion, $page->getSite()->getLocale());
-                    if ($object) {
-                        $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
-                        $routeParams[$param] = $object->translate($p->getSite()->getLocale())->$getProperty();
-                    }
-
-                } else {
-                    if (isset($paramsConfig[$param]) && isset($paramsConfig[$param]['entity']) && $paramsConfig[$param]['entity'] !== null) {
-                        $getProperty         = 'get' . ucfirst($paramsConfig[$param]['property']);
-                        $routeParams[$param] = $request->get($param)->$getProperty();
-
-                    } else {
-                        $routeParams[$param] = $request->get($param);
-                    }
-                }
-            }
-
-            try {
-                $path = $this->router->generate($p->getRoute()->getName(), $routeParams);
-            } catch (RouteNotFoundException $e) {
+            if ($path === null) {
                 continue;
             }
 
@@ -352,9 +332,13 @@ class CmsTwigExtension extends AbstractExtension
         return $pages;
     }
 
-    public function renderLocaleSwitch(CmsPage $page, $useless = null): ?string
+    public function renderLocaleSwitch(?CmsPage $page = null, $useless = null): ?string
     {
-        $pages = $this->getLocalSwithPages($page);
+        if ($page === null) {
+            return null;
+        }
+
+        $pages = $this->getLocalSwitchPages($page);
 
         return $this->twig->render('@WebEtDesignCms/block/cms_locale_switch.html.twig', [
             'page'  => $page,
@@ -364,11 +348,18 @@ class CmsTwigExtension extends AbstractExtension
 
     public function renderMetaLocalSwitch(CmsPage $page): ?string
     {
-        $pages = $this->getLocalSwithPages($page);
+        $pages = $this->getLocalSwitchPages($page);
+
+        $path = $this->generatePageUrl($page);
 
         return $this->twig->render('@WebEtDesignCms/block/cms_meta_locale_switch.html.twig', [
-            'page'  => $page,
-            'pages' => $pages
+            'canonical'  => [
+                'path'   => $path,
+                'code'   => $page->getSite()->getLocale(),
+                'icon'   => $page->getSite()->getFlagIcon(),
+                'locale' => $page->getSite()->getLocale(),
+            ],
+            'alternates' => $pages
         ]);
     }
 
@@ -380,7 +371,7 @@ class CmsTwigExtension extends AbstractExtension
         $method = 'get' . ucfirst($name);
 
         $value = null;
-        if ($object instanceof CmsPage && $this->declination && ($declination = $this->declinationService->getDeclination($object))) {
+        if ($object instanceof CmsPage && $this->useDeclination && ($declination = $this->declinationService->getDeclination($object))) {
             $value = $this->getSeoSmoValue($declination, $method);
             if (empty($value)) {
                 $value = $this->getSeoSmoValueFallbackParentPage($object, $method);
@@ -399,10 +390,6 @@ class CmsTwigExtension extends AbstractExtension
             return $value;
         }
 
-        if ($this->globalVarsEnable) {
-            $value = $this->globalVars->replaceVars($value);
-        }
-
         return $value;
     }
 
@@ -418,6 +405,10 @@ class CmsTwigExtension extends AbstractExtension
 
     private function getSeoSmoValue($object, $method)
     {
+        if ($object == null) {
+            return null;
+        }
+
         if (method_exists($object, $method)) {
             return call_user_func_array([$object, $method], []);
         } else {
@@ -430,7 +421,7 @@ class CmsTwigExtension extends AbstractExtension
     /**
      * @param CmsPage $page
      */
-    public function breadcrumb($page)
+    public function breadcrumb($page): array
     {
         $items = [];
         while ($page != null) {
@@ -447,9 +438,9 @@ class CmsTwigExtension extends AbstractExtension
         return array_reverse($items);
     }
 
-    public function routeExist($path)
+    public function routeExist($path): bool
     {
-        return (null === $this->router->getRouteCollection()->get($path)) ? false : true;
+        return !(null === $this->router->getRouteCollection()->get($path));
     }
 
     public function choiceLabel($choices, $value)
@@ -460,7 +451,7 @@ class CmsTwigExtension extends AbstractExtension
                 return $choice->label;
             }
         }
+
         return null;
     }
-
 }

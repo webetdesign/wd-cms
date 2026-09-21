@@ -22,4 +22,8 @@ interface CmsRouteInterface
     public function getPage(): ?CmsPage;
 
     public function getController(): ?string;
+
+    public function getDefaults(): ?string;
+
+    public function getRequirements(): ?string;
 }

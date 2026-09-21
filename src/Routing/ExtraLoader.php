@@ -1,46 +1,50 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Routing;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use PDOException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class ExtraLoader implements LoaderInterface
 {
-    protected $loaded = false;
+    protected bool $loaded = false;
 
-    protected $em = null;
+    protected ?EntityManager $em = null;
 
-    protected $parameterBag = null;
-    private   $cmsConfig;
+    protected ?LoaderResolverInterface $resolver;
+
+    protected TemplateRegistry $templateRegistry;
 
     /**
      * ExtraLoader constructor.
      * @param EntityManager $entityManager
-     * @param ContainerBagInterface $parameterBag
+     * @param TemplateRegistry $templateRegistry
      */
     public function __construct(
-        EntityManager $entityManager,
-        ContainerBagInterface $parameterBag,
-        $cmsConfig
+        EntityManagerInterface $entityManager,
+        TemplateRegistry $templateRegistry,
     ) {
-        $this->em           = $entityManager;
-        $this->parameterBag = $parameterBag;
-        $this->cmsConfig    = $cmsConfig;
+        $this->em               = $entityManager;
+        $this->templateRegistry = $templateRegistry;
     }
 
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): RouteCollection
     {
         try {
             $con = $this->em->getConnection();
-            $con->connect();
+            $con->getNativeConnection();
             $cmsRoutes = $this->em->getRepository(CmsRoute::class)->findAll();
         } catch (Exception $exception) {
             return new RouteCollection();
@@ -57,11 +61,17 @@ class ExtraLoader implements LoaderInterface
             if ($cmsRoute->getPage() == null || $cmsRoute->getPage()->getRoot() == null || !$cmsRoute->getPage()->getActive()) {
                 continue;
             }
+
             //            /** @var CmsSite $cmsSite */
             $cmsSite = $cmsRoute->getPage()->getRoot()->getSite();
             if ($cmsSite) {
                 $langPrefix = !empty($cmsSite->getLocale()) && !$cmsSite->isHostMultilingual() ? '/' . $cmsSite->getLocale() : null;
                 $host       = !empty($cmsSite->getHost()) ? $cmsSite->getHost() : null;
+                if (isset($_ENV['MULTISITE_LOCALHOST'])
+                    && filter_var($_ENV['MULTISITE_LOCALHOST'], FILTER_VALIDATE_BOOLEAN)
+                    && !empty($cmsSite->getLocalhost())) {
+                    $host = $cmsSite->getLocalhost();
+                }
             }
 
             // prepare a new route
@@ -89,24 +99,30 @@ class ExtraLoader implements LoaderInterface
                 }
             }
 
-            if ($this->parameterBag->get('wd_cms.cms.page_extension')) {
-                if ($pattern !== '/' && strpos($pattern, '.{extension}') === false) {
-                    $pattern               .= '.{extension}';
-                    $defaults['extension'] = '';
-                }
-            }
-
             $route = new Route($pattern, $defaults, $requirements ?? []);
             if (!empty($host)) {
                 $route->setHost($host);
             }
             $route->setMethods($cmsRoute->getMethods());
 
+            $priority = 0;
+            try {
+                $pageConfig     = $this->templateRegistry->get($cmsRoute->getPage()->getTemplate());
+                $routeDefnition = $pageConfig->getRoute();
+                if ($routeDefnition !== null) {
+                    $priority = $routeDefnition->getPriority();
+                }
+            } catch (Exception $e) {
+
+            }
+
+
             preg_match_all('/\{(\w+)\}/', $cmsRoute->getPath(), $matches);
             $routes [] = [
                 'nbParams' => count($matches[1]),
                 'name'     => $cmsRoute->getName(),
-                'route'    => $route
+                'route'    => $route,
+                'priority' => $priority
             ];
         }
 
@@ -119,33 +135,32 @@ class ExtraLoader implements LoaderInterface
 
         $routeCollection = new RouteCollection();
         foreach ($routes as $route) {
-            $routeCollection->add($route['name'], $route['route']);
+            $routeCollection->add($route['name'], $route['route'], $route['priority']);
         }
 
 
-//        if ($this->cmsConfig['multisite']) {
-//            $sitemap = new Route('/sitemap.xml', [
-//                '_controller' => 'WebEtDesign\CmsBundle\Controller\SitemapController'
-//            ]);
-//            $routeCollection->add('sitemap', $sitemap);
-//        }
+        //        if ($this->cmsConfig['multisite']) {
+        //            $sitemap = new Route('/sitemap.xml', [
+        //                '_controller' => 'WebEtDesign\CmsBundle\Controller\SitemapController'
+        //            ]);
+        //            $routeCollection->add('sitemap', $sitemap);
+        //        }
 
         return $routeCollection;
     }
 
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return 'cms' === $type;
     }
 
-    public function getResolver()
+    public function getResolver(): LoaderResolverInterface
     {
-        // needed, but can be blank, unless you want to load other resources
-        // and if you do, using the Loader base class is easier (see below)
+        return $this->resolver;
     }
 
-    public function setResolver(LoaderResolverInterface $resolver)
+    public function setResolver(LoaderResolverInterface $resolver): void
     {
-        // same as above
+        $this->resolver = $resolver;
     }
 }

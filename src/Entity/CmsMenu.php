@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Entity;
 
@@ -6,60 +7,47 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
+use Doctrine\DBAL\Schema\UniqueConstraint;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Loggable\Loggable;
+use WebEtDesign\CmsBundle\Repository\CmsMenuRepository;
 
-/**
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsMenuRepository")
- * @ORM\Table(name="cms__menu", uniqueConstraints={@ORM\UniqueConstraint(name="code_idx", columns={"code", "site_id"})})
- */
-class CmsMenu
+#[ORM\Entity(repositoryClass: CmsMenuRepository::class)]
+#[ORM\Table(name: 'cms__menu')]
+#[ORM\UniqueConstraint(name: 'code_idx', columns: ['code', 'site_id'])]
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsMenu implements Loggable
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     * @var string
-     */
-    private $label;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
+    private ?string $label = null;
 
-    /**
-     * @ORM\Column(type="string", length=128, nullable=false)
-     *
-     * @var string
-     */
-    private $code;
+    #[ORM\Column(type: Types::STRING, length: 128, nullable: false)]
+    #[Gedmo\Versioned]
+    private ?string $code = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     * @var string
-     */
-    private $type;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $type = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="menu", cascade={"persist", "remove"})
-     * @var CmsMenuItem[]|Collection|Selectable
-     */
-    private $children;
+    #[ORM\OneToMany(mappedBy: "menu", targetEntity: CmsMenuItem::class, cascade: ["persist", "remove"])]
+    private Collection $children;
 
-    /**
-     * @var CmsSite
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="menus")
-     * @ORM\JoinColumn(name="site_id", referencedColumnName="id")
-     */
-    private $site;
+    #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: "menus")]
+    #[ORM\JoinColumn(name: "site_id", referencedColumnName: "id")]
+    #[Gedmo\Versioned]
+    private ?CmsSite $site = null;
 
-    public $initRoot = true;
+    public bool $initRoot = true;
 
 
     public function __construct()
@@ -68,9 +56,6 @@ class CmsMenu
         $this->children = new ArrayCollection();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __toString()
     {
         return (string)$this->getLabel();
@@ -85,7 +70,7 @@ class CmsMenu
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
      */
     public function setId(?int $id): void
     {
@@ -122,9 +107,9 @@ class CmsMenu
     }
 
     /**
-     * @return Collection|Selectable|CmsMenuItem[]
+     * @return Collection
      */
-    public function getChildren()
+    public function getChildren(): Collection
     {
         return $this->children;
     }
@@ -163,7 +148,7 @@ class CmsMenu
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCode(): ?string
     {
@@ -199,7 +184,7 @@ class CmsMenu
     }
 
     /**
-     * @return CmsSite
+     * @return CmsSite|null
      */
     public function getSite(): ?CmsSite
     {

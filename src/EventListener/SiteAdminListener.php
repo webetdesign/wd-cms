@@ -9,6 +9,7 @@ use WebEtDesign\CmsBundle\Entity\CmsMenuTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -35,9 +36,9 @@ class SiteAdminListener
         $this->parameterBag = $parameterBag;
     }
 
-    public function prePersist($event)
+    public function prePersist(LifecycleEventArgs $event): void
     {
-        $em = $event->getEntityManager();
+        $em = $event->getObjectManager();
         /** @var CmsSite $site */
         $site = $event->getObject();
 
@@ -54,7 +55,7 @@ class SiteAdminListener
         }
     }
 
-    public function postUpdate($event)
+    public function postUpdate(LifecycleEventArgs $event): void
     {
         $site = $event->getObject();
 
@@ -65,7 +66,7 @@ class SiteAdminListener
         $this->warmUpRouteCache();
     }
 
-    public function postPersist($event)
+    public function postPersist(LifecycleEventArgs $event): void
     {
         $site = $event->getObject();
 
@@ -77,11 +78,11 @@ class SiteAdminListener
     }
 
     // remove cache routing file and warmup cache
-    protected function warmUpRouteCache()
+    protected function warmUpRouteCache(): void
     {
         $cacheDir = $this->kernel->getCacheDir();
 
-        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
+        foreach (['matcher_class', 'generator_class'] as $option) {
             $className = $this->router->getOption($option);
             $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
             $this->fs->remove($cacheFile);
@@ -95,7 +96,7 @@ class SiteAdminListener
      * @param CmsSite $site
      * @throws \Doctrine\ORM\ORMException
      */
-    private function createMenu(EntityManager $em, CmsSite $site)
+    private function createMenu(EntityManager $em, CmsSite $site): void
     {
         $menu = new CmsMenu();
         $menu->setLabel('Menu principal')
@@ -118,13 +119,14 @@ class SiteAdminListener
         $em->persist($homepage);
     }
 
-    private function createPage(EntityManager $em, CmsSite $site)
+    private function createPage(EntityManager $em, CmsSite $site): void
     {
         $tmplName = $this->parameterBag->get('wd_cms.cms')['default_home_template'];
 
         $page = new CmsPage();
         $page->setTemplate(!empty($site->getTemplateFilter()) ? ($site->getTemplateFilter() . '_' . $tmplName) : $tmplName);
         $page->setTitle('Homepage');
+        $page->setActive(true);
         $page->rootPage = true;
         $site->addPage($page);
 

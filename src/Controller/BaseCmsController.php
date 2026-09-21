@@ -2,18 +2,20 @@
 
 namespace WebEtDesign\CmsBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
+use WebEtDesign\CmsBundle\CMS\ConfigurationInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use WebEtDesign\CmsBundle\Entity\GlobalVarsInterface;
-use WebEtDesign\CmsBundle\Services\AbstractCmsGlobalVars;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class BaseCmsController extends AbstractController
 {
+    protected ?ConfigurationInterface $configuration = null;
+
     /** @var CmsPage|null */
     protected ?CmsPage $page;
 
@@ -23,45 +25,21 @@ class BaseCmsController extends AbstractController
     /** @var boolean */
     protected bool $granted;
 
-    /** @var TemplateProvider */
-    protected TemplateProvider $provider;
-
-    /** @var AbstractCmsGlobalVars */
-    protected AbstractCmsGlobalVars $globalVars;
+    protected TemplateRegistry $templateRegistry;
 
     protected ?Response $response = null;
 
     private $cmsConfig;
 
-    public function setVarsObject(GlobalVarsInterface $object)
+    public function getResponse(): Response
     {
-        if ($this->globalVars) {
-            $this->globalVars->setObject($object);
+        if (!$this->response) {
+            $this->response = new Response();
+            $this->response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
+            $this->response->headers->set('X-Reverse-Proxy-TTL', 0);
         }
-    }
 
-    /**
-     * @param mixed $globalVars
-     */
-    public function setGlobalVars($globalVars): void
-    {
-        $this->globalVars = $globalVars;
-    }
-
-    /**
-     * @return TemplateProvider
-     */
-    public function getProvider(): TemplateProvider
-    {
-        return $this->provider;
-    }
-
-    /**
-     * @param TemplateProvider $provider
-     */
-    public function setProvider(TemplateProvider $provider): void
-    {
-        $this->provider = $provider;
+        return $this->response;
     }
 
     public function getResponse(): Response
@@ -85,8 +63,10 @@ class BaseCmsController extends AbstractController
             $baseParams['declination'] = $this->getDeclination($page);
         }
 
+        $templateConfig = $this->templateRegistry->get($page->getTemplate());
+
         return $this->render(
-            $this->provider->getTemplate($page->getTemplate()),
+            $templateConfig->getTemplate(),
             array_merge($params, $baseParams),
             $this->getResponse()
         );
@@ -114,7 +94,7 @@ class BaseCmsController extends AbstractController
     public function getDeclination(CmsPage $page): ?CmsPageDeclination
     {
         /** @var RequestStack $requestStack */
-        $requestStack     = $this->get('request_stack');
+        $requestStack     = $this->container->get('request_stack');
         $request          = $requestStack->getCurrentRequest();
         $path             = $request->getRequestUri();
         $path             = preg_replace('(\?.*)', '', $path);
@@ -131,31 +111,13 @@ class BaseCmsController extends AbstractController
     }
 
     /**
-     * @return string|null
-     */
-    private function getExtension(): ?string
-    {
-        /** @var RequestStack $requestStack */
-        $requestStack = $this->get('request_stack');
-        $request      = $requestStack->getCurrentRequest();
-        $path         = $request->getRequestUri();
-
-        if ($path === '/index.php') {
-            return null;
-        }
-
-        preg_match('/\.([a-z]+)($|\?)/', $path, $extension);
-
-        return $extension[1] ?? null;
-    }
-
-    /**
      * @return bool
      */
     public function isPageGranted(): bool
     {
         return $this->granted;
     }
+
 
     /**
      * @param bool $granted
@@ -166,6 +128,25 @@ class BaseCmsController extends AbstractController
         $this->granted = $granted;
 
         return $this;
+
+    }
+
+    /**
+     * @param TemplateRegistry $templateRegistry
+     * @return BaseCmsController
+     */
+    public function setTemplateRegistry(TemplateRegistry $templateRegistry): BaseCmsController
+    {
+        $this->templateRegistry = $templateRegistry;
+        return $this;
+    }
+
+    /**
+     * @return TemplateRegistry
+     */
+    public function getTemplateRegistry(): TemplateRegistry
+    {
+        return $this->templateRegistry;
     }
 
     /**
@@ -174,6 +155,7 @@ class BaseCmsController extends AbstractController
      */
     public function setPage(?CmsPage $page): BaseCmsController
     {
+        $this->configuration->setCurrentPage($page);
         $this->page = $page;
 
         return $this;
@@ -219,6 +201,24 @@ class BaseCmsController extends AbstractController
     {
         $this->cmsConfig = $cmsConfig;
 
+        return $this;
+    }
+
+    /**
+     * @return ConfigurationInterface|null
+     */
+    public function getConfiguration(): ?ConfigurationInterface
+    {
+        return $this->configuration;
+    }
+
+    /**
+     * @param ConfigurationInterface|null $configuration
+     * @return BaseCmsController
+     */
+    public function setConfiguration(?ConfigurationInterface $configuration): BaseCmsController
+    {
+        $this->configuration = $configuration;
         return $this;
     }
 }

@@ -3,95 +3,74 @@
 namespace WebEtDesign\CmsBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Exception;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Routing\RouterInterface;
+use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
-use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
-use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
-use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
-use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 use Doctrine\ORM\EntityManager;
-use Sonata\AdminBundle\Event\PersistenceEvent;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
+use function Symfony\Component\String\u;
 
 class PageAdminListener
 {
-    protected $provider;
-    protected $em;
-    protected $router;
-    protected $fs;
-    protected $kernel;
-    protected $routeClass;
-    protected $configCms;
-    protected $configCustomContent;
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    protected TemplateRegistry       $templateRegistry;
+    protected EntityManagerInterface $em;
+    protected RouterInterface        $router;
+    protected Filesystem             $fs;
+    protected KernelInterface        $kernel;
+    protected string                 $routeClass;
+    protected array                  $configCms;
+    protected ParameterBagInterface  $parameterBag;
 
     public function __construct(
-        TemplateProvider $provider,
-        EntityManager $em,
-        Router $router,
+        TemplateRegistry $templateFactory,
+        EntityManagerInterface $em,
+        RouterInterface $router,
         Filesystem $fs,
         KernelInterface $kernel,
-        $routeClass,
-        $configCms,
-        $configCustomContent,
-        ContainerInterface $container
-    )
-    {
-        $this->provider            = $provider;
-        $this->em                  = $em;
-        $this->router              = $router;
-        $this->fs                  = $fs;
-        $this->kernel              = $kernel;
-        $this->routeClass          = $routeClass;
-        $this->configCms           = $configCms;
-        $this->configCustomContent = $configCustomContent;
-        $this->container           = $container;
+        ParameterBagInterface $parameterBag,
+    ) {
+        $this->templateRegistry = $templateFactory;
+        $this->em               = $em;
+        $this->router           = $router;
+        $this->fs               = $fs;
+        $this->kernel           = $kernel;
+        $this->parameterBag     = $parameterBag;
+        $this->configCms        = $this->parameterBag->get('wd_cms.cms');
+        $this->routeClass       = CmsRoute::class;
     }
 
     // create page form template configuration
-    public function prePersist($event)
+    public function prePersist($event): void
     {
         $page = $event->getObject();
 
         if (!$page instanceof CmsPage) {
             return;
         }
-        $config = $this->provider->getConfigurationFor($page->getTemplate());
-
-        if (isset($config['association'])) {
-            $page->setClassAssociation($config['association']['class']);
-            $page->setQueryAssociation($config['association']['queryMethod']);
-        }
+        $config = $this->templateRegistry->get($page->getTemplate());
 
         if (!$page->dontImportContent) {
             // hydrate content
-            foreach ($config['contents'] as $content) {
-               if(!$page->getContent($content['code'])){
-                   $CmsContent = new CmsContent();
-                   $CmsContent->setCode($content['code']);
-                   $CmsContent->setLabel($content['label'] ?? $content['code']);
-                   $CmsContent->setType($content['type']);
-                   $CmsContent->setHelp($content['help'] ?? null);
-                   $page->addContent($CmsContent);
-               }
+            foreach ($config->getBlocks() as $block) {
+                if (!$page->getContent($block->getCode())) {
+                    $CmsContent = new CmsContent();
+                    $CmsContent->setCode($block->getCode());
+                    $CmsContent->setLabel($block->getLabel());
+                    $CmsContent->setType($block->getType());
+                    $page->addContent($CmsContent);
+                }
             }
         }
     }
 
     // create route from template configuration
-    public function postPersist($event)
+    public function postPersist($event): void
     {
         $page = $event->getObject();
 
@@ -99,13 +78,9 @@ class PageAdminListener
             return;
         }
 
-        if ($this->configCms['menuByPage']) {
-            $this->createMenuItem($event->getEntityManager(), $page);
-        }
+        $config = $this->templateRegistry->get($page->getTemplate());
 
-        $config = $this->provider->getConfigurationFor($page->getTemplate());
-
-        if ($config['disableRoute'] || $page->getRoute() != null || !$page->initRoute) {
+        if ($config->isSection() || $page->getRoute() != null || !$page->initRoute) {
             return;
         }
 
@@ -115,7 +90,7 @@ class PageAdminListener
     }
 
     // clear cache routing on update
-    public function postUpdate($event)
+    public function postUpdate($event): void
     {
         $page = $event->getObject();
 
@@ -123,141 +98,59 @@ class PageAdminListener
             return;
         }
 
-        $config = $this->provider->getConfigurationFor($page->getTemplate());
+        $config = $this->templateRegistry->get($page->getTemplate());
 
-        if (!$config['disableRoute'] && $page->getRoute() === null && $page->initRoute) {
+        if (!$config->isSection() && $page->getRoute() === null && $page->initRoute) {
             $this->createRoute($config, $page);
         }
 
-        if ($config['disableRoute'] && $page->getRoute() !== null) {
+        if ($config->isSection() && $page->getRoute() !== null) {
             $route = $page->getRoute();
             $page->setRoute(null);
             $this->em->remove($route);
         }
-
-        if ($this->configCms['menuByPage']) {
-            $this->moveMenuItem($event->getEntityManager(), $page);
-        }
-
+        
         $this->warmUpRouteCache();
     }
 
-    public function preRemove($event)
-    {
-        $page = $event->getObject();
-
-        if (!$page instanceof CmsPage) {
-            return;
-        }
-
-        $em       = $event->getEntityManager();
-        $menuRepo = $em->getRepository(CmsMenuItem::class);
-        $menuItem = $menuRepo->getPageArboMenuItem($page);
-
-        if ($menuItem) {
-            $em->remove($menuItem);
-        }
-    }
-
-    protected function moveMenuItem(EntityManager $em, CmsPage $page)
-    {
-        if ($page->getLvl() === 0) {
-            return;
-        }
-        /** @var CmsMenuItem $menu */
-        $menuRepo = $em->getRepository(CmsMenuItem::class);
-        $pageRepo = $em->getRepository('WebEtDesignCmsBundle:CmsPage');
-        $menu     = $menuRepo->getPageArboMenuItem($page);
-
-        if (!$menu) {
-            return false;
-        }
-
-        $pagePrevSiblings = $pageRepo->getPrevSiblings($page);
-        $prevPage         = isset($pagePrevSiblings[array_key_last($pagePrevSiblings)]) ? $pagePrevSiblings[array_key_last($pagePrevSiblings)] : null;
-
-        $menuPrevSiblings = $menuRepo->getPrevSiblings($menu);
-        $prevMenu         = isset($menuPrevSiblings[array_key_last($menuPrevSiblings)]) ? $menuPrevSiblings[array_key_last($menuPrevSiblings)] : null;
-        $prevMenuPage     = $prevPage !== null ? $prevMenu->getPage() : null;
-
-        if ($menu->getParent()->getPage() !== $page->getParent() || $prevMenuPage !== $prevPage) {
-            if ($page->getParent()->isRoot()) {
-                $target = $menu->getRoot();
-                $menuRepo->persistAsFirstChildOf($menu, $target);
-                $em->flush();
-            } elseif ($prevPage !== null) {
-                $target = $menuRepo->getPageArboMenuItem($prevPage);
-                $menuRepo->persistAsNextSiblingOf($menu, $target);
-                $em->flush();
-            } else {
-                $target = $menuRepo->getPageArboMenuItem($page->getParent());
-                $menuRepo->persistAsFirstChildOf($menu, $target);
-                $em->flush();
-            }
-        }
-    }
-
-    protected function createMenuItem(EntityManagerInterface $em, CmsPage $page)
-    {
-        $menuRepo = $em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
-        /** @var CmsMenu $menu */
-        $menu = $page->getSite()->getMenuArbo();
-        if ($menu) {
-            $menuItem = new CmsMenuItem();
-
-            $menuItem->setIsVisible($page->isActive());
-            $menuItem->setLinkType(CmsMenuLinkTypeEnum::CMS_PAGE);
-            $menuItem->setPage($page);
-            $menuItem->setName($page->getTitle());
-            $menuItem->setMenu($menu);
-            $em->persist($menuItem);
-
-            if ($page->getMoveTarget()->isRoot()) {
-                $target = $menu->getChildren()[0];
-            } else {
-                $target = $menuRepo->getPageArboMenuItem($page->getMoveTarget());
-            }
-            $menuItem->setMoveMode($page->getMoveMode());
-            $menuItem->setMoveTarget($target);
-            $this->moveItems($em, $menuItem);
-        }
-    }
-
     // remove cache routing file and warmup cache
-    protected function warmUpRouteCache()
+    protected function warmUpRouteCache(): void
     {
         $cacheDir = $this->kernel->getCacheDir();
 
-        foreach (['matcher_cache_class', 'generator_cache_class'] as $option) {
-            $className = $this->router->getOption($option);
-            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $className . '.php';
+        foreach (['url_matching_routes', 'url_generating_routes'] as $option) {
+            $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $option . '.php';
             $this->fs->remove($cacheFile);
         }
 
         $this->router->warmUp($cacheDir);
     }
 
-    protected function createRoute($config, CmsPage $page)
+    protected function createRoute(PageInterface $config, CmsPage $page): void
     {
         $paramString  = '';
         $defaults     = [];
         $requirements = [];
 
-        foreach ($config['params'] as $param => $attributes) {
-            $paramString          .= "/{" . $param . "}";
-            $defaults[$param]     = $attributes['default'];
-            $requirements[$param] = $attributes['requirement'];
+        $route = $config->getRoute();
+
+        if (!$route) {
+            return;
         }
 
-        $defaultName = isset($config['route']) && $config['route'] !== null ? $config['route'] : null;
-
-        // hydrate route
-        $CmsRoute = new $this->routeClass();
-        if ($this->configCms['multilingual']) {
-            $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(), $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId());
-        } else {
-            $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s', $page->getId());
+        foreach ($route->getAttributes() as $attribute) {
+            $paramString                         .= "/{" . $attribute->getName() . "}";
+            $defaults[$attribute->getName()]     = $attribute->getDefault();
+            $requirements[$attribute->getName()] = $attribute->getRequirement();
         }
+
+        $defaultName = $route->getName();
+
+        $routeName = sprintf('%s%s%s',
+            $this->configCms['multilingual'] ? $page->getSite()->getLocale() . '_' : '',
+            !empty($page->getSite()->getTemplateFilter()) ? u($page->getSite()->getTemplateFilter())->snake() . '_' : '',
+            !empty($defaultName) ? $defaultName : sprintf('cms_route_%s', $page->getId())
+        );
 
         // Pour éviter le problème de doublon de route
         $exists = $this->em->getRepository(CmsRoute::class)->findBy(['name' => $routeName]);
@@ -266,16 +159,25 @@ class PageAdminListener
             $routeName .= '_' . uniqid();
         }
 
+        // hydrate route
+        $CmsRoute = new $this->routeClass();
         $CmsRoute->setName($routeName);
 
-        if ($config['controller'] && $config['action']) {
-            $CmsRoute->setController(sprintf('%s::%s', $config['controller'], $config['action']));
+        if (!empty($route->getController())) {
+            $controller = $route->getController();
+            $controller .= '::' . (!empty($route->getAction()) ? $route->getAction() : '__invoke');
+            $CmsRoute->setController($controller);
         }
 
-        $route_slug = isset($config['path']) && $config['path'] !== null ? $config['path'] : $page->getSlug();
+        if ($route->getPath()) {
+            $path = $route->getPath();
+        } else {
+            $path = ($page->rootPage ? '/' : '/' . $page->getSlug()) . $paramString;
+        }
 
-        $CmsRoute->setMethods($config['methods']);
-        $CmsRoute->setPath($page->rootPage ? '/' : '/' . $route_slug . $paramString);
+
+        $CmsRoute->setMethods($route->getMethods());
+        $CmsRoute->setPath($path);
         $CmsRoute->setDefaults(json_encode($defaults));
         $CmsRoute->setRequirements(json_encode($requirements));
         $CmsRoute->setPage($page);
@@ -288,35 +190,39 @@ class PageAdminListener
         $this->em->flush();
     }
 
-    protected function moveItems(EntityManager $em, $submittedObject)
+    protected function moveItems(EntityManager $em, $submittedObject): void
     {
         $cmsRepo = $em->getRepository(CmsMenuItem::class);
 
         switch ($submittedObject->getMoveMode()) {
             case 'persistAsFirstChildOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $cmsRepo->persistAsFirstChildOf($submittedObject, $submittedObject->getMoveTarget());
+                    $cmsRepo->persistAsFirstChildOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $cmsRepo->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsLastChildOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $cmsRepo->persistAsLastChildOf($submittedObject, $submittedObject->getMoveTarget());
+                    $cmsRepo->persistAsLastChildOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $cmsRepo->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsNextSiblingOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $cmsRepo->persistAsNextSiblingOf($submittedObject, $submittedObject->getMoveTarget());
+                    $cmsRepo->persistAsNextSiblingOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $cmsRepo->persistAsFirstChild($submittedObject);
                 }
                 break;
             case 'persistAsPrevSiblingOf':
                 if ($submittedObject->getMoveTarget()) {
-                    $cmsRepo->persistAsPrevSiblingOf($submittedObject, $submittedObject->getMoveTarget());
+                    $cmsRepo->persistAsPrevSiblingOf($submittedObject,
+                        $submittedObject->getMoveTarget());
                 } else {
                     $cmsRepo->persistAsPrevSibling($submittedObject);
                 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: jvaldena
@@ -16,16 +17,16 @@ use WebEtDesign\CmsBundle\Entity\CmsGlobalVarsDelimiterEnum;
 
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('web_et_design_cms');
+        $treeBuilder = new TreeBuilder('web_et_design_cms');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
                 ->arrayNode('cms')->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('default_home_template')->defaultValue('home')->end()
+                        ->scalarNode('default_home_template')->defaultValue('HOME')->end()
                         ->scalarNode('multisite')->defaultValue(false)->end()
                         ->scalarNode('multilingual')->defaultValue(false)->end()
                         ->scalarNode('declination')->defaultValue(false)->end()
@@ -35,11 +36,8 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('enable')->defaultFalse()->end()
                                 ->scalarNode('global_service')->defaultNull()->end()
-                                ->scalarNode('delimiter')
-                                    ->validate()
-                                        ->ifNotInArray(CmsGlobalVarsDelimiterEnum::getAvailableTypes())
-                                        ->thenInvalid('Invalid type %s')
-                                    ->end()
+                                ->enumNode('delimiter')
+                                    ->values(CmsGlobalVarsDelimiterEnum::getAvailableTypes())
                                     ->defaultValue(CmsGlobalVarsDelimiterEnum::DOUBLE_UNDERSCORE)
                                 ->end()
                             ->end()
@@ -121,7 +119,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('pages')
+                ->arrayNode('pages')->setDeprecated('WdCms', '3.0.0', 'web_et_design_cms.pages is deprecated')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()
@@ -187,6 +185,9 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('help')->defaultNull()->end()
                                         ->scalarNode('open')->defaultFalse()->end()
                                         ->arrayNode('options')->scalarPrototype()->defaultValue([])->end()->end()
+                                        ->arrayNode('form_options')->scalarPrototype()->defaultValue([])->end()->end()
+                                        ->arrayNode('settings')->scalarPrototype()->defaultValue([])->end()->end()
+                                        ->arrayNode('blocks')->arrayPrototype()->end()->end()
                                     ->end()
                                 ->end()
                             ->end()
@@ -195,7 +196,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('sharedBlock')
+                ->arrayNode('sharedBlock')->setDeprecated('WdCms', '3.0.0', 'web_et_design_cms.sharedBlock is deprecated')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()
@@ -215,7 +216,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('customContents')
+                ->arrayNode('customContents')->setDeprecated('WdCms', '3.0.0', 'web_et_design_cms.customContents is deprecated')
                     ->useAttributeAsKey('code')
                     ->arrayPrototype()
                         ->children()

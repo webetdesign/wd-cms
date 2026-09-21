@@ -2,7 +2,9 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-
+/**
+ * @deprecated not functional since version 4.0.0
+ */
 class CmsGlobalVarsDelimiterEnum
 {
     const DOUBLE_UNDERSCORE      = 'DOUBLE_UNDERSCORE';

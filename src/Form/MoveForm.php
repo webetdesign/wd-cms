@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form;
 
@@ -18,7 +18,7 @@ class MoveForm extends AbstractType
     /**
      * @inheritDoc
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $object = $options['object'];
 
@@ -33,7 +33,7 @@ class MoveForm extends AbstractType
                 'choice_attr' => function ($choice, $key, $value) {
                     return [
                         'data-disallow-root' => in_array($choice, ['persistAsNextSiblingOf', 'persistAsPrevSiblingOf']),
-                        'data-allow-root' => in_array($choice, ['persistAsFirstChildOf', 'persistAsLastChildOf'])
+                        'data-allow-root'    => in_array($choice, ['persistAsFirstChildOf', 'persistAsLastChildOf'])
                     ];
                 },
                 'expanded'    => true,
@@ -74,15 +74,18 @@ class MoveForm extends AbstractType
                     return str_repeat('—', $lvl) . ' ' . $object->__toString();
                 },
                 'choice_attr'   => function ($choice, $key, $value) {
-                    return ['data-root' => $choice->isRoot()];
+                    return ['data-custom-properties' => $choice->isRoot() ? 1 : 0];
                 },
+                'attr'          => [
+                    'data-sonata-select2' => "false"
+                ],
                 'label'         => false,
                 'required'      => true,
             ]);
 
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'wd_cms_move_form';
     }
@@ -90,7 +93,7 @@ class MoveForm extends AbstractType
     /**
      * @inheritDoc
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('entity', null);
 

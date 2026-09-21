@@ -3,6 +3,7 @@
 namespace WebEtDesign\CmsBundle\Repository;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\NonUniqueResultException;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use LogicException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -35,10 +36,10 @@ class CmsPageRepository extends NestedTreeRepository
 
     /**
      * @param $name
-     * @return CmsPage[]|Collection
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return CmsPage|null
+     * @throws NonUniqueResultException
      */
-    public function findByRouteName($name)
+    public function findByRouteName($name): ?CmsPage
     {
         $qb = $this->createQueryBuilder('p');
         $qb->leftJoin('p.route', 'r')
@@ -70,6 +71,32 @@ class CmsPageRepository extends NestedTreeRepository
             ->setParameter('template', $template);
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function getBuilderByCollections(?array $collections = null)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.lft', 'ASC');
+
+        if (!empty($collections)) {
+            $qb->join('p.site', 's');
+            $qb->andWhere($qb->expr()->in('s.templateFilter', ':templateFilter'))
+                ->setParameter('templateFilter', $collections);
+        }
+
+        return $qb;
+    }
+
+    public function findPageByRouteName(string $name)
+    {
+        return $this
+            ->createQueryBuilder('page')
+            ->innerJoin('page.route', 'route')
+            ->where('route.name = :name')
+            ->setParameter('name', $name)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     // /**

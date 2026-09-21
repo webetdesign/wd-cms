@@ -1,204 +1,139 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use JetBrains\PhpStorm\ArrayShape;
+use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
+use WebEtDesign\CmsBundle\Handler\CmsPageSlugHandler;
+use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
+use WebEtDesign\SeoBundle\Entity\SeoAwareTrait;
 use WebEtDesign\SeoBundle\Entity\SmoOpenGraphTrait;
 use WebEtDesign\SeoBundle\Entity\SmoTwitterTrait;
 
-/**
- * @Gedmo\Tree(type="nested")
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsPageRepository")
- * @ORM\Table(name="cms__page")
- */
-class CmsPage
+#[Gedmo\Tree(type: 'nested')]
+#[ORM\Entity(repositoryClass: CmsPageRepository::class)]
+#[ORM\Table(name: 'cms__page')]
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsPage implements Loggable
 {
     use SeoAwareTrait;
     use SmoOpenGraphTrait;
     use SmoTwitterTrait;
     use TimestampableEntity;
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
-    private $title;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @var string | null
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $template;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
+    private string $title = '';
 
-    /**
-     *
-     * @var ArrayCollection|PersistentCollection
-     *
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="page", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"position" = "ASC"})
-     */
-    private $contents;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $template = '';
 
-    /**
-     * @var null | CmsRouteInterface
-     *
-     * @ORM\OneToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsRoute", inversedBy="page", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="route_id", referencedColumnName="id", onDelete="CASCADE"))
-     */
-    private $route;
+    #[ORM\OneToMany(mappedBy: 'page', targetEntity: CmsContent::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    private PersistentCollection|ArrayCollection $contents;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     * @Gedmo\Slug(handlers={
-     *      @Gedmo\SlugHandler(class="WebEtDesign\CmsBundle\Handler\CmsPageSlugHandler")
-     * }, fields={"title"}, unique=false)
-     *
-     */
-    private $slug;
+    #[ORM\OneToOne(targetEntity: CmsRoute::class, inversedBy: 'page', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'route_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?CmsRouteInterface $route = null;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Slug(fields: ['title'], unique: false)]
+    #[Gedmo\SlugHandler(class: CmsPageSlugHandler::class)]
+    #[Gedmo\Versioned]
+    private ?string $slug = null;
+
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
     private ?string $breadcrumb = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
-    private $class_association;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 0])]
+    #[Gedmo\Versioned]
+    private bool $active = false;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
-    private $query_association;
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Gedmo\Versioned]
+    private array $roles;
 
-    /**
-     * @var int
-     * @ORM\Column(type="integer", nullable=true)
-     *
-     */
-    private $association;
+    #[ORM\ManyToMany(targetEntity: CmsPage::class)]
+    #[ORM\JoinTable(name: 'cms__page_has_page')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'associated_page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private Collection $crossSitePages;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(type="boolean", options={"default" = 0})
-     */
-    private $active;
+    private mixed $referencePage;
 
-    /**
-     * @var array
-     *
-     * @ORM\Column(type="array", nullable=true)
-     */
-    private $roles;
+    #[ORM\OneToMany(targetEntity: CmsPageDeclination::class, mappedBy: 'page', cascade: ['persist', 'remove'])]
+    private Collection|ArrayCollection $declinations;
+    
+    #[ORM\OneToMany(targetEntity: CmsMenuItem::class, mappedBy: 'page')]
+    private Collection|ArrayCollection $menuItems;
+    
+    #[ORM\ManyToOne(targetEntity: CmsSite::class, inversedBy: 'pages')]
+    #[ORM\JoinColumn(name: 'site_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Gedmo\Versioned]
+    private ?CmsSite $site = null;
+    
+    #[Gedmo\TreeLeft]
+    #[ORM\Column(name: 'lft', type: Types::INTEGER)]
+    private ?int $lft = null;
+    
+    #[Gedmo\TreeLevel]
+    #[ORM\Column(name: 'lvl', type: Types::INTEGER)]
+    private ?int $lvl = null;
 
-    /** @var Collection
-     * @ORM\ManyToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage")
-     * @ORM\JoinTable(name="cms__page_has_page",
-     *      joinColumns={@ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="associated_page_id", referencedColumnName="id", onDelete="CASCADE")}
-     * )
-     */
-    private $crossSitePages;
+    #[Gedmo\TreeRight]
+    #[ORM\Column(name: 'rgt', type: Types::INTEGER)]
+    private ?int $rgt = null;
+    
+    #[Gedmo\TreeRoot]
+    #[ORM\ManyToOne(targetEntity: 'CmsPage')]
+    #[ORM\JoinColumn(name: 'tree_root', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?CmsPage $root = null;
+    
+    #[Gedmo\TreeParent]
+    #[ORM\ManyToOne(targetEntity: 'CmsPage', inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
+    private ?CmsPage $parent = null;
+    
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'CmsPage', cascade: ['remove'])]
+    private Collection|ArrayCollection $children;
 
-    private $referencePage;
+    #[ORM\Column(options: ['default' => false])]
+    private bool $noIndex = false;
 
-    /**
-     * @var Collection
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPageDeclination", mappedBy="page", cascade={"persist", "remove"})
-     */
-    private $declinations;
+    private ?string $moveMode = null;
 
-    /**
-     * @var Collection|null
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="page")
-     */
-    private $menuItems;
+    private mixed $moveTarget = null;
 
-    /**
-     * @var CmsSite
-     *
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsSite", inversedBy="pages")
-     * @ORM\JoinColumn(name="site_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    private $site;
-
-    /**
-     * @Gedmo\TreeLeft
-     * @ORM\Column(name="lft", type="integer")
-     */
-    private $lft;
-
-    /**
-     * @Gedmo\TreeLevel
-     * @ORM\Column(name="lvl", type="integer")
-     */
-    private $lvl;
-
-    /**
-     * @Gedmo\TreeRight
-     * @ORM\Column(name="rgt", type="integer")
-     */
-    private $rgt;
-
-    /**
-     * @Gedmo\TreeRoot
-     * @ORM\ManyToOne(targetEntity="CmsPage")
-     * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
-     */
-    private $root;
-
-    /**
-     * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="CmsPage", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
-     */
-    private $parent;
-
-    /**
-     * @var CmsPage[]|Collection
-     * @ORM\OneToMany(targetEntity="CmsPage", mappedBy="parent", cascade={"remove"})
-     */
-    private $children;
-
-    private $moveMode;
-
-    private $moveTarget;
-
-    public $rootPage = false;
+    public bool $rootPage = false;
 
     /**
      * Set at true tu disable the creation of contents in listener, used in page import context
      * @var bool
      */
-    public $dontImportContent = false;
+    public bool $dontImportContent = false;
 
     /**
      * Set at false tu disable the creation of route in listener
      * @var bool
      */
-    public $initRoute = true;
+    public bool $initRoute = true;
 
     public $indexedContent = null;
 
@@ -208,7 +143,7 @@ class CmsPage
         $this->setMoveTarget($values['moveTarget']);
     }
 
-    public function getPosition()
+    #[ArrayShape(['moveMode' => 'mixed|null|string', 'moveTarget' => 'mixed|null'])] public function getPosition()
     {
         return [
             'moveMode' => $this->getMoveMode(),
@@ -228,54 +163,6 @@ class CmsPage
         $criteria = Criteria::create()->orderBy(['lft' => 'ASC']);
 
         return $this->children->matching($criteria);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getClassAssociation()
-    {
-        return $this->class_association;
-    }
-
-    /**
-     * @param mixed $class_association
-     */
-    public function setClassAssociation($class_association)
-    {
-        $this->class_association = $class_association;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getQueryAssociation()
-    {
-        return $this->query_association;
-    }
-
-    /**
-     * @param mixed $query_association
-     */
-    public function setQueryAssociation($query_association)
-    {
-        $this->query_association = $query_association;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAssociation()
-    {
-        return $this->association;
-    }
-
-    /**
-     * @param mixed $association
-     */
-    public function setAssociation($association)
-    {
-        $this->association = $association;
     }
 
     /**
@@ -325,6 +212,11 @@ class CmsPage
     public function setId($id): void
     {
         $this->id = $id;
+    }
+
+    public function getSeoSitemapPriority(): float
+    {
+        return $this->seoSitemapPriority ?: 1 - $this->getLvl() * 0.2;
     }
 
     public function getTitle(): ?string
@@ -815,6 +707,25 @@ class CmsPage
     public function setBreadcrumb(?string $breadcrumb): void
     {
         $this->breadcrumb = $breadcrumb;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNoIndex(): bool
+    {
+        return $this->noIndex;
+    }
+
+    /**
+     * @param bool $noIndex
+     * @return CmsPage
+     */
+    public function setNoIndex(bool $noIndex): CmsPage
+    {
+        $this->noIndex = $noIndex;
+
+        return $this;
     }
 
 }

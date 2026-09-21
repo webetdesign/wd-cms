@@ -9,18 +9,22 @@ persistAsPrevSiblingOf: 'Déplacer avant :'
 'Cms Menu Item Tree': Menus
 'Cms Shared Block List': Blocs partagés
 'Cms Site List': Sites
+breadcrumb.link_cms_page_list: Pages
+breadcrumb.link_cms_page_tree: Arborescence
+breadcrumb.link_cms_page_create: Création
 
-cms_page.tab.general: Général
-cms_page.tab.seo: Référencement naturel
-cms_page.tab.content: Gestion des contenus
-cms_page.tab.route: Route
-cms_page.tab.security: Sécurité
-cms_page.tab.multilingual: MultiLingue
+form.group_cms_page_tab_general: Général
+form.group_cms_page_tab_seo: Référencement naturel
+form.group_cms_page_tab_content: Gestion des contenus
+form.group_cms_page_tab_route: Route
+form.group_cms_page_tab_security: Sécurité
+form.group_cms_page_tab_multilingual: MultiLingue
 
 cms_page.form.title.label: Titre de la page dans l'interface d'administration
 cms_page.form.template.label: Modèle de page
 cms_page.form.active.label: Accessible
 cms_page.form.cross_site_pages.label: Pages associées
+cms_page.form.no_index.label: Ne pas indexer la page dans les moteur de recherche
 
 
 cms_page.form.seo_title.label: Titre (balise title)
@@ -38,6 +42,15 @@ cms_page.form.og_image.help: Taille de l'image 1200 x 627
 cms_page.form.og_description.label: Courte description (4 phrases max.)
 cms_page.form.og_site_name.label: Nom du site
 cms_page.form.og_admins.label: Administrateur (obsolète)
+cms_page.form.seo_sitemap_priority.label: Sitemap - Priorité
+cms_page.form.seo_sitemap_change_freq.label: Sitemap - Fréquence de mise à jour
+cms_page.form.seo_sitemap_change_freq.always: Toujours
+cms_page.form.seo_sitemap_change_freq.hourly: Horaire
+cms_page.form.seo_sitemap_change_freq.daily: Journalier
+cms_page.form.seo_sitemap_change_freq.weekly: Hebdomadaire
+cms_page.form.seo_sitemap_change_freq.monthly: Mensuel
+cms_page.form.seo_sitemap_change_freq.yearly: Annuel
+cms_page.form.seo_sitemap_change_freq.never: Jamais
 
 cms_page.form.twitter_card.label: 'Type de présentation (summary|summary_large_image|app|player)'
 cms_page.form.twitter_site.label: 'Nom du site (@compte pour lier au compte twitter)'

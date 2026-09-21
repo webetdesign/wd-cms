@@ -16,20 +16,6 @@ services:
       - '../../Twig'
       - '../../Sitemap'
 
-  WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockContent:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@cms.block_provider'
-      - '@twig'
-    public: true
-
-  WebEtDesign\CmsBundle\Services\CustomContents\SharedBlockCollectionContent:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@cms.block_provider'
-      - '@twig'
-    public: true
-
   # ===============================================
   # REPOSITORY
   # ===============================================
@@ -44,30 +30,24 @@ services:
   # MISCELLANEOUS
   # ===============================================
 
+  WebEtDesign\CmsBundle\EventListener\CmsBlockResizeFormListener:
+    autoconfigure: false
+  WebEtDesign\CmsBundle\EventListener\CmsDynamicBlockResizeFormListener:
+    autoconfigure: false
+
   WebEtDesign\CmsBundle\Collectors\CmsCollector:
     tags:
       - name: data_collector
         template: '@WebEtDesignCms/collectors/template.html.twig'
         id: 'cms.collector'
     arguments:
-      - '@cms.helper'
-      - '@cms.page_provider'
-      - '@cms.admin.cms_page'
-      - '@cms.admin.cms_page_declination'
-      - '%wd_cms.cms%'
+      $profile: '@twig.profile'
 
   cms.routing_loader:
     class: WebEtDesign\CmsBundle\Routing\ExtraLoader
     public: true
-    arguments: [ '@doctrine.orm.entity_manager', '@parameter_bag', '%wd_cms.cms%' ]
     tags:
       - { name: routing.loader }
-
-
-  WebEtDesign\CmsBundle\Utils\SitemapIterator:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@router'
 
   cms.security.editable_role_builder:
     class: WebEtDesign\CmsBundle\Security\EditableRolesBuilder
@@ -79,44 +59,18 @@ services:
       - '%security.role_hierarchy.roles%'
 
   WebEtDesign\CmsBundle\Services\CmsHelper:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@cms.page_provider'
-      - '@twig'
-      - "@security.authorization_checker"
-      - '@security.role_hierarchy'
-      - '@security.token_storage'
-      - '@parameter_bag'
-      - '@request_stack'
     public: true
 
   cms.helper:
     alias: WebEtDesign\CmsBundle\Services\CmsHelper
 
   # ===============================================
-  # CMS provider
-  # ===============================================
-
-  WebEtDesign\CmsBundle\Services\TemplateProvider:
-    arguments:
-      $config: '%wd_cms.templates%'
-
-  cms.page_provider:
-    alias: WebEtDesign\CmsBundle\Services\TemplateProvider
-    public: true
-
-  cms.block_provider:
-    class: WebEtDesign\CmsBundle\Services\TemplateProvider
-    arguments:
-      $config: '%wd_cms.shared_block%'
-
-  # ===============================================
   # Menu
   # ===============================================
 
-  WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder:
-    autowire: true
-    public: true
+#  WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\PageBreadcrumbsBuilder:
+#    autowire: true
+#    public: true
 
   WebEtDesign\CmsBundle\Admin\BreadcrumbsBuilder\MenuBreadcrumbsBuilder:
     autowire: true
@@ -126,16 +80,17 @@ services:
   # CKEditor Renderer
   # ===============================================
 
-  fos_ck_editor.renderer:
-    class: WebEtDesign\CmsBundle\Services\CKEditorRenderer
-    arguments:
-      - '@fos_ck_editor.builder.json_builder'
-      - '@router'
-      - '@assets.packages'
-      - '@request_stack'
-      - "@=container.has('twig') ? container.get('twig') : container.get('templating')"
-      - "@=container.hasParameter('locale') ? parameter('locale') : null"
-    public: true
+# Uncomment : MAJ sf6, obselet
+#  fos_ck_editor.renderer:
+#    class: WebEtDesign\CmsBundle\Services\CKEditorRenderer
+#    arguments:
+#      - '@fos_ck_editor.builder.json_builder'
+#      - '@router'
+#      - '@assets.packages'
+#      - '@request_stack'
+#      - "@=container.has('twig') ? container.get('twig') : container.get('templating')"
+#      - "@=container.hasParameter('locale') ? parameter('locale') : null"
+#    public: true
 
   # ===============================================
   # TWIG EXTENSION
@@ -143,24 +98,12 @@ services:
 
   cms.twig.extension:
     class: WebEtDesign\CmsBundle\Twig\CmsTwigExtension
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@router'
-      - '@service_container'
-      - '@twig'
-      - '@cms.page_provider'
-      - '@cms.block_provider'
-      - '@request_stack'
-      - '@parameter_bag'
-      - '@WebEtDesign\MediaBundle\Services\WDMediaService'
-      - '@WebEtDesign\CmsBundle\Services\WDDeclinationService'
     tags:
       - { name: twig.extension }
     public: true
 
-
-
-  WebEtDesign\CmsBundle\Controller\SitemapController:
-    arguments:
-      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
-    tags: [ 'controller.service_arguments' ]
+  cms.breadcrumb.extension:
+    class: WebEtDesign\CmsBundle\Twig\BreadcrumbTwigExtension
+    tags:
+      - { name: twig.extension }
+    public: true

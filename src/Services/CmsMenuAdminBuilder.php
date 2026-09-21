@@ -34,7 +34,7 @@ class CmsMenuAdminBuilder
     public function __construct(FactoryInterface $factory, EntityManagerInterface $entityManager, RouterInterface $router)
     {
         $this->em      = $entityManager;
-        $this->repo    = $this->em->getRepository('CmsMenuItem');
+        $this->repo    = $this->em->getRepository(CmsMenuItem::class);
         $this->router  = $router;
         $this->factory = $factory;
     }
@@ -42,7 +42,7 @@ class CmsMenuAdminBuilder
     public function cmsAdminMenu(array $options)
     {
         $rootItem = $options['item'];
-        $repo = $this->em->getRepository('CmsMenuItem');
+        $repo = $this->em->getRepository(CmsMenuItem::class);
         $this->admin = $options['admin'] ?? null;
 
         /** @var MenuItem $menu */

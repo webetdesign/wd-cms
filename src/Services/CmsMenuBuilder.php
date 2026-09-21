@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 use WebEtDesign\CmsBundle\Entity\CmsMenuLinkTypeEnum;
 use Doctrine\ORM\EntityManager;
@@ -84,15 +85,15 @@ class CmsMenuBuilder
         $activeClass  = $options['activeClass'] ?? 'active';
         $mainClass    = $options['classes'] ?? false;
 
-        $repo = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenuItem');
+        $repo = $this->em->getRepository(CmsMenuItem::class);
         if ($page) {
             $locale = $page->getSite()->getLocale();
-            $menu   = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy([
+            $menu   = $this->em->getRepository(CmsMenu::class)->findOneBy([
                 'code' => $code,
                 'site' => $page->getSite()
             ]);
         } else {
-            $menu = $this->em->getRepository('WebEtDesignCmsBundle:CmsMenu')->findOneBy(['code' => $code]);
+            $menu = $this->em->getRepository(CmsMenu::class)->findOneBy(['code' => $code]);
         }
         if (!$menu) {
             return $this->factory->createItem('root');
@@ -132,10 +133,10 @@ class CmsMenuBuilder
             if ($item->getRole() && !$this->authorizationChecker->isGranted($item->getRole())) {
                 continue;
             }
-            if ($item->getConnected() == 'ONLY_LOGIN' && $user === 'anon.') {
+            if ($item->getConnected() == 'ONLY_LOGIN' && !$user) {
                 continue;
             }
-            if ($item->getConnected() == 'ONLY_LOGOUT' && $user !== 'anon.') {
+            if ($item->getConnected() == 'ONLY_LOGOUT' && $user) {
                 continue;
             }
 
@@ -174,12 +175,11 @@ class CmsMenuBuilder
                             $route = $item->getPage()->getRoute();
                             if ($route) {
                                 if ($route->isDynamic()) {
-                                    $params = json_decode($item->getParams(), true) ?: [];
+                                    $params = $item->getParams();
                                     try {
                                         $menuItem->setUri($this->router->generate($route->getName() . $anchor,
                                             $params));
-                                    } catch (InvalidParameterException $exception) {
-                                    } catch (RouteNotFoundException $exception) {
+                                    } catch (InvalidParameterException|RouteNotFoundException $exception) {
                                     }
                                 } else {
                                     try {
@@ -229,7 +229,7 @@ class CmsMenuBuilder
                 $this->buildNodes($menuItem, $children, $parentActive, $activeClass, $locale);
             }
 
-            if ($this->isChildActive($menuItem) && !preg_match('/active/', $liClass)) {
+            if ($this->isChildActive($menuItem) && !str_contains($liClass, 'active')) {
                 $liClass .= ' '.$activeClass;
             }
 
@@ -251,7 +251,7 @@ class CmsMenuBuilder
     {
         $active = false;
         $class  = $item->getAttribute('class');
-        if (preg_match('/active/', $class)) {
+        if (str_contains($class, 'active')) {
             $active = true;
         }
         foreach ($item->getChildren() as $child) {
@@ -261,7 +261,7 @@ class CmsMenuBuilder
                 }
             } else {
                 $class = $child->getAttribute('class');
-                if (preg_match('/active/', $class)) {
+                if (str_contains($class, 'active')) {
                     $active = true;
                 }
             }
@@ -272,7 +272,7 @@ class CmsMenuBuilder
     public function isActive(CmsMenuItem $item)
     {
         $request         = $this->requestStack->getCurrentRequest();
-        $activeRouteName = $request->get('_route');
+        $activeRouteName = $request->attributes->get('_route');
         if (!$item->getPage()->getRoute()) {
             return false;
         }

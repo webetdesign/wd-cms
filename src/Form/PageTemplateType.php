@@ -1,12 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form;
 
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 /**
  * Class TemplateType
@@ -16,32 +19,35 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PageTemplateType extends AbstractType
 {
-    private $provider;
 
-    public function __construct(TemplateProvider $provider)
-    {
-        $this->provider = $provider;
-    }
+    public function __construct(private readonly TemplateRegistry $templateFactory) { }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $resolver->setDefaults(
-            [
-                'choices' => $this->provider->getTemplateList(),
+        $builder->add('tpl', ChoiceType::class, [
+            'required'    => false,
+            'label'       => false,
+            'choices'     => $this->templateFactory->getChoiceList(TemplateRegistry::TYPE_PAGE, $options['collection']),
+            'constraints' => [
+                new NotBlank(),
             ]
-        );
+        ]);
+
+        $builder->addModelTransformer(new CallbackTransformer(
+            function ($value) {
+                return ['tpl' => $value];
+            },
+            function ($value) {
+                return $value['tpl'] ?? null;
+            }
+        ));
     }
 
-    public function getParent()
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        return ChoiceType::class;
+        $resolver->setDefaults([
+            'collection' => null,
+        ]);
     }
 
-    /**
-     * @return TemplateProvider
-     */
-    public function getProvider(): TemplateProvider
-    {
-        return $this->provider;
-    }
 }

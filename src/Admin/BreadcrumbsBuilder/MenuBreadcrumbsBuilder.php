@@ -10,7 +10,6 @@ use Sonata\AdminBundle\Admin\BreadcrumbsBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsSite;
-use function Symfony\Component\VarDumper\Dumper\esc;
 
 /**
  * Stateless breadcrumbs builder (each method needs an Admin object).
@@ -22,7 +21,7 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
     /**
      * @var string[]
      */
-    private $config = [];
+    private array $config;
 
     /**
      * @param string[] $config
@@ -62,8 +61,11 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
     }
 
     /**
-     * {@inheritdoc}
      * NEXT_MAJOR : make this method private.
+     * @param AdminInterface $admin
+     * @param $action
+     * @param ItemInterface|null $menu
+     * @return ItemInterface
      */
     public function buildBreadcrumbs(
         AdminInterface $admin,
@@ -85,7 +87,7 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
         $childAdmin = $admin->getCurrentChildAdmin();
 
         if ($childAdmin && $admin->hasSubject()) {
-            $id = $admin->getRequest()->get($admin->getIdParameter());
+//            $id = $admin->getRequest()->get($admin->getIdParameter());
 
             //            $menu = $menu->addChild(
             //                $admin->toString($admin->getSubject()),
@@ -133,8 +135,8 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
                 ],
             ]);
         } else {
-            if (strpos($admin->getRequest()->get('_route'), '_tree')
-                || strpos($admin->getRequest()->get('_route'), 'menu_create')) {
+            if (strpos($admin->getRequest()->attributes->get('_route'), '_tree')
+                || strpos($admin->getRequest()->attributes->get('_route'), 'menu_create')) {
                 $site = $admin->getEntityManager()->getRepository(CmsSite::class)
                     ->find($admin->getRequest()->attributes->get("id"));
             } else {
@@ -161,8 +163,9 @@ final class MenuBreadcrumbsBuilder implements BreadcrumbsBuilderInterface
      * @param AdminInterface $admin used for translation
      * @param ItemInterface $menu will be modified and returned
      * @param string $name the source of the final label
-     * @param string $translationDomain for label translation
+     * @param string|null $translationDomain for label translation
      * @param array<string, mixed> $options menu item options
+     * @return ItemInterface
      */
     private function createMenuItem(
         AdminInterface $admin,

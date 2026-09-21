@@ -8,7 +8,9 @@
 
 namespace WebEtDesign\CmsBundle\Entity;
 
-
+/**
+ * @deprecated not functional since version 4.0.0
+ */
 interface GlobalVarsInterface
 {
     public static function getAvailableVars(): array;

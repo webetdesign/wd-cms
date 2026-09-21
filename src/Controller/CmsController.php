@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CmsController extends BaseCmsController
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         if (!$this->isPageGranted()) {
             return $this->forward('WebEtDesign\CmsBundle\Controller\CmsController::pageAccessDenied');
@@ -18,13 +18,13 @@ class CmsController extends BaseCmsController
         ]);
     }
 
-    public function pageDisabled(Request $request)
+    public function pageDisabled(Request $request): Response
     {
         $content = $this->renderView('@WebEtDesignCms/page/page_disabled.html.twig');
         return new Response($content, 404);
     }
 
-    public function pageAccessDenied(Request $request)
+    public function pageAccessDenied(Request $request): Response
     {
         $content = $this->renderView('@WebEtDesignCms/page/page_access_denied.html.twig');
         return new Response($content, 403);

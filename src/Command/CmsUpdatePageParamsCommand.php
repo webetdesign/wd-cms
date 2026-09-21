@@ -1,61 +1,62 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use WebEtDesign\CmsBundle\Entity\AbstractCmsRoute;
-use WebEtDesign\CmsBundle\Entity\CmsContent;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use WebEtDesign\CmsBundle\CMS\Configuration\RouteAttributeDefinition;
+use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
-use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 use WebEtDesign\CmsBundle\Entity\CmsRouteInterface;
-use WebEtDesign\CmsBundle\Entity\CmsSite;
-use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 use WebEtDesign\CmsBundle\Repository\CmsPageRepository;
-use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
+use function Symfony\Component\String\u;
 
+#[AsCommand(
+    name: 'cms:page:update-params',
+    description: 'Update pages parameters and declination with configuration file',
+)]
 class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 {
-    protected static $defaultName = 'cms:page:update-params';
+    protected CmsPageRepository $pageRp;
 
-    /**
-     * @var CmsPageRepository
-     */
-    protected $pageRp;
-
-    protected $configCms;
+    protected ?array           $configCms;
+    protected TemplateRegistry $templateRegistry;
 
     protected $routes = [];
 
     public function __construct(
-        string $name = null,
         EntityManagerInterface $em,
-        TemplateProvider $pageProvider,
-        array $configCms
+        TemplateRegistry $templateRegistry,
+        ParameterBagInterface $parameterBag,
+        ?string $name = null
     ) {
-        parent::__construct($name, $em, $pageProvider);
-        $this->configCms = $configCms;
+        parent::__construct($em, $name);
+        $this->configCms        = $parameterBag->get('wd_cms.cms');
+        $this->templateRegistry = $templateRegistry;
     }
 
-
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription('Update pages parameters and declination with configuration file')
             ->addArgument('template', InputArgument::OPTIONAL, 'template name')
             ->addOption('all', '-a', InputOption::VALUE_NONE, 'Reset all page')
             ->addOption('page', '-p', InputOption::VALUE_REQUIRED, 'Page id');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+
+    public function __invoke(InputInterface $input, OutputInterface $output): int
     {
         $this->init($input, $output);
         $this->pageRp = $this->em->getRepository(CmsPage::class);
@@ -66,16 +67,14 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
 
         if ($input->getOption('all')) {
             if ($this->io->confirm('Resetting all page\' configuration, are you sure to continue')) {
-                $templates = array_values($this->templateProvider->getTemplateList());
+                $templates = array_values($this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_PAGE));
 
                 foreach ($templates as $template) {
                     $this->processTemplate($template);
                 }
                 $this->io->success('Done');
-                return 0;
-            } else {
-                return 0;
             }
+            return Command::SUCCESS;
         }
 
         $pageId = $input->getOption('page');
@@ -84,7 +83,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
             if ($page) {
                 $this->resetPage($page);
                 $this->io->success('Done');
-                return 0;
+                return Command::SUCCESS;
             }
         }
 
@@ -96,10 +95,10 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         $this->processTemplate($template);
 
         $this->io->success('Done');
-        return 0;
+        return Command::SUCCESS;
     }
 
-    public function processTemplate($template)
+    public function processTemplate($template): void
     {
         $pages = $this->pageRp->findByTemplate($template);
 
@@ -109,77 +108,81 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         $this->em->flush();
     }
 
-    protected function resetPage(?CmsPage $page)
+    protected function resetPage(?CmsPage $page): void
     {
         $this->io->title('Update page ' . $page->getTitle());
 
         try {
-            $config = $this->templateProvider->getConfigurationFor($page->getTemplate());
+            $config = $this->templateRegistry->get($page->getTemplate());
         } catch (Exception $e) {
             $this->io->error($e->getMessage());
-            return false;
         }
 
-        if (!$page->getRoute()) {
-            return false;
+        if (isset($config) && $config instanceof PageInterface && $page->getRoute() !== null) {
+            $this->updateRouteMetadata($page, $config);
+
+            $this->updateParams($page->getRoute(), $config);
         }
 
-        $this->updateParams($page->getRoute(), $config);
-
-        $this->updateRouteMetadata($page, $config);
-
-        return true;
     }
 
-    private function updateRouteMetadata(CmsPage $page, $config)
+    private function updateRouteMetadata(CmsPage $page, PageInterface $config): void
     {
         $route = $page->getRoute();
 
-        if(!empty($config['controller']) && strlen($config['controller']) > 0 && !empty($config['action']) & strlen($config['action']) > 0){
-            $route->setController($config['controller'] . '::' . $config['action']);
+        $routeConfig = $config->getRoute();
 
+        if (!empty($routeConfig->getController())) {
+            $controller = $routeConfig->getController();
+            $controller .= '::' . (!empty($routeConfig->getAction()) ? $routeConfig->getAction() : '__invoke');
+            $route->setController($controller);
         }
-        if(!empty($config['methods']) && count($config['methods']) > 0){
-            $route->setMethods($config['methods']);
+
+        $route->setMethods($routeConfig->getMethods());
+
+        $defaultName = $routeConfig->getName();
+        $routeName = sprintf('%s%s%s',
+            $this->configCms['multilingual'] ? $page->getSite()->getLocale() . '_' : '',
+            !empty($page->getSite()->getTemplateFilter()) ? u($page->getSite()->getTemplateFilter())->snake() . '_' : '',
+            !empty($defaultName) ? $defaultName : sprintf('cms_route_%s', $page->getId())
+        );
+
+        // Pour éviter le problème de doublon de route
+        $exists = $this->em->getRepository(CmsRoute::class)->findSameRoute($route, $routeName);
+
+        if (is_array($exists) && count($exists) > 0) {
+            $routeName .= '_' . uniqid();
         }
 
-        if (!empty($config['route']) && $config['refresh_route']) {
-            $defaultName = $config['route'];
-            if ($this->configCms['multilingual']) {
-                $routeName = $defaultName ? sprintf('%s_%s', $page->getSite()->getLocale(), $defaultName) : sprintf('%s_cms_route_%s', $page->getSite()->getLocale(), $page->getId());
-            } else {
-                $routeName = $defaultName ? sprintf('%s', $defaultName) : sprintf('cms_route_%s', $page->getId());
-            }
-
-            if (array_key_exists($routeName, $this->routes) && $this->routes[$routeName] !== $route->getId()) {
-                $routeName .= '_' . uniqid();
-            }
-
+        if ($routeConfig->getName() !== null) {
             $route->setName($routeName);
-
-            $this->routes[$routeName] = $route->getId();
         }
-
-        return $route;
     }
 
-    private function updateParams(CmsRouteInterface $cmsRoute, $config)
+    private function updateParams(CmsRouteInterface $cmsRoute, PageInterface $config): void
     {
+        $routeConfig = $config->getRoute();
+
         preg_match('/{.*}/', $cmsRoute->getPath(), $defined);
-        $config = isset($config['params']) ? $config['params'] : [];
+
+        $attributes = [];
+
+        foreach ($routeConfig->getAttributes() as $attribute) {
+            $attributes[$attribute->getName()] = $attribute;
+        }
 
         foreach ($defined as $item) {
             $param = str_replace(['{', '}'], '', $item);
-            if (!array_key_exists($param, $config)) {
+            if (!array_key_exists($param, $attributes)) {
                 $cmsRoute = $this->removeParam($cmsRoute, $param);
             }
         }
 
-        foreach ($config as $param => $item) {
-            if (strpos($cmsRoute->getPath(), $param) < 0 || !strpos($cmsRoute->getPath(), $param)) {
-                $cmsRoute = $this->addParam($cmsRoute, $param, $config[$param]);
+        foreach ($attributes as $name => $attribute) {
+            if (strpos($cmsRoute->getPath(), $name) < 0 || !strpos($cmsRoute->getPath(), $name)) {
+                $cmsRoute = $this->addParam($cmsRoute, $attribute);
             }
-            $this->upsertDefaultAndRequirement($cmsRoute, $param, $config[$param]);
+            $this->upsertDefaultAndRequirement($cmsRoute, $attribute);
         }
 
         $cmsRoute->setPath(
@@ -189,7 +192,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         $this->em->persist($cmsRoute);
     }
 
-    private function removeParam(CmsRouteInterface $cmsRoute, $param)
+    private function removeParam(CmsRouteInterface $cmsRoute, $param): CmsRouteInterface
     {
         $cmsRoute->setPath(
             str_replace('/{' . $param . '}', '', $cmsRoute->getPath())
@@ -208,27 +211,33 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         return $cmsRoute;
     }
 
-    private function addParam(CmsRouteInterface $cmsRoute, $param, $config)
+    private function addParam(CmsRouteInterface $cmsRoute, RouteAttributeDefinition $attribute): CmsRouteInterface
     {
-        $cmsRoute->setPath($cmsRoute->getPath() . '/{' . $param . '}');
+        $cmsRoute->setPath($cmsRoute->getPath() . '/{' . $attribute->getName() . '}');
 
         return $cmsRoute;
     }
 
-    private function upsertDefaultAndRequirement(CmsRouteInterface $cmsRoute, $param, $config)
+    private function upsertDefaultAndRequirement(CmsRouteInterface $cmsRoute, RouteAttributeDefinition $attribute): void
     {
-        if (isset($config['default'])) {
+        if (!empty($attribute->getDefault())) {
             $defaults         = json_decode($cmsRoute->getDefaults(), true);
-            $defaults[$param] = $config['default'];
+            $defaults[$attribute->getName()] = $attribute->getDefault();
             $cmsRoute->setDefaults(json_encode($defaults));
         }
 
-        if (isset($config['requirement'])) {
+        if (!empty($attribute->getRequirement())) {
             $requirements         = json_decode($cmsRoute->getRequirements(), true);
-            $requirements[$param] = $config['requirement'];
+            $requirements[$attribute->getName()] = $attribute->getRequirement();
             $cmsRoute->setRequirements(json_encode($requirements));
         }
 
-        return $cmsRoute;
+    }
+
+    protected function selectTemplate(): string
+    {
+        $templates = $this->templateRegistry->getChoiceList(TemplateRegistry::TYPE_PAGE);
+
+        return $this->io->choice('Template', array_flip($templates));
     }
 }

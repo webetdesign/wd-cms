@@ -12,19 +12,17 @@ namespace WebEtDesign\CmsBundle\Entity;
 class CmsMenuTypeEnum
 {
     const DEFAULT   = 'DEFAULT';
-    const PAGE_ARBO = 'PAGE_ARBO';
 
     /** @var array user friendly named type */
-    protected static $typeName = [
+    protected static array $typeName = [
         self::DEFAULT   => 'DEFAULT',
-        self::PAGE_ARBO => 'PAGE_ARBO',
     ];
 
     /**
      * @param string $typeShortName
      * @return string
      */
-    public static function getName($typeShortName)
+    public static function getName(string $typeShortName): string
     {
         if (!isset(static::$typeName[$typeShortName])) {
             return "Unknown type ($typeShortName)";
@@ -36,15 +34,14 @@ class CmsMenuTypeEnum
     /**
      * @return array<string>
      */
-    public static function getAvailableTypes()
+    public static function getAvailableTypes(): array
     {
         return [
-            self::ROOT,
-            self::PAGE_ARBO,
+            self::DEFAULT,
         ];
     }
 
-    public static function getChoices()
+    public static function getChoices(): array
     {
         $choices = [];
         foreach (self::getAvailableTypes() as $availableType) {

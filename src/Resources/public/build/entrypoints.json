@@ -1,0 +1,12 @@
+{
+  "entrypoints": {
+    "cms_admin": {
+      "css": [
+        "/bundles/webetdesigncms/build/cms_admin.css"
+      ],
+      "js": [
+        "/bundles/webetdesigncms/build/cms_admin.js"
+      ]
+    }
+  }
+}

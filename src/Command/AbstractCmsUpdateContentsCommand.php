@@ -1,77 +1,65 @@
 <?php
 
-
 namespace WebEtDesign\CmsBundle\Command;
 
-
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use WebEtDesign\CmsBundle\CMS\Template\ComponentInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPage;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
 use WebEtDesign\CmsBundle\Entity\CmsSharedBlock;
 use WebEtDesign\CmsBundle\Repository\CmsContentRepository;
-use WebEtDesign\CmsBundle\Repository\CmsSharedBlockRepository;
-use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
-use WebEtDesign\CmsBundle\Services\TemplateProvider;
 
 abstract class AbstractCmsUpdateContentsCommand extends Command
 {
-    /**
-     * @var SymfonyStyle
-     */
-    protected $io;
+    protected SymfonyStyle $io;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
+    protected EntityManagerInterface $em;
 
-    /**
-     * @var CmsContentRepository
-     */
-    protected $contentRp;
+    protected CmsContentRepository $contentRp;
 
-    /**
-     * @var TemplateProvider
-     */
-    protected $templateProvider;
-
-    public function __construct(string $name = null, EntityManagerInterface $em, TemplateProvider $templateProvider)
+    public function __construct(
+        EntityManagerInterface $em,
+        ?string                 $name = null
+    )
     {
         parent::__construct($name);
-        $this->em               = $em;
-        $this->templateProvider = $templateProvider;
+        $this->em = $em;
     }
 
-    protected function init($input, $output)
+    protected function init(InputInterface $input, OutputInterface $output): void
     {
         $this->contentRp = $this->em->getRepository(CmsContent::class);
         $this->io        = new SymfonyStyle($input, $output);
     }
 
-    protected function selectTemplate(): string
-    {
-        $templates = $this->templateProvider->getTemplateList();
-
-        return $this->io->choice('Template', array_flip($templates));
-    }
-
-    protected function processContent($object, $config)
+    protected function processContent($object, ComponentInterface $config, ?string $table = null, ?string $field = null): true
     {
         $contentConf = [];
-        foreach ($config['contents'] as $content) {
-            $contentConf[$content['code']] = $content;
+        foreach ($config->getBlocks() as $block) {
+            $contentConf[$block->getCode()] = $block;
         }
-        $codes = array_keys($contentConf);
 
-        if(count($codes) == 0){
+        $codes = array_keys($contentConf ?? []);
+
+        if (count($codes) === 0) {
             return true;
         }
 
-        $ins  = $this->contentRp->findByParentInOutCodes($object, $codes, 'IN');
-        $outs = $this->contentRp->findByParentInOutCodes($object, $codes, 'OUT');
+        if ($object instanceof CmsPage || $object instanceof CmsPageDeclination || $object instanceof CmsSharedBlock) {
+            $ins  = $this->contentRp->findByParentInOutCodes($object, $codes, 'IN');
+            $outs = $this->contentRp->findByParentInOutCodes($object, $codes, 'OUT');
+        } elseif (!empty($table) && !empty($field)) {
+            $ins  = $this->contentRp->findByCustomParent($object, $codes, $table, $field, 'IN');
+            $outs = $this->contentRp->findByCustomParent($object, $codes, $table, $field, 'OUT');
+        } else {
+            throw new InvalidArgumentException('Parent type not supported');
+        }
 
         foreach ($outs as $out) {
             $this->em->remove($out);
@@ -81,23 +69,18 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
 
         /** @var CmsContent $in */
         foreach ($ins as $in) {
-            if(!isset($contentConf[$in->getCode()])){
+            if (!isset($contentConf[$in->getCode()])) {
                 $this->em->remove($in);
                 continue;
             }
             $conf          = $contentConf[$in->getCode()];
             $contentDone[] = $in->getCode();
             $in->setPosition(array_search($in->getCode(), $codes));
-            if (isset($conf['label'])) {
-                $in->setLabel($conf['label']);
-            }
-            if (isset($conf['help'])) {
-                $in->setHelp($conf['help']);
-            }
+            $in->setLabel($conf->getLabel());
 
-            if ($in->getType() !== $conf['type']) {
+            if ($in->getType() !== $conf->getType()) {
                 $in->setValue(null);
-                $in->setType($conf['type']);
+                $in->setType($conf->getType());
             }
             $this->em->persist($in);
         }
@@ -107,29 +90,27 @@ abstract class AbstractCmsUpdateContentsCommand extends Command
             $content = new CmsContent();
             $content->setPosition(array_search($code, $codes));
             $content->setCode($code);
-            $content->setType($conf['type']);
-            if ($object instanceof CmsPage) {
-                $content->setPage($object);
-            }
-            if ($object instanceof CmsPageDeclination) {
-                $content->setDeclination($object);
-            }
-            if ($object instanceof CmsSharedBlock) {
-                $content->setSharedBlockParent($object);
-            }
-            if (isset($conf['label'])) {
-                $content->setLabel($conf['label']);
-            } else {
-                $content->setLabel($code);
-            }
-            if (isset($conf['help'])) {
-                $content->setHelp($conf['help']);
+            $content->setLabel($conf->getLabel());
+            $content->setType($conf->getType());
+            switch (true) {
+                case $object instanceof CmsPage:
+                    $content->setPage($object);
+                    break;
+                case $object instanceof CmsPageDeclination:
+                    $content->setDeclination($object);
+                    break;
+                case $object instanceof CmsSharedBlock:
+                    $content->setSharedBlockParent($object);
+                    break;
+                default:
+                    $object->addContent($content);
             }
 
             $this->em->persist($content);
         }
 
         $this->em->flush();
+
         return true;
     }
 }

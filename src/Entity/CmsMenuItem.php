@@ -1,213 +1,148 @@
 <?php
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Entity;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Loggable\Loggable;
 use Gedmo\Mapping\Annotation as Gedmo;
-use stdClass;
+use JetBrains\PhpStorm\ArrayShape;
+use WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository;
 
-/**
- * @ORM\Entity(repositoryClass="WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository")
- * @ORM\Table(name="cms__menu_item")
- * @Gedmo\Tree(type="nested")
- */
-class CmsMenuItem
+#[ORM\Entity(repositoryClass: CmsMenuItemRepository::class)]
+#[ORM\Table(name: 'cms__menu_item')]
+#[Gedmo\Tree(type: 'nested')]
+#[Gedmo\Loggable(logEntryClass: CmsLogEntry::class)]
+class CmsMenuItem implements Loggable
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
-    private $name;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
+    #[Gedmo\Versioned]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     *
-     * @var ?string
-     */
-    private $information;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $information = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true, name="link_type")
-     *
-     */
-    private $linkType;
+    #[ORM\Column(name: 'link_type', type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $linkType = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true, name="link_value")
-     *
-     */
-    private $linkValue;
+    #[ORM\Column(name: 'link_value', type: Types::STRING, length: 255, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $linkValue = null;
 
-    /**
-     * @var CmsPage|null
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="menuItems")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    private $page;
+    #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'menuItems')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[Gedmo\Versioned]
+    private ?CmsPage $page = null;
 
-    /**
-     * @var boolean
-     * @ORM\Column(type="boolean", nullable=false, name="is_visible", options={"default": true})
-     */
-    private $isVisible = true;
+    #[ORM\Column(name: 'is_visible', type: Types::BOOLEAN, nullable: false, options: ['default' => true])]
+    #[Gedmo\Versioned]
+    private bool $isVisible = true;
 
-    /**
-     * @var int
-     * @Gedmo\TreeLevel
-     * @ORM\Column(type="integer", nullable=false)
-     *
-     */
-    private $lvl;
+    #[Gedmo\TreeLevel]
+    #[ORM\Column(type: Types::INTEGER, nullable: false)]
+    #[Gedmo\Versioned]
+    private ?int $lvl = null;
 
-    /**
-     * @var int
-     * @Gedmo\TreeLeft
-     * @ORM\Column(type="integer", nullable=false)
-     *
-     */
-    private $lft;
+    #[Gedmo\TreeLeft]
+    #[ORM\Column(type: Types::INTEGER, nullable: false)]
+    #[Gedmo\Versioned]
+    private ?int $lft = null;
 
-    /**
-     * @var int
-     * @Gedmo\TreeRight
-     * @ORM\Column(type="integer", nullable=false)
-     *
-     */
-    private $rgt;
+    #[Gedmo\TreeRight]
+    #[ORM\Column(type: Types::INTEGER, nullable: false)]
+    #[Gedmo\Versioned]
+    private ?int $rgt = null;
 
-    /**
-     * @Gedmo\TreeRoot
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem")
-     * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
-     */
-    private $root;
+    #[Gedmo\TreeRoot]
+    #[ORM\ManyToOne(targetEntity: CmsMenuItem::class)]
+    #[ORM\JoinColumn(name: 'tree_root', referencedColumnName: "id", onDelete: 'CASCADE')]
+    #[Gedmo\Versioned]
+    private ?CmsMenuItem $root = null;
 
-    /**
-     * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    private $parent;
+    #[Gedmo\TreeParent]
+    #[ORM\ManyToOne(targetEntity: CmsMenuItem::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Gedmo\Versioned]
+    private ?CmsMenuItem $parent = null;
 
-    /**
-     * @var CmsMenuItem[]|Collection|Selectable
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenuItem", mappedBy="parent")
-     * @ORM\OrderBy({"lft" = "ASC"})
-     */
-    private $children;
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: CmsMenuItem::class)]
+    #[ORM\OrderBy(['lft' => 'ASC'])]
+    private ?Collection $children;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private $liClass;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $liClass = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private $ulClass;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $ulClass = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private $linkClass;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $linkClass = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private $iconClass;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $iconClass = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private $connected;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $connected = null;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     *
-     */
-    private $role;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Gedmo\Versioned]
+    private ?string $role = null;
 
-    /**
-     * @var null|String
-     */
     private $moveMode;
 
-    /**
-     * @var null|CmsMenuItem
-     */
     private $moveTarget;
 
-    /**
-     * @var null|string
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $params;
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $params = [];
 
-    /**
-     * @var CmsMenu
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsMenu", inversedBy="children", cascade={"persist"})
-     * @ORM\JoinColumn(name="menu_id", referencedColumnName="id")
-     */
-    private $menu;
+    #[ORM\ManyToOne(targetEntity: CmsMenu::class, cascade: ["persist"], inversedBy: "children")]
+    #[ORM\JoinColumn(name: "menu_id", referencedColumnName: "id")]
+    private ?CmsMenu $menu = null;
 
-    /**
-     * @var boolean
-     * @ORM\Column(type="boolean")
-     */
-    private $blank = 0;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    private bool $blank = false;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $anchor;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    protected ?string $anchor = null;
 
     public function __construct()
     {
         $this->children = new ArrayCollection();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function __toString()
     {
-        return (string) $this->getName();
+        return (string)$this->getName();
     }
 
-    public function getPath()
+    public function getPath(): array|string|null
     {
-        $params = json_decode($this->getParams(), true);
         $pagePath = $this->getPage()->getRoute()->getPath();
-        $path     = preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($params) {
-            return $params[$matches[1]] ?? '';
+
+        return preg_replace_callback('/\{(\w+)\}/', function ($matches) {
+            return $this->params[$matches[1]] ?? '';
         }, $pagePath);
-        return $path;
     }
 
-    public function isRoot()
+    public function isRoot(): bool
     {
         return $this->getId() == $this->getRoot()->getId();
     }
@@ -225,49 +160,45 @@ class CmsMenuItem
         }
     }
 
-    public function setPosition($values)
+    public function setPosition($values): void
     {
         $this->setMoveMode($values['moveMode']);
         $this->setMoveTarget($values['moveTarget']);
     }
 
-    public function getPosition()
+    #[ArrayShape(['moveMode'   => "null|String",
+                  'moveTarget' => "null|\WebEtDesign\CmsBundle\Entity\CmsMenuItem"
+    ])] public function getPosition(): array
     {
         return [
-            'moveMode' => $this->getMoveMode(),
+            'moveMode'   => $this->getMoveMode(),
             'moveTarget' => $this->getMoveTarget()
         ];
     }
 
-    public function getVisibleString()
+    public function getVisibleString(): string
     {
         if ($this->isVisible()) {
-            switch ($this->getConnected()) {
-                case 'ONLY_LOGIN':
-                    return 'Visible si connecté';
-                    break;
-                case 'ONLY_LOGOUT':
-                    return 'Visible si non connecté';
-                    break;
-                default:
-                    return 'Visible';
-                    break;
-            }
+            return match ($this->getConnected()) {
+                'ONLY_LOGIN'  => 'Visible si connecté',
+                'ONLY_LOGOUT' => 'Visible si non connecté',
+                default       => 'Visible',
+            };
         } else {
             return 'Caché';
         }
     }
 
-    public function getChildrenRight()
+    public function getChildrenRight(): Collection&Selectable
     {
-        $criteria = Criteria::create()->orderBy(['rgt'=>'ASC']);
+        $criteria = Criteria::create()->orderBy(['rgt' => 'ASC']);
 
         return $this->children->matching($criteria);
     }
 
-    public function getChildrenLeft()
+    public function getChildrenLeft(): Collection&Selectable
     {
-        $criteria = Criteria::create()->orderBy(['lft'=>'ASC']);
+        $criteria = Criteria::create()->orderBy(['lft' => 'ASC']);
 
         return $this->children->matching($criteria);
     }
@@ -338,7 +269,7 @@ class CmsMenuItem
     }
 
     /**
-     * @return Collection|CmsMenuItem[]
+     * @return Collection
      */
     public function getChildren(): Collection
     {
@@ -399,21 +330,22 @@ class CmsMenuItem
     public function setInformation(?string $information): self
     {
         $this->information = $information;
+
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return CmsPage|null
      */
-    public function getPage()
+    public function getPage(): ?CmsPage
     {
         return $this->page;
     }
 
     /**
-     * @param mixed $page
+     * @param CmsPage|null $page
      */
-    public function setPage($page): void
+    public function setPage(?CmsPage $page): void
     {
         $this->page = $page;
     }
@@ -421,7 +353,7 @@ class CmsMenuItem
     /**
      * @return null|String
      */
-    public function getMoveMode(): ?String
+    public function getMoveMode(): ?string
     {
         return $this->moveMode;
     }
@@ -429,7 +361,7 @@ class CmsMenuItem
     /**
      * @param null|String $moveMode
      */
-    public function setMoveMode(?String $moveMode): void
+    public function setMoveMode(?string $moveMode): void
     {
         $this->moveMode = $moveMode;
     }
@@ -467,7 +399,7 @@ class CmsMenuItem
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLinkType(): ?string
     {
@@ -475,7 +407,7 @@ class CmsMenuItem
     }
 
     /**
-     * @param string $linkType
+     * @param string|null $linkType
      */
     public function setLinkType(?string $linkType): void
     {
@@ -483,7 +415,7 @@ class CmsMenuItem
     }
 
     /**
-     * @return string
+     * @return string|null
      * @deprecated use getLiClass()
      */
     public function getClasses(): ?string
@@ -492,7 +424,7 @@ class CmsMenuItem
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getConnected(): ?string
     {
@@ -500,17 +432,18 @@ class CmsMenuItem
     }
 
     /**
-     * @param string $connected
+     * @param string|null $connected
      * @return CmsMenuItem
      */
     public function setConnected(?string $connected): CmsMenuItem
     {
         $this->connected = $connected;
+
         return $this;
     }
 
     /**
-     * @return array
+     * @return string|null
      */
     public function getRole(): ?string
     {
@@ -518,44 +451,45 @@ class CmsMenuItem
     }
 
     /**
-     * @param string $roles
+     * @param string|null $role
      * @return CmsMenuItem
      */
     public function setRole(?string $role): CmsMenuItem
     {
         $this->role = $role;
+
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSite()
+    public function getSite(): CmsSite
     {
-        $this->getMenu()->getSite();
+        return $this->getMenu()->getSite();
     }
 
-    public function getSlug(){
+    public function getSlug(): string
+    {
         $slugify = new Slugify();
+
         return $slugify->slugify($this->getName(), "_");
     }
 
     /**
-     * @param string|null $params
+     * @param array|null $params
      * @return CmsMenuItem
      */
-    public function setParams(?string $params): CmsMenuItem
+    public function setParams(?array $params): CmsMenuItem
     {
         $this->params = $params;
+
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return array
      */
-    public function getParams(): ?string
+    public function getParams(): array
     {
-        return $this->params;
+        return $this->params ?? [];
     }
 
     /**
@@ -565,6 +499,7 @@ class CmsMenuItem
     public function setIsVisible(bool $isVisible): self
     {
         $this->isVisible = $isVisible;
+
         return $this;
     }
 
@@ -577,17 +512,18 @@ class CmsMenuItem
     }
 
     /**
-     * @param CmsMenu $menu
+     * @param CmsMenu|null $menu
      * @return CmsMenuItem
      */
-    public function setMenu(CmsMenu $menu): CmsMenuItem
+    public function setMenu(?CmsMenu $menu): CmsMenuItem
     {
         $this->menu = $menu;
+
         return $this;
     }
 
     /**
-     * @return CmsMenu
+     * @return CmsMenu|null
      */
     public function getMenu(): ?CmsMenu
     {
@@ -601,6 +537,7 @@ class CmsMenuItem
     public function setBlank(bool $blank): CmsMenuItem
     {
         $this->blank = $blank;
+
         return $this;
     }
 
@@ -613,17 +550,18 @@ class CmsMenuItem
     }
 
     /**
-     * @param string $anchor
+     * @param string|null $anchor
      * @return CmsMenuItem
      */
     public function setAnchor(?string $anchor): CmsMenuItem
     {
         $this->anchor = $anchor;
+
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAnchor(): ?string
     {
@@ -641,17 +579,18 @@ class CmsMenuItem
     }
 
     /**
-     * @param string $liClass
+     * @param string|null $liClass
      * @return CmsMenuItem
      */
     public function setLiClass(?string $liClass): CmsMenuItem
     {
         $this->liClass = $liClass;
+
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLiClass(): ?string
     {
@@ -659,17 +598,18 @@ class CmsMenuItem
     }
 
     /**
-     * @param string $ulClass
+     * @param string|null $ulClass
      * @return CmsMenuItem
      */
     public function setUlClass(?string $ulClass): CmsMenuItem
     {
         $this->ulClass = $ulClass;
+
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUlClass(): ?string
     {
@@ -677,17 +617,18 @@ class CmsMenuItem
     }
 
     /**
-     * @param string $linkClass
+     * @param string|null $linkClass
      * @return CmsMenuItem
      */
     public function setLinkClass(?string $linkClass): CmsMenuItem
     {
         $this->linkClass = $linkClass;
+
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLinkClass(): ?string
     {
@@ -695,7 +636,7 @@ class CmsMenuItem
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIconClass(): ?string
     {
@@ -703,12 +644,13 @@ class CmsMenuItem
     }
 
     /**
-     * @param string $iconClass
+     * @param string|null $iconClass
      * @return CmsMenuItem
      */
     public function setIconClass(?string $iconClass): CmsMenuItem
     {
         $this->iconClass = $iconClass;
+
         return $this;
     }
 }

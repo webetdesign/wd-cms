@@ -1,7 +1,8 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {% if collector.data is defined and collector.data is not empty and collector.data is not null %}
+    {% if collector.data is defined and collector.data is not empty and collector.data is not null
+        and collector.data.serviceRC is defined and collector.data.serviceRC is not empty %}
 
         {% set icon %}
             {# this is the content displayed as a panel in the toolbar #}
@@ -13,8 +14,18 @@
             {# this is the content displayed when hovering the mouse over
                the toolbar panel #}
             <div class="sf-toolbar-info-piece">
-                <b>Page</b>
-                <span>{{ collector.data.page }}</span>
+                <b>Configuration</b>
+                <span><a href="{{ collector.data.serviceRC.fileName|file_link(1) }}">{{ collector.data.serviceRC.className }}</a></span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Page title</b>
+                <span>{{ collector.data.page.title }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Page id</b>
+                <span>{{ collector.data.page.id }}</span>
             </div>
 
             {% if collector.data.type is not null %}
@@ -25,18 +36,17 @@
             {% endif %}
 
             <div class="sf-toolbar-info-piece">
-                <b>Page id </b>
-                <span>{{ collector.data.pageId }}</span>
-            </div>
-
-            <div class="sf-toolbar-info-piece">
                 <b>Template</b>
-                <span>{{ collector.data.template }}</span>
-            </div>
-
-            <div class="sf-toolbar-info-piece">
-                <b>Twig template</b>
-                <span>{{ collector.data.twigTemplate }}</span>
+                <span>
+                    {%- set template = collector.data.service.template -%}
+                    {%- set file = collector.templatePaths[template]|default(false) -%}
+                    {%- set link = file ? file|file_link(1) : false -%}
+                    {% if link %}
+                        <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
+                    {% else %}
+                        {{ template }}
+                    {% endif %}
+                </span>
             </div>
 
             <div class="sf-toolbar-info-piece">
@@ -57,6 +67,168 @@
 
         {# the 'link' value set to 'false' means that this panel doesn't
            show a section in the web profiler #}
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {# This left-hand menu appears when using the full-screen profiler. #}
+    {% if collector.data is defined and collector.data is not empty and collector.data is not null
+        and collector.data.serviceRC is defined and collector.data.serviceRC is not empty %}
+        <span class="label">
+            <span class="icon"><img src="{{ asset('bundles/webetdesigncms/img/logo-compact-2.svg') }}"></span>
+            <strong>CMS</strong>
+        </span>
+    {% endif %}
+{% endblock %}
+
+{% block panel %}
+    {% if collector.data is defined and collector.data is not empty and collector.data is not null
+        and collector.data.serviceRC is defined and collector.data.serviceRC is not empty %}
+        <h2>CMS ::
+            <a href="{{ collector.data.serviceRC.fileName|file_link(1) }}">{{ collector.data.serviceRC.className }}</a>
+        </h2>
+
+        <table>
+            <tr>
+                <th>code</th>
+                <td>{{ collector.data.service.code }}</td>
+            </tr>
+
+            <tr>
+                <th>label</th>
+                <td>{{ collector.data.service.label }}</td>
+            </tr>
+
+            <tr>
+                <th>template</th>
+                <td>
+                    {%- set template = collector.data.service.template -%}
+                    {%- set file = collector.templatePaths[template]|default(false) -%}
+                    {%- set link = file ? file|file_link(1) : false -%}
+                    <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+                    {% if link %}
+                        <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
+                        <div>
+                            <a class="text-muted" href="{{ link }}" title="{{ file }}">
+                                {{ file|file_relative|default(file) }}
+                            </a>
+                        </div>
+                    {% else %}
+                        {{ template }}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+        <h2>Blocks</h2>
+
+        <div class="sf-tabs">
+            {% for block in collector.blocks %}
+                <div class="tab">
+                    <div class="tab-title">
+                        {{ block.config.code }}
+                    </div>
+                    <div class="tab-content">
+                        <h3>
+                            Block :
+                            <a href="{{ block.serviceRC.fileName|file_link(1) }}">{{ block.serviceRC.className }}</a>
+                        </h3>
+                        <table>
+                            <tr>
+                                <th>code</th>
+                                <td>{{ block.config.code }}</td>
+                            </tr>
+                            <tr>
+                                <th>label</th>
+                                <td>{{ block.config.label }}</td>
+                            </tr>
+                            <tr>
+                                <th>template</th>
+                                <td>
+                                    {%- set template = block.config.template -%}
+                                    {%- set file = collector.templatePaths[template]|default(false) -%}
+                                    {%- set link = file ? file|file_link(1) : false -%}
+                                    <span class="sf-icon icon-twig">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
+                                    {% if link %}
+                                        <a href="{{ link }}" title="{{ file }}">{{ template }}</a>
+                                        <div>
+                                            <a class="text-muted" href="{{ link }}" title="{{ file }}">
+                                                {{ file|file_relative|default(file) }}
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        {{ template }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>settings</th>
+                                <td>
+                                    {{ dump(block.config.settings) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>value</th>
+                                <td>
+                                    {{ dump(block.value) }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h2>CmsVars</h2>
+
+        <div class="sf-tabs">
+            {% for def in collector.data.service.varsBag.definitions %}
+                <div class="tab">
+                    <div class="tab-title">{{ def.code }}</div>
+                    <div class="tab-content">
+                        <table>
+                            <tr>
+                                <th>Code</th>
+                                <td>{{ def.code }}</td>
+                            </tr>
+                            <tr>
+                                <th>Class</th>
+                                <td>{{ def.class }}</td>
+                            </tr>
+                            <tr>
+                                <th>Name</th>
+                                <td>{{ def.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>routeAttributeKey</th>
+                                <td>{{ def.routeAttributeKey }}</td>
+                            </tr>
+                            <tr>
+                                <th>findOneBy</th>
+                                <td>{{ def.findOneBy }}</td>
+                            </tr>
+                            <tr>
+                                <th>Exposed properties</th>
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Property accessor</th>
+                                        </tr>
+                                        {% for var, accessor in collector.data.service.varsBag.exposed[def.code] %}
+                                            <tr>
+                                                <th>{{ var }}</th>
+                                                <td>{{ accessor }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% endif %}
 {% endblock %}

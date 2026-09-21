@@ -1,79 +1,39 @@
 services:
-  WebEtDesign\CmsBundle\Command\CmsMigrationArboCommand:
-    arguments:
-      - ~
-      - '@doctrine.orm.default_entity_manager'
-    tags:
-      - { name: 'console.command', command: 'cms:migration-arbo' }
+  _defaults:
+    autowire: true
 
-  WebEtDesign\CmsBundle\Command\CmsGenerateContentsPositionCommand:
-    arguments:
-      - ~
-      - '@doctrine.orm.default_entity_manager'
+  WebEtDesign\CmsBundle\Command\CmsNormalizeLegacyJsonCommand:
     tags:
-      - { name: 'console.command', command: 'cms:gen-contents-position' }
-
-  WebEtDesign\CmsBundle\Command\CmsUpdateContentsPageCommand:
-    arguments:
-      - ~
-      - '@doctrine.orm.default_entity_manager'
-      - '@cms.page_provider'
-    tags:
-      - { name: 'console.command', command: 'cms:page:update-contents' }
+      - { name: 'console.command', command: 'cms:normalize-legacy-json' }
 
   WebEtDesign\CmsBundle\Command\CmsUpdatePageParamsCommand:
-    arguments:
-      - ~
-      - '@doctrine.orm.default_entity_manager'
-      - '@cms.page_provider'
-      - '%wd_cms.cms%'
-
     tags:
       - { name: 'console.command', command: 'cms:page:update-params' }
 
   WebEtDesign\CmsBundle\Command\CmsUpdateContentsSharedBlockCommand:
-    arguments:
-      - ~
-      - '@doctrine.orm.default_entity_manager'
-      - '@cms.block_provider'
     tags:
       - { name: 'console.command', command: 'cms:shared-block:update-contents' }
 
   WebEtDesign\CmsBundle\Command\CmsDuplicateSiteCommand:
     arguments:
-      - ~
       - '@doctrine.orm.default_entity_manager'
       - '@WebEtDesign\CmsBundle\Repository\CmsPageRepository'
       - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
+      - ~
     tags:
       - { name: 'console.command', command: 'cms:duplicate:site' }
 
   WebEtDesign\CmsBundle\Command\CmsDuplicateMenuCommand:
     arguments:
-      - ~
       - '@doctrine.orm.default_entity_manager'
       - '@WebEtDesign\CmsBundle\Repository\CmsMenuRepository'
       - '@WebEtDesign\CmsBundle\Repository\CmsMenuItemRepository'
       - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
+      - '@WebEtDesign\CmsBundle\Repository\CmsPageRepository'
+      - ~
     tags:
       - { name: 'console.command', command: 'cms:duplicate:menu' }
 
-  WebEtDesign\CmsBundle\Command\CmsSitemapGeneratorCommand:
-    arguments:
-      - '@router'
-      - '@sonata.seo.sitemap.manager'
-      - '@filesystem'
-      - '@WebEtDesign\CmsBundle\Utils\SitemapIterator'
-      - '%wd_cms.cms%'
-    tags:
-      - { name: 'console.command', command: 'cms:seo:sitemap' }
-
-  WebEtDesign\CmsBundle\Command\CmsSitemapHelperCommand:
-    arguments:
-      - '@WebEtDesign\CmsBundle\Repository\CmsSiteRepository'
-      - '%wd_cms.cms%'
-    tags:
-      - { name: 'console.command', command: 'cms:sitemap-helper' }
 
   WebEtDesign\CmsBundle\Command\CmsMenuIconSetGeneratorCommand:
     arguments:

@@ -2,24 +2,25 @@
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use Doctrine\ORM\EntityManager;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class PageDeclinationAdminListener
 {
-    protected $em;
-    protected $pageConfig;
-    private   $cmsConfig;
+    protected                $em;
+    protected                $pageConfig;
+    private                  $cmsConfig;
+    private TemplateRegistry $templateRegistry;
 
-    public function __construct(EntityManager $em, $pageConfig, $cmsConfig)
+    public function __construct(EntityManagerInterface $em, TemplateRegistry $templateRegistry, ParameterBagInterface $parameterBag)
     {
-        $this->em = $em;
-        $this->pageConfig = $pageConfig;
-        $this->cmsConfig = $cmsConfig;
-
+        $this->em               = $em;
+        $this->cmsConfig        = $parameterBag->get('wd_cms.cms');
+        $this->templateRegistry = $templateRegistry;
     }
 
     public function prePersist($event)
@@ -46,8 +47,7 @@ class PageDeclinationAdminListener
         $technicName = $this->generateTechnicName($declination);
         $declination
             ->setTechnicName($technicName)
-            ->setLocale($declination->getPage()->getSite()->getLocale())
-        ;
+            ->setLocale($declination->getPage()->getSite()->getLocale());
     }
 
     public function preUpdate($event)
@@ -66,22 +66,23 @@ class PageDeclinationAdminListener
             ->setLocale($declination->getPage()->getSite()->getLocale());
     }
 
-    private function generateTechnicName(CmsPageDeclination $declination) {
-        
+    private function generateTechnicName(CmsPageDeclination $declination)
+    {
+
         $technicName = $declination->getPage()->getRoute()->getName();
-        $values = json_decode($declination->getParams(), true);
-        $route = $declination->getPage()->getRoute();
-        $config = $this->pageConfig[$declination->getPage()->getTemplate()];
+        $values      = json_decode($declination->getParams(), true);
+        /** @var PageInterface $config */
+        $config = $this->templateRegistry->get($declination->getPage()->getTemplate());
 
         foreach ($values as $name => $value) {
-            $param = $config['params'][$name] ?? null;
-            if ($param && isset($param['entity']) && isset($param['property'])) {
-                if ($this->cmsConfig['multilingual'] == true && is_subclass_of($param['entity'], TranslatableInterface::class)) {
-                    $method = 'findOneBy' . ucfirst($param['property']);
+            $attribute = $config->getRoute()->getAttribute($name);
+            if ($attribute && !empty($attribute->getEntityClass())) {
+                if ($this->cmsConfig['multilingual'] && is_subclass_of($attribute->getEntityClass(), TranslatableInterface::class)) {
+                    $method = 'findOneBy' . ucfirst(!empty($attribute->getEntityProperty()) ? $attribute->getEntityProperty() : 'id');
                     $locale = $declination->getPage()->getSite()->getLocale();
-                    $entity = $this->em->getRepository($param['entity'])->$method($value, $locale);
+                    $entity = $this->em->getRepository($attribute->getEntityClass())->$method($value, $locale);
                 } else {
-                    $entity = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
+                    $entity = $this->em->getRepository($attribute->getEntityClass())->findOneBy(['id' => $value]);
                 }
 
                 if ($entity) {
@@ -90,7 +91,7 @@ class PageDeclinationAdminListener
                 $values[$name] = $entity ?? null;
             }
         }
-        
+
         return $technicName;
     }
 }

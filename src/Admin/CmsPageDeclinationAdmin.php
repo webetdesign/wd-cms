@@ -4,53 +4,51 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Admin;
 
-use App\Entity\Product\Brand;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
-use Sonata\AdminBundle\Show\ShowMapper;
-use Sonata\CoreBundle\Form\Type\CollectionType;
-use Sonata\Form\Type\ImmutableArrayType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Sonata\AdminBundle\Route\RouteCollectionInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use WebEtDesign\CmsBundle\Entity\CmsPageDeclination;
-use WebEtDesign\CmsBundle\Form\CmsContentsType;
 use WebEtDesign\CmsBundle\Form\CmsRouteParamsType;
-use WebEtDesign\CmsBundle\Utils\GlobalVarsAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoFacebookAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoOpenGraphAdminTrait;
-use WebEtDesign\CmsBundle\Utils\SmoTwitterAdminTrait;
+use WebEtDesign\CmsBundle\Form\Content\AdminCmsBlockCollectionType;
+use WebEtDesign\CmsBundle\Manager\BlockFormThemesManager;
+use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
+use WebEtDesign\CmsBundle\Utils\CmsVarsAdminTrait;
+use WebEtDesign\SeoBundle\Admin\SmoOpenGraphAdminTrait;
+use WebEtDesign\SeoBundle\Admin\SmoTwitterAdminTrait;
 
 final class CmsPageDeclinationAdmin extends AbstractAdmin
 {
-    use SmoTwitterAdminTrait;
     use SmoOpenGraphAdminTrait;
-    use GlobalVarsAdminTrait;
+    use SmoTwitterAdminTrait;
+    use CmsVarsAdminTrait;
 
-    protected $em;
-    protected $pageConfig;
-    protected $globalVarsEnable;
+    protected ?bool $globalVarsEnable;
 
-    protected $parentAssociationMapping = 'page';
-    protected $datagridValues           = [
+    protected ?string $parentAssociationMapping = 'page';
+    protected array   $datagridValues           = [
         '_page'       => 1,
         '_sort_order' => 'ASC',
         '_sort_by'    => 'position',
     ];
-    private   $customFormThemes;
 
-    public function __construct(string $code, string $class, string $baseControllerName, EntityManager $em, $pageConfig, $globalVarsDefinition, $customFormThemes)
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly TemplateRegistry $templateRegistry,
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly BlockFormThemesManager $blockFormThemesManager
+    ) {
+        $this->globalVarsEnable = false; // TODO $globalVarsDefinition['enable'];
+        parent::__construct();
+    }
+
+
+    protected function configureRoutes(RouteCollectionInterface $collection): void
     {
-        $this->em               = $em;
-        $this->pageConfig       = $pageConfig;
-        $this->globalVarsEnable = $globalVarsDefinition['enable'];
-
-
-        parent::__construct($code, $class, $baseControllerName);
-        $this->customFormThemes = $customFormThemes;
+        $collection->remove('show');
     }
 
 
@@ -63,14 +61,15 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
     protected function configureListFields(ListMapper $listMapper): void
     {
-        unset($this->listModes['mosaic']);
+        $modes = $this->getListModes();
+        unset($modes['mosaic']);
+        $this->setListModes($modes);
 
         $listMapper
             ->add('id')
             ->add('title')
-            ->add('_action', null, [
+            ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
-                    'show'   => [],
                     'edit'   => [],
                     'delete' => [],
                 ],
@@ -79,46 +78,49 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $formMapper): void
     {
-        $roleAdmin = $this->canManageContent();
         $this->setFormTheme(array_merge($this->getFormTheme(), [
-            '@WebEtDesignCms/form/cms_global_vars_type.html.twig',
             '@WebEtDesignCms/form/cms_route_params.html.twig',
-            '@WebEtDesignCms/form/cms_contents_type.html.twig',
-            '@WebEtDesignCms/customContent/sortable_collection_widget.html.twig',
-            '@WebEtDesignCms/customContent/sortable_entity_widget.html.twig',
-        ], $this->customFormThemes));
+            '@WebEtDesignCms/admin/form/cms_block.html.twig',
+            '@WebEtDesignCms/admin/form/dynamic_block.html.twig',
+            '@WebEtDesignCms/admin/form/admin_cms_vars_section.html.twig',
+        ], $this->blockFormThemesManager->getThemes()));
 
         /** @var CmsPageDeclination $object */
         $object = $this->getSubject();
-        if (!$object) { //For Batch action delete
+        if (!$object || !$object->getPage()) { //For Batch action delete
             return;
         }
-        $route  = $object->getPage()->getRoute();
-        $config = $this->pageConfig[$object->getPage()->getTemplate()];
+        $route = $object->getPage()->getRoute();
+
+        $pageConfig = $this->templateRegistry->get($object->getPage()->getTemplate());
 
         //region Général
         $formMapper
             ->tab('Général')// The tab call is optional
-            ->with('', ['box_class' => '']);
+            ->with('', ['box_class' => 'header_none']);
 
         $formMapper
             ->add('title', null, ['label' => 'Title']);
 
-        $formMapper->add('params', CmsRouteParamsType::class, [
-            'config' => $config,
-            'route'  => $route,
-            'object' => $object,
-            'label'  => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
-        ]);
+        if ($route) {
+            $formMapper->add('params', CmsRouteParamsType::class, [
+                'config'      => $pageConfig,
+                'route'       => $route,
+                'object'      => $object,
+                'json_string' => true,
+                'label'       => 'Parametre de l\'url de la page : ' . $route->getPath() . ', ( ' . $object->getPath() . ' )'
+            ]);
+        }
 
         $formMapper
             ->end()// End form group
             ->end()// End tab
         ;
+        // endregion
 
         //region SEO
         $formMapper->tab('SEO');// The tab call is optional
-        $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable);
+        $this->addFormVarsSection($formMapper, $object->getPage(), 'seo');
         $formMapper
             ->with('Général', ['class' => 'col-xs-12 col-md-4', 'box_class' => ''])
             ->add('seo_title')
@@ -129,52 +131,23 @@ final class CmsPageDeclinationAdmin extends AbstractAdmin
         $this->addFormFieldSmoTwitter($formMapper);
         $formMapper->end();
         //endregion
-        //endregion
 
         //region Contenus
         $formMapper->tab('Contenus');
         $formMapper
-            ->with('', ['box_class' => 'header_none', 'class' => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'])
-            ->add('contents', CmsContentsType::class, [
-                'label'        => false,
-                'by_reference' => false,
-                'role_admin'   => $roleAdmin,
+            ->with('', [
+                'box_class' => 'header_none',
+                'class'     => $this->globalVarsEnable ? 'col-xs-9' : 'col-xs-12'
+            ])
+            ->add('contents', AdminCmsBlockCollectionType::class, [
+                'templateFactory' => $this->templateRegistry,
             ])
             ->end();
-        $this->addGlobalVarsHelp($formMapper, $object->getPage(), $this->globalVarsEnable, true);
+        $this->addFormVarsSection($formMapper, $object->getPage(), 'content');
         $formMapper
             ->end();
         //endregion
     }
 
-    protected function configureShowFields(ShowMapper $showMapper): void
-    {
-        $showMapper
-            ->add('id')
-            ->add('title')
-            ->add('seo_title')
-            ->add('seo_description')
-            ->add('seo_keywords')
-            ->add('fb_title')
-            ->add('fb_type')
-            ->add('fb_url')
-            ->add('fb_image')
-            ->add('fb_description')
-            ->add('fb_site_name')
-            ->add('fb_admins')
-            ->add('twitter_card')
-            ->add('twitter_site')
-            ->add('twitter_title')
-            ->add('twitter_description')
-            ->add('twitter_creator')
-            ->add('twitter_image');
-    }
 
-
-    protected function canManageContent()
-    {
-        $user = $this->getConfigurationPool()->getContainer()->get('security.token_storage')->getToken()->getUser();
-
-        return $user->hasRole('ROLE_ADMIN_CMS');
-    }
 }

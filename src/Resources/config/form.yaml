@@ -16,31 +16,11 @@ services:
     tags:
       - { name: form.type }
 
-  WebEtDesign\CmsBundle\Form\PageTemplateType:
-    arguments:
-      - '@cms.page_provider'
-    tags:
-      - { name: form.type }
-
-  WebEtDesign\CmsBundle\Form\BlockTemplateType:
-    arguments:
-      - '@cms.block_provider'
-    tags:
-      - { name: form.type }
-
   WebEtDesign\CmsBundle\Form\MultilingualType:
     arguments:
       - '@doctrine.orm.default_entity_manager'
       - WebEtDesign\CmsBundle\Entity\CmsPage
       - WebEtDesign\CmsBundle\Entity\CmsSite
-    tags:
-      - { name: form.type }
-
-  WebEtDesign\CmsBundle\Form\GlobalVarsType:
-    arguments:
-      - '@cms.page_provider'
-      - '@service_container'
-      - '%wd_cms.vars%'
     tags:
       - { name: form.type }
 

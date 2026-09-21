@@ -1,20 +1,20 @@
 <?php
-
+declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\Form;
 
-
-use App\Entity\Product\Range\RangeCategory;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use WebEtDesign\CmsBundle\CMS\Template\PageInterface;
 use WebEtDesign\CmsBundle\Entity\CmsRoute;
 
 class CmsRouteParamsType extends AbstractType
@@ -22,25 +22,24 @@ class CmsRouteParamsType extends AbstractType
     /**
      * @var EntityManagerInterface
      */
-    protected $em;
-    private   $cmsConfig;
+    protected EntityManagerInterface $em;
+    private array                    $cmsConfig;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct(EntityManagerInterface $em, $cmsConfig)
     {
         $this->em        = $em;
         $this->cmsConfig = $cmsConfig;
     }
 
-
     /**
      * @inheritDoc
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $config = $options['config'];
+        /** @var PageInterface config */
+        $config      = $options['config'];
+        $routeConfig = $config->getRoute();
+
         /** @var CmsRoute $route */
         $route  = $options['route'];
         $object = $options['object'];
@@ -50,107 +49,76 @@ class CmsRouteParamsType extends AbstractType
         $requirements = json_decode($route->getRequirements(), true);
 
         foreach ($route->getParams() as $name) {
-            $param = $config['params'][$name] ?? null;
-            $type  = !empty($param['entity']) ? EntityType::class : TextType::class;
-            $opts  = !empty($param['entity']) ? [
-                'class'        => $param['entity'],
-                'choice_value' => function ($entity = null) use ($param, $locale) {
-                    $getter = 'get' . ucfirst($param['property']);
-                    if ($this->cmsConfig['multilingual'] == true && is_subclass_of($entity, TranslatableInterface::class)) {
-                        return $entity ? $entity->translate($locale)->$getter() : '';
-                    } else {
-                        return $entity ? $entity->$getter() : '';
-                    }
-                },
-                'required'     => false
-            ] : [
-                'required' => false
-            ];
+            $attribute = $routeConfig->getAttribute($name);
 
-            if (isset($defaults[$name])) {
-                if (empty($param['entity'])) {
-                    $opts['empty_data']          = $defaults[$name];
-                    $opts['attr']['placeholder'] = $defaults[$name];
-                } else {
-                    $opts['choice_attr'] = function ($choice, $key, $value) use ($defaults, $name) {
-                        $attr = [];
-                        if ($value == $defaults[$name]) {
-                            $attr['selected'] = 'selected';
-                        }
-                        return $attr;
-                    };
-                }
-            }
             if (isset($requirements[$name]) && !empty($requirements[$name])) {
-                $opts['constraints'][] = new Regex([
-                    'pattern' => '/' . $requirements[$name] . '/',
-                    'match'   => true,
-                ]);
-
-                if (!preg_match('/' . $requirements[$name] . '/', '')) {
-                    $opts['constraints'][] = new NotBlank();
-                }
+                $constraints = [
+                    new Regex([
+                        'pattern' => '/' . $requirements[$name] . '/',
+                    ])
+                ];
             }
+            if (!empty($attribute->getFormType())) {
+                $builder->add($name, $attribute->getFormType(), [
+                    'required'    => false,
+                    'constraints' => $constraints ?? [],
+                ]);
+            } elseif (!empty($attribute->getEntityClass())) {
+                $choices = [];
+                foreach ($this->em->getRepository($attribute->getEntityClass())->findAll() as $item) {
+                    if (!empty($attribute->getEntityProperty())) {
+                        $getter = 'get' . ucfirst($attribute->getEntityProperty());
+                        if ($this->cmsConfig['multilingual'] &&
+                            is_subclass_of($attribute->getEntityClass(), TranslatableInterface::class)) {
+                            $choices[$item->__toString()] = $item->translate($locale)->$getter();
+                        } else {
+                            $choices[$item->__toString()] = $item->$getter();
+                        }
+                    } else {
+                        $choices[$item->__toString()] = $item->getId();
+                    }
+                }
 
-            $builder->add($name, $type, $opts);
+                $builder->add($name, ChoiceType::class, [
+                    'choices'     => $choices,
+                    'required'    => false,
+                    'constraints' => $constraints ?? [],
+                ]);
+            } else {
+                $builder->add($name, TextType::class, [
+                    'constraints' => $constraints ?? [],
+                    'required'    => false,
+                ]);
+            }
         }
 
-        $builder->addModelTransformer(new CallbackTransformer(
-            function ($values) use ($config, $object) {
-                if ($values != null) {
-                    $values = json_decode($values, true);
-                    foreach ($values as $name => $value) {
-                        $param = $config['params'][$name] ?? null;
-                        if ($param && isset($param['entity']) && isset($param['property'])) {
-                            if ($this->cmsConfig['multilingual'] == true && is_subclass_of($param['entity'], TranslatableInterface::class)) {
-                                $method = 'findOneBy'.ucfirst($param['property']);
-                                $locale = $object->getPage()->getSite()->getLocale();
-                                $entity = $this->em->getRepository($param['entity'])->$method($value, $locale);
-                            } else {
-                                $entity = $this->em->getRepository($param['entity'])->findOneBy([$param['property'] => $value]);
-                            }
-                            $values[$name] = $entity ?? null;
-                        }
-                    }
-                }
-                return $values;
-            },
-            function ($values) use ($config, $locale) {
-                foreach ($values as $name => $value) {
-                    $param = $config['params'][$name] ?? null;
-                    if ($param && isset($param['property'])) {
-                        $getter = 'get' . ucfirst($param['property']);
-                        if (method_exists($value, $getter)) {
-                            if ($this->cmsConfig['multilingual'] == true && is_subclass_of($value, TranslatableInterface::class)) {
-                                $values[$name] = $value->translate($locale)->$getter();
-                            } else {
-                                $values[$name] = $value->$getter();
-                            }
-                        }
-                    }
-                }
-                return json_encode($values);
-            }
-        ));
+        // A declination keeps its params in a JSON string column, where a menu item keeps an array.
+        if ($options['json_string']) {
+            $builder->addModelTransformer(new CallbackTransformer(
+                static fn(?string $values): array => $values ? (json_decode($values, true) ?? []) : [],
+                static fn(?array $values): string => json_encode($values ?? [])
+            ));
+        }
     }
 
     /**
      * @inheritDoc
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('config');
         $resolver->setRequired('route');
         $resolver->setRequired('object');
+        $resolver->setDefault('json_string', false);
+        $resolver->setAllowedTypes('json_string', 'bool');
     }
 
     /**
      * @inheritDoc
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'cms_route_params';
     }
-
 
 }

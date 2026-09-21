@@ -71,17 +71,15 @@ file that was distributed with this source code.
                                                 {% set sort_by              = current ? admin.datagrid.values._sort_order : field_description.options._sort_order %}
                                             {% endif %}
 
-                                            {% apply spaceless %}
-                                                <th class="sonata-ba-list-field-header-{{ field_description.type }}{% if sortable %} sonata-ba-list-field-header-order-{{ sort_by|lower }} {{ sort_active_class }}{% endif %}{% if field_description.options.header_class is defined %} {{ field_description.options.header_class }}{% endif %}"{% if field_description.options.header_style is defined %} style="{{ field_description.options.header_style }}"{% endif %}>
-                                                    {% if sortable %}
-                                                    <a href="{{ admin.generateUrl('list', sort_parameters|merge({_list_mode: admin.getListMode()})) }}">{% endif %}
-                                                        {% if field_description.getOption('label_icon') %}
-                                                            <i class="sonata-ba-list-field-header-label-icon {{ field_description.getOption('label_icon') }}" aria-hidden="true"></i>
-                                                        {% endif %}
-                                                        {{ field_description.label|trans({}, field_description.translationDomain) }}
-                                                        {% if sortable %}</a>{% endif %}
-                                                </th>
-                                            {% endapply %}
+                                            <th class="sonata-ba-list-field-header-{{ field_description.type }}{% if sortable %} sonata-ba-list-field-header-order-{{ sort_by|lower }} {{ sort_active_class }}{% endif %}{% if field_description.options.header_class is defined %} {{ field_description.options.header_class }}{% endif %}"{% if field_description.options.header_style is defined %} style="{{ field_description.options.header_style }}"{% endif %}>
+                                                {% if sortable %}
+                                                <a href="{{ admin.generateUrl('list', sort_parameters|merge({_list_mode: admin.getListMode()})) }}">{% endif %}
+                                                    {% if field_description.getOption('label_icon') %}
+                                                        <i class="sonata-ba-list-field-header-label-icon {{ field_description.getOption('label_icon') }}" aria-hidden="true"></i>
+                                                    {% endif %}
+                                                    {{ field_description.label|trans({}, field_description.translationDomain) }}
+                                                    {% if sortable %}</a>{% endif %}
+                                            </th>
                                         {% endif %}
                                     {% endfor %}
                                 </tr>
@@ -104,7 +102,7 @@ file that was distributed with this source code.
                                 <div class="info-box-content">
                                     <span class="info-box-text">{{ 'no_result'|trans({}, 'SonataAdminBundle') }}</span>
                                     <div class="progress">
-                                        <div class="progress-bar" style="width: 0%"></div>
+                                        <div class="progress-bar" style="width: 0"></div>
                                     </div>
                                     <span class="progress-description">
                                     {% if not app.request.xmlHttpRequest %}

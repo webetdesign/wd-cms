@@ -2,45 +2,65 @@
 
 namespace WebEtDesign\CmsBundle\Controller\Admin;
 
-use Knp\Menu\Renderer\TwigRenderer;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use LogicException;
+use ReflectionClass;
+use ReflectionException;
+use Sonata\AdminBundle\Admin\Pool;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Sonata\AdminBundle\Exception\ModelManagerException;
-use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use WebEtDesign\CmsBundle\Entity\CmsSite;
+use WebEtDesign\CmsBundle\Repository\CmsSiteRepository;
 
 final class CmsSharedBlockAdminController extends CRUDController
 {
 
-    public function listAction($id = null)
+    public function __construct(private EntityManagerInterface $em, private Pool $pool) { }
+
+    public function listAction(Request $request): Response
     {
-        $request = $this->getRequest();
-        $session = $request->getSession();
-
-        if ($id === null) {
-            if($session->get('admin_current_site_id')) {
-                $id = $session->get('admin_current_site_id');
-            } else {
-                $defaultSite = $this->getDoctrine()->getRepository('WebEtDesignCmsBundle:CmsSite')->getDefault();
-                if (!$defaultSite) {
-                    $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
-
-                    return $this->redirect($this->get('cms.admin.cms_site')->generateUrl('list'));
-                }
-
-                $id = $defaultSite->getId();
-            }
-            $request->attributes->set('id', $id);
+        $defaultSite = $this->em->getRepository(CmsSite::class)->getDefault();
+        if ($defaultSite === null) {
+            $this->addFlash('warning', 'Vous devez déclarer un site par défaut');
+            return $this->redirect($this->pool->getAdminByAdminCode('cms.admin.cms_site')->generateUrl('list'));
         }
+
+        try {
+            $this->admin->getParent();
+        } catch (LogicException $exception) {
+            $session = $request->getSession();
+
+            $site = null;
+//            if ($session->get('admin_current_site_id')) {
+//                $id = $session->get('admin_current_site_id');
+//                $site = $this->em->find(CmsSite::class, $id);
+//            }
+
+            if ($site === null) {
+                $site = $defaultSite;
+            }
+
+            $siteAdmin = $this->pool->getAdminByClass(CmsSite::class);
+
+            $url = $siteAdmin->generateUrl('cms.admin.cms_shared_block.list', ['id' => $site->getId()]);
+            return $this->redirect($url);
+
+        }
+
+        $session = $request->getSession();
+        $id = $request->attributes->get($this->admin->getIdParameter());
 
         $this->admin->checkAccess('list');
 
-        $request     = $this->getRequest();
         $preResponse = $this->preList($request);
         if (null !== $preResponse) {
             return $preResponse;
         }
 
-        if ($listMode = $request->get('_list_mode')) {
+        if ($listMode = $request->query->get('_list_mode')) {
             $this->admin->setListMode($listMode);
         }
 
@@ -55,34 +75,31 @@ final class CmsSharedBlockAdminController extends CRUDController
         $this->setFormTheme($formView, $this->admin->getFilterTheme());
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
-        $template = $this->admin->getTemplate('list');
+        $template = $this->admin->getTemplateRegistry()->getTemplate('list');
 
         // $template = $this->templateRegistry->getTemplate('list');
 
         return $this->renderWithExtraParams($template, [
-            'action'         => 'list',
-            'form'           => $formView,
-            'datagrid'       => $datagrid,
-            'csrf_token'     => $this->getCsrfToken('sonata.batch'),
-            'export_formats' => $this->has('sonata.admin.admin_exporter') ?
-                $this->get('sonata.admin.admin_exporter')->getAvailableFormats($this->admin) :
-                $this->admin->getExportFormats(),
-        ], null);
+            'action' => 'list',
+            'form' => $formView,
+            'datagrid' => $datagrid,
+            'csrf_token' => $this->getCsrfToken('sonata.batch'),
+            'export_formats' => $exportFormats ?? $this->admin->getExportFormats(),
+        ]);
     }
 
     /**
      * @inheritDoc
+     * @throws ReflectionException
      */
-    public function createAction()
+    public function createAction(Request $request): Response
     {
-        $request = $this->getRequest();
-
         $this->admin->checkAccess('create');
 
         // the key used to lookup the template
         $templateKey = 'edit';
 
-        $class = new \ReflectionClass($this->admin->hasActiveSubClass() ? $this->admin->getActiveSubClass() : $this->admin->getClass());
+        $class = new ReflectionClass($this->admin->hasActiveSubClass() ? $this->admin->getActiveSubClass() : $this->admin->getClass());
 
         if ($class->isAbstract()) {
             return $this->renderWithExtraParams(
@@ -114,7 +131,7 @@ final class CmsSharedBlockAdminController extends CRUDController
             $isFormValid = $form->isValid();
 
             // persist if the form was valid and if in preview mode the preview was approved
-            if ($isFormValid && (!$this->isInPreviewMode() || $this->isPreviewApproved())) {
+            if ($isFormValid && (!$this->isInPreviewMode($request) || $this->isPreviewApproved($request))) {
                 /** @phpstan-var T $submittedObject */
                 $submittedObject = $form->getData();
                 $this->admin->setSubject($submittedObject);
@@ -123,7 +140,7 @@ final class CmsSharedBlockAdminController extends CRUDController
                 try {
                     $newObject = $this->admin->create($submittedObject);
 
-                    if ($this->isXmlHttpRequest()) {
+                    if ($this->isXmlHttpRequest($request)) {
                         return $this->handleXmlHttpRequestSuccessResponse($request, $newObject);
                     }
 
@@ -137,9 +154,12 @@ final class CmsSharedBlockAdminController extends CRUDController
                     );
 
                     // redirect to edit mode
-                    return $this->redirectTo($newObject);
+                    return $this->redirectTo($request, $newObject);
                 } catch (ModelManagerException $e) {
-                    $this->handleModelManagerException($e);
+                    try {
+                        $this->handleModelManagerException($e);
+                    } catch (Exception $e) {
+                    }
 
                     $isFormValid = false;
                 }
@@ -147,7 +167,7 @@ final class CmsSharedBlockAdminController extends CRUDController
 
             // show an error message if the form failed validation
             if (!$isFormValid) {
-                if ($this->isXmlHttpRequest() && null !== ($response = $this->handleXmlHttpRequestErrorResponse($request, $form))) {
+                if ($this->isXmlHttpRequest($request) && null !== ($response = $this->handleXmlHttpRequestErrorResponse($request, $form))) {
                     return $response;
                 }
 
@@ -159,7 +179,7 @@ final class CmsSharedBlockAdminController extends CRUDController
                         'SonataAdminBundle'
                     )
                 );
-            } elseif ($this->isPreviewRequested()) {
+            } elseif ($this->isPreviewRequested($request)) {
                 // pick the preview template if the form was valid and preview was requested
                 $templateKey = 'preview';
                 $this->admin->getShow();
@@ -171,7 +191,7 @@ final class CmsSharedBlockAdminController extends CRUDController
         $this->setFormTheme($formView, $this->admin->getFormTheme());
 
         // NEXT_MAJOR: Remove this line and use commented line below it instead
-        $template = $this->admin->getTemplate($templateKey);
+        $template = $this->admin->getTemplateRegistry()->getTemplate($templateKey);
         // $template = $this->templateRegistry->getTemplate($templateKey);
 
         return $this->renderWithExtraParams($template, [
@@ -181,13 +201,4 @@ final class CmsSharedBlockAdminController extends CRUDController
             'objectId' => null,
         ], null);
     }
-
-
-    protected function setFormTheme(FormView $formView, array $theme = null): void
-    {
-        $twig = $this->get('twig');
-
-        $twig->getRuntime(FormRenderer::class)->setTheme($formView, $theme);
-    }
-
 }
