@@ -117,6 +117,14 @@ class CmsPage implements Loggable
     #[ORM\Column(options: ['default' => false])]
     private bool $noIndex = false;
 
+    #[Gedmo\Versioned]
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
+    private ?float $seoSitemapPriority = null;
+
+    #[Gedmo\Versioned]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $seoSitemapChangeFreq = UrlConcrete::CHANGEFREQ_MONTHLY;
+
     private ?string $moveMode = null;
 
     private mixed $moveTarget = null;
@@ -216,7 +224,26 @@ class CmsPage implements Loggable
 
     public function getSeoSitemapPriority(): float
     {
-        return $this->seoSitemapPriority ?: 1 - $this->getLvl() * 0.2;
+        return $this->seoSitemapPriority ?? 1 - $this->getLvl() * 0.2;
+    }
+
+    public function setSeoSitemapPriority(?float $seoSitemapPriority): self
+    {
+        $this->seoSitemapPriority = $seoSitemapPriority;
+
+        return $this;
+    }
+
+    public function getSeoSitemapChangeFreq(): ?string
+    {
+        return $this->seoSitemapChangeFreq;
+    }
+
+    public function setSeoSitemapChangeFreq(?string $seoSitemapChangeFreq): self
+    {
+        $this->seoSitemapChangeFreq = $seoSitemapChangeFreq;
+
+        return $this;
     }
 
     public function getTitle(): ?string
