@@ -18,6 +18,9 @@
             "url": "https://github.com/webetdesign/wd-seo-bundle.git"
         }
     ],
+    "conflict": {
+        "doctrine/dbal": ">=4.0"
+    },
     "require": {
         "php": "^8.2",
         "cocur/slugify": "^4.0",
