@@ -65,11 +65,6 @@ services:
       - { name: routing.loader }
 
 
-  WebEtDesign\CmsBundle\Utils\SitemapIterator:
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@router'
-
   cms.security.editable_role_builder:
     class: WebEtDesign\CmsBundle\Security\EditableRolesBuilder
     arguments:
