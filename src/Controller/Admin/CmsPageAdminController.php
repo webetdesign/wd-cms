@@ -234,7 +234,7 @@ class CmsPageAdminController extends CRUDController
 
         if ($request->query->has('refId')) {
             /** @var CmsPage $refPage */
-            $refPage = $this->getDoctrine()->getRepository(CmsPage::class)
+            $refPage = $this->em->getRepository(CmsPage::class)
                 ->find($request->query->get('refId'));
 
             $newObject->setSite($site);
