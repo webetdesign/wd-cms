@@ -1,6 +1,7 @@
 {
     "name": "webetdesign/wd-cms",
     "type": "symfony-bundle",
+    "description": "Web&Design CMS bundle for Symfony applications.",
     "license": "proprietary",
     "authors": [
         {
@@ -46,7 +47,6 @@
         "symfony/security-bundle": "^7.4",
         "symfony/security-core": "^7.4",
         "symfony/security-csrf": "^7.4",
-        "symfony/templating": "^6.4",
         "symfony/translation": "^7.4",
         "symfony/twig-bridge": "^7.4",
         "symfony/twig-bundle": "^7.4",
