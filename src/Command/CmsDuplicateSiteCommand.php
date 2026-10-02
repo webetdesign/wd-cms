@@ -58,7 +58,7 @@ class CmsDuplicateSiteCommand extends Command
      * @throws OptimisticLockException
      * @author Benjamin Robert
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -113,7 +113,7 @@ class CmsDuplicateSiteCommand extends Command
 
         $this->duplicate($site, $newSite, $doClean);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
