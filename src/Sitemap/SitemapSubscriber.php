@@ -2,7 +2,6 @@
 
 namespace WebEtDesign\CmsBundle\Sitemap;
 
-use JetBrains\PhpStorm\ArrayShape;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
 use Presta\SitemapBundle\Service\UrlContainerInterface;
 use Presta\SitemapBundle\Sitemap\Url\GoogleMultilangUrlDecorator;
@@ -40,11 +39,10 @@ class SitemapSubscriber implements EventSubscriberInterface
         $this->parameterBag      = $parameterBag;
     }
 
-    #[ArrayShape([SitemapPopulateEvent::ON_SITEMAP_POPULATE => "string"])]
     public static function getSubscribedEvents(): array
     {
         return [
-            SitemapPopulateEvent::ON_SITEMAP_POPULATE => 'populate',
+            SitemapPopulateEvent::class => 'populate',
         ];
     }
 
