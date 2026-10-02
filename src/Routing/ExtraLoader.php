@@ -154,7 +154,7 @@ class ExtraLoader implements LoaderInterface
         return 'cms' === $type;
     }
 
-    public function getResolver(): ?LoaderResolverInterface
+    public function getResolver(): LoaderResolverInterface
     {
         return $this->resolver;
     }
