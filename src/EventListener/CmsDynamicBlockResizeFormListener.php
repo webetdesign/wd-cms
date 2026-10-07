@@ -14,13 +14,17 @@ use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 class CmsDynamicBlockResizeFormListener extends ResizeFormListener
 {
 
+    /**
+     * $type, $options, $allowAdd and $allowDelete are private in
+     * ResizeFormListener since Symfony 7, so this listener keeps its own copy.
+     */
     public function __construct(
         private readonly BlockRegistry   $blockRegistry,
         private readonly BlockDefinition $blockDefinition,
-        string                           $type,
-        array                            $options = [],
-        bool                             $allowAdd = false,
-        bool                             $allowDelete = false,
+        private readonly string          $type,
+        private readonly array           $options = [],
+        private readonly bool            $allowAdd = false,
+        private readonly bool            $allowDelete = false,
                                          $deleteEmpty = false
     )
     {

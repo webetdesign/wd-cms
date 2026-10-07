@@ -6,23 +6,41 @@ namespace WebEtDesign\CmsBundle\EventListener;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class CmsBlockResizeFormListener extends ResizeFormListener
 {
-
+    /**
+     * $type and $options are private in ResizeFormListener since Symfony 7,
+     * so this listener keeps its own copy.
+     */
     public function __construct(
         private readonly TemplateRegistry $templateRegistry,
         private readonly BlockRegistry $blockRegistry,
-        string $type,
-        array $options = [],
+        private readonly string $type,
+        private readonly array $options = [],
         bool $allowAdd = false,
         bool $allowDelete = false,
         $deleteEmpty = false,
     ) {
         parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
+    }
+
+    /**
+     * The rows are built on PRE_SET_DATA by preSetData() below: the parent
+     * POST_SET_DATA listener would only report that override as deprecated.
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            FormEvents::PRE_SET_DATA => 'preSetData',
+            FormEvents::PRE_SUBMIT   => 'preSubmit',
+            // (MergeCollectionListener, MergeDoctrineCollectionListener)
+            FormEvents::SUBMIT       => ['onSubmit', 50],
+        ];
     }
 
 
