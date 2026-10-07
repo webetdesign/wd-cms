@@ -75,7 +75,7 @@ final class CmsMenuAdmin extends AbstractAdmin
     protected function configureSideMenu(
         MenuItemInterface $menu,
         $action,
-        AdminInterface $childAdmin = null
+        ?AdminInterface $childAdmin = null
     ) {
         $admin = $this->isChild() ? $this->getParent() : $this;
 

@@ -52,7 +52,7 @@
         "symfony/twig-bundle": "^7.4",
         "symfony/validator": "^7.4",
         "webetdesign/wd-media-bundle": "^7.4.0",
-        "webetdesign/wd-seo-bundle": "7.0.0"
+        "webetdesign/wd-seo-bundle": "^7.0"
     },
     "require-dev": {
         "symfony/filesystem": "^7.4",

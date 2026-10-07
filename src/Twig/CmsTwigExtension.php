@@ -246,7 +246,7 @@ class CmsTwigExtension extends AbstractExtension
             array_merge(['block' => $block, 'page' => $this->cmsHelper->getPage()], $context));
     }
 
-    public function cmsPath($route, $params = [], $absoluteUrl = false, CmsPage $page = null)
+    public function cmsPath($route, $params = [], $absoluteUrl = false, ?CmsPage $page = null)
     {
         if ($this->configCms['multilingual'] && $page !== null) {
             $prefix = $page->getSite()->getLocale() . '_';

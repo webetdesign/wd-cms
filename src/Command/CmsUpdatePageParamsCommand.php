@@ -32,7 +32,7 @@ class CmsUpdatePageParamsCommand extends AbstractCmsUpdateContentsCommand
         EntityManagerInterface $em,
         TemplateRegistry $templateRegistry,
         ParameterBagInterface $parameterBag,
-        string $name = null
+        ?string $name = null
     ) {
         parent::__construct($em, $name);
         $this->configCms        = $parameterBag->get('wd_cms.cms');

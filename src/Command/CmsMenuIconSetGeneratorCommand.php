@@ -17,7 +17,7 @@ class CmsMenuIconSetGeneratorCommand extends Command
 
     public function __construct(
         array $iconSet,
-        string $name = null
+        ?string $name = null
     ) {
         parent::__construct($name);
         $this->iconSet = $iconSet;

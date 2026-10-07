@@ -88,7 +88,7 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
     /**
      * @inheritDoc
      */
-    public function collect(Request $request, Response $response, Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?Throwable $exception = null): void
     {
 
         /** @var CmsPage $page */
