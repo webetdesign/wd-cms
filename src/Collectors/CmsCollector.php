@@ -186,8 +186,8 @@ class CmsCollector extends AbstractDataCollector implements LateDataCollectorInt
 
     public function getPage(): ?CmsPage
     {
-        if ('admin_webetdesign_cms_cmssite_cmspage_edit' === $this->requestStack->getCurrentRequest()->get('_route')) {
-            return $this->em->find(CmsPage::class, $this->requestStack->getCurrentRequest()->get('childId'));
+        if ('admin_webetdesign_cms_cmssite_cmspage_edit' === $this->requestStack->getCurrentRequest()->attributes->get('_route')) {
+            return $this->em->find(CmsPage::class, $this->requestStack->getCurrentRequest()->attributes->get('childId'));
         }
 
         return $this->cmsHelper->getPage();

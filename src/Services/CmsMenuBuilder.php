@@ -229,7 +229,7 @@ class CmsMenuBuilder
                 $this->buildNodes($menuItem, $children, $parentActive, $activeClass, $locale);
             }
 
-            if ($this->isChildActive($menuItem) && !str_contains($liClass, 'active')) {
+            if ($this->isChildActive($menuItem) && !str_contains((string) $liClass, 'active')) {
                 $liClass .= ' '.$activeClass;
             }
 
@@ -251,7 +251,7 @@ class CmsMenuBuilder
     {
         $active = false;
         $class  = $item->getAttribute('class');
-        if (str_contains($class, 'active')) {
+        if (str_contains((string) $class, 'active')) {
             $active = true;
         }
         foreach ($item->getChildren() as $child) {
@@ -261,7 +261,7 @@ class CmsMenuBuilder
                 }
             } else {
                 $class = $child->getAttribute('class');
-                if (str_contains($class, 'active')) {
+                if (str_contains((string) $class, 'active')) {
                     $active = true;
                 }
             }
@@ -272,7 +272,7 @@ class CmsMenuBuilder
     public function isActive(CmsMenuItem $item)
     {
         $request         = $this->requestStack->getCurrentRequest();
-        $activeRouteName = $request->get('_route');
+        $activeRouteName = $request->attributes->get('_route');
         if (!$item->getPage()->getRoute()) {
             return false;
         }

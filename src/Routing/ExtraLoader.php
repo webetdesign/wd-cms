@@ -43,8 +43,6 @@ class ExtraLoader implements LoaderInterface
     public function load($resource, $type = null): RouteCollection
     {
         try {
-            $con = $this->em->getConnection();
-            $con->connect();
             $cmsRoutes = $this->em->getRepository(CmsRoute::class)->findAll();
         } catch (Exception $exception) {
             return new RouteCollection();
