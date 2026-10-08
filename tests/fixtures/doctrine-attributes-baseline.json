@@ -1,0 +1,1784 @@
+{
+  "WebEtDesign\\CmsBundle\\Entity\\CmsPage": {
+    "gedmo": {
+      "class": {
+        "Gedmo\\Mapping\\Annotation\\Loggable": {
+          "class": "Gedmo\\Mapping\\Annotation\\Loggable",
+          "values": {
+            "logEntryClass": "WebEtDesign\\CmsBundle\\Entity\\CmsLogEntry"
+          }
+        },
+        "Gedmo\\Mapping\\Annotation\\Tree": {
+          "class": "Gedmo\\Mapping\\Annotation\\Tree",
+          "values": {
+            "activateLocking": false,
+            "identifierMethod": null,
+            "lockingTimeout": 3,
+            "type": "nested"
+          }
+        }
+      },
+      "properties": {
+        "active": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "breadcrumb": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "createdAt": {
+          "Gedmo\\Mapping\\Annotation\\Timestampable": {
+            "class": "Gedmo\\Mapping\\Annotation\\Timestampable",
+            "values": {
+              "field": null,
+              "on": "create",
+              "value": null
+            }
+          }
+        },
+        "lft": {
+          "Gedmo\\Mapping\\Annotation\\TreeLeft": {
+            "class": "Gedmo\\Mapping\\Annotation\\TreeLeft",
+            "values": []
+          }
+        },
+        "lvl": {
+          "Gedmo\\Mapping\\Annotation\\TreeLevel": {
+            "class": "Gedmo\\Mapping\\Annotation\\TreeLevel",
+            "values": {
+              "base": 0
+            }
+          }
+        },
+        "ogDescription": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "ogImage": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "ogSiteName": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "ogTitle": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "ogType": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "parent": {
+          "Gedmo\\Mapping\\Annotation\\TreeParent": {
+            "class": "Gedmo\\Mapping\\Annotation\\TreeParent",
+            "values": []
+          }
+        },
+        "rgt": {
+          "Gedmo\\Mapping\\Annotation\\TreeRight": {
+            "class": "Gedmo\\Mapping\\Annotation\\TreeRight",
+            "values": []
+          }
+        },
+        "roles": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "root": {
+          "Gedmo\\Mapping\\Annotation\\TreeRoot": {
+            "class": "Gedmo\\Mapping\\Annotation\\TreeRoot",
+            "values": {
+              "identifierMethod": null
+            }
+          }
+        },
+        "seoDescription": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoKeywords": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoSitemapChangeFreq": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoSitemapPriority": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoTitle": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "site": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "slug": {
+          "Gedmo\\Mapping\\Annotation\\Slug": {
+            "class": "Gedmo\\Mapping\\Annotation\\Slug",
+            "values": {
+              "dateFormat": "Y-m-d-H:i",
+              "fields": [
+                "title"
+              ],
+              "handlers": [],
+              "prefix": "",
+              "separator": "-",
+              "style": "default",
+              "suffix": "",
+              "unique": false,
+              "uniqueOverTranslations": false,
+              "unique_base": null,
+              "updatable": true
+            }
+          },
+          "Gedmo\\Mapping\\Annotation\\SlugHandler": [
+            {
+              "class": "Gedmo\\Mapping\\Annotation\\SlugHandler",
+              "values": {
+                "class": "WebEtDesign\\CmsBundle\\Handler\\CmsPageSlugHandler",
+                "options": []
+              }
+            }
+          ],
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "title": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterCard": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterCreator": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterDescription": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterImage": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterSite": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterTitle": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "updatedAt": {
+          "Gedmo\\Mapping\\Annotation\\Timestampable": {
+            "class": "Gedmo\\Mapping\\Annotation\\Timestampable",
+            "values": {
+              "field": null,
+              "on": "update",
+              "value": null
+            }
+          }
+        }
+      }
+    },
+    "orm": {
+      "associationMappings": {
+        "children": {
+          "cascade": [
+            "remove"
+          ],
+          "fetch": 2,
+          "fieldName": "children",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": false,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": true,
+          "isOwningSide": false,
+          "mappedBy": "parent",
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "type": 4
+        },
+        "contents": {
+          "cascade": [
+            "persist",
+            "remove"
+          ],
+          "fetch": 2,
+          "fieldName": "contents",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": true,
+          "isOwningSide": false,
+          "mappedBy": "page",
+          "orderBy": {
+            "position": "ASC"
+          },
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsContent",
+          "type": 4
+        },
+        "crossSitePages": {
+          "cascade": [],
+          "fetch": 2,
+          "fieldName": "crossSitePages",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": false,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOnDeleteCascade": true,
+          "isOwningSide": true,
+          "joinTable": {
+            "inverseJoinColumns": [
+              {
+                "columnDefinition": null,
+                "name": "associated_page_id",
+                "nullable": true,
+                "onDelete": "CASCADE",
+                "referencedColumnName": "id",
+                "unique": false
+              }
+            ],
+            "joinColumns": [
+              {
+                "columnDefinition": null,
+                "name": "page_id",
+                "nullable": true,
+                "onDelete": "CASCADE",
+                "referencedColumnName": "id",
+                "unique": false
+              }
+            ],
+            "name": "cms__page_has_page",
+            "schema": null
+          },
+          "joinTableColumns": [
+            "page_id",
+            "associated_page_id"
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "relationToSourceKeyColumns": {
+            "page_id": "id"
+          },
+          "relationToTargetKeyColumns": {
+            "associated_page_id": "id"
+          },
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "type": 8
+        },
+        "declinations": {
+          "cascade": [
+            "persist",
+            "remove"
+          ],
+          "fetch": 2,
+          "fieldName": "declinations",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": true,
+          "isOwningSide": false,
+          "mappedBy": "page",
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination",
+          "type": 4
+        },
+        "menuItems": {
+          "cascade": [],
+          "fetch": 2,
+          "fieldName": "menuItems",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": false,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": false,
+          "mappedBy": "page",
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsMenuItem",
+          "type": 4
+        },
+        "ogImage": {
+          "cascade": [
+            "persist"
+          ],
+          "fetch": 2,
+          "fieldName": "ogImage",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "ogImage_id": "ogImage_id"
+          },
+          "joinColumns": [
+            {
+              "name": "ogImage_id",
+              "referencedColumnName": "id"
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "sourceToTargetKeyColumns": {
+            "ogImage_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\MediaBundle\\Entity\\Media",
+          "targetToSourceKeyColumns": {
+            "id": "ogImage_id"
+          },
+          "type": 2
+        },
+        "parent": {
+          "cascade": [],
+          "fetch": 2,
+          "fieldName": "parent",
+          "inversedBy": "children",
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": false,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "parent_id": "parent_id"
+          },
+          "joinColumns": [
+            {
+              "columnDefinition": null,
+              "name": "parent_id",
+              "nullable": true,
+              "onDelete": null,
+              "referencedColumnName": "id",
+              "unique": false
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "sourceToTargetKeyColumns": {
+            "parent_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "targetToSourceKeyColumns": {
+            "id": "parent_id"
+          },
+          "type": 2
+        },
+        "root": {
+          "cascade": [],
+          "fetch": 2,
+          "fieldName": "root",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": false,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "tree_root": "tree_root"
+          },
+          "joinColumns": [
+            {
+              "columnDefinition": null,
+              "name": "tree_root",
+              "nullable": true,
+              "onDelete": "CASCADE",
+              "referencedColumnName": "id",
+              "unique": false
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "sourceToTargetKeyColumns": {
+            "tree_root": "id"
+          },
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "targetToSourceKeyColumns": {
+            "id": "tree_root"
+          },
+          "type": 2
+        },
+        "route": {
+          "cascade": [
+            "persist",
+            "remove"
+          ],
+          "fetch": 2,
+          "fieldName": "route",
+          "inversedBy": "page",
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": true,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "route_id": "route_id"
+          },
+          "joinColumns": [
+            {
+              "columnDefinition": null,
+              "name": "route_id",
+              "nullable": true,
+              "onDelete": "CASCADE",
+              "referencedColumnName": "id",
+              "unique": true
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "sourceToTargetKeyColumns": {
+            "route_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsRoute",
+          "targetToSourceKeyColumns": {
+            "id": "route_id"
+          },
+          "type": 1
+        },
+        "site": {
+          "cascade": [],
+          "fetch": 2,
+          "fieldName": "site",
+          "inversedBy": "pages",
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": false,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "site_id": "site_id"
+          },
+          "joinColumns": [
+            {
+              "columnDefinition": null,
+              "name": "site_id",
+              "nullable": true,
+              "onDelete": "CASCADE",
+              "referencedColumnName": "id",
+              "unique": false
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "sourceToTargetKeyColumns": {
+            "site_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsSite",
+          "targetToSourceKeyColumns": {
+            "id": "site_id"
+          },
+          "type": 2
+        },
+        "twitterImage": {
+          "cascade": [
+            "persist"
+          ],
+          "fetch": 2,
+          "fieldName": "twitterImage",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "twitterImage_id": "twitterImage_id"
+          },
+          "joinColumns": [
+            {
+              "name": "twitterImage_id",
+              "referencedColumnName": "id"
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "sourceToTargetKeyColumns": {
+            "twitterImage_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\MediaBundle\\Entity\\Media",
+          "targetToSourceKeyColumns": {
+            "id": "twitterImage_id"
+          },
+          "type": 2
+        }
+      },
+      "cache": null,
+      "changeTrackingPolicy": 1,
+      "columnNames": {
+        "active": "active",
+        "breadcrumb": "breadcrumb",
+        "createdAt": "createdAt",
+        "id": "id",
+        "lft": "lft",
+        "lvl": "lvl",
+        "noIndex": "noIndex",
+        "ogDescription": "ogDescription",
+        "ogSiteName": "ogSiteName",
+        "ogTitle": "ogTitle",
+        "ogType": "ogType",
+        "rgt": "rgt",
+        "roles": "roles",
+        "seoDescription": "seoDescription",
+        "seoKeywords": "seoKeywords",
+        "seoSitemapChangeFreq": "seoSitemapChangeFreq",
+        "seoSitemapPriority": "seoSitemapPriority",
+        "seoTitle": "seoTitle",
+        "slug": "slug",
+        "template": "template",
+        "title": "title",
+        "twitterCard": "twitterCard",
+        "twitterCreator": "twitterCreator",
+        "twitterDescription": "twitterDescription",
+        "twitterSite": "twitterSite",
+        "twitterTitle": "twitterTitle",
+        "updatedAt": "updatedAt"
+      },
+      "containsEnumIdentifier": false,
+      "containsForeignIdentifier": false,
+      "customGeneratorDefinition": null,
+      "customRepositoryClassName": "WebEtDesign\\CmsBundle\\Repository\\CmsPageRepository",
+      "discriminatorColumn": null,
+      "discriminatorMap": [],
+      "discriminatorValue": null,
+      "embeddedClasses": [],
+      "entityListeners": [],
+      "fieldMappings": {
+        "active": {
+          "columnName": "active",
+          "fieldName": "active",
+          "length": null,
+          "nullable": false,
+          "options": {
+            "default": 0
+          },
+          "precision": null,
+          "scale": null,
+          "type": "boolean",
+          "unique": false
+        },
+        "breadcrumb": {
+          "columnName": "breadcrumb",
+          "fieldName": "breadcrumb",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "createdAt": {
+          "columnName": "createdAt",
+          "fieldName": "createdAt",
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "datetime",
+          "unique": false
+        },
+        "id": {
+          "columnName": "id",
+          "fieldName": "id",
+          "id": true,
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "integer",
+          "unique": false
+        },
+        "lft": {
+          "columnName": "lft",
+          "fieldName": "lft",
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "integer",
+          "unique": false
+        },
+        "lvl": {
+          "columnName": "lvl",
+          "fieldName": "lvl",
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "integer",
+          "unique": false
+        },
+        "noIndex": {
+          "columnName": "noIndex",
+          "fieldName": "noIndex",
+          "length": null,
+          "nullable": false,
+          "options": {
+            "default": false
+          },
+          "precision": null,
+          "scale": null,
+          "type": "boolean",
+          "unique": false
+        },
+        "ogDescription": {
+          "columnName": "ogDescription",
+          "fieldName": "ogDescription",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "text",
+          "unique": false
+        },
+        "ogSiteName": {
+          "columnName": "ogSiteName",
+          "fieldName": "ogSiteName",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "ogTitle": {
+          "columnName": "ogTitle",
+          "fieldName": "ogTitle",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "ogType": {
+          "columnName": "ogType",
+          "fieldName": "ogType",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "rgt": {
+          "columnName": "rgt",
+          "fieldName": "rgt",
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "integer",
+          "unique": false
+        },
+        "roles": {
+          "columnName": "roles",
+          "fieldName": "roles",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "array",
+          "unique": false
+        },
+        "seoDescription": {
+          "columnName": "seoDescription",
+          "fieldName": "seoDescription",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seoKeywords": {
+          "columnName": "seoKeywords",
+          "fieldName": "seoKeywords",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seoSitemapChangeFreq": {
+          "columnName": "seoSitemapChangeFreq",
+          "fieldName": "seoSitemapChangeFreq",
+          "length": 255,
+          "nullable": true,
+          "options": {
+            "default": "monthly"
+          },
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seoSitemapPriority": {
+          "columnName": "seoSitemapPriority",
+          "fieldName": "seoSitemapPriority",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "float",
+          "unique": false
+        },
+        "seoTitle": {
+          "columnName": "seoTitle",
+          "fieldName": "seoTitle",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "slug": {
+          "columnName": "slug",
+          "fieldName": "slug",
+          "length": 255,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "template": {
+          "columnName": "template",
+          "fieldName": "template",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "title": {
+          "columnName": "title",
+          "fieldName": "title",
+          "length": 255,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "twitterCard": {
+          "columnName": "twitterCard",
+          "fieldName": "twitterCard",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "twitterCreator": {
+          "columnName": "twitterCreator",
+          "fieldName": "twitterCreator",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "twitterDescription": {
+          "columnName": "twitterDescription",
+          "fieldName": "twitterDescription",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "text",
+          "unique": false
+        },
+        "twitterSite": {
+          "columnName": "twitterSite",
+          "fieldName": "twitterSite",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "twitterTitle": {
+          "columnName": "twitterTitle",
+          "fieldName": "twitterTitle",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "updatedAt": {
+          "columnName": "updatedAt",
+          "fieldName": "updatedAt",
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "datetime",
+          "unique": false
+        }
+      },
+      "fieldNames": {
+        "active": "active",
+        "breadcrumb": "breadcrumb",
+        "createdAt": "createdAt",
+        "id": "id",
+        "lft": "lft",
+        "lvl": "lvl",
+        "noIndex": "noIndex",
+        "ogDescription": "ogDescription",
+        "ogSiteName": "ogSiteName",
+        "ogTitle": "ogTitle",
+        "ogType": "ogType",
+        "rgt": "rgt",
+        "roles": "roles",
+        "seoDescription": "seoDescription",
+        "seoKeywords": "seoKeywords",
+        "seoSitemapChangeFreq": "seoSitemapChangeFreq",
+        "seoSitemapPriority": "seoSitemapPriority",
+        "seoTitle": "seoTitle",
+        "slug": "slug",
+        "template": "template",
+        "title": "title",
+        "twitterCard": "twitterCard",
+        "twitterCreator": "twitterCreator",
+        "twitterDescription": "twitterDescription",
+        "twitterSite": "twitterSite",
+        "twitterTitle": "twitterTitle",
+        "updatedAt": "updatedAt"
+      },
+      "generatorType": 1,
+      "idGenerator": null,
+      "identifier": [
+        "id"
+      ],
+      "inheritanceType": 1,
+      "isEmbeddedClass": false,
+      "isIdentifierComposite": false,
+      "isMappedSuperclass": false,
+      "isReadOnly": false,
+      "isVersioned": false,
+      "lifecycleCallbacks": [],
+      "name": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+      "namedNativeQueries": [],
+      "namedQueries": [],
+      "namespace": "WebEtDesign\\CmsBundle\\Entity",
+      "parentClasses": [],
+      "reflClass": {
+        "reflectionClass": "WebEtDesign\\CmsBundle\\Entity\\CmsPage"
+      },
+      "reflFields": [],
+      "requiresFetchAfterChange": false,
+      "rootEntityName": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+      "sequenceGeneratorDefinition": null,
+      "sqlResultSetMappings": [],
+      "subClasses": [],
+      "table": {
+        "name": "cms__page"
+      },
+      "tableGeneratorDefinition": null,
+      "versionField": null
+    }
+  },
+  "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination": {
+    "gedmo": {
+      "class": {
+        "Gedmo\\Mapping\\Annotation\\Loggable": {
+          "class": "Gedmo\\Mapping\\Annotation\\Loggable",
+          "values": {
+            "logEntryClass": "WebEtDesign\\CmsBundle\\Entity\\CmsLogEntry"
+          }
+        }
+      },
+      "properties": {
+        "ogDescription": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "ogImage": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "ogSiteName": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "ogTitle": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "ogType": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoDescription": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoKeywords": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoSitemapChangeFreq": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoSitemapPriority": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "seoTitle": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterCard": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterCreator": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterDescription": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterImage": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterSite": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        },
+        "twitterTitle": {
+          "Gedmo\\Mapping\\Annotation\\Versioned": {
+            "class": "Gedmo\\Mapping\\Annotation\\Versioned",
+            "values": []
+          }
+        }
+      }
+    },
+    "orm": {
+      "associationMappings": {
+        "contents": {
+          "cascade": [
+            "remove",
+            "persist"
+          ],
+          "fetch": 2,
+          "fieldName": "contents",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": true,
+          "isOwningSide": false,
+          "mappedBy": "declination",
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination",
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsContent",
+          "type": 4
+        },
+        "ogImage": {
+          "cascade": [
+            "persist"
+          ],
+          "fetch": 2,
+          "fieldName": "ogImage",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "ogImage_id": "ogImage_id"
+          },
+          "joinColumns": [
+            {
+              "name": "ogImage_id",
+              "referencedColumnName": "id"
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination",
+          "sourceToTargetKeyColumns": {
+            "ogImage_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\MediaBundle\\Entity\\Media",
+          "targetToSourceKeyColumns": {
+            "id": "ogImage_id"
+          },
+          "type": 2
+        },
+        "page": {
+          "cascade": [],
+          "fetch": 2,
+          "fieldName": "page",
+          "inversedBy": "declinations",
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": false,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "page_id": "page_id"
+          },
+          "joinColumns": [
+            {
+              "columnDefinition": null,
+              "name": "page_id",
+              "nullable": true,
+              "onDelete": "CASCADE",
+              "referencedColumnName": "id",
+              "unique": false
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination",
+          "sourceToTargetKeyColumns": {
+            "page_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPage",
+          "targetToSourceKeyColumns": {
+            "id": "page_id"
+          },
+          "type": 2
+        },
+        "twitterImage": {
+          "cascade": [
+            "persist"
+          ],
+          "fetch": 2,
+          "fieldName": "twitterImage",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "twitterImage_id": "twitterImage_id"
+          },
+          "joinColumns": [
+            {
+              "name": "twitterImage_id",
+              "referencedColumnName": "id"
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination",
+          "sourceToTargetKeyColumns": {
+            "twitterImage_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\MediaBundle\\Entity\\Media",
+          "targetToSourceKeyColumns": {
+            "id": "twitterImage_id"
+          },
+          "type": 2
+        }
+      },
+      "cache": null,
+      "changeTrackingPolicy": 1,
+      "columnNames": {
+        "active": "active",
+        "id": "id",
+        "locale": "locale",
+        "ogDescription": "ogDescription",
+        "ogSiteName": "ogSiteName",
+        "ogTitle": "ogTitle",
+        "ogType": "ogType",
+        "params": "params",
+        "seoDescription": "seoDescription",
+        "seoKeywords": "seoKeywords",
+        "seoSitemapChangeFreq": "seoSitemapChangeFreq",
+        "seoSitemapPriority": "seoSitemapPriority",
+        "seoTitle": "seoTitle",
+        "technic_name": "technic_name",
+        "title": "title",
+        "twitterCard": "twitterCard",
+        "twitterCreator": "twitterCreator",
+        "twitterDescription": "twitterDescription",
+        "twitterSite": "twitterSite",
+        "twitterTitle": "twitterTitle"
+      },
+      "containsEnumIdentifier": false,
+      "containsForeignIdentifier": false,
+      "customGeneratorDefinition": null,
+      "customRepositoryClassName": "WebEtDesign\\CmsBundle\\Repository\\CmsPageDeclinationRepository",
+      "discriminatorColumn": null,
+      "discriminatorMap": [],
+      "discriminatorValue": null,
+      "embeddedClasses": [],
+      "entityListeners": [],
+      "fieldMappings": {
+        "active": {
+          "columnName": "active",
+          "fieldName": "active",
+          "length": 255,
+          "nullable": false,
+          "options": {
+            "default": false
+          },
+          "precision": null,
+          "scale": null,
+          "type": "boolean",
+          "unique": false
+        },
+        "id": {
+          "columnName": "id",
+          "fieldName": "id",
+          "id": true,
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "integer",
+          "unique": false
+        },
+        "locale": {
+          "columnName": "locale",
+          "fieldName": "locale",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "ogDescription": {
+          "columnName": "ogDescription",
+          "fieldName": "ogDescription",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "text",
+          "unique": false
+        },
+        "ogSiteName": {
+          "columnName": "ogSiteName",
+          "fieldName": "ogSiteName",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "ogTitle": {
+          "columnName": "ogTitle",
+          "fieldName": "ogTitle",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "ogType": {
+          "columnName": "ogType",
+          "fieldName": "ogType",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "params": {
+          "columnName": "params",
+          "fieldName": "params",
+          "length": 255,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "text",
+          "unique": false
+        },
+        "seoDescription": {
+          "columnName": "seoDescription",
+          "fieldName": "seoDescription",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seoKeywords": {
+          "columnName": "seoKeywords",
+          "fieldName": "seoKeywords",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seoSitemapChangeFreq": {
+          "columnName": "seoSitemapChangeFreq",
+          "fieldName": "seoSitemapChangeFreq",
+          "length": 255,
+          "nullable": true,
+          "options": {
+            "default": "monthly"
+          },
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seoSitemapPriority": {
+          "columnName": "seoSitemapPriority",
+          "fieldName": "seoSitemapPriority",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "float",
+          "unique": false
+        },
+        "seoTitle": {
+          "columnName": "seoTitle",
+          "fieldName": "seoTitle",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "technic_name": {
+          "columnName": "technic_name",
+          "fieldName": "technic_name",
+          "length": 255,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "title": {
+          "columnName": "title",
+          "fieldName": "title",
+          "length": 255,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "twitterCard": {
+          "columnName": "twitterCard",
+          "fieldName": "twitterCard",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "twitterCreator": {
+          "columnName": "twitterCreator",
+          "fieldName": "twitterCreator",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "twitterDescription": {
+          "columnName": "twitterDescription",
+          "fieldName": "twitterDescription",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "text",
+          "unique": false
+        },
+        "twitterSite": {
+          "columnName": "twitterSite",
+          "fieldName": "twitterSite",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "twitterTitle": {
+          "columnName": "twitterTitle",
+          "fieldName": "twitterTitle",
+          "length": null,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        }
+      },
+      "fieldNames": {
+        "active": "active",
+        "id": "id",
+        "locale": "locale",
+        "ogDescription": "ogDescription",
+        "ogSiteName": "ogSiteName",
+        "ogTitle": "ogTitle",
+        "ogType": "ogType",
+        "params": "params",
+        "seoDescription": "seoDescription",
+        "seoKeywords": "seoKeywords",
+        "seoSitemapChangeFreq": "seoSitemapChangeFreq",
+        "seoSitemapPriority": "seoSitemapPriority",
+        "seoTitle": "seoTitle",
+        "technic_name": "technic_name",
+        "title": "title",
+        "twitterCard": "twitterCard",
+        "twitterCreator": "twitterCreator",
+        "twitterDescription": "twitterDescription",
+        "twitterSite": "twitterSite",
+        "twitterTitle": "twitterTitle"
+      },
+      "generatorType": 1,
+      "idGenerator": null,
+      "identifier": [
+        "id"
+      ],
+      "inheritanceType": 1,
+      "isEmbeddedClass": false,
+      "isIdentifierComposite": false,
+      "isMappedSuperclass": false,
+      "isReadOnly": false,
+      "isVersioned": false,
+      "lifecycleCallbacks": [],
+      "name": "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination",
+      "namedNativeQueries": [],
+      "namedQueries": [],
+      "namespace": "WebEtDesign\\CmsBundle\\Entity",
+      "parentClasses": [],
+      "reflClass": {
+        "reflectionClass": "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination"
+      },
+      "reflFields": [],
+      "requiresFetchAfterChange": false,
+      "rootEntityName": "WebEtDesign\\CmsBundle\\Entity\\CmsPageDeclination",
+      "sequenceGeneratorDefinition": null,
+      "sqlResultSetMappings": [],
+      "subClasses": [],
+      "table": {
+        "name": "cms__page_declination"
+      },
+      "tableGeneratorDefinition": null,
+      "versionField": null
+    }
+  },
+  "WebEtDesign\\CmsBundle\\Entity\\CmsSharedBlock": {
+    "gedmo": {
+      "class": [],
+      "properties": []
+    },
+    "orm": {
+      "associationMappings": {
+        "contents": {
+          "cascade": [
+            "persist",
+            "remove"
+          ],
+          "fetch": 2,
+          "fieldName": "contents",
+          "inversedBy": null,
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": true,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": true,
+          "isOwningSide": false,
+          "mappedBy": "sharedBlockParent",
+          "orderBy": {
+            "position": "ASC"
+          },
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsSharedBlock",
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsContent",
+          "type": 4
+        },
+        "site": {
+          "cascade": [],
+          "fetch": 2,
+          "fieldName": "site",
+          "inversedBy": "sharedBlocks",
+          "isCascadeDetach": false,
+          "isCascadeMerge": false,
+          "isCascadePersist": false,
+          "isCascadeRefresh": false,
+          "isCascadeRemove": false,
+          "isOwningSide": true,
+          "joinColumnFieldNames": {
+            "site_id": "site_id"
+          },
+          "joinColumns": [
+            {
+              "columnDefinition": null,
+              "name": "site_id",
+              "nullable": true,
+              "onDelete": "SET NULL",
+              "referencedColumnName": "id",
+              "unique": false
+            }
+          ],
+          "mappedBy": null,
+          "orphanRemoval": false,
+          "sourceEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsSharedBlock",
+          "sourceToTargetKeyColumns": {
+            "site_id": "id"
+          },
+          "targetEntity": "WebEtDesign\\CmsBundle\\Entity\\CmsSite",
+          "targetToSourceKeyColumns": {
+            "id": "site_id"
+          },
+          "type": 2
+        }
+      },
+      "cache": null,
+      "changeTrackingPolicy": 1,
+      "columnNames": {
+        "active": "active",
+        "code": "code",
+        "id": "id",
+        "label": "label",
+        "template": "template"
+      },
+      "containsEnumIdentifier": false,
+      "containsForeignIdentifier": false,
+      "customGeneratorDefinition": null,
+      "customRepositoryClassName": "WebEtDesign\\CmsBundle\\Repository\\CmsSharedBlockRepository",
+      "discriminatorColumn": null,
+      "discriminatorMap": [],
+      "discriminatorValue": null,
+      "embeddedClasses": [],
+      "entityListeners": [],
+      "fieldMappings": {
+        "active": {
+          "columnName": "active",
+          "fieldName": "active",
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "boolean",
+          "unique": false
+        },
+        "code": {
+          "columnName": "code",
+          "fieldName": "code",
+          "length": 255,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "id": {
+          "columnName": "id",
+          "fieldName": "id",
+          "id": true,
+          "length": null,
+          "nullable": false,
+          "precision": null,
+          "scale": null,
+          "type": "integer",
+          "unique": false
+        },
+        "label": {
+          "columnName": "label",
+          "fieldName": "label",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "template": {
+          "columnName": "template",
+          "fieldName": "template",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        }
+      },
+      "fieldNames": {
+        "active": "active",
+        "code": "code",
+        "id": "id",
+        "label": "label",
+        "template": "template"
+      },
+      "generatorType": 1,
+      "idGenerator": null,
+      "identifier": [
+        "id"
+      ],
+      "inheritanceType": 1,
+      "isEmbeddedClass": false,
+      "isIdentifierComposite": false,
+      "isMappedSuperclass": false,
+      "isReadOnly": false,
+      "isVersioned": false,
+      "lifecycleCallbacks": [],
+      "name": "WebEtDesign\\CmsBundle\\Entity\\CmsSharedBlock",
+      "namedNativeQueries": [],
+      "namedQueries": [],
+      "namespace": "WebEtDesign\\CmsBundle\\Entity",
+      "parentClasses": [],
+      "reflClass": {
+        "reflectionClass": "WebEtDesign\\CmsBundle\\Entity\\CmsSharedBlock"
+      },
+      "reflFields": [],
+      "requiresFetchAfterChange": false,
+      "rootEntityName": "WebEtDesign\\CmsBundle\\Entity\\CmsSharedBlock",
+      "sequenceGeneratorDefinition": null,
+      "sqlResultSetMappings": [],
+      "subClasses": [],
+      "table": {
+        "name": "cms__shared_block"
+      },
+      "tableGeneratorDefinition": null,
+      "versionField": null
+    }
+  },
+  "CmsLegacySeoTraitMappingFixture": {
+    "gedmo": {
+      "class": [],
+      "properties": []
+    },
+    "orm": {
+      "associationMappings": [],
+      "cache": null,
+      "changeTrackingPolicy": 1,
+      "columnNames": {
+        "seo_breadcrumb": "seo_breadcrumb",
+        "seo_description": "seo_description",
+        "seo_keywords": "seo_keywords",
+        "seo_title": "seo_title"
+      },
+      "containsEnumIdentifier": false,
+      "containsForeignIdentifier": false,
+      "customGeneratorDefinition": null,
+      "customRepositoryClassName": null,
+      "discriminatorColumn": null,
+      "discriminatorMap": [],
+      "discriminatorValue": null,
+      "embeddedClasses": [],
+      "entityListeners": [],
+      "fieldMappings": {
+        "seo_breadcrumb": {
+          "columnName": "seo_breadcrumb",
+          "fieldName": "seo_breadcrumb",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seo_description": {
+          "columnName": "seo_description",
+          "fieldName": "seo_description",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seo_keywords": {
+          "columnName": "seo_keywords",
+          "fieldName": "seo_keywords",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        },
+        "seo_title": {
+          "columnName": "seo_title",
+          "fieldName": "seo_title",
+          "length": 255,
+          "nullable": true,
+          "precision": null,
+          "scale": null,
+          "type": "string",
+          "unique": false
+        }
+      },
+      "fieldNames": {
+        "seo_breadcrumb": "seo_breadcrumb",
+        "seo_description": "seo_description",
+        "seo_keywords": "seo_keywords",
+        "seo_title": "seo_title"
+      },
+      "generatorType": 5,
+      "idGenerator": null,
+      "identifier": [],
+      "inheritanceType": 1,
+      "isEmbeddedClass": false,
+      "isIdentifierComposite": false,
+      "isMappedSuperclass": false,
+      "isReadOnly": false,
+      "isVersioned": false,
+      "lifecycleCallbacks": [],
+      "name": "CmsLegacySeoTraitMappingFixture",
+      "namedNativeQueries": [],
+      "namedQueries": [],
+      "namespace": "",
+      "parentClasses": [],
+      "reflClass": {
+        "reflectionClass": "CmsLegacySeoTraitMappingFixture"
+      },
+      "reflFields": [],
+      "requiresFetchAfterChange": false,
+      "rootEntityName": "CmsLegacySeoTraitMappingFixture",
+      "sequenceGeneratorDefinition": null,
+      "sqlResultSetMappings": [],
+      "subClasses": [],
+      "table": {
+        "name": "CmsLegacySeoTraitMappingFixture"
+      },
+      "tableGeneratorDefinition": null,
+      "versionField": null
+    }
+  }
+}

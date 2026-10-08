@@ -4,7 +4,7 @@
 namespace WebEtDesign\CmsBundle\EventListener;
 
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PostLoadEventArgs;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Entity\CmsContentTypeEnum;
@@ -32,7 +32,7 @@ class SharedBlockListener
         $this->container           = $container;
     }
 
-    public function postLoad(LifecycleEventArgs $event)
+    public function postLoad(PostLoadEventArgs $event)
     {
         $sharedBlock = $event->getObject();
 

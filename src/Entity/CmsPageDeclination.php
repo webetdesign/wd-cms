@@ -25,11 +25,6 @@ class CmsPageDeclination implements Loggable
     use SmoTwitterTrait;
 
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
@@ -38,8 +33,6 @@ class CmsPageDeclination implements Loggable
     /**
      * @var CmsPage|null
      *
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="declinations")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
      */
     #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'declinations')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
@@ -47,7 +40,6 @@ class CmsPageDeclination implements Loggable
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
@@ -55,7 +47,6 @@ class CmsPageDeclination implements Loggable
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
      *
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
@@ -64,7 +55,6 @@ class CmsPageDeclination implements Loggable
 
     /**
      * @var ?string
-     * @ORM\Column(type="string", length=255, nullable=true)
      *
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
@@ -73,14 +63,12 @@ class CmsPageDeclination implements Loggable
     /**
      * @var ArrayCollection|PersistentCollection
      *
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="declination", cascade={"remove", "persist"})
      */
     #[ORM\OneToMany(mappedBy: 'declination', targetEntity: CmsContent::class, cascade: ['remove', 'persist'])]
     private PersistentCollection|ArrayCollection $contents;
 
     /**
      * @var bool
-     * @ORM\Column(type="boolean", length=255, nullable=false, options={"default": false})
      */
     #[ORM\Column(type: Types::BOOLEAN, length: 255, nullable: false, options: ['default' => false])]
 
@@ -88,7 +76,6 @@ class CmsPageDeclination implements Loggable
 
     /**
      * @var string
-     * @ORM\Column(type="text", length=255, nullable=false)
      */
     #[ORM\Column(type: Types::TEXT, length: 255, nullable: false)]
 

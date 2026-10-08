@@ -37,7 +37,7 @@ class SiteAdminListener
 
     public function prePersist($event): void
     {
-        $em = $event->getEntityManager();
+        $em = $event->getObjectManager();
         /** @var CmsSite $site */
         $site = $event->getObject();
 

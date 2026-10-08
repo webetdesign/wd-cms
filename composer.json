@@ -25,7 +25,7 @@
         "doctrine/common": "^2.11 || ^3.1",
         "doctrine/doctrine-bundle": "^1.12 || ^2.0",
         "doctrine/inflector": "^2.0 || ^1.1",
-        "doctrine/orm": "^2.6",
+        "doctrine/orm": "^2.20 || ^3.3",
         "sonata-project/block-bundle": "^5.0",
         "sonata-project/admin-bundle": "4.* || ^3.45",
         "stof/doctrine-extensions-bundle": "^1.3",

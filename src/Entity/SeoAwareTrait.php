@@ -13,7 +13,6 @@ trait SeoAwareTrait
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $seo_title;
@@ -21,7 +20,6 @@ trait SeoAwareTrait
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $seo_description;
@@ -29,7 +27,6 @@ trait SeoAwareTrait
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $seo_keywords;
@@ -37,7 +34,6 @@ trait SeoAwareTrait
     /**
      * @var string|null
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private $seo_breadcrumb;
