@@ -73,3 +73,17 @@ Lexical inspection cannot prove absence of dynamic APIs or compatibility of ever
 No other runtime annotations were found in this bundle's `src/` PHPDoc after cleanup. External Gedmo TimestampableEntity still has legacy annotations and is intentionally untouched.
 
 Official migration reference: https://github.com/doctrine/orm/blob/3.3.0/UPGRADE.md (removed annotations driver, ClassMetadataInfo, LifecycleEventArgs, ORMException; PARTIAL compatibility from 3.3). ORM 3 lifecycle events inherit Doctrine Persistence LifecycleEventArgs with getObject()/getObjectManager().
+
+## Symfony 7 controller and bundle build regressions
+
+```sh
+php tests/controller-declination.php /path/to/integration/vendor/autoload.php
+php tests/bundle-build.php /path/to/integration/vendor/autoload.php
+```
+
+Both standalone tests prepend the candidate namespace loader and assert the source filename. No application kernel, database, secrets or network are used.
+
+- Declination: eight cases using a real ContainerBuilder, RequestStack (main + current subrequest), CmsPage/CmsRoute/CmsPageDeclination. Exact path, ignored query, configured lowercase extension with/without query, disabled extension exact match/non-match, uppercase extension and unknown path assert entity identity or null. The inherited request_stack service subscription is checked. Only the removed AbstractController::get shortcut is replaced with access through its existing injected container; matching and CMS configuration remain unchanged.
+- Build: real Symfony DebugClassLoader captures the specific future native void return-type deprecation, then real build() must register BlockPass, TemplatePass and ConfigurationPass in order. This is not a claim that those passes or the whole application compile successfully.
+
+The exact-path case failed before the controller fix with undefined BaseCmsController::get(). The build test separately failed before adding : void with the actual Symfony deprecation. Additional declination cases characterize unchanged behavior; they require no additional production changes. Verified on PHP 8.2.27, Symfony 7.4.20 and ORM 3.7.4. No universal compatibility or complete application QA is implied.
