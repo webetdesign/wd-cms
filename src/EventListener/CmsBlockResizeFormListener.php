@@ -15,15 +15,15 @@ use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
 class CmsBlockResizeFormListener implements EventSubscriberInterface
 {
-    /**
-     * $type and $options are private in ResizeFormListener since Symfony 7,
-     * so this listener keeps its own copy.
-     */
+    private string $entryType;
+    private array $entryOptions;
+    private ResizeFormListener $resizeFormListener;
+
     public function __construct(
         private readonly TemplateRegistry $templateRegistry,
         private readonly BlockRegistry $blockRegistry,
-        private readonly string $type,
-        private readonly array $options = [],
+        string $type,
+        array $options = [],
         bool $allowAdd = false,
         bool $allowDelete = false,
         $deleteEmpty = false,
@@ -33,20 +33,14 @@ class CmsBlockResizeFormListener implements EventSubscriberInterface
         $this->resizeFormListener = new ResizeFormListener($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
     }
 
-    /**
-     * The rows are built on PRE_SET_DATA by preSetData() below: the parent
-     * POST_SET_DATA listener would only report that override as deprecated.
-     */
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::PRE_SUBMIT   => 'preSubmit',
-            // (MergeCollectionListener, MergeDoctrineCollectionListener)
-            FormEvents::SUBMIT       => ['onSubmit', 50],
+            FormEvents::POST_SET_DATA => 'postSetData',
+            FormEvents::PRE_SUBMIT => 'preSubmit',
+            FormEvents::SUBMIT => ['onSubmit', 50],
         ];
     }
-
 
     public function preSubmit(FormEvent $event): void
     {
@@ -87,8 +81,8 @@ class CmsBlockResizeFormListener implements EventSubscriberInterface
                     $template = $value->getDeclination()->getPage()->getTemplate();
                 } elseif ($value->getSharedBlockParent()) {
                     $template = $value->getSharedBlockParent()->getTemplate();
-                } elseif (isset($this->options['template_code'])) {
-                    $template = $this->options['template_code'];
+                } elseif (isset($this->entryOptions['template_code'])) {
+                    $template = $this->entryOptions['template_code'];
                 }
 
                 if (isset($template)) {
