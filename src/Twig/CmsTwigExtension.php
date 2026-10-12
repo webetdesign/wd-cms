@@ -45,6 +45,7 @@ class CmsTwigExtension extends AbstractExtension
     private BlockRegistry        $blockRegistry;
     private CmsHelper            $cmsHelper;
     private array                $configCms;
+    protected array              $customContents;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -70,6 +71,7 @@ class CmsTwigExtension extends AbstractExtension
         $this->declinationService = $declinationService;
         $this->blockRegistry      = $blockRegistry;
         $this->cmsHelper          = $cmsHelper;
+        $this->customContents     = [];
     }
 
     public function getTests(): array

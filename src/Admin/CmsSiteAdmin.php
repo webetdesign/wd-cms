@@ -134,7 +134,7 @@ final class CmsSiteAdmin extends AbstractAdmin
         }
 
         if ($this->cmsConfig['declination'] && $childAdmin instanceof CmsPageAdmin) {
-            $requestRouteName = $this->getRequest()->get('_route');
+            $requestRouteName = $this->getRequest()->attributes->get('_route');
 
             // Sonata ne gérant pas le troisième niveau d'admin test sur les routeNames directement
 

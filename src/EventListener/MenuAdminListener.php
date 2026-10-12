@@ -4,22 +4,22 @@
 namespace WebEtDesign\CmsBundle\EventListener;
 
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use WebEtDesign\CmsBundle\Entity\CmsMenu;
 use WebEtDesign\CmsBundle\Entity\CmsMenuItem;
 
 class MenuAdminListener
 {
-    public function postPersist($event): void
+    public function postPersist(LifecycleEventArgs $event): void
     {
-        $menu = $event->getEntity();
+        $menu = $event->getObject();
 
         if (!$menu instanceof CmsMenu) {
             return;
         }
 
         if ($menu->initRoot) {
-            $em = $event->getEntityManager();
+            $em = $event->getObjectManager();
 
             $root = new CmsMenuItem();
             $root->setName('root ' . $menu->getSite() . ' ' . $menu->getLabel());

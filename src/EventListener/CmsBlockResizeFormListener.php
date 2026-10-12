@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace WebEtDesign\CmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -11,7 +13,7 @@ use WebEtDesign\CmsBundle\Entity\CmsContent;
 use WebEtDesign\CmsBundle\Registry\BlockRegistry;
 use WebEtDesign\CmsBundle\Registry\TemplateRegistry;
 
-class CmsBlockResizeFormListener extends ResizeFormListener
+class CmsBlockResizeFormListener implements EventSubscriberInterface
 {
     /**
      * $type and $options are private in ResizeFormListener since Symfony 7,
@@ -26,7 +28,9 @@ class CmsBlockResizeFormListener extends ResizeFormListener
         bool $allowDelete = false,
         $deleteEmpty = false,
     ) {
-        parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
+        $this->entryType = $type;
+        $this->entryOptions = $options;
+        $this->resizeFormListener = new ResizeFormListener($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
     }
 
     /**
@@ -44,7 +48,17 @@ class CmsBlockResizeFormListener extends ResizeFormListener
     }
 
 
-    public function preSetData(FormEvent $event): void
+    public function preSubmit(FormEvent $event): void
+    {
+        $this->resizeFormListener->preSubmit($event);
+    }
+
+    public function onSubmit(FormEvent $event): void
+    {
+        $this->resizeFormListener->onSubmit($event);
+    }
+
+    public function postSetData(FormEvent|PostSetDataEvent $event): void
     {
         $form = $event->getForm();
         /** @var CmsContent $data */
@@ -81,11 +95,11 @@ class CmsBlockResizeFormListener extends ResizeFormListener
                     $tpl     = $this->templateRegistry->get($template);
                     $config  = $tpl->getBlock($value->getCode());
                     $block   = $config ? $this->blockRegistry->get($config) : null;
-                    $options = array_merge($this->options, ['block' => $block, 'config' => $config]);
+                    $options = array_merge($this->entryOptions, ['block' => $block, 'config' => $config]);
 
-                    $form->add($name, $this->type, array_replace([
+                    $form->add($name, $this->entryType, array_replace([
                         'property_path' => '[' . $name . ']',
-                    ], $options ?? $this->options));
+                    ], $options ?? $this->entryOptions));
                 }
             }
         }

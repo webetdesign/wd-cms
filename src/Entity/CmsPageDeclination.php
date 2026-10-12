@@ -23,73 +23,33 @@ class CmsPageDeclination implements Loggable
     use SeoAwareTrait;
     use SmoOpenGraphTrait;
     use SmoTwitterTrait;
-
-
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
-
-    /**
-     * @var CmsPage|null
-     *
-     * @ORM\ManyToOne(targetEntity="WebEtDesign\CmsBundle\Entity\CmsPage", inversedBy="declinations")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
-     */
+    
     #[ORM\ManyToOne(targetEntity: CmsPage::class, inversedBy: 'declinations')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?CmsPage $page = null;
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
+    
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     private string $title = '';
-
-    /**
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     */
+    
     #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
 
     private string $technic_name = '';
-
-    /**
-     * @var ?string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     *
-     */
+    
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $locale = null;
-
-    /**
-     * @var ArrayCollection|PersistentCollection
-     *
-     * @ORM\OneToMany(targetEntity="WebEtDesign\CmsBundle\Entity\CmsContent", mappedBy="declination", cascade={"remove", "persist"})
-     */
+    
     #[ORM\OneToMany(mappedBy: 'declination', targetEntity: CmsContent::class, cascade: ['remove', 'persist'])]
     private PersistentCollection|ArrayCollection $contents;
-
-    /**
-     * @var bool
-     * @ORM\Column(type="boolean", length=255, nullable=false, options={"default": false})
-     */
+    
     #[ORM\Column(type: Types::BOOLEAN, length: 255, nullable: false, options: ['default' => false])]
 
     private bool $active = false;
-
-    /**
-     * @var string
-     * @ORM\Column(type="text", length=255, nullable=false)
-     */
+    
     #[ORM\Column(type: Types::TEXT, length: 255, nullable: false)]
 
     private string $params = '[]';
